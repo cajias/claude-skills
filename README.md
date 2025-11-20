@@ -22,6 +22,16 @@ Automate GitHub issue management workflows including:
 - Removing redundant labels
 - Organizing issue dependencies
 
+### [Software Effort Estimation & Codebase Valuation](./skills/software-effort-estimation/)
+
+Generate comprehensive software effort estimation reports including:
+- Automated codebase analysis (LOC, commits, contributors)
+- Five independent estimation models (COCOMO II, Industry Benchmarks, Infrastructure Multiplier, Blended Hybrid, Team Analysis)
+- Productivity multiplier analysis (LLM-assisted vs traditional development)
+- Three-stage verification process with 90%+ accuracy
+- Professional 15,000+ word reports with strategic recommendations
+- Reproducible methodology with complete command documentation
+
 ## Available Plugins
 
 ### [PR Monitor](./plugins/pr-monitor/)
