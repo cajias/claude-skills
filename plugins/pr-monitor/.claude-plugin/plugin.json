@@ -1,0 +1,12 @@
+{
+  "name": "pr-monitor",
+  "version": "1.0.0",
+  "description": "Automated PR monitoring with Stop hook that auto-resumes Claude Code when new commits are detected",
+  "author": "cajias",
+  "repository": "https://github.com/cajias/claude-skills",
+  "license": "MIT",
+  "keywords": ["pr", "monitoring", "github", "automation", "hooks"],
+  "requirements": {
+    "gh": "GitHub CLI (gh) v2.0.0 or higher - Install: https://cli.github.com/"
+  }
+}

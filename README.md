@@ -22,6 +22,17 @@ Automate GitHub issue management workflows including:
 - Removing redundant labels
 - Organizing issue dependencies
 
+## Available Plugins
+
+### [PR Monitor](./plugins/pr-monitor/)
+
+Automated GitHub pull request monitoring with event-driven hooks:
+- Automatically detects new commits in monitored PRs
+- Auto-resumes Claude Code when changes are detected
+- Supports monitoring multiple PRs simultaneously
+- Includes Stop hook + PR monitor skill
+- Auto-cleanup when PR is merged or closed
+
 ## Using Skills
 
 Skills can be invoked by Claude when working on related tasks. Each skill directory contains:
@@ -30,15 +41,37 @@ Skills can be invoked by Claude when working on related tasks. Each skill direct
 - `skill.md` - The skill prompt and detailed instructions
 - `examples/` - Example workflows and outputs (when applicable)
 
+## Using Plugins
+
+Plugins extend Claude Code with hooks, skills, and other capabilities. Each plugin directory contains:
+
+- `.claude-plugin/plugin.json` - Plugin metadata
+- `hooks/` - Hook definitions and scripts
+- `skills/` - Bundled skills
+- `README.md` - Plugin documentation
+
+**Installation:**
+```bash
+claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
+```
+
 ## Contributing
 
-To add a new skill:
+**To add a new skill:**
 
 1. Create a new directory under `skills/`
 2. Add a `README.md` with skill overview
 3. Add a `skill.md` with detailed instructions
 4. Include examples if applicable
 5. Update this main README with the new skill
+
+**To add a new plugin:**
+
+1. Create a new directory under `plugins/`
+2. Add `.claude-plugin/plugin.json` with metadata
+3. Add `hooks/`, `skills/`, or other components
+4. Add a `README.md` with documentation
+5. Update this main README with the new plugin
 
 ## License
 
