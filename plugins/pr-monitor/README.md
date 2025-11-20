@@ -2,6 +2,8 @@
 
 Automated GitHub pull request monitoring for Claude Code. Automatically resumes Claude when new commits are detected.
 
+> 📖 **New to this plugin?** See the [Complete Usage Guide](./USAGE-GUIDE.md) for step-by-step instructions, troubleshooting, and examples.
+
 ## Overview
 
 This plugin provides:
@@ -382,6 +384,12 @@ MIT License - See LICENSE file for details
 
 cajias
 
+## Documentation
+
+- 📘 [**Complete Usage Guide**](./USAGE-GUIDE.md) - Comprehensive how-to guide with examples
+- 📋 [**PR Monitor Skill**](./skills/pr-monitor/SKILL.md) - Detailed skill instructions
+- 🔧 [**Stop Hook Script**](./scripts/Stop.sh) - Hook implementation
+
 ## Support
 
 - **Issues**: https://github.com/cajias/claude-skills/issues
@@ -403,3 +411,4 @@ cajias
 - PR monitor skill
 - Multi-PR support
 - Auto-cleanup on merge/close
+- Comprehensive usage guide with troubleshooting and examples
