@@ -1,0 +1,3 @@
+{
+  "extends": "@sca-skills/markdownlint-config"
+}
