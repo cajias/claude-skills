@@ -214,13 +214,13 @@ Average = (450 + 282 + 585 + 400) / 4
 
 ## Model Convergence Analysis
 
-| Model | Estimate | Variance from Mean |
-|-------|----------|--------------------|
-| COCOMO II | 450 PM | +4.7% |
-| Industry Benchmark | 282 PM | -34.4% ⚠ |
-| Infrastructure Multiplier | 585 PM | +36.0% ⚠ |
-| Blended Hybrid | 400 PM | -6.9% |
-| **Mean** | **429 PM** | - |
+| Model                     | Estimate   | Variance from Mean |
+| ------------------------- | ---------- | ------------------ |
+| COCOMO II                 | 450 PM     | +4.7%              |
+| Industry Benchmark        | 282 PM     | -34.4% ⚠           |
+| Infrastructure Multiplier | 585 PM     | +36.0% ⚠           |
+| Blended Hybrid            | 400 PM     | -6.9%              |
+| **Mean**                  | **429 PM** | -                  |
 
 **Consensus Range:** 400-585 person-months
 

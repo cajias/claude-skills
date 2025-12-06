@@ -293,7 +293,7 @@ rm /tmp/claude_monitor_pr_*
    REPO_PATH=/path/to/repo
    PR_NUMBER=123
    CURRENT_SHA=$(cd "$REPO_PATH" && gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
-   
+
    cat > /tmp/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
    $REPO_PATH
    $PR_NUMBER
@@ -315,7 +315,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # Check rate limit status
    gh api rate_limit
-   
+
    # Output shows remaining requests
    # Wait if limit exceeded (resets hourly)
    ```
@@ -325,7 +325,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # Re-authenticate
    gh auth login
-   
+
    # Select GitHub.com
    # Choose authentication method
    # Follow prompts
@@ -336,7 +336,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # Verify you have access to the repository
    gh repo view OWNER/REPO
-   
+
    # If access denied, request access from repo owner
    ```
 
@@ -352,7 +352,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # List all monitored PRs
    ls -la /tmp/claude_monitor_pr_*
-   
+
    # Remove unwanted monitors
    rm /tmp/claude_monitor_pr_<repo>_<pr>
    ```
@@ -369,7 +369,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # Run hook manually to see output
    echo '{"stop_hook_active": false}' | ~/.claude/plugins/pr-monitor/scripts/Stop.sh
-   
+
    # Should output JSON with "decision": "block" when new commits exist
    ```
 
@@ -378,7 +378,7 @@ rm /tmp/claude_monitor_pr_*
    ```bash
    # Get current SHA from GitHub
    gh pr view PR_NUMBER --json headRefOid --jq '.headRefOid'
-   
+
    # Compare with SHA in state file
    cat /tmp/claude_monitor_pr_<repo>_<pr> | sed -n '3p'
    ```
@@ -449,17 +449,17 @@ PR_NUMBERS=("$@")
 
 for pr in "${PR_NUMBERS[@]}"; do
   echo "Setting up monitoring for PR #$pr..."
-  
+
   cd "$REPO_PATH"
   CURRENT_SHA=$(gh pr view "$pr" --json headRefOid --jq '.headRefOid')
   REPO_NAME=$(basename "$REPO_PATH")
-  
+
   cat > /tmp/claude_monitor_pr_${REPO_NAME}_${pr} <<EOF
 $REPO_PATH
 $pr
 $CURRENT_SHA
 EOF
-  
+
   echo "✓ Monitoring enabled for PR #$pr"
 done
 

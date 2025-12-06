@@ -250,7 +250,7 @@ average_multiplier = 53x
    mean = 435
    std_dev = 135
    coeff_variation = (135 / 435) * 100  # = 31%
-   
+
    # Flag outliers >20% from mean
    # Document variance explanations
    ```
@@ -262,8 +262,8 @@ automated_accuracy = 0.98  # % of automated counts that match
 manual_pass_rate = 0.92     # % of spot-checks that pass
 convergence = 0.85 if coeff_variation < 25 else 0.70
 
-confidence = (automated_accuracy * 0.5 + 
-              manual_pass_rate * 0.3 + 
+confidence = (automated_accuracy * 0.5 +
+              manual_pass_rate * 0.3 +
               convergence * 0.2)
 
 # "High" if >0.85, "Medium" if >0.70, else "Low"

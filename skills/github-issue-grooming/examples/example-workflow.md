@@ -52,13 +52,13 @@ gh api repos/cajias/mcp-lite/milestones -X POST \
 
 **Milestone Mapping:**
 
-| Phase | Milestone Number | Title |
-|-------|------------------|-------|
-| Phase 1 | 2 | Core Infrastructure |
-| Phase 2 | 3 | MCP Server Management |
-| Phase 3 | 4 | HTTP API Layer |
-| Phase 4 | 1 | Dashboard UI (existing) |
-| Phase 5 | 5 | Testing & Polish |
+| Phase   | Milestone Number | Title                   |
+| ------- | ---------------- | ----------------------- |
+| Phase 1 | 2                | Core Infrastructure     |
+| Phase 2 | 3                | MCP Server Management   |
+| Phase 3 | 4                | HTTP API Layer          |
+| Phase 4 | 1                | Dashboard UI (existing) |
+| Phase 5 | 5                | Testing & Polish        |
 
 ### Step 3: Issue Organization
 
