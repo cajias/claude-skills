@@ -4,19 +4,14 @@
   "description": "Collection of Claude Code skills",
   "private": true,
   "scripts": {
-    "lint": "npm run lint:js && npm run lint:md",
-    "lint:js": "npx eslint .",
+    "lint": "npm run lint:md",
     "lint:md": "npx markdownlint '**/*.md' --ignore node_modules",
-    "lint:fix": "npm run lint:js:fix && npm run lint:md:fix",
-    "lint:js:fix": "npx eslint . --fix",
+    "lint:fix": "npm run lint:md:fix",
     "lint:md:fix": "npx markdownlint '**/*.md' --ignore node_modules --fix",
-    "format": "npx prettier --write '**/*.{ts,tsx,js,jsx,json,md}' --ignore-path .gitignore",
-    "format:check": "npx prettier --check '**/*.{ts,tsx,js,jsx,json,md}' --ignore-path .gitignore"
+    "format": "npx prettier --write '**/*.{md,json,yml,yaml}' --ignore-path .gitignore",
+    "format:check": "npx prettier --check '**/*.{md,json,yml,yaml}' --ignore-path .gitignore"
   },
   "devDependencies": {
-    "@sca-skills/eslint-config": "^1.0.2",
-    "@sca-skills/markdownlint-config": "^1.0.0",
-    "eslint": "^9.16.0",
     "markdownlint-cli": "^0.43.0",
     "prettier": "^3.7.1"
   },

@@ -16,7 +16,6 @@ Thumbs.db
 
 # Node modules (if adding JavaScript tools)
 node_modules/
-package-lock.json
 
 # Python (if adding Python tools)
 __pycache__/
