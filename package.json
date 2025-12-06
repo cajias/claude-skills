@@ -21,11 +21,11 @@
   },
   "lint-staged": {
     "*.{json,yml,yaml}": [
-      "prettier --write"
+      "npx prettier --write"
     ],
     "*.md": [
-      "markdownlint --fix",
-      "prettier --write"
+      "npx markdownlint --fix",
+      "npx prettier --write"
     ]
   },
   "keywords": [
