@@ -1,11 +1,13 @@
 # Example Workflow: Omega Platform Analysis
 
-Complete software effort estimation analysis of a complex infrastructure project demonstrating the five-model approach and productivity multiplier calculation.
+Complete software effort estimation analysis of a complex infrastructure project demonstrating the
+five-model approach and productivity multiplier calculation.
 
 ## Repository Context
 
 - **Project**: Omega Platform (AWS CDK/serverless application)
-- **Technology Stack**: TypeScript, Go, Smithy, AWS CDK, Lambda, DynamoDB, EventBridge
+- **Technology Stack**: TypeScript, Go, Smithy, AWS CDK, Lambda, DynamoDB,
+  EventBridge
 - **Architecture**: Event-driven microservices with WASM plugins
 - **Total Code**: 93,160 lines across multiple languages
 - **Development Timeline**: 7.6 months (Jan 15 - Aug 28, 2024)
@@ -23,7 +25,7 @@ cd /path/to/omega-platform
 
 ### Git Statistics (`git_stats.txt`)
 
-```
+```text
 Total Commits: 998
 Active Development Days: 187 days
 
@@ -41,7 +43,7 @@ Timeline:
 
 ### Code Metrics (`metrics/cloc_summary.txt`)
 
-```
+```text
 Language            files    blank   comment      code
 ----------------------------------------------------
 TypeScript            178     8420      3120     53080
@@ -61,13 +63,14 @@ Test ratio: 1.33:1 (production:test)
 ```
 
 **Generated Code Detection:**
+
 - Smithy models generate 39,960 lines of TypeScript (42.9% of TS code)
 - Hand-written TypeScript: 13,120 lines
 - Hand-written production: 74,530 lines (TS + Go + Smithy definitions)
 
 ### Infrastructure Inventory (`infrastructure.txt`)
 
-```
+```text
 AWS CDK Components:
   Lambda functions: 23
   CDK stacks: 8
@@ -92,6 +95,7 @@ File Types:
 ### Model 1: COCOMO II
 
 **Parameters:**
+
 - Production KLOC: 53.2 (53,200 lines)
 - Complexity Multipliers:
   - Product Complexity: 1.74 (distributed/event-driven)
@@ -103,7 +107,8 @@ File Types:
   - Combined M = 2.15
 
 **Calculation:**
-```
+
+```text
 Effort = 3.0 × (53.2^1.12) × 2.15
       = 3.0 × 69.8 × 2.15
       = 450 person-months
@@ -116,11 +121,12 @@ Optimal Team = 450 / 21.3
              = 21 developers
 ```
 
-**Result: 450 person-months**
+#### Result: 450 person-months
 
 ### Model 2: Industry Benchmarks
 
 **Complexity Classification:**
+
 - ✓ Distributed architecture
 - ✓ Real-time processing (EventBridge)
 - ✓ Multi-language (TypeScript, Go, Smithy)
@@ -129,22 +135,24 @@ Optimal Team = 450 / 21.3
 - ✓ WASM plugins
 - ✓ Microservices (23 Lambda functions)
 
-**Score: 7/8 indicators = Very High Complexity**
+#### Score: 7/8 indicators = Very High Complexity
 
 **Calculation:**
-```
+
+```text
 Productivity Rate: 12 LOC/day (very high complexity)
 Production LOC: 74,530 (hand-written TS + Go + Smithy)
 Developer-Days: 74,530 / 12 = 6,211 days
 Person-Months: 6,211 / 22 = 282 person-months
 ```
 
-**Result: 282 person-months** (more conservative than COCOMO)
+#### Result: 282 person-months (more conservative than COCOMO)
 
 ### Model 3: Infrastructure Multiplier
 
 **Component-Based Calculation:**
-```
+
+```text
 Lambda (23 × 2.5 days):      57.5 days
 CDK Stack (8 × 4 days):      32.0 days
 DynamoDB (12 × 2.5 days):    30.0 days
@@ -161,17 +169,19 @@ Total:                       262 days = 12 person-months
 **Code-only estimate:** 450 PM (from COCOMO)
 
 **Infrastructure premium approach:**
-```
+
+```text
 Total = 450 × 1.30 (30% premium)
       = 585 person-months
 ```
 
-**Result: 585 person-months** (highest, accounts for infrastructure)
+#### Result: 585 person-months (highest, accounts for infrastructure)
 
 ### Model 4: Blended Hybrid
 
 **By Code Type:**
-```
+
+```text
 TS hand-written (13,120 @ 12 LOC/day):   1,093 days → 50 PM
 Go production (21,450 @ 12 LOC/day):     1,788 days → 81 PM
 Smithy definitions (39,960 @ 20 LOC/day): 1,998 days → 91 PM
@@ -184,17 +194,19 @@ Subtotal:                                6,751 days → 307 PM
 Add integration overhead (30%):          307 × 1.30 = 399 PM
 ```
 
-**Result: 400 person-months** (rounded)
+#### Result: 400 person-months (rounded)
 
 ### Model 5: Team Analysis
 
 **Average of Models 1-4:**
-```
+
+```text
 Average = (450 + 282 + 585 + 400) / 4
         = 429 person-months (rounded to 430)
 ```
 
 **Equivalent Teams for Different Timelines:**
+
 - **12-month aggressive:** 430 / 12 = **36 developers**
 - **18-month standard:** 430 / 18 = **24 developers**
 - **24-month conservative:** 430 / 24 = **18 developers**
@@ -215,6 +227,7 @@ Average = (450 + 282 + 585 + 400) / 4
 **Coefficient of Variation:** 30.1%
 
 **Analysis:**
+
 - Industry Benchmarks most conservative (code-only, no overhead)
 - Infrastructure Multiplier highest (emphasizes cloud complexity)
 - COCOMO and Blended cluster around 425 PM (within 7%)
@@ -225,7 +238,8 @@ Average = (450 + 282 + 585 + 400) / 4
 ### Effective FTE Calculation
 
 **From contributor percentages:**
-```
+
+```text
 Lead Developer (52.1%):        1.00 FTE (>50%)
 Backend Engineer (28.1%):      0.75 FTE (>25%)
 Infrastructure Engineer (15.0%): 0.50 FTE (>10%)
@@ -237,7 +251,8 @@ Total Effective FTE:           2.5 FTE
 ### Actual Effort
 
 **Calendar-based:**
-```
+
+```text
 Timeline: 7.6 months
 Effective FTE: 2.5
 Working ratio: 187/227 = 0.82 (82% of days had commits)
@@ -252,7 +267,7 @@ Conservative estimate: 9-12 person-months
 
 **Using conservative actual effort of 9 PM:**
 
-```
+```text
 Traditional Estimates: 400-585 person-months
 Actual Effort: 9 person-months
 
@@ -290,7 +305,7 @@ tokei . --exclude node_modules dist build
 
 ### Manual Spot-Check (18 files sampled)
 
-```
+```text
 ✓ src/lambda/api-handler.ts - 450 lines, production
 ✓ src/cdk/compute-stack.ts - 380 lines, infrastructure
 ✓ generated/smithy/models.ts - 2,450 lines, confirmed generated
@@ -306,15 +321,16 @@ tokei . --exclude node_modules dist build
 ### Cross-Model Validation
 
 **Convergence:** 30.1% coefficient of variation
+
 - Within acceptable range (<35%)
 - All models within reasonable bounds
 - Outliers explained (Infrastructure emphasizes components, Benchmarks most conservative)
 
-**Overall Confidence: High (95%)**
+#### Overall Confidence: High (95%)
 
-```
-Confidence = 0.98 × 0.5 (automated) + 
-             1.00 × 0.3 (manual) + 
+```text
+Confidence = 0.98 × 0.5 (automated) +
+             1.00 × 0.3 (manual) +
              0.85 × 0.2 (convergence)
            = 0.49 + 0.30 + 0.17
            = 0.96 (96% confidence)
@@ -325,16 +341,19 @@ Confidence = 0.98 × 0.5 (automated) +
 ### Key Findings
 
 **Traditional Development Estimates:**
+
 - Consensus: **400-585 person-months**
 - Timeline: **18-24 months** with **20-36 developers**
 - Most likely: **430 person-months** over **21 months** with **20 developers**
 
 **LLM-Assisted Actual:**
+
 - Effort: **9-15 person-months**
 - Timeline: **7.6 months**
 - Team: **2.5 effective FTE**
 
 **Productivity Breakthrough:**
+
 - **44-65x productivity multiplier** (average: 55x)
 - **2.8x faster time-to-market**
 - **88-93% reduction in team size**

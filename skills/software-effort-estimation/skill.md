@@ -2,7 +2,9 @@
 
 ## Objective
 
-Generate comprehensive software effort estimation reports that analyze codebase complexity, calculate traditional development effort across five estimation models, and quantify productivity gains from LLM-assisted development.
+Generate comprehensive software effort estimation reports that analyze codebase complexity, calculate
+traditional development effort across five estimation models, and quantify productivity gains from
+LLM-assisted development.
 
 ## Prerequisites
 
@@ -19,6 +21,8 @@ Generate comprehensive software effort estimation reports that analyze codebase 
 ## Quick Start
 
 Use the provided scripts for automated data collection:
+
+### Option A: Collect all metrics at once (recommended)
 
 ```bash
 # Navigate to the repository you want to analyze
@@ -38,14 +42,7 @@ See `scripts/README.md` for detailed script documentation.
 
 Use the automated scripts to collect all necessary metrics:
 
-**Option A: Collect all metrics at once (recommended)**
-
-```bash
-cd /path/to/repository
-./scripts/collect_all_metrics.sh .
-```
-
-**Option B: Run individual scripts**
+### Option B: Run individual scripts
 
 ```bash
 # Git statistics
@@ -59,6 +56,7 @@ cd /path/to/repository
 ```
 
 The scripts will generate:
+
 - **git_stats.txt**: Total commits, contributors with percentages, active days, timeline
 - **metrics/**: Detailed LOC analysis (production, test, generated code)
 - **infrastructure.txt**: AWS CDK, Kubernetes, Docker inventory
@@ -72,6 +70,7 @@ Using the collected data, calculate effort using five independent models:
 **Formula:** `Effort = 3.0 × (KLOC^1.12) × ComplexityMultiplier`
 
 **Complexity Multipliers:**
+
 - Product Complexity: 1.74 (distributed/event-driven) or 1.30 (standard)
 - Required Reliability: 1.26 (high) or 1.00 (normal)
 - Database Size: 1.14 (large) or 1.00 (small)
@@ -82,6 +81,7 @@ Using the collected data, calculate effort using five independent models:
 **Duration:** `Duration = 2.5 × (Effort^0.38)` months
 
 **Example Calculation:**
+
 ```python
 # From collected data
 production_kloc = 53.2  # From metrics/production_code.txt
@@ -98,12 +98,15 @@ team_size = 450 / 21.3  # = 21 people
 #### Model 2: Industry Benchmarks
 
 **Productivity Rates:**
-- Very High Complexity: 12 LOC/day (distributed, multi-language, event-driven)
+
+- Very High Complexity: 12 LOC/day (distributed, multi-language,
+  event-driven)
 - High Complexity: 17.5 LOC/day (microservices, cloud-native)
 - Medium Complexity: 37.5 LOC/day (standard web/mobile apps)
 - Simple: 75 LOC/day (basic CRUD applications)
 
 **Classification:** Select "Very High" if project has 3+ of:
+
 - Distributed systems architecture
 - Real-time processing
 - Multi-language codebase (3+ languages)
@@ -113,6 +116,7 @@ team_size = 450 / 21.3  # = 21 people
 - WASM or specialized compilation
 
 **Calculation:**
+
 ```python
 production_loc = 74530  # From metrics
 productivity_rate = 12  # Very high complexity
@@ -123,6 +127,7 @@ person_months = 6211 / 22  # = 282 person-months
 #### Model 3: Infrastructure Multiplier
 
 **Component Effort Estimates:**
+
 - Lambda Function: 2.5 days each
 - CDK Stack: 4 days each
 - DynamoDB Table: 2.5 days each
@@ -133,6 +138,7 @@ person_months = 6211 / 22  # = 282 person-months
 - CI/CD Pipeline: 10 days
 
 **Calculation:**
+
 ```python
 # From infrastructure.txt
 components = {
@@ -153,6 +159,7 @@ total_with_infra = code_estimate * 1.35  # = 608 person-months
 #### Model 4: Blended Hybrid
 
 **Apply different rates by code type:**
+
 ```python
 code_breakdown = {
     "Production (TS/Go)": (74530, 12),    # LOC, rate
@@ -169,6 +176,7 @@ blended_with_overhead = blended_pm * 1.30  # Add 30% for integration
 #### Model 5: Team Analysis
 
 **Calculate equivalent teams for different timelines:**
+
 ```python
 average_estimate = (450 + 282 + 608 + 400) / 4  # = 435 person-months
 
@@ -185,6 +193,7 @@ timelines = {
 Calculate actual effort and compare to traditional estimates:
 
 **Calculate Effective FTE:**
+
 ```python
 # From git_stats.txt contributor percentages
 contributors = {
@@ -197,6 +206,7 @@ effective_fte = 2.5  # Total
 ```
 
 **Calculate Actual Effort:**
+
 ```python
 # From git_stats.txt timeline
 calendar_months = 7.6
@@ -208,6 +218,7 @@ actual_effort = calendar_months * effective_fte * active_ratio
 ```
 
 **Calculate Multiplier:**
+
 ```python
 traditional_range = (434, 582)  # From models 1-4
 actual_effort = 9
@@ -233,6 +244,7 @@ average_multiplier = 53x
    - Check infrastructure component counts manually
 
 3. **Cross-Model Validation:**
+
    ```python
    estimates = [450, 282, 608, 400]  # From 4 models
    mean = 435
@@ -244,6 +256,7 @@ average_multiplier = 53x
    ```
 
 **Calculate Confidence:**
+
 ```python
 automated_accuracy = 0.98  # % of automated counts that match
 manual_pass_rate = 0.92     # % of spot-checks that pass
@@ -260,43 +273,51 @@ confidence = (automated_accuracy * 0.5 +
 
 Generate comprehensive markdown report with these sections:
 
-**1. Executive Summary (2-3 pages)**
+#### 1. Executive Summary (2-3 pages)
+
 - Key metrics table
 - Project overview
 - Estimation models summary
 - Productivity breakthrough metrics
 - Strategic implications
 
-**2. Raw Codebase Metrics (2-3 pages)**
+#### 2. Raw Codebase Metrics (2-3 pages)
+
 - LOC breakdown by language
 - File counts by type
 - Git history analysis
 - Infrastructure inventory
 
-**3. Five Estimation Models (10-12 pages)**
+#### 3. Five Estimation Models (10-12 pages)
+
 For each model:
+
 - Methodology explanation
 - Calculation steps with actual numbers
 - Results and team size implications
 
-**4. Comprehensive Comparison (2-3 pages)**
+#### 4. Comprehensive Comparison (2-3 pages)
+
 - Side-by-side model comparison
 - Convergence analysis
 - Variance explanations
 
-**5. Strategic Recommendations (2-3 pages)**
+#### 5. Strategic Recommendations (2-3 pages)
+
 - Project planning guidelines
 - Team sizing formulas
 - Timeline estimation best practices
 
-**6. Methodology & Verification (4-5 pages)**
+#### 6. Methodology & Verification (4-5 pages)
+
 - Data collection commands
 - Verification results
 - Confidence assessment
 - Limitations and caveats
 - Reproducibility instructions
 
-**7. Appendices (2-3 pages)**
+#### 7. Appendices (2-3 pages)
+
 - Complete git statistics
 - Infrastructure component list
 - Monetary conversion tables (optional)

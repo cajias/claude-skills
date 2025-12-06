@@ -1,13 +1,15 @@
 # GitHub Issue Grooming Skill
 
-Automate the complete workflow for organizing and structuring GitHub issues with proper relationships, milestones, and clean labeling.
+Automate the complete workflow for organizing and structuring GitHub issues with proper
+relationships, milestones, and clean labeling.
 
 ## Overview
 
 This skill enables Claude to perform comprehensive GitHub issue management, including:
 
 - **Milestone Creation**: Automatically create phase-based milestones from issue descriptions
-- **Native Relationships**: Set up GitHub's native "blocked by" and "blocks" relationships using GraphQL API
+- **Native Relationships**: Set up GitHub's native "blocked by" and "blocks" relationships using
+  GraphQL API
 - **Milestone Assignment**: Assign issues to appropriate milestones based on phase information
 - **Label Cleanup**: Remove redundant labels that duplicate milestone or relationship functionality
 - **Dependency Tracking**: Add tasklist checkboxes for tracking dependencies in issue bodies
@@ -33,6 +35,7 @@ Use this skill when you need to:
 ### 1. Native GitHub Relationships
 
 Uses GitHub's GraphQL API to set true issue relationships:
+
 - `addBlockedBy` mutations for dependency tracking
 - Bidirectional, automatically synchronized relationships
 - Visible in GitHub UI and project boards
@@ -40,6 +43,7 @@ Uses GitHub's GraphQL API to set true issue relationships:
 ### 2. Phase-Based Organization
 
 Automatically creates milestones from phase information:
+
 - Extracts phase structure from epic/parent issues
 - Creates appropriately named milestones
 - Assigns all issues to correct milestones
@@ -47,6 +51,7 @@ Automatically creates milestones from phase information:
 ### 3. Concurrent Processing
 
 Uses sub-agents to work on multiple phases in parallel:
+
 - Faster processing of large issue sets
 - Independent phase updates
 - Scalable to repositories with 100+ issues

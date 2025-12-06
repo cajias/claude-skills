@@ -4,7 +4,8 @@ A collection of skills to expand Claude's capabilities for specific workflows an
 
 ## What are Claude Skills?
 
-Skills are reusable prompts and workflows that enable Claude to perform complex, multi-step tasks efficiently. Each skill contains:
+Skills are reusable prompts and workflows that enable Claude to perform complex, multi-step tasks
+efficiently. Each skill contains:
 
 - Detailed instructions and best practices
 - Step-by-step procedures
@@ -16,6 +17,7 @@ Skills are reusable prompts and workflows that enable Claude to perform complex,
 ### [GitHub Issue Grooming](./skills/github-issue-grooming/)
 
 Automate GitHub issue management workflows including:
+
 - Setting up milestones based on project phases
 - Creating native issue relationships (blocked by, blocks)
 - Assigning issues to milestones
@@ -25,8 +27,10 @@ Automate GitHub issue management workflows including:
 ### [Software Effort Estimation & Codebase Valuation](./skills/software-effort-estimation/)
 
 Generate comprehensive software effort estimation reports including:
+
 - Automated codebase analysis (LOC, commits, contributors)
-- Five independent estimation models (COCOMO II, Industry Benchmarks, Infrastructure Multiplier, Blended Hybrid, Team Analysis)
+- Five independent estimation models (COCOMO II, Industry Benchmarks, Infrastructure Multiplier,
+  Blended Hybrid, Team Analysis)
 - Productivity multiplier analysis (LLM-assisted vs traditional development)
 - Three-stage verification process with 90%+ accuracy
 - Professional 15,000+ word reports with strategic recommendations
@@ -37,6 +41,7 @@ Generate comprehensive software effort estimation reports including:
 ### [PR Monitor](./plugins/pr-monitor/)
 
 Automated GitHub pull request monitoring with event-driven hooks:
+
 - Automatically detects new commits in monitored PRs
 - Auto-resumes Claude Code when changes are detected
 - Supports monitoring multiple PRs simultaneously
@@ -53,7 +58,8 @@ Skills can be invoked by Claude when working on related tasks. Each skill direct
 
 ## Using Plugins
 
-Plugins extend Claude Code with hooks, skills, and other capabilities. Each plugin directory contains:
+Plugins extend Claude Code with hooks, skills, and other capabilities. Each plugin directory
+contains:
 
 - `.claude-plugin/plugin.json` - Plugin metadata
 - `hooks/` - Hook definitions and scripts
@@ -61,8 +67,10 @@ Plugins extend Claude Code with hooks, skills, and other capabilities. Each plug
 - `README.md` - Plugin documentation
 
 **Installation:**
+
 ```bash
-claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
 ```
 
 ## Contributing

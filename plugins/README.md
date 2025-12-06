@@ -9,6 +9,7 @@ This directory contains Claude Code plugins that extend functionality through ho
 Automated GitHub pull request monitoring with event-driven hooks.
 
 **Features:**
+
 - Auto-detects new commits in monitored PRs
 - Auto-resumes Claude Code when changes detected
 - Multi-PR monitoring support
@@ -16,15 +17,17 @@ Automated GitHub pull request monitoring with event-driven hooks.
 - Auto-cleanup on merge/close
 
 **Installation:**
+
 ```bash
-claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/pr-monitor
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/pr-monitor
 ```
 
 ## Plugin Structure
 
 Each plugin follows this structure:
 
-```
+```text
 plugin-name/
 ├── .claude-plugin/
 │   └── plugin.json           # Metadata (name, version, description)
@@ -43,7 +46,8 @@ plugin-name/
 ### Via Plugin Manager (Recommended)
 
 ```bash
-claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
 ```
 
 Then restart Claude Code.
@@ -61,6 +65,7 @@ cp -r plugins/PLUGIN_NAME/* ~/.claude/plugins/PLUGIN_NAME/
 ## Creating a Plugin
 
 1. **Create plugin directory:**
+
    ```bash
    mkdir -p plugins/my-plugin/.claude-plugin
    mkdir -p plugins/my-plugin/hooks
@@ -69,6 +74,7 @@ cp -r plugins/PLUGIN_NAME/* ~/.claude/plugins/PLUGIN_NAME/
    ```
 
 2. **Add plugin.json:**
+
    ```json
    {
      "name": "my-plugin",
@@ -80,6 +86,7 @@ cp -r plugins/PLUGIN_NAME/* ~/.claude/plugins/PLUGIN_NAME/
    ```
 
 3. **Add hooks (optional):**
+
    ```json
    {
      "hooks": {
@@ -109,6 +116,7 @@ cp -r plugins/PLUGIN_NAME/* ~/.claude/plugins/PLUGIN_NAME/
 ### Hook-Based Plugins
 
 Plugins that extend Claude Code with event-driven automation:
+
 - Stop hooks (run when Claude would idle)
 - PreToolUse/PostToolUse hooks
 - Notification hooks
@@ -117,6 +125,7 @@ Plugins that extend Claude Code with event-driven automation:
 ### Skill-Based Plugins
 
 Plugins that bundle specialized skills:
+
 - Domain-specific workflows
 - Multi-step procedures
 - Tool integrations
@@ -124,6 +133,7 @@ Plugins that bundle specialized skills:
 ### Hybrid Plugins
 
 Plugins that combine hooks + skills:
+
 - Example: PR Monitor (Stop hook + monitoring skill)
 - Hooks provide automation
 - Skills provide instructions

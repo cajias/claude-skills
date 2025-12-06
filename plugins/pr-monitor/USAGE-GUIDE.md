@@ -2,17 +2,21 @@
 
 ## Overview
 
-The PR Monitor plugin enables automated monitoring of GitHub pull requests with automatic resumption of Claude Code when new commits are detected. This guide provides detailed instructions for installation, usage, and troubleshooting.
+The PR Monitor plugin enables automated monitoring of GitHub pull requests with automatic resumption
+of Claude Code when new commits are detected. This guide provides detailed instructions for
+installation, usage, and troubleshooting.
 
 ## What This Plugin Does
 
-**Problem it solves:** Manually checking PRs for updates is tedious and easy to miss. You want Claude to automatically notify you and resume work when collaborators push new commits.
+**Problem it solves:** Manually checking PRs for updates is tedious and easy to miss. You want Claude
+to automatically notify you and resume work when collaborators push new commits.
 
-**Solution:** A Stop hook that checks monitored PRs when Claude would idle, automatically resuming with a notification when new commits are detected.
+**Solution:** A Stop hook that checks monitored PRs when Claude would idle, automatically resuming
+with a notification when new commits are detected.
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ User enables PR monitoring                                   │
 │ Creates state file: /tmp/claude_monitor_pr_<repo>_<pr>      │
@@ -54,10 +58,12 @@ The PR Monitor plugin enables automated monitoring of GitHub pull requests with 
 ### Method 1: Via Claude Plugin Manager (Recommended)
 
 ```bash
-claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/pr-monitor
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/pr-monitor
 ```
 
 **Then restart Claude Code:**
+
 - Quit Claude Code completely
 - Relaunch Claude Code
 - Hook will be active on restart
@@ -91,6 +97,7 @@ ls -la ~/.claude/plugins/pr-monitor/
 Before using the plugin:
 
 1. **GitHub CLI (`gh`)** - Version 2.0.0 or higher
+
    ```bash
    # Install
    brew install gh  # macOS
@@ -105,6 +112,7 @@ Before using the plugin:
    ```
 
 2. **jq** - For JSON parsing
+
    ```bash
    # Install
    brew install jq  # macOS
@@ -123,11 +131,12 @@ Before using the plugin:
 
 The simplest way to start monitoring:
 
-```
+```text
 Monitor PR cajias/claude-skills#2 in this repository for new commits
 ```
 
 Claude will:
+
 1. Verify PR exists
 2. Get current commit SHA
 3. Create monitoring state file
@@ -164,14 +173,16 @@ cat /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
 State files are stored in `/tmp/claude_monitor_pr_<repo-name>_<pr-number>`
 
 **Format (3 lines):**
-```
+
+```text
 Line 1: /absolute/path/to/repository
 Line 2: PR_NUMBER
 Line 3: LAST_COMMIT_SHA
 ```
 
 **Example:**
-```
+
+```text
 /Users/cajias/Projects/claude-skills
 2
 a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
@@ -192,7 +203,7 @@ Each PR is monitored independently.
 
 ### Ask Claude
 
-```
+```text
 Stop monitoring PR cajias/claude-skills#2
 ```
 
@@ -211,17 +222,20 @@ rm /tmp/claude_monitor_pr_*
 ### Hook Not Triggering
 
 1. **Verify plugin installed:**
+
    ```bash
    ls -la ~/.claude/plugins/pr-monitor/
    ```
 
 2. **Check hook script is executable:**
+
    ```bash
    ls -l ~/.claude/plugins/pr-monitor/scripts/Stop.sh
    # Should show: -rwxr-xr-x (executable)
    ```
 
 3. **Test hook manually:**
+
    ```bash
    echo '{"stop_hook_active": false}' | ~/.claude/plugins/pr-monitor/scripts/Stop.sh
    ```
@@ -229,6 +243,7 @@ rm /tmp/claude_monitor_pr_*
 ### PR Changes Not Detected
 
 1. **Verify state file format:**
+
    ```bash
    cat /tmp/claude_monitor_pr_<repo-name>_<pr-number>
    # Should have exactly 3 lines:
@@ -238,23 +253,27 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 2. **Check if state file exists:**
+
    ```bash
    ls -la /tmp/claude_monitor_pr_*
    ```
 
 3. **Verify PR is accessible:**
+
    ```bash
    cd /path/to/repository
    gh pr view PR_NUMBER --json headRefOid,state,commits
    ```
 
 4. **Test GitHub CLI authentication:**
+
    ```bash
    gh auth status
    # Should show: ✓ Logged in to github.com
    ```
 
 5. **Check for errors in hook execution:**
+
    ```bash
    # Test hook manually with verbose output
    echo '{"stop_hook_active": false}' | bash -x ~/.claude/plugins/pr-monitor/scripts/Stop.sh
@@ -268,6 +287,7 @@ rm /tmp/claude_monitor_pr_*
    - Verify file is in `/tmp` directory
 
 2. **Incorrect format:**
+
    ```bash
    # Recreate state file with correct format
    REPO_PATH=/path/to/repo
@@ -282,6 +302,7 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 3. **Permissions issues:**
+
    ```bash
    # Ensure state file is readable
    chmod 644 /tmp/claude_monitor_pr_*
@@ -290,6 +311,7 @@ rm /tmp/claude_monitor_pr_*
 ### GitHub API Issues
 
 1. **Rate limit exceeded:**
+
    ```bash
    # Check rate limit status
    gh api rate_limit
@@ -299,6 +321,7 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 2. **Authentication expired:**
+
    ```bash
    # Re-authenticate
    gh auth login
@@ -309,6 +332,7 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 3. **Permission denied:**
+
    ```bash
    # Verify you have access to the repository
    gh repo view OWNER/REPO
@@ -324,6 +348,7 @@ rm /tmp/claude_monitor_pr_*
    - Check `.claude/settings.json` for `disableAllHooks: false`
 
 2. **Multiple stop triggers:**
+
    ```bash
    # List all monitored PRs
    ls -la /tmp/claude_monitor_pr_*
@@ -340,6 +365,7 @@ rm /tmp/claude_monitor_pr_*
 ### Claude Not Auto-Resuming
 
 1. **Check hook output:**
+
    ```bash
    # Run hook manually to see output
    echo '{"stop_hook_active": false}' | ~/.claude/plugins/pr-monitor/scripts/Stop.sh
@@ -348,6 +374,7 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 2. **Verify commit SHA changed:**
+
    ```bash
    # Get current SHA from GitHub
    gh pr view PR_NUMBER --json headRefOid --jq '.headRefOid'
@@ -357,6 +384,7 @@ rm /tmp/claude_monitor_pr_*
    ```
 
 3. **Check PR state:**
+
    ```bash
    # Verify PR is still open
    gh pr view PR_NUMBER --json state --jq '.state'
@@ -439,6 +467,7 @@ echo "All PRs now monitored."
 ```
 
 Usage:
+
 ```bash
 bash monitor-prs.sh /path/to/repo 1 2 3 4 5
 ```
@@ -463,6 +492,7 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
 ### Best Practices
 
 1. **Review before installing:**
+
    ```bash
    # Review the hook script before using
    cat ~/.claude/plugins/pr-monitor/scripts/Stop.sh
@@ -473,12 +503,14 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
    - Avoid monitoring sensitive or private repos unnecessarily
 
 3. **Clean up regularly:**
+
    ```bash
    # Remove old state files
    rm /tmp/claude_monitor_pr_*
    ```
 
 4. **Protect state files:**
+
    ```bash
    # State files may contain repo paths
    # Don't share or commit state files
@@ -486,6 +518,7 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
    ```
 
 5. **Audit monitoring:**
+
    ```bash
    # Regularly check what's being monitored
    ls -la /tmp/claude_monitor_pr_*
@@ -632,6 +665,7 @@ ls -la /tmp/claude_monitor_pr_*
 ### Q: How quickly does Claude detect new commits?
 
 **A:** Detection happens when Claude Code would naturally stop/idle. The timing depends on:
+
 - When you finish your current task
 - When Claude would normally stop
 - Hook execution time (~1-3 seconds per PR)
@@ -641,6 +675,7 @@ This is **not real-time**. There may be delays between commit push and detection
 ### Q: Can I monitor PRs from private repositories?
 
 **A:** Yes, as long as:
+
 - You have read access to the repository
 - GitHub CLI (`gh`) is authenticated with appropriate permissions
 - The repository is cloned locally
@@ -648,6 +683,7 @@ This is **not real-time**. There may be delays between commit push and detection
 ### Q: What happens if I restart my computer?
 
 **A:** State files in `/tmp` are typically cleared on reboot. You'll need to:
+
 1. Recreate monitoring state files
 2. Re-authenticate `gh` if needed
 3. Restart Claude Code
@@ -656,11 +692,14 @@ Consider moving state files to a persistent location if needed.
 
 ### Q: Can I monitor PRs in repositories I don't own?
 
-**A:** Yes, you can monitor any PR in any public repository or private repository where you have read access. The GitHub CLI must be authenticated and have the necessary permissions.
+**A:** Yes, you can monitor any PR in any public repository or private repository where
+you have read access. The GitHub CLI must be authenticated and have the necessary
+permissions.
 
 ### Q: Does this work with GitHub Enterprise?
 
 **A:** Yes, if:
+
 - GitHub CLI is configured for your Enterprise instance
 - You're authenticated: `gh auth login --hostname github.enterprise.com`
 - API endpoints are accessible
@@ -668,6 +707,7 @@ Consider moving state files to a persistent location if needed.
 ### Q: How many PRs can I monitor simultaneously?
 
 **A:** Technical limit: As many as you want, but practical considerations:
+
 - Each PR adds ~1-3 seconds to hook execution
 - More PRs = more GitHub API calls
 - API rate limit: 5,000 requests/hour
@@ -688,6 +728,7 @@ Consider moving state files to a persistent location if needed.
 ### Q: Does this work offline?
 
 **A:** No, the plugin requires:
+
 - Internet connectivity
 - Access to GitHub API
 - GitHub CLI authentication
@@ -697,6 +738,7 @@ It will fail gracefully if offline.
 ### Q: What if the PR is closed or merged?
 
 **A:** The hook detects this and:
+
 1. Sends notification about PR state change
 2. Automatically removes the state file
 3. Stops monitoring that PR
@@ -716,6 +758,7 @@ Contributions welcome! To improve this plugin:
 5. Submit a pull request
 
 **Areas for contribution:**
+
 - Enhanced notification messages
 - Additional hook types (PreToolUse, PostToolUse)
 - Support for other version control systems
@@ -753,5 +796,5 @@ MIT License - See [LICENSE](../../LICENSE) file for details
 ---
 
 **Author**: cajias  
-**Repository**: https://github.com/cajias/claude-skills  
+**Repository**: <https://github.com/cajias/claude-skills>  
 **Plugin Path**: `/plugins/pr-monitor/`

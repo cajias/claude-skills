@@ -1,12 +1,15 @@
 # PR Monitor Plugin
 
-Automated GitHub pull request monitoring for Claude Code. Automatically resumes Claude when new commits are detected.
+Automated GitHub pull request monitoring for Claude Code. Automatically resumes Claude when new
+commits are detected.
 
-> 📖 **New to this plugin?** See the [Complete Usage Guide](./USAGE-GUIDE.md) for step-by-step instructions, troubleshooting, and examples.
+> 📖 **New to this plugin?** See the [Complete Usage Guide](./USAGE-GUIDE.md) for step-by-step
+> instructions, troubleshooting, and examples.
 
 ## Overview
 
 This plugin provides:
+
 - **Stop Hook**: Automatically checks PRs when Claude would idle
 - **PR Monitor Skill**: Instructions for setting up and managing PR monitoring
 - **Auto-Resume**: Claude automatically continues when new commits detected
@@ -24,7 +27,8 @@ This plugin provides:
 ### Via Plugin Manager (Recommended)
 
 ```bash
-claude plugin install https://github.com/cajias/claude-skills/tree/main/skills/pr-monitor
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/skills/pr-monitor
 ```
 
 After installation, restart Claude Code for the hook to activate.
@@ -32,12 +36,14 @@ After installation, restart Claude Code for the hook to activate.
 ### Manual Installation
 
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/cajias/claude-skills.git
    cd claude-skills/skills/pr-monitor
    ```
 
 2. Copy to Claude plugins directory:
+
    ```bash
    mkdir -p ~/.claude/plugins/pr-monitor
    cp -r ./* ~/.claude/plugins/pr-monitor/
@@ -51,11 +57,12 @@ After installation, restart Claude Code for the hook to activate.
 
 Ask Claude to monitor a PR:
 
-```
+```text
 Monitor PR #2 in the current repository for new commits
 ```
 
 Claude will:
+
 1. Verify the PR exists
 2. Get current commit SHA
 3. Create monitoring state file
@@ -81,11 +88,13 @@ EOF
 ### Stop Monitoring
 
 Ask Claude:
-```
+
+```text
 Stop monitoring PR #2
 ```
 
 Or manually:
+
 ```bash
 rm /tmp/claude_monitor_pr_REPO_PR
 ```
@@ -94,7 +103,7 @@ rm /tmp/claude_monitor_pr_REPO_PR
 
 ### Architecture
 
-```
+```text
 User works on tasks
        ↓
 Claude finishes task → Would normally stop
@@ -112,14 +121,15 @@ Claude auto-resumes → Reviews changes and provides feedback
 
 Files stored in `/tmp/claude_monitor_pr_<repo-name>_<pr-number>`:
 
-```
+```text
 Line 1: /path/to/repository
 Line 2: PR_NUMBER
 Line 3: LAST_COMMIT_SHA
 ```
 
 Example:
-```
+
+```text
 /Users/cajias/Projects/claude-skills
 2
 a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
@@ -128,6 +138,7 @@ a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
 ### Hook Behavior
 
 The Stop hook:
+
 - Runs when Claude Code would naturally stop/idle
 - Checks all state files in `/tmp/claude_monitor_pr_*`
 - Queries GitHub for each monitored PR
@@ -140,7 +151,7 @@ The Stop hook:
 ## Requirements
 
 - **GitHub CLI (gh)**: v2.0.0 or higher
-  - Install: https://cli.github.com/
+  - Install: <https://cli.github.com/>
   - Must be authenticated: `gh auth login`
 - **jq**: For JSON parsing
   - macOS: `brew install jq`
@@ -179,6 +190,7 @@ Add to `.claude/settings.json` in your project (optional):
 ```
 
 Disable for specific project:
+
 ```json
 {
   "disableAllHooks": true
@@ -217,16 +229,19 @@ Disable for specific project:
 ### Hook Not Triggering
 
 **Check plugin installed:**
+
 ```bash
 ls -la ~/.claude/plugins/pr-monitor
 ```
 
 **Check hooks registered:**
+
 ```bash
 cat ~/.claude/plugins/pr-monitor/hooks/hooks.json
 ```
 
 **Test hook manually:**
+
 ```bash
 echo '{"stop_hook_active": false}' | bash ~/.claude/plugins/pr-monitor/scripts/Stop.sh
 ```
@@ -234,22 +249,26 @@ echo '{"stop_hook_active": false}' | bash ~/.claude/plugins/pr-monitor/scripts/S
 ### PR Not Detected
 
 **Verify state file exists:**
+
 ```bash
 ls -la /tmp/claude_monitor_pr_*
 ```
 
 **Check state file format:**
+
 ```bash
 cat /tmp/claude_monitor_pr_REPO_PR
 # Should have 3 lines
 ```
 
 **Test GitHub CLI:**
+
 ```bash
 gh pr view PR_NUMBER --json headRefOid,commits
 ```
 
 **Check authentication:**
+
 ```bash
 gh auth status
 ```
@@ -257,16 +276,19 @@ gh auth status
 ### Multiple Triggers
 
 **List all monitors:**
+
 ```bash
 ls -la /tmp/claude_monitor_pr_*
 ```
 
 **Remove specific monitor:**
+
 ```bash
 rm /tmp/claude_monitor_pr_REPO_PR
 ```
 
 **Clear all monitors:**
+
 ```bash
 rm /tmp/claude_monitor_pr_*
 ```
@@ -280,6 +302,7 @@ rm /tmp/claude_monitor_pr_*
 - Read-only access to repositories
 
 **Best Practices:**
+
 - Review hook script before installation
 - Monitor only trusted repositories
 - Clean up state files when done
@@ -335,7 +358,7 @@ rm /tmp/claude_monitor_pr_*
 
 ### Plugin Structure
 
-```
+```text
 pr-monitor/
 ├── .claude-plugin/
 │   └── plugin.json           # Metadata
@@ -371,6 +394,7 @@ rm /tmp/claude_monitor_pr_test_1
 ### Contributing
 
 Contributions welcome! Please:
+
 1. Fork the repository
 2. Create a feature branch
 3. Test your changes
@@ -392,9 +416,9 @@ cajias
 
 ## Support
 
-- **Issues**: https://github.com/cajias/claude-skills/issues
-- **Documentation**: https://code.claude.com/docs/en/hooks.md
-- **GitHub CLI**: https://cli.github.com/manual/
+- **Issues**: <https://github.com/cajias/claude-skills/issues>
+- **Documentation**: <https://code.claude.com/docs/en/hooks.md>
+- **GitHub CLI**: <https://cli.github.com/manual/>
 
 ## Related
 

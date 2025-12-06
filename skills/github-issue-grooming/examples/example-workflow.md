@@ -7,7 +7,8 @@ This example demonstrates the complete GitHub issue grooming workflow applied to
 - **Repository**: cajias/mcp-lite
 - **Total Issues**: 48
 - **Structure**: 5 phases with parent issues and sub-tasks
-- **Initial State**: Issues had dependency information in bodies, but no milestones or native relationships
+- **Initial State**: Issues had dependency information in bodies, but no milestones or native
+  relationships
 
 ## Workflow Execution
 
@@ -16,16 +17,20 @@ This example demonstrates the complete GitHub issue grooming workflow applied to
 **Concurrent data gathering using 2 sub-agents:**
 
 Agent 1 - Fetch issues:
+
 ```bash
 gh issue list --repo cajias/mcp-lite --limit 1000 --json number,title,body,milestone,labels,state
 ```
 
 Agent 2 - Fetch milestones:
+
 ```bash
-gh api repos/cajias/mcp-lite/milestones --jq '.[] | {number: .number, title: .title, state: .state}'
+gh api repos/cajias/mcp-lite/milestones \
+  --jq '.[] | {number: .number, title: .title, state: .state}'
 ```
 
 **Results:**
+
 - 48 open issues identified
 - 1 existing milestone found (Phase 4)
 - 5 phases identified from issue structure
@@ -35,13 +40,18 @@ gh api repos/cajias/mcp-lite/milestones --jq '.[] | {number: .number, title: .ti
 **Created missing milestones:**
 
 ```bash
-gh api repos/cajias/mcp-lite/milestones -X POST -f title="Phase 1: Core Infrastructure"
-gh api repos/cajias/mcp-lite/milestones -X POST -f title="Phase 2: MCP Server Management"
-gh api repos/cajias/mcp-lite/milestones -X POST -f title="Phase 3: HTTP API Layer"
-gh api repos/cajias/mcp-lite/milestones -X POST -f title="Phase 5: Testing & Polish"
+gh api repos/cajias/mcp-lite/milestones -X POST \
+  -f title="Phase 1: Core Infrastructure"
+gh api repos/cajias/mcp-lite/milestones -X POST \
+  -f title="Phase 2: MCP Server Management"
+gh api repos/cajias/mcp-lite/milestones -X POST \
+  -f title="Phase 3: HTTP API Layer"
+gh api repos/cajias/mcp-lite/milestones -X POST \
+  -f title="Phase 5: Testing & Polish"
 ```
 
 **Milestone Mapping:**
+
 | Phase | Milestone Number | Title |
 |-------|------------------|-------|
 | Phase 1 | 2 | Core Infrastructure |
@@ -55,6 +65,7 @@ gh api repos/cajias/mcp-lite/milestones -X POST -f title="Phase 5: Testing & Pol
 **Concurrent assignment using 5 sub-agents (one per phase):**
 
 **Phase 1 Agent** - Processed issues #1, 6-14:
+
 ```bash
 gh issue edit 1 --repo cajias/mcp-lite --milestone 2
 gh issue edit 6 --repo cajias/mcp-lite --milestone 2
@@ -62,14 +73,16 @@ gh issue edit 6 --repo cajias/mcp-lite --milestone 2
 ```
 
 **Phase 2 Agent** - Processed issues #2, 15-21:
+
 ```bash
 gh issue edit 2 --repo cajias/mcp-lite --milestone 3
 # ... continued for all Phase 2 issues
 ```
 
-*Similar for Phases 3-5*
+### Similar for Phases 3-5
 
 **Results:**
+
 - Phase 1: 10 issues → Milestone 2
 - Phase 2: 8 issues → Milestone 3
 - Phase 3: 9 issues → Milestone 4
@@ -80,9 +93,10 @@ gh issue edit 2 --repo cajias/mcp-lite --milestone 3
 
 **Set 112 blocking relationships using GraphQL API:**
 
-**Example: Setting Issue #7 blocked by Issue #6**
+#### Example: Setting Issue #7 blocked by Issue #6
 
 1. Get global IDs:
+
 ```bash
 # Get Issue #6 ID
 ID6=$(gh api graphql -f query='query {
@@ -101,15 +115,17 @@ ID7=$(gh api graphql -f query='query {
 # Returns: I_kwDON8xAbM6cPqrt
 ```
 
-2. Create relationship:
+1. Create relationship:
+
 ```bash
-gh api graphql -f issueId="$ID7" -f blockingIssueId="$ID6" -f mutation='
-mutation($issueId: ID!, $blockingIssueId: ID!) {
-  addBlockedBy(input: {issueId: $issueId, blockingIssueId: $blockingIssueId}) {
-    blockedIssue { number title }
-    blockingIssue { number title }
-  }
-}'
+gh api graphql -f issueId="$ID7" -f blockingIssueId="$ID6" \
+  -f mutation='
+  mutation($issueId: ID!, $blockingIssueId: ID!) {
+    addBlockedBy(input: {issueId: $issueId, blockingIssueId: $blockingIssueId}) {
+      blockedIssue { number title }
+      blockingIssue { number title }
+    }
+  }'
 ```
 
 **Relationship Summary by Phase:**
@@ -132,7 +148,8 @@ mutation($issueId: ID!, $blockingIssueId: ID!) {
   - #18 blocked by #16, #17
   - #19 blocked by #16, #17
   - #20 blocked by #18, #8
-  - #21 blocked by #15, #16, #17, #18, #19, #20 (6 blockers)
+  - #21 blocked by #15, #16, #17, #18, #19, #20
+    (6 blockers)
 
 - **Phase 3**: 20 relationships
 - **Phase 4**: 28 relationships
@@ -143,9 +160,11 @@ mutation($issueId: ID!, $blockingIssueId: ID!) {
 ### Step 5: Label Cleanup
 
 **Identified redundant labels:**
+
 - `phase-1` through `phase-5` (now replaced by milestones)
 
 **Removed from all 48 issues:**
+
 ```bash
 # Phase 1 issues
 gh issue edit 1 --repo cajias/mcp-lite --remove-label "phase-1"
@@ -160,6 +179,7 @@ gh issue edit 2 --repo cajias/mcp-lite --remove-label "phase-2"
 ```
 
 **Deleted label definitions:**
+
 ```bash
 gh label delete "phase-1" --repo cajias/mcp-lite --yes
 gh label delete "phase-2" --repo cajias/mcp-lite --yes
@@ -169,12 +189,14 @@ gh label delete "phase-5" --repo cajias/mcp-lite --yes
 ```
 
 **Labels removed:**
+
 - 48 phase label assignments removed from issues
 - 5 label definitions deleted from repository
 
 ## Final Results
 
 ### Before
+
 - ❌ 1 milestone, 47 issues without milestones
 - ❌ No native issue relationships
 - ❌ Dependency tracking only in comments/bodies
@@ -182,6 +204,7 @@ gh label delete "phase-5" --repo cajias/mcp-lite --yes
 - ❌ No clear dependency visualization
 
 ### After
+
 - ✅ 5 phase-based milestones
 - ✅ All 48 issues assigned to appropriate milestones
 - ✅ 112 native "blocked by" relationships
@@ -192,16 +215,19 @@ gh label delete "phase-5" --repo cajias/mcp-lite --yes
 ## Verification
 
 **Check milestones:**
+
 ```bash
 gh api repos/cajias/mcp-lite/milestones
 ```
 
 **Check issue #15 relationships:**
-Visit: https://github.com/cajias/mcp-lite/issues/15
+Visit: <https://github.com/cajias/mcp-lite/issues/15>
+
 - Sidebar shows "Blocked by #1"
 - Native GitHub relationship visible
 
 **Check labels:**
+
 ```bash
 gh label list --repo cajias/mcp-lite --json name
 # phase-1 through phase-5 no longer present
@@ -217,12 +243,17 @@ gh label list --repo cajias/mcp-lite --json name
 
 ## Key Learnings
 
-1. **Concurrent processing is essential**: Processing 5 phases in parallel reduced time from ~15 minutes to ~5 minutes
+1. **Concurrent processing is essential**: Processing 5 phases in parallel reduced time from
+   ~15 minutes to ~5 minutes
 
-2. **GraphQL IDs are required**: Cannot use issue numbers directly in `addBlockedBy` mutations
+2. **GraphQL IDs are required**: Cannot use issue numbers directly in `addBlockedBy`
+   mutations
 
-3. **Native features are superior**: GitHub UI automatically shows relationship graphs, dependency chains, and blocks completion tracking
+3. **Native features are superior**: GitHub UI automatically shows relationship graphs,
+   dependency chains, and blocks completion tracking
 
-4. **Labels should be semantic, not structural**: Keep component labels (api, frontend), remove phase labels (replaced by milestones)
+4. **Labels should be semantic, not structural**: Keep component labels (api, frontend),
+   remove phase labels (replaced by milestones)
 
-5. **Document as you go**: The dependency information in issue bodies remains valuable even after setting native relationships
+5. **Document as you go**: The dependency information in issue bodies remains valuable even
+   after setting native relationships

@@ -20,6 +20,7 @@ This will create an `effort_estimation_output` directory with all collected data
 Collects git repository statistics including commits, contributors, timeline, and activity patterns.
 
 **Usage:**
+
 ```bash
 ./collect_git_stats.sh [repository_path] [output_file]
 ```
@@ -27,24 +28,29 @@ Collects git repository statistics including commits, contributors, timeline, an
 **Output:** Text file with git statistics
 
 **Example:**
+
 ```bash
 ./collect_git_stats.sh /path/to/repo git_stats.txt
 ```
 
 ### 2. collect_code_metrics.sh
 
-Analyzes codebase using `cloc` (Count Lines of Code) to separate production code, test code, and generate detailed metrics.
+Analyzes codebase using `cloc` (Count Lines of Code) to separate production code, test code, and
+generate detailed metrics.
 
 **Prerequisites:** `cloc` must be installed
+
 - macOS: `brew install cloc`
 - Linux: `apt-get install cloc`
 
 **Usage:**
+
 ```bash
 ./collect_code_metrics.sh [repository_path] [output_dir]
 ```
 
 **Output:** Multiple files in output directory:
+
 - `cloc_full.json` - Complete analysis in JSON format
 - `cloc_summary.txt` - Human-readable summary
 - `production_code.txt` - Production code only
@@ -52,15 +58,18 @@ Analyzes codebase using `cloc` (Count Lines of Code) to separate production code
 - `summary.txt` - Quick statistics
 
 **Example:**
+
 ```bash
 ./collect_code_metrics.sh /path/to/repo metrics
 ```
 
 ### 3. collect_infrastructure.sh
 
-Inventories infrastructure components including AWS CDK resources, Kubernetes manifests, Docker containers, and file types.
+Inventories infrastructure components including AWS CDK resources, Kubernetes manifests, Docker
+containers, and file types.
 
 **Usage:**
+
 ```bash
 ./collect_infrastructure.sh [repository_path] [output_file]
 ```
@@ -68,6 +77,7 @@ Inventories infrastructure components including AWS CDK resources, Kubernetes ma
 **Output:** Text file with infrastructure inventory
 
 **Example:**
+
 ```bash
 ./collect_infrastructure.sh /path/to/repo infrastructure.txt
 ```
@@ -77,6 +87,7 @@ Inventories infrastructure components including AWS CDK resources, Kubernetes ma
 Runs all three collection scripts in sequence and organizes output into a structured directory.
 
 **Usage:**
+
 ```bash
 ./collect_all_metrics.sh [repository_path]
 ```
@@ -84,6 +95,7 @@ Runs all three collection scripts in sequence and organizes output into a struct
 **Output:** `effort_estimation_output/` directory containing all metrics
 
 **Example:**
+
 ```bash
 ./collect_all_metrics.sh /path/to/repo
 ```
@@ -92,7 +104,7 @@ Runs all three collection scripts in sequence and organizes output into a struct
 
 After running `collect_all_metrics.sh`:
 
-```
+```text
 effort_estimation_output/
 ├── git_stats.txt              # Git repository statistics
 ├── infrastructure.txt         # Infrastructure inventory
@@ -117,16 +129,20 @@ See the main `skill.md` file for detailed instructions on applying estimation mo
 
 ## Troubleshooting
 
-**"cloc: command not found"**
+### "cloc: command not found"
+
 - Install cloc: `brew install cloc` (macOS) or `apt-get install cloc` (Linux)
 
-**"Not a git repository"**
+### "Not a git repository"
+
 - Ensure you're running scripts on a directory with a `.git` folder
 - Check that the repository path is correct
 
-**Scripts not executable**
+### Scripts not executable
+
 - Run: `chmod +x *.sh` in the scripts directory
 
-**Date calculation errors**
+### Date calculation errors
+
 - Scripts handle both GNU date (Linux) and BSD date (macOS)
 - If errors persist, check that `bc` is installed: `which bc`

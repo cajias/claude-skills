@@ -2,14 +2,17 @@
 
 ## Objective
 
-Organize GitHub repository issues with proper milestones, native relationships, and clean labeling structure.
+Organize GitHub repository issues with proper milestones, native relationships, and clean labeling
+structure.
 
 ## Prerequisites
 
 Before starting, ensure:
+
 1. GitHub CLI (`gh`) is installed and authenticated
 2. You have write/admin access to the target repository
-3. Issues exist with dependency information in their descriptions (e.g., "Depends on:", "Blocks:", "Parent Issue:")
+3. Issues exist with dependency information in their descriptions (e.g., "Depends on:", "Blocks:",
+   "Parent Issue:")
 
 ## Step-by-Step Workflow
 
@@ -18,13 +21,16 @@ Before starting, ensure:
 **Use sub-agents to fetch data concurrently:**
 
 1. **Fetch all issues:**
+
    ```bash
    gh issue list --repo OWNER/REPO --limit 1000 --json number,title,body,milestone,labels,state
    ```
 
 2. **Fetch existing milestones:**
+
    ```bash
-   gh api repos/OWNER/REPO/milestones --jq '.[] | {number: .number, title: .title, state: .state}'
+   gh api repos/OWNER/REPO/milestones \
+     --jq '.[] | {number: .number, title: .title, state: .state}'
    ```
 
 3. **Analyze issue structure:**
@@ -37,13 +43,16 @@ Before starting, ensure:
 **Create milestones for identified phases:**
 
 1. **Create missing milestones:**
+
    ```bash
    gh api repos/OWNER/REPO/milestones -X POST -f title="PHASE_NAME"
    ```
 
 2. **Fetch milestone numbers:**
+
    ```bash
-   gh api repos/OWNER/REPO/milestones --jq '.[] | {number: .number, title: .title}'
+   gh api repos/OWNER/REPO/milestones \
+     --jq '.[] | {number: .number, title: .title}'
    ```
 
 3. **Create phase-to-milestone mapping:**
@@ -57,6 +66,7 @@ Before starting, ensure:
 For each phase, perform these operations in parallel:
 
 1. **Assign issues to milestones:**
+
    ```bash
    gh issue edit ISSUE_NUM --repo OWNER/REPO --milestone MILESTONE_NUM
    ```
@@ -73,6 +83,7 @@ For each phase, perform these operations in parallel:
 **IMPORTANT:** Use the GraphQL API, not comments or labels.
 
 1. **Get issue global IDs:**
+
    ```bash
    gh api graphql -f query='
    query {
@@ -85,6 +96,7 @@ For each phase, perform these operations in parallel:
    ```
 
 2. **Set blocking relationships:**
+
    ```bash
    gh api graphql -f issueId="BLOCKED_ISSUE_ID" -f blockingIssueId="BLOCKING_ISSUE_ID" -f mutation='
    mutation($issueId: ID!, $blockingIssueId: ID!) {
@@ -96,6 +108,7 @@ For each phase, perform these operations in parallel:
    ```
 
 **Key Points:**
+
 - Use `addBlockedBy` mutation (there is no `addBlocks` mutation)
 - To make Issue A block Issue B, set B as blocked by A
 - Relationships are bidirectional and automatically synchronized
@@ -111,11 +124,13 @@ For each phase, perform these operations in parallel:
    - Status labels that duplicate milestone information
 
 2. **Remove labels from issues:**
+
    ```bash
    gh issue edit ISSUE_NUM --repo OWNER/REPO --remove-label "LABEL_NAME"
    ```
 
 3. **Delete label definitions:**
+
    ```bash
    gh label delete "LABEL_NAME" --repo OWNER/REPO --yes
    ```
@@ -156,6 +171,7 @@ This approach significantly reduces processing time for repositories with many i
 After completing the workflow, verify:
 
 1. **Milestones created:**
+
    ```bash
    gh api repos/OWNER/REPO/milestones
    ```
@@ -166,11 +182,13 @@ After completing the workflow, verify:
    - Verify relationships are visible
 
 3. **Labels removed:**
+
    ```bash
    gh label list --repo OWNER/REPO
    ```
 
 4. **Issues assigned to milestones:**
+
    ```bash
    gh issue list --repo OWNER/REPO --json number,milestone
    ```
@@ -201,7 +219,7 @@ After completing the workflow, verify:
 
 After running this skill, a repository should have:
 
-```
+```text
 ✓ 5 phase-based milestones created
 ✓ 48 issues assigned to appropriate milestones
 ✓ 112 native "blocked by" relationships established

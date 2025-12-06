@@ -8,11 +8,13 @@ version: 1.0.0
 
 ## Objective
 
-Set up automated monitoring of GitHub pull requests that triggers Claude Code to auto-resume and review changes when new commits are detected.
+Set up automated monitoring of GitHub pull requests that triggers Claude Code to auto-resume and
+review changes when new commits are detected.
 
 ## Prerequisites
 
 Before starting, ensure:
+
 1. GitHub CLI (`gh`) is installed and authenticated
 2. You have read access to the target repository
 3. The pr-monitor plugin is installed (includes Stop hook)
@@ -20,6 +22,7 @@ Before starting, ensure:
 ## When to Use
 
 Use this skill when:
+
 - You want to continuously monitor a PR for updates
 - You need to provide automated feedback on new commits
 - You're waiting for someone to push changes to a PR
@@ -32,17 +35,20 @@ Use this skill when:
 **Get PR information:**
 
 1. **If user provides PR URL**, extract repo and PR number:
+
    ```bash
    # Example URL: https://github.com/owner/repo/pull/123
    # Extract: owner/repo and PR number 123
    ```
 
 2. **If user provides repo and PR number**, verify PR exists:
+
    ```bash
    gh pr view PR_NUMBER --repo OWNER/REPO --json number,title,state,headRefOid
    ```
 
 3. **If in a git repository**, list open PRs:
+
    ```bash
    gh pr list --json number,title,headRefOid --limit 20
    ```
@@ -52,6 +58,7 @@ Use this skill when:
 **Create state file for the Stop hook to monitor:**
 
 1. **Get repository path:**
+
    ```bash
    # If already in repo
    REPO_PATH=$(pwd)
@@ -63,11 +70,13 @@ Use this skill when:
    ```
 
 2. **Get current commit SHA:**
+
    ```bash
    CURRENT_SHA=$(gh pr view PR_NUMBER --json headRefOid --jq '.headRefOid')
    ```
 
 3. **Create monitoring state file:**
+
    ```bash
    # Format: /tmp/claude_monitor_pr_<repo-name>_<pr-number>
    # Extract repo name from path
@@ -75,14 +84,15 @@ Use this skill when:
    STATE_FILE="/tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}"
 
    # Write state file with 3 lines: repo_path, pr_number, last_sha
-   cat > "$STATE_FILE" <<EOF
-$REPO_PATH
-$PR_NUMBER
-$CURRENT_SHA
-EOF
+   cat > "$STATE_FILE" <<'EOF'
+   $REPO_PATH
+   $PR_NUMBER
+   $CURRENT_SHA
+   EOF
    ```
 
 4. **Confirm monitoring active:**
+
    ```bash
    echo "✓ Monitoring enabled for PR #$PR_NUMBER"
    echo "✓ State file: $STATE_FILE"
@@ -95,11 +105,13 @@ EOF
 **If requested, perform initial review of current PR state:**
 
 1. **Get PR details:**
+
    ```bash
    gh pr view PR_NUMBER --json title,body,commits,files
    ```
 
 2. **View recent changes:**
+
    ```bash
    gh pr diff PR_NUMBER
    ```
@@ -114,6 +126,7 @@ EOF
 **The Stop hook will now automatically monitor the PR:**
 
 When Claude Code would normally stop:
+
 1. Stop hook checks state file
 2. Queries GitHub for PR status
 3. Compares current SHA with last_sha
@@ -126,9 +139,11 @@ When Claude Code would normally stop:
 **When new commits are detected, Claude will automatically:**
 
 1. **Resume with notification:**
-   - Message: "New commits detected in PR #X. Current commit: abcd1234. There are now Y total commits. Please review the new changes and provide feedback."
+   - Message: "New commits detected in PR #X. Current commit: abcd1234. There are now Y total
+     commits. Please review the new changes and provide feedback."
 
 2. **Review new changes:**
+
    ```bash
    # Get updated PR information
    gh pr view PR_NUMBER --json commits,headRefOid,files
@@ -141,6 +156,7 @@ When Claude Code would normally stop:
    ```
 
 3. **Provide feedback:**
+
    ```bash
    # Comment on PR
    gh pr comment PR_NUMBER --body "FEEDBACK_TEXT"
@@ -158,16 +174,19 @@ When Claude Code would normally stop:
 **When monitoring is no longer needed:**
 
 1. **Remove state file:**
+
    ```bash
    rm /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
    ```
 
 2. **Confirm stopped:**
+
    ```bash
    echo "✓ Monitoring stopped for PR #$PR_NUMBER"
    ```
 
 **Monitoring will also auto-stop if:**
+
 - PR is merged or closed (Stop hook detects and cleans up)
 - Repository is deleted
 - User manually removes state file
@@ -230,7 +249,7 @@ When Claude Code would normally stop:
 
 ## Example Usage
 
-**Scenario: Monitor a PR from Copilot**
+### Scenario: Monitor a PR from Copilot
 
 ```bash
 # 1. User asks to monitor PR #2 in claude-skills repo
@@ -264,17 +283,20 @@ echo "✓ Current commit: ${CURRENT_SHA:0:8}"
 After enabling monitoring, verify:
 
 1. **State file created:**
+
    ```bash
    ls -la /tmp/claude_monitor_pr_*
    ```
 
 2. **State file format correct:**
+
    ```bash
    cat /tmp/claude_monitor_pr_REPO_PR
    # Should show 3 lines: repo_path, pr_number, sha
    ```
 
 3. **PR accessible:**
+
    ```bash
    gh pr view PR_NUMBER --repo OWNER/REPO
    ```

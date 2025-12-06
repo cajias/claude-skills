@@ -1,13 +1,15 @@
 # Software Effort Estimation & Codebase Valuation Skill
 
-Generate comprehensive software effort estimation reports analyzing codebase complexity, traditional development effort estimates, and LLM-assisted productivity gains.
+Generate comprehensive software effort estimation reports analyzing codebase complexity, traditional
+development effort estimates, and LLM-assisted productivity gains.
 
 ## Overview
 
 This skill enables Claude to produce professional documentation analyzing:
 
 - **Codebase Statistics**: Lines of code, files, commits, contributors
-- **Effort Estimation**: Five independent models for triangulation (COCOMO II, Industry Benchmarks, Infrastructure Multiplier, Blended Hybrid, Team Analysis)
+- **Effort Estimation**: Five independent models for triangulation (COCOMO II, Industry Benchmarks,
+  Infrastructure Multiplier, Blended Hybrid, Team Analysis)
 - **Productivity Analysis**: LLM-assisted vs traditional development multipliers
 - **Verification**: Three-stage verification process with 90%+ accuracy
 - **Strategic Insights**: Project planning guidelines and recommendations
@@ -27,14 +29,18 @@ Use this skill when you need to:
 ## Prerequisites
 
 **Required Tools:**
+
 - Git (for repository analysis)
-- `cloc` (Count Lines of Code) - Install via `brew install cloc` (macOS) or `apt-get install cloc` (Linux)
+- `cloc` (Count Lines of Code) - Install via `brew install cloc` (macOS) or
+  `apt-get install cloc` (Linux)
 
 **Optional Tools:**
+
 - GitHub CLI (`gh`) for enhanced git statistics
 - Language-specific analysis tools (gocloc, tokei, etc.)
 
 **Repository Requirements:**
+
 - Git repository with commit history
 - Readable source files
 - Standard project structure
@@ -44,6 +50,7 @@ Use this skill when you need to:
 ### 1. Automated Data Collection
 
 Uses command-line tools to gather verifiable metrics:
+
 - Git statistics (commits, contributors, timeline)
 - Code metrics (LOC by language, file counts)
 - Infrastructure inventory (AWS CDK, Kubernetes, Docker)
@@ -52,6 +59,7 @@ Uses command-line tools to gather verifiable metrics:
 ### 2. Five Independent Estimation Models
 
 Provides triangulation through multiple methodologies:
+
 - **COCOMO II**: Industry-standard constructive cost model
 - **Industry Benchmarks**: Productivity rates by complexity level
 - **Infrastructure Multiplier**: Component-based cloud/infrastructure effort
@@ -61,6 +69,7 @@ Provides triangulation through multiple methodologies:
 ### 3. Productivity Multiplier Analysis
 
 Quantifies LLM-assisted development gains:
+
 - Traditional effort estimates (400-600 person-months typical)
 - Actual effort from commit history
 - Productivity multiplier (often 50-100x)
@@ -69,6 +78,7 @@ Quantifies LLM-assisted development gains:
 ### 4. Three-Stage Verification
 
 Ensures accuracy and defensibility:
+
 - **Automated Counting**: Primary data from tools
 - **Manual Verification**: Spot-checking critical numbers
 - **Cross-Model Validation**: Convergence across models
@@ -76,6 +86,7 @@ Ensures accuracy and defensibility:
 ### 5. Comprehensive Report Generation
 
 Produces 15,000+ word markdown reports with:
+
 - Executive summary with key metrics
 - Detailed methodology notes
 - Comparison tables across all models
@@ -133,7 +144,8 @@ A successful implementation should:
 ## References
 
 Key sources for estimation models:
-- COCOMO II Model - USC CSSE (http://csse.usc.edu/tools/COCOMOII.php)
+
+- COCOMO II Model - USC CSSE (<http://csse.usc.edu/tools/COCOMOII.php>)
 - Capers Jones - "Estimating Software Costs" (2007)
 - Steve McConnell - "Software Estimation: Demystifying the Black Art" (2006)
 - Industry benchmarks from Stack Overflow, Robert Half, Glassdoor data
