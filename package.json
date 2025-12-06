@@ -20,15 +20,12 @@
     "prettier": "^3.7.1"
   },
   "lint-staged": {
-    "*.json": [
-      "npx prettier --write"
-    ],
-    "*.{yml,yaml}": [
-      "npx prettier --write"
+    "*.{json,yml,yaml}": [
+      "prettier --write"
     ],
     "*.md": [
-      "npx markdownlint --fix",
-      "npx prettier --write"
+      "markdownlint --fix",
+      "prettier --write"
     ]
   },
   "keywords": [
