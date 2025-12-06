@@ -12,6 +12,7 @@
     "format:check": "npx prettier --check '**/*.{md,json,yml,yaml}' --ignore-path .gitignore"
   },
   "devDependencies": {
+    "@sca-skills/markdownlint-config": "https://github.com/cajias/lint-configs/releases/download/v1.0.3/sca-skills-markdownlint-config-1.0.0.tgz",
     "markdownlint-cli": "^0.43.0",
     "prettier": "^3.7.1"
   },
