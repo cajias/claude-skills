@@ -1,0 +1,1068 @@
+{
+  "version": "1.0.0",
+  "categories": [
+    {
+      "id": "inflated-symbolism",
+      "name": "Inflated Symbolism & Meaning",
+      "priority": "high",
+      "description": "Phrases that artificially inflate importance or add unwarranted gravitas",
+      "patterns": [
+        {
+          "pattern": "stands as a testament",
+          "type": "phrase",
+          "replacements": ["shows", "demonstrates", "illustrates"]
+        },
+        {
+          "pattern": "serves as a testament",
+          "type": "phrase",
+          "replacements": ["shows", "demonstrates"]
+        },
+        {
+          "pattern": "is a testament",
+          "type": "phrase",
+          "replacements": ["shows", "proves"]
+        },
+        {
+          "pattern": "plays a vital role",
+          "type": "phrase",
+          "replacements": ["contributes to", "helps with", "is part of"]
+        },
+        {
+          "pattern": "plays a significant role",
+          "type": "phrase",
+          "replacements": ["contributes to", "affects"]
+        },
+        {
+          "pattern": "plays a crucial role",
+          "type": "phrase",
+          "replacements": ["is important for", "affects"]
+        },
+        {
+          "pattern": "plays a pivotal role",
+          "type": "phrase",
+          "replacements": ["influences", "shapes"]
+        },
+        {
+          "pattern": "underscores its importance",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Often unnecessary editorializing"
+        },
+        {
+          "pattern": "underscores the significance",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Often unnecessary editorializing"
+        },
+        {
+          "pattern": "continue(?:s)? to captivate",
+          "type": "phrase",
+          "regex": true,
+          "replacements": ["interest", "attracts"]
+        },
+        {
+          "pattern": "leaves a lasting impact",
+          "type": "phrase",
+          "replacements": ["influenced", "changed", "affected"]
+        },
+        {
+          "pattern": "watershed moment",
+          "type": "phrase",
+          "replacements": ["turning point", "important event"]
+        },
+        {
+          "pattern": "key turning point",
+          "type": "phrase",
+          "replacements": ["turning point", "change"]
+        },
+        {
+          "pattern": "deeply rooted",
+          "type": "phrase",
+          "replacements": ["based on", "connected to", "traditional"]
+        },
+        {
+          "pattern": "profound heritage",
+          "type": "phrase",
+          "replacements": ["history", "traditions"]
+        },
+        {
+          "pattern": "steadfast dedication",
+          "type": "phrase",
+          "replacements": ["commitment", "dedication"]
+        },
+        {
+          "pattern": "solidifies",
+          "type": "word",
+          "replacements": ["confirms", "establishes", "strengthens"]
+        },
+        {
+          "pattern": "embodies",
+          "type": "word",
+          "replacements": ["represents", "shows"]
+        },
+        {
+          "pattern": "epitomizes",
+          "type": "word",
+          "replacements": ["represents", "shows"]
+        }
+      ]
+    },
+    {
+      "id": "promotional-language",
+      "name": "Promotional/Travel Brochure Language",
+      "priority": "high",
+      "description": "Text reads like marketing copy or tourism website",
+      "patterns": [
+        {
+          "pattern": "rich cultural heritage",
+          "type": "phrase",
+          "replacements": ["history", "traditions", "culture"]
+        },
+        {
+          "pattern": "rich history",
+          "type": "phrase",
+          "replacements": ["long history", "history"]
+        },
+        {
+          "pattern": "rich tapestry",
+          "type": "phrase",
+          "replacements": ["mix", "combination", "variety"]
+        },
+        {
+          "pattern": "rich cultural tapestry",
+          "type": "phrase",
+          "replacements": ["diverse culture", "cultural mix"]
+        },
+        {
+          "pattern": "breathtaking",
+          "type": "word",
+          "replacements": ["impressive", "notable", "striking"]
+        },
+        {
+          "pattern": "stunning",
+          "type": "word",
+          "replacements": ["impressive", "notable", "attractive"]
+        },
+        {
+          "pattern": "must-visit",
+          "type": "word",
+          "replacements": ["notable", "popular", "well-known"]
+        },
+        {
+          "pattern": "must-see",
+          "type": "word",
+          "replacements": ["notable", "popular", "well-known"]
+        },
+        {
+          "pattern": "stunning natural beauty",
+          "type": "phrase",
+          "replacements": ["natural scenery", "landscape"]
+        },
+        {
+          "pattern": "scenic beauty",
+          "type": "phrase",
+          "replacements": ["scenery", "views", "landscape"]
+        },
+        {
+          "pattern": "enduring legacy",
+          "type": "phrase",
+          "replacements": ["influence", "impact", "lasting effect"]
+        },
+        {
+          "pattern": "lasting legacy",
+          "type": "phrase",
+          "replacements": ["influence", "continued impact"]
+        },
+        {
+          "pattern": "dynamic hub",
+          "type": "phrase",
+          "replacements": ["center", "active area"]
+        },
+        {
+          "pattern": "vibrant community",
+          "type": "phrase",
+          "replacements": ["active community", "community"]
+        },
+        {
+          "pattern": "coastal charm",
+          "type": "phrase",
+          "replacements": ["coastal character", "seaside atmosphere"]
+        },
+        {
+          "pattern": "captivates visitors",
+          "type": "phrase",
+          "replacements": ["attracts visitors", "interests visitors"]
+        },
+        {
+          "pattern": "captivates residents",
+          "type": "phrase",
+          "replacements": ["appeals to residents"]
+        },
+        {
+          "pattern": "hidden gem",
+          "type": "phrase",
+          "replacements": ["lesser-known", "overlooked"]
+        },
+        {
+          "pattern": "world-class",
+          "type": "word",
+          "replacements": ["high-quality", "excellent", "notable"]
+        }
+      ]
+    },
+    {
+      "id": "editorializing",
+      "name": "Editorializing & Commentary",
+      "priority": "high",
+      "description": "Phrases that break neutral encyclopedic tone",
+      "patterns": [
+        {
+          "pattern": "it'?s important to note",
+          "type": "phrase",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete and state directly"
+        },
+        {
+          "pattern": "it is important to note",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete and state directly"
+        },
+        {
+          "pattern": "it'?s worth noting",
+          "type": "phrase",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete and state directly"
+        },
+        {
+          "pattern": "it is worth",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete and state directly"
+        },
+        {
+          "pattern": "importantly",
+          "type": "word",
+          "replacements": [],
+          "action": "delete",
+          "note": "Let facts speak"
+        },
+        {
+          "pattern": "no discussion would be complete without",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Just discuss it"
+        },
+        {
+          "pattern": "in this article",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Self-referential"
+        },
+        {
+          "pattern": "as mentioned earlier",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or restructure"
+        },
+        {
+          "pattern": "needless to say",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "If needless, don't say it"
+        }
+      ]
+    },
+    {
+      "id": "transition-overuse",
+      "name": "Overused Conjunctive/Transitional Phrases",
+      "priority": "medium",
+      "description": "Not always wrong, but flag when multiple appear in same text",
+      "detection_type": "frequency",
+      "threshold": "per_500_words",
+      "patterns": [
+        {
+          "pattern": "moreover",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["also", "and"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "furthermore",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["also", "and"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "additionally",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["also", "and"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "in addition",
+          "type": "phrase",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["also", "and"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "nevertheless",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["however", "but"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "consequently",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["so", "therefore"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "on the other hand",
+          "type": "phrase",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["however", "but"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "in contrast",
+          "type": "phrase",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 1,
+            "per_word_count": 500
+          },
+          "replacements": ["however", "but"],
+          "note": "Flag only when exceeding 1 per 500 words"
+        },
+        {
+          "pattern": "however",
+          "type": "word",
+          "case_sensitive": false,
+          "frequency_threshold": {
+            "max_occurrences": 2,
+            "per_word_count": 500
+          },
+          "replacements": ["but"],
+          "note": "Flag only when exceeding 2 per 500 words"
+        }
+      ],
+      "replacement_strategy": "Vary sentence structure, use simpler connectors (but, and, also), or restructure to eliminate need for transition"
+    },
+    {
+      "id": "negative-parallelism",
+      "name": "Negative Parallelism Pattern",
+      "priority": "high",
+      "description": "Pattern: 'It's not X, it's Y' or 'not just X, but Y' - creates false drama",
+      "patterns": [
+        {
+          "pattern": "(not just|not only|not merely|it'?s not|isn'?t just|more than just).{1,50}(but|but also|it'?s|rather)",
+          "type": "phrase",
+          "regex": true,
+          "case_sensitive": false,
+          "replacements": [],
+          "action": "rephrase",
+          "note": "Rephrase to direct statement. Example: 'It's not just a tool, it's a revolution' → 'The tool significantly changed how people work'"
+        }
+      ]
+    },
+    {
+      "id": "participle-endings",
+      "name": "Superficial Participle Endings",
+      "priority": "high",
+      "description": "Sentences ending with vague -ing clauses that add no real information",
+      "patterns": [
+        {
+          "pattern": ", ensuring\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", highlighting\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", emphasizing\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", reflecting\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", underscoring\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", demonstrating\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", showcasing\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", signaling\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", cementing\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ", solidifying\\b",
+          "type": "ending",
+          "regex": true,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete or make specific"
+        },
+        {
+          "pattern": ",\\s*(ensuring|highlighting|emphasizing|reflecting|underscoring|demonstrating|showcasing|signaling|cementing|solidifying|illustrating|reinforcing|capturing|representing)\\b[^.]*",
+          "type": "ending",
+          "regex": true,
+          "case_sensitive": false,
+          "replacements": [],
+          "action": "delete",
+          "note": "Delete vague -ing clauses at end of sentences. These add no real information."
+        }
+      ]
+    },
+    {
+      "id": "weasel-wording",
+      "name": "Weasel Wording / Vague Attribution",
+      "priority": "medium",
+      "description": "Phrases that suggest authority without providing sources",
+      "patterns": [
+        {
+          "pattern": "industry reports suggest",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite specific report or remove"
+        },
+        {
+          "pattern": "observers have noted",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Name the observers or remove"
+        },
+        {
+          "pattern": "some critics argue",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Name the critics or remove"
+        },
+        {
+          "pattern": "experts say",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Name the experts or remove"
+        },
+        {
+          "pattern": "many believe",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite source or remove"
+        },
+        {
+          "pattern": "it has been said",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite who said it or remove"
+        },
+        {
+          "pattern": "is widely considered",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite sources or rephrase"
+        },
+        {
+          "pattern": "is often regarded as",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite sources or rephrase"
+        },
+        {
+          "pattern": "according to sources",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Name the sources"
+        },
+        {
+          "pattern": "studies show",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite the studies"
+        },
+        {
+          "pattern": "research suggests",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite the research"
+        },
+        {
+          "pattern": "has been described as",
+          "type": "phrase",
+          "replacements": [],
+          "action": "cite_or_remove",
+          "note": "Cite who described it"
+        }
+      ]
+    },
+    {
+      "id": "em-dash-overuse",
+      "name": "Em Dash Overuse",
+      "priority": "medium",
+      "description": "AI uses em dashes more frequently than human writers",
+      "detection_type": "frequency",
+      "threshold": "per_500_words",
+      "patterns": [
+        {
+          "pattern": "—",
+          "type": "punctuation",
+          "note": "Flag if >2 em dashes per 500 words",
+          "replacements": ["commas", "parentheses", "restructure sentence"],
+          "frequency_threshold": {
+            "max_per_500_words": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "rule-of-three",
+      "name": "Rule of Three Overuse",
+      "priority": "medium",
+      "description": "AI overuses three-part lists",
+      "detection_type": "pattern_frequency",
+      "patterns": [
+        {
+          "pattern": "\\b(\\w+),\\s+(\\w+),?\\s+and\\s+(\\w+)\\b",
+          "type": "list",
+          "regex": true,
+          "note": "Flag when appearing multiple times",
+          "replacement_strategy": "Vary list lengths (sometimes 2, sometimes 4), or restructure entirely"
+        }
+      ]
+    },
+    {
+      "id": "formatting-patterns",
+      "name": "Formatting Patterns",
+      "priority": "low",
+      "description": "Common AI formatting quirks",
+      "patterns": [
+        {
+          "pattern": "title_case_headers",
+          "type": "formatting",
+          "detection": "Every main word capitalized in headers",
+          "action": "Use sentence case"
+        },
+        {
+          "pattern": "excessive_bold",
+          "type": "formatting",
+          "detection": ">3 bold phrases per section",
+          "action": "Reduce bolding"
+        },
+        {
+          "pattern": "uniform_bullets",
+          "type": "formatting",
+          "detection": "Every item follows **Topic:** description",
+          "action": "Vary formatting"
+        },
+        {
+          "pattern": "\\*[^*]+\\*",
+          "type": "markdown",
+          "regex": true,
+          "note": "Single asterisks for emphasis",
+          "action": "Use proper formatting"
+        },
+        {
+          "pattern": "_[^_]+_",
+          "type": "markdown",
+          "regex": true,
+          "note": "Underscores for emphasis",
+          "action": "Use proper formatting"
+        }
+      ]
+    },
+    {
+      "id": "buzzwords",
+      "name": "Buzzwords & Jargon",
+      "priority": "high",
+      "description": "Corporate buzzwords and overused jargon",
+      "patterns": [
+        {
+          "pattern": "\\bdelve\\b",
+          "type": "word",
+          "regex": true,
+          "replacements": ["explore", "examine", "look at"]
+        },
+        {
+          "pattern": "delve into",
+          "type": "phrase",
+          "replacements": ["explore", "examine"]
+        },
+        {
+          "pattern": "cutting-edge",
+          "type": "word",
+          "replacements": ["modern", "new", "advanced"]
+        },
+        {
+          "pattern": "revolutionary",
+          "type": "word",
+          "replacements": ["new", "significant", "innovative"]
+        },
+        {
+          "pattern": "game-changing",
+          "type": "word",
+          "replacements": ["significant", "important"]
+        },
+        {
+          "pattern": "groundbreaking",
+          "type": "word",
+          "replacements": ["new", "innovative", "first"]
+        },
+        {
+          "pattern": "multifaceted",
+          "type": "word",
+          "replacements": ["complex", "varied"]
+        },
+        {
+          "pattern": "\\bleverage\\b",
+          "type": "word",
+          "regex": true,
+          "replacements": ["use", "apply"]
+        },
+        {
+          "pattern": "\\butilize\\b",
+          "type": "word",
+          "regex": true,
+          "replacements": ["use"]
+        },
+        {
+          "pattern": "facilitate",
+          "type": "word",
+          "replacements": ["help", "enable", "allow"]
+        },
+        {
+          "pattern": "optimize",
+          "type": "word",
+          "replacements": ["improve"]
+        },
+        {
+          "pattern": "synergy",
+          "type": "word",
+          "replacements": ["cooperation", "combination"]
+        },
+        {
+          "pattern": "paradigm",
+          "type": "word",
+          "replacements": ["model", "approach", "method"]
+        },
+        {
+          "pattern": "holistic",
+          "type": "word",
+          "replacements": ["complete", "comprehensive", "overall"]
+        },
+        {
+          "pattern": "seamlessly",
+          "type": "word",
+          "replacements": ["smoothly", "easily"]
+        },
+        {
+          "pattern": "\\brobust\\b",
+          "type": "word",
+          "regex": true,
+          "replacements": ["strong", "reliable"]
+        },
+        {
+          "pattern": "scalable",
+          "type": "word",
+          "replacements": [],
+          "action": "be_specific",
+          "note": "Be specific about what scales"
+        },
+        {
+          "pattern": "ecosystem",
+          "type": "word",
+          "replacements": ["system", "environment", "community"]
+        },
+        {
+          "pattern": "empower",
+          "type": "word",
+          "replacements": ["enable", "help", "allow"]
+        },
+        {
+          "pattern": "harness",
+          "type": "word",
+          "replacements": ["use", "apply"]
+        }
+      ]
+    },
+    {
+      "id": "filler-phrases",
+      "name": "Filler Openings & Closings",
+      "priority": "high",
+      "description": "Generic openings and closings that add no value",
+      "patterns": [
+        {
+          "pattern": "In today'?s ever-evolving world",
+          "type": "phrase",
+          "regex": true,
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "In the ever-evolving landscape",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "In today'?s fast-paced world",
+          "type": "phrase",
+          "regex": true,
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "As we navigate",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete_or_rephrase"
+        },
+        {
+          "pattern": "In summary",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete",
+          "note": "Let content summarize itself"
+        },
+        {
+          "pattern": "In conclusion",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "In essence",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "Overall",
+          "type": "word",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "To summarize",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "All in all",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "At the end of the day",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "In a nutshell",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        }
+      ]
+    },
+    {
+      "id": "chatbot-artifacts",
+      "name": "Chatbot Artifacts",
+      "priority": "critical",
+      "description": "Dead giveaways of AI generation",
+      "patterns": [
+        {
+          "pattern": "I hope this helps",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "Certainly!",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "Let me know if you",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "feel free to ask",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "As an AI",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "as a language model",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "I don'?t have personal",
+          "type": "chatbot",
+          "regex": true,
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "as of my last",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "as of my knowledge cutoff",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "up to my last training",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "turn0search0",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete",
+          "note": "ChatGPT artifact (Feb 2025+)"
+        },
+        {
+          "pattern": "Based on my training",
+          "type": "chatbot",
+          "replacements": [],
+          "action": "delete"
+        }
+      ]
+    },
+    {
+      "id": "section-conclusions",
+      "name": "Section Conclusions",
+      "priority": "medium",
+      "description": "AI tends to add unnecessary concluding sentences to sections",
+      "detection_type": "ending_sentence",
+      "patterns": [
+        {
+          "pattern": "continues to be",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete",
+          "note": "Check if last sentence of paragraph"
+        },
+        {
+          "pattern": "remains to be seen",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "time will tell",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "only time will tell",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "the future holds",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "looking ahead",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        },
+        {
+          "pattern": "moving forward",
+          "type": "ending",
+          "replacements": [],
+          "action": "often_delete"
+        }
+      ]
+    },
+    {
+      "id": "hedge-words",
+      "name": "Hedge Words Overuse",
+      "priority": "low",
+      "description": "Flag when multiple hedge words appear in close proximity",
+      "detection_mode": "cluster",
+      "cluster_threshold": {
+        "max_occurrences": 3,
+        "within_word_count": 200
+      },
+      "patterns": [
+        {
+          "pattern": "arguably",
+          "type": "word"
+        },
+        {
+          "pattern": "somewhat",
+          "type": "word"
+        },
+        {
+          "pattern": "generally",
+          "type": "word"
+        },
+        {
+          "pattern": "relatively",
+          "type": "word"
+        },
+        {
+          "pattern": "potentially",
+          "type": "word"
+        },
+        {
+          "pattern": "possibly",
+          "type": "word"
+        },
+        {
+          "pattern": "perhaps",
+          "type": "word"
+        },
+        {
+          "pattern": "likely",
+          "type": "word"
+        },
+        {
+          "pattern": "might",
+          "type": "word"
+        },
+        {
+          "pattern": "may",
+          "type": "word"
+        },
+        {
+          "pattern": "could",
+          "type": "word"
+        }
+      ]
+    }
+  ]
+}
