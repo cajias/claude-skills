@@ -36,6 +36,17 @@ Generate comprehensive software effort estimation reports including:
 - Professional 15,000+ word reports with strategic recommendations
 - Reproducible methodology with complete command documentation
 
+### [AI Writing Humanizer](./skills/ai-writing-humanizer/)
+
+Transform AI-generated text into natural human-sounding writing:
+
+- Comprehensive pattern detection across 15 categories (200+ patterns)
+- Iterative loop-until-clean approach with re-analysis after each pass
+- Removes chatbot artifacts, buzzwords, promotional language, and inflated symbolism
+- Interactive mode for review or batch mode for automatic fixes
+- Context-aware replacements that preserve meaning
+- Before/after comparisons and detailed change logs
+
 ## Available Plugins
 
 ### [PR Monitor](./plugins/pr-monitor/)
