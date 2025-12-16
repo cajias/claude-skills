@@ -12,6 +12,30 @@ efficiently. Each skill contains:
 - Example usage patterns
 - Tool and API integration guidance
 
+## Installation
+
+### Via Homebrew (macOS/Linux)
+
+```bash
+brew tap cajias/tools
+brew install claude-skills
+```
+
+After installation, skills and plugins will be available at:
+
+```bash
+$(brew --prefix)/share/claude-skills/skills/   # Skills
+$(brew --prefix)/share/claude-skills/plugins/  # Plugins
+```
+
+### Manual Installation
+
+Clone this repository to access skills and plugins directly:
+
+```bash
+git clone https://github.com/cajias/claude-skills.git
+```
+
 ## Available Skills
 
 ### [GitHub Issue Grooming](./skills/github-issue-grooming/)
