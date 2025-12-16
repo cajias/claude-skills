@@ -49,10 +49,12 @@ jobs:
           # Download the release tarball
           echo "Downloading tarball from https://github.com/$GITHUB_USER/$REPO/archive/refs/tags/$TAG.tar.gz"
           TARBALL_URL="https://github.com/$GITHUB_USER/$REPO/archive/refs/tags/$TAG.tar.gz"
-          curl -fsSL "$TARBALL_URL" -o release.tar.gz || {
-            echo "Error: Failed to download release tarball"
+          HTTP_CODE=$(curl -w '%{http_code}' -fsSL "$TARBALL_URL" -o release.tar.gz)
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Error: Failed to download release tarball (HTTP $HTTP_CODE)"
             exit 1
-          }
+          fi
 
           # Calculate SHA256
           SHA256=$(shasum -a 256 release.tar.gz | awk '{print $1}')
