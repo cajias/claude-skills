@@ -18,6 +18,8 @@ permissions:
 jobs:
   update-formula:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_USER: cajias
     steps:
       - uses: actions/checkout@v4
 
@@ -41,14 +43,16 @@ jobs:
       - name: Download and calculate SHA256
         id: sha256
         run: |
-          GITHUB_USER=cajias
           REPO="${{ steps.get-tag.outputs.repo }}"
           TAG="${{ steps.get-tag.outputs.tag }}"
 
           # Download the release tarball
           echo "Downloading tarball from https://github.com/$GITHUB_USER/$REPO/archive/refs/tags/$TAG.tar.gz"
           TARBALL_URL="https://github.com/$GITHUB_USER/$REPO/archive/refs/tags/$TAG.tar.gz"
-          curl -sL "$TARBALL_URL" -o release.tar.gz
+          curl -fsSL "$TARBALL_URL" -o release.tar.gz || {
+            echo "Error: Failed to download release tarball"
+            exit 1
+          }
 
           # Calculate SHA256
           SHA256=$(shasum -a 256 release.tar.gz | awk '{print $1}')
@@ -63,7 +67,6 @@ jobs:
           VERSION="${{ steps.get-tag.outputs.version }}"
           TAG="${{ steps.get-tag.outputs.tag }}"
           REPO="${{ steps.get-tag.outputs.repo }}"
-          GITHUB_USER=cajias
           SHA256="${{ steps.sha256.outputs.sha256 }}"
 
           # Update the formula file

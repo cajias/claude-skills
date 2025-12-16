@@ -44,8 +44,7 @@ class ClaudeSkills < Formula
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
       📖 To use plugins:
-        claude plugin install \\
-          https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
+        claude plugin install https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
 
       📖 Learn more: https://github.com/cajias/claude-skills
     EOS
