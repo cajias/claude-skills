@@ -5,7 +5,7 @@ refinement from heavily AI-generated text to clean, natural-sounding writing.
 
 ## Original Text (AI-Generated)
 
-```
+````text
 In today's ever-evolving digital landscape, the revolutionary platform stands as a testament to
 innovation and forward-thinking design. It's not just a tool, but a comprehensive ecosystem that
 leverages cutting-edge artificial intelligence to facilitate seamless collaboration, ensuring that
@@ -22,7 +22,7 @@ rich tapestry of features includes real-time processing, robust security measure
 approach to data management, cementing its position as a world-class solution.
 
 I hope this helps! Let me know if you need more information.
-```
+```text
 
 **Word count**: 168 words
 
@@ -311,13 +311,13 @@ I hope this helps! Let me know if you need more information.
     "word_count": 168
   }
 }
-```
+```text
 
 ### Changes Applied - Iteration 1
 
 All 31 issues addressed. Text after changes:
 
-```
+```text
 The innovative platform demonstrates innovation and forward-thinking design. The comprehensive
 platform uses advanced artificial intelligence to enable smooth collaboration. Teams can improve
 their workflow efficiently and effectively.
@@ -329,7 +329,7 @@ solution is a significant advancement in the field.
 The platform's ability to use machine learning is important in the technology sector. The range of
 features includes real-time processing, strong security measures, and a comprehensive approach to
 data management.
-```
+```text
 
 **Word count**: 99 words (reduced from 168)
 
@@ -366,13 +366,13 @@ data management.
     "word_count": 99
   }
 }
-```
+```text
 
 ### Changes Applied - Iteration 2
 
 Issues 1-2 addressed:
 
-```
+```text
 The innovative platform supports forward-thinking design. The comprehensive platform uses advanced
 artificial intelligence to enable smooth collaboration. Teams can improve their workflow
 efficiently and effectively.
@@ -383,7 +383,7 @@ solution is a significant advancement in the field.
 
 The platform's ability to use machine learning is important in the technology sector. Features
 include real-time processing, security measures, and data management approaches.
-```
+```text
 
 **Word count**: 95 words
 
@@ -403,7 +403,7 @@ include real-time processing, security measures, and data management approaches.
     "word_count": 95
   }
 }
-```
+```text
 
 ### Verification Results
 
@@ -424,11 +424,11 @@ include real-time processing, security measures, and data management approaches.
   },
   "notes": "Text is clean and natural-sounding. All AI patterns removed."
 }
-```
+```text
 
 ## Final Output
 
-```
+```text
 The innovative platform supports forward-thinking design. The comprehensive platform uses advanced
 artificial intelligence to enable smooth collaboration. Teams can improve their workflow
 efficiently and effectively.
@@ -439,7 +439,7 @@ solution is a significant advancement in the field.
 
 The platform's ability to use machine learning is important in the technology sector. Features
 include real-time processing, security measures, and data management approaches.
-```
+```text
 
 ## Summary Report
 
@@ -519,7 +519,7 @@ innovation and forward-thinking design."
 
 Further simplification possible:
 
-```
+```text
 The platform uses artificial intelligence to enable collaboration and improve workflow.
 
 The system helps organizations examine data analytics and identify patterns. Analysis shows this
@@ -527,7 +527,7 @@ solution is a significant advancement.
 
 The platform uses machine learning. Features include real-time processing, security, and data
 management.
-```
+```text
 
 **Word count**: 48 words (72% reduction)
 
@@ -535,7 +535,7 @@ management.
 
 If more context needed:
 
-```
+```text
 The innovative platform supports forward-thinking design through advanced artificial intelligence.
 It enables smooth collaboration, allowing teams to improve their workflow efficiently.
 
@@ -546,7 +546,7 @@ solution represents a significant advancement in the field.
 The platform's machine learning capabilities are important in the technology sector. Key features
 include real-time data processing, strong security measures, and comprehensive data management
 approaches.
-```
+```text
 
 **Word count**: 87 words (48% reduction)
 
@@ -563,3 +563,4 @@ professional writing through 3 iterations. The final text:
 
 This demonstrates the effectiveness of the iterative loop-until-clean approach for humanizing
 AI-generated content.
+````

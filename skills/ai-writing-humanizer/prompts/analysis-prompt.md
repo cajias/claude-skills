@@ -5,9 +5,9 @@ report ALL matches.
 
 ## Text to Analyze
 
-```
+````text
 {{INPUT_TEXT}}
-```
+```text
 
 ## Categories to Check
 
@@ -113,7 +113,7 @@ For each issue found, report:
     "word_count": 0
   }
 }
-```
+```text
 
 ## Analysis Guidelines
 
@@ -248,7 +248,7 @@ seamless integration."
     "word_count": 27
   }
 }
-```
+```text
 
 ## Notes
 
@@ -257,3 +257,4 @@ seamless integration."
 - Calculate word count for frequency analysis
 - Group related issues when reporting (e.g., multiple instances of same pattern)
 - Prioritize CRITICAL issues (chatbot artifacts) for immediate attention
+````

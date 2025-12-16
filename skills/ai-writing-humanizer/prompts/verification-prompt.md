@@ -5,15 +5,15 @@ ensure all patterns have been addressed and no new issues were introduced.
 
 ## Modified Text
 
-```
+````text
 {{MODIFIED_TEXT}}
-```
+```text
 
 ## Changes Made
 
 ```json
 {{CHANGES_LOG}}
-```
+```text
 
 ## Verification Checklist
 
@@ -142,7 +142,7 @@ Evaluate:
   },
   "notes": "any additional observations or recommendations"
 }
-```
+```text
 
 ## Scoring Guidelines
 
@@ -236,7 +236,7 @@ metrics."
   },
   "notes": "Text is clear, concise, and natural. No AI patterns detected."
 }
-```
+```text
 
 ### Example 2: Issues Remaining
 
@@ -287,7 +287,7 @@ Moreover, it facilitates seamless integration."
   },
   "notes": "Several high-priority patterns remain. Text needs another iteration to remove participle ending and buzzwords."
 }
-```
+```text
 
 ### Example 3: Grammar Issues Introduced
 
@@ -319,7 +319,7 @@ Moreover, it facilitates seamless integration."
   },
   "notes": "AI patterns removed but grammar error introduced during editing. Requires fix."
 }
-```
+```text
 
 ## Final Recommendations
 
@@ -367,3 +367,4 @@ After restoration, verify AI patterns are still removed."
 - Balance pattern removal with natural language
 - Don't over-optimize (sometimes acceptable patterns are fine)
 - Flag genuine concerns, not theoretical possibilities
+````

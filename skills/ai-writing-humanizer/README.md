@@ -98,29 +98,29 @@ The skill checks for **15 comprehensive categories** of AI writing patterns:
 
 Provide text and request humanization:
 
-```
+````text
 I have some AI-generated text that needs to sound more natural. Can you use the AI Writing
 Humanizer skill to clean it up?
 
 [Your text here]
-```
+```text
 
 ### Specify Mode
 
-```
+```text
 Use the AI Writing Humanizer in batch mode to automatically fix all high-priority issues in this
 text:
 
 [Your text here]
-```
+```text
 
 ### Analysis Only
 
-```
+```text
 Analyze this text for AI writing patterns but don't make changes yet:
 
 [Your text here]
-```
+```text
 
 ## Workflow Phases
 
@@ -222,3 +222,4 @@ See the `examples/` directory for:
 ## Version
 
 1.0.0 - Initial release with 15 pattern categories and iterative refinement workflow
+````

@@ -4,15 +4,15 @@ For each flagged AI writing pattern below, generate a natural human-sounding rep
 
 ## Flagged Issues
 
-```json
+````json
 {{ISSUES_JSON}}
-```
+```text
 
 ## Original Text
 
-```
+```text
 {{ORIGINAL_TEXT}}
-```
+```text
 
 ## Guidelines for Replacements
 
@@ -152,7 +152,7 @@ If a phrase adds nothing, remove it entirely.
     }
   ]
 }
-```
+```text
 
 ## Confidence Levels
 
@@ -197,7 +197,7 @@ Use when substantial rewriting needed or meaning might change:
   "context_before": "The platform",
   "context_after": "cutting-edge AI technology."
 }
-```
+```text
 
 ### Example 2: Deletion
 
@@ -214,7 +214,7 @@ Use when substantial rewriting needed or meaning might change:
   "context_before": "",
   "context_after": "the results were positive."
 }
-```
+```text
 
 ### Example 3: Complex Rephrase
 
@@ -231,7 +231,7 @@ Use when substantial rewriting needed or meaning might change:
   "context_before": "",
   "context_after": "for developers."
 }
-```
+```text
 
 ### Example 4: Participle Ending Removal
 
@@ -249,7 +249,7 @@ transparency."
   "context_before": "The company released quarterly earnings",
   "context_after": ""
 }
-```
+```text
 
 ## Special Cases
 
@@ -328,3 +328,4 @@ Restructure the sentence or clause. Use when:
 4. Provide clear, actionable explanation
 5. Be consistent with confidence levels
 6. Ensure valid JSON formatting
+````

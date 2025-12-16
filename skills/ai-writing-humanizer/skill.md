@@ -17,18 +17,18 @@ Before starting, ensure:
 
 ## Core Algorithm
 
-```
+```pseudocode
 function humanize_text(input_text, max_iterations=5):
     iteration = 0
     current_text = input_text
     all_changes = []
-    
+
     while iteration < max_iterations:
         iteration++
-        
+
         # Step 1: Analyze current text
         issues = analyze_for_ai_patterns(current_text)
-        
+
         # Step 2: Check if clean
         if issues.length == 0:
             return {
@@ -37,20 +37,20 @@ function humanize_text(input_text, max_iterations=5):
                 iterations: iteration,
                 changes_made: all_changes
             }
-        
+
         # Step 3: Generate suggestions for each issue
         suggestions = generate_suggestions(issues, current_text)
-        
+
         # Step 4: Get approval (interactive) or auto-apply (batch)
         approved_changes = get_approval(suggestions, mode)
-        
+
         # Step 5: Apply changes
         current_text = apply_changes(current_text, approved_changes)
         all_changes.append(approved_changes)
-        
+
         # Step 6: Log iteration
         log_iteration(iteration, issues, approved_changes)
-    
+
     # Max iterations reached
     remaining_issues = analyze_for_ai_patterns(current_text)
     return {
@@ -66,7 +66,7 @@ function humanize_text(input_text, max_iterations=5):
 
 ### Phase 1: Input Processing and Setup
 
-**Step 1.1: Accept Input**
+#### Step 1.1: Accept Input
 
 Accept text from one of these sources:
 
@@ -75,7 +75,7 @@ Accept text from one of these sources:
 - Clipboard content
 - URL to fetch (if supported)
 
-**Step 1.2: Configure Options**
+#### Step 1.2: Configure Options
 
 Determine mode and settings:
 
@@ -91,7 +91,7 @@ Determine mode and settings:
 }
 ```
 
-**Step 1.3: Initialize State**
+#### Step 1.3: Initialize State
 
 ```json
 {
@@ -105,7 +105,7 @@ Determine mode and settings:
 
 ### Phase 2: Pattern Analysis (First Iteration)
 
-**Step 2.1: Load Pattern Database**
+#### Step 2.1: Load Pattern Database
 
 Load patterns from `patterns/patterns.json`. Organize by priority:
 
@@ -114,7 +114,7 @@ Load patterns from `patterns/patterns.json`. Organize by priority:
 - Medium: Frequency-based patterns, weasel words
 - Low: Hedge words, formatting
 
-**Step 2.2: Analyze Text Using Analysis Prompt**
+#### Step 2.2: Analyze Text Using Analysis Prompt
 
 Use the prompt template from `prompts/analysis-prompt.md`. For each category:
 
@@ -138,7 +138,7 @@ Use the prompt template from `prompts/analysis-prompt.md`. For each category:
    - Count repeated structures
    - Flag excessive use
 
-**Step 2.3: Generate Analysis Report**
+#### Step 2.3: Generate Analysis Report
 
 Output format:
 
@@ -177,7 +177,7 @@ Output format:
 }
 ```
 
-**Step 2.4: Present Analysis to User**
+#### Step 2.4: Present Analysis to User
 
 Format issues for display:
 
@@ -187,24 +187,26 @@ Format issues for display:
 Found 15 AI writing patterns:
 
 ### Critical Priority (1 issue)
+
 - **Chatbot Artifact** (paragraph 1, sentence 5): "I hope this helps"
   → Suggested action: Delete
 
 ### High Priority (9 issues)
+
 - **Buzzword** (paragraph 2, sentence 3): "leverage"
   → Suggested replacement: "use"
 - **Inflated Symbolism** (paragraph 3, sentence 1): "stands as a testament"
   → Suggested replacement: "demonstrates"
-...
+  ...
 ```
 
 ### Phase 3: Suggestion Generation
 
-**Step 3.1: Load Suggestion Prompt**
+#### Step 3.1: Load Suggestion Prompt
 
 Use template from `prompts/suggestion-prompt.md`.
 
-**Step 3.2: Generate Context-Aware Replacements**
+#### Step 3.2: Generate Context-Aware Replacements
 
 For each issue:
 
@@ -233,7 +235,7 @@ For each issue:
    - Sounds natural
    - Consistent tone
 
-**Step 3.3: Output Suggestions**
+#### Step 3.3: Output Suggestions
 
 ```json
 {
@@ -268,7 +270,7 @@ For each issue:
 
 ### Phase 4: Change Application
 
-**Step 4.1: Present Changes for Approval (Interactive Mode)**
+#### Step 4.1: Present Changes for Approval (Interactive Mode)
 
 For each issue (grouped by paragraph):
 
@@ -290,7 +292,7 @@ Options:
 [Q] Quit interactive mode (apply remaining automatically)
 ```
 
-**Step 4.2: Auto-Apply Changes (Batch Mode)**
+#### Step 4.2: Auto-Apply Changes (Batch Mode)
 
 Automatically apply changes based on:
 
@@ -298,7 +300,7 @@ Automatically apply changes based on:
 - Confidence level (high confidence only)
 - Category settings (user-configured)
 
-**Step 4.3: Apply Approved Changes**
+#### Step 4.3: Apply Approved Changes
 
 Apply changes in order (from end to beginning to preserve positions):
 
@@ -310,7 +312,7 @@ Apply changes in order (from end to beginning to preserve positions):
 3. Update current_text
 4. Log change with before/after
 
-**Step 4.4: Update Change Log**
+#### Step 4.4: Update Change Log
 
 ```json
 {
@@ -336,13 +338,13 @@ Apply changes in order (from end to beginning to preserve positions):
 
 ### Phase 5: Re-Analysis Loop
 
-**Step 5.1: Increment Iteration Counter**
+#### Step 5.1: Increment Iteration Counter
 
-```
+```pseudocode
 iteration++
 ```
 
-**Step 5.2: Re-Run Pattern Analysis**
+#### Step 5.2: Re-Run Pattern Analysis
 
 Using the same analysis process as Phase 2, scan the modified text for:
 
@@ -358,9 +360,9 @@ Using the same analysis process as Phase 2, scan the modified text for:
    - Patterns that were hidden by other patterns
    - Issues that become visible after changes
 
-**Step 5.3: Check Termination Conditions**
+#### Step 5.3: Check Termination Conditions
 
-```
+```pseudocode
 if (issues.length == 0) {
     # SUCCESS: Text is clean
     proceed to Phase 6
@@ -382,7 +384,7 @@ goto Phase 3 (Suggestion Generation)
 
 ### Phase 6: Verification and Final Report
 
-**Step 6.1: Final Verification**
+#### Step 6.1: Final Verification
 
 Use prompt from `prompts/verification-prompt.md`:
 
@@ -391,7 +393,7 @@ Use prompt from `prompts/verification-prompt.md`:
 3. **Coherence check**: Text flows naturally
 4. **Meaning check**: Original intent preserved
 
-**Step 6.2: Generate Final Report**
+#### Step 6.2: Generate Final Report
 
 ```markdown
 # AI Writing Humanizer Report
@@ -413,9 +415,11 @@ Use prompt from `prompts/verification-prompt.md`:
 ## Changes by Category
 
 ### Chatbot Artifacts (1)
+
 - Removed "I hope this helps"
 
 ### Buzzwords (6)
+
 - "leverage" → "use"
 - "utilize" → "use"
 - "cutting-edge" → "modern"
@@ -424,29 +428,35 @@ Use prompt from `prompts/verification-prompt.md`:
 - "delve into" → "examine"
 
 ### Inflated Symbolism (3)
+
 - "stands as a testament" → "demonstrates"
 - "plays a vital role" → "is important for"
 - "watershed moment" → "turning point"
 
 ### Participle Endings (2)
+
 - Removed ", highlighting its importance"
 - Removed ", ensuring quality"
 
 ### Filler Phrases (1)
+
 - Removed "In today's ever-evolving world"
 
 ### Editorializing (2)
+
 - Removed "It's important to note that"
 - Removed "Worth mentioning is that"
 
 ## Before and After
 
 ### Before (excerpt)
+
 "In today's ever-evolving world, the platform stands as a testament to innovation. It's not just
 a tool, but a revolutionary ecosystem that leverages cutting-edge technology, ensuring seamless
 integration. I hope this helps!"
 
 ### After
+
 "The platform demonstrates innovation. The revolutionary system uses modern technology and
 integrates smoothly."
 
