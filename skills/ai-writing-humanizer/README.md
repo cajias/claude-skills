@@ -167,14 +167,27 @@ Analyze this text for AI writing patterns but don't make changes yet:
 
 ## Configuration Options
 
-The skill supports various configuration options:
+The skill supports extensive configuration via `config/default.config.json`:
+
+### Core Settings
 
 - **Mode**: interactive, batch, or report-only
-- **Max iterations**: Typically 3-5 passes
-- **Auto-fix priority**: Which levels to apply automatically
+- **Max iterations**: Typically 3-5 passes (configurable 1-10)
+- **Auto-fix priority**: Which levels to apply automatically (default: critical, high)
+- **Require approval**: Which levels need manual review (default: medium, low)
 - **Strict mode**: More aggressive pattern detection
-- **Categories to check**: Enable/disable specific categories
-- **Output format**: Markdown, JSON, or diff
+- **Min confidence**: Minimum confidence score to report issues (0.0-1.0)
+- **Output format**: Markdown, JSON, diff, or HTML
+
+### Advanced Options
+
+- **Categories to skip**: Exclude specific pattern categories from analysis
+- **Custom patterns file**: Path to additional project-specific patterns
+- **Preserve technical terms**: Use allowlist for established technical terminology
+- **Technical terms allowlist**: See `patterns/technical-terms-allowlist.json` for terms
+  like "Kubernetes ecosystem", "financial leverage" that are legitimate in context
+
+See `config/config.schema.json` for complete configuration schema and validation.
 
 ## Success Criteria
 

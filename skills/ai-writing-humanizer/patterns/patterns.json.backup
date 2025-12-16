@@ -296,101 +296,74 @@
         {
           "pattern": "moreover",
           "type": "word",
-          "case_sensitive": false,
+          "note": "Flag if >1 occurrence per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["also", "and"],
-          "note": "Flag only when exceeding 1 per 500 words"
+            "max_per_500_words": 1
+          }
         },
         {
           "pattern": "furthermore",
           "type": "word",
-          "case_sensitive": false,
+          "note": "Flag if >1 occurrence per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["also", "and"],
-          "note": "Flag only when exceeding 1 per 500 words"
+            "max_per_500_words": 1
+          }
         },
         {
           "pattern": "additionally",
           "type": "word",
-          "case_sensitive": false,
+          "note": "Flag if >1 occurrence per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["also", "and"],
-          "note": "Flag only when exceeding 1 per 500 words"
+            "max_per_500_words": 1
+          }
         },
         {
           "pattern": "in addition",
           "type": "phrase",
-          "case_sensitive": false,
+          "note": "Flag if >1 occurrence per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["also", "and"],
-          "note": "Flag only when exceeding 1 per 500 words"
-        },
-        {
-          "pattern": "nevertheless",
-          "type": "word",
-          "case_sensitive": false,
-          "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["however", "but"],
-          "note": "Flag only when exceeding 1 per 500 words"
-        },
-        {
-          "pattern": "consequently",
-          "type": "word",
-          "case_sensitive": false,
-          "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["so", "therefore"],
-          "note": "Flag only when exceeding 1 per 500 words"
+            "max_per_500_words": 1
+          }
         },
         {
           "pattern": "on the other hand",
           "type": "phrase",
-          "case_sensitive": false,
+          "note": "Flag if >1 occurrence per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["however", "but"],
-          "note": "Flag only when exceeding 1 per 500 words"
-        },
-        {
-          "pattern": "in contrast",
-          "type": "phrase",
-          "case_sensitive": false,
-          "frequency_threshold": {
-            "max_occurrences": 1,
-            "per_word_count": 500
-          },
-          "replacements": ["however", "but"],
-          "note": "Flag only when exceeding 1 per 500 words"
+            "max_per_500_words": 1
+          }
         },
         {
           "pattern": "however",
           "type": "word",
-          "case_sensitive": false,
+          "note": "Flag if >2 occurrences per 500 words",
           "frequency_threshold": {
-            "max_occurrences": 2,
-            "per_word_count": 500
-          },
-          "replacements": ["but"],
-          "note": "Flag only when exceeding 2 per 500 words"
+            "max_per_500_words": 2
+          }
+        },
+        {
+          "pattern": "in contrast",
+          "type": "phrase",
+          "note": "Flag if >1 occurrence per 500 words",
+          "frequency_threshold": {
+            "max_per_500_words": 1
+          }
+        },
+        {
+          "pattern": "nevertheless",
+          "type": "word",
+          "note": "Flag if >1 occurrence per 500 words",
+          "frequency_threshold": {
+            "max_per_500_words": 1
+          }
+        },
+        {
+          "pattern": "consequently",
+          "type": "word",
+          "note": "Flag if >1 occurrence per 500 words",
+          "frequency_threshold": {
+            "max_per_500_words": 1
+          }
         }
       ],
       "replacement_strategy": "Vary sentence structure, use simpler connectors (but, and, also), or restructure to eliminate need for transition"
@@ -405,10 +378,9 @@
           "pattern": "(not just|not only|not merely|it'?s not|isn'?t just|more than just).{1,50}(but|but also|it'?s|rather)",
           "type": "phrase",
           "regex": true,
-          "case_sensitive": false,
           "replacements": [],
           "action": "rephrase",
-          "note": "Rephrase to direct statement. Example: 'It's not just a tool, it's a revolution' → 'The tool significantly changed how people work'"
+          "note": "Rephrase to direct statement"
         }
       ]
     },
@@ -499,13 +471,12 @@
           "note": "Delete or make specific"
         },
         {
-          "pattern": ",\\s*(ensuring|highlighting|emphasizing|reflecting|underscoring|demonstrating|showcasing|signaling|cementing|solidifying|illustrating|reinforcing|capturing|representing)\\b[^.]*",
+          "pattern": ", (ensuring|highlighting|emphasizing|reflecting|underscoring|demonstrating|showcasing|signaling|cementing|solidifying)\\b",
           "type": "ending",
           "regex": true,
-          "case_sensitive": false,
           "replacements": [],
           "action": "delete",
-          "note": "Delete vague -ing clauses at end of sentences. These add no real information."
+          "note": "Delete vague -ing clauses at end of sentences"
         }
       ]
     },
@@ -1012,55 +983,98 @@
       "name": "Hedge Words Overuse",
       "priority": "low",
       "description": "Flag when multiple hedge words appear in close proximity",
-      "detection_mode": "cluster",
-      "cluster_threshold": {
-        "max_occurrences": 3,
-        "within_word_count": 200
-      },
+      "detection_type": "frequency",
+      "threshold": "per_200_words",
       "patterns": [
         {
           "pattern": "arguably",
-          "type": "word"
+          "type": "word",
+          "note": "Flag if >3 hedge words per 200 words",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          }
         },
         {
           "pattern": "somewhat",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "generally",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "relatively",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "potentially",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "possibly",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "perhaps",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "likely",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
-          "pattern": "might",
-          "type": "word"
+          "pattern": "\\bmight\\b",
+          "type": "word",
+          "regex": true,
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
-          "pattern": "may",
-          "type": "word"
+          "pattern": "\\bmay\\b",
+          "type": "word",
+          "regex": true,
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "could",
-          "type": "word"
+          "type": "word",
+          "frequency_threshold": {
+            "max_per_200_words": 3
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         }
       ]
     }

@@ -359,6 +359,34 @@ After fixes, run verification again."
 
 After restoration, verify AI patterns are still removed."
 
+## Regression Detection
+
+Check if modifications introduced NEW AI patterns:
+
+1. Run all 15 category checks on the new text
+2. Compare issue counts: new_issues should be 0
+3. If new patterns found, mark as "issues_remaining" and list them
+
+## Coherence Scoring Rubric
+
+- **10**: Perfect flow, reads naturally, professional quality
+- **8-9**: Minor awkwardness, still clear
+- **6-7**: Noticeable choppiness, meaning clear
+- **4-5**: Difficult to follow, meaning partially obscured
+- **1-3**: Incoherent, meaning lost
+
+## Meaning Preservation Check
+
+Compare original and modified for:
+
+1. All proper nouns preserved
+2. All numbers/statistics preserved
+3. All dates preserved
+4. Core claims unchanged
+5. Tone consistency (formal/informal)
+
+If ANY factual content lost, set `meaning_preserved: false` and explain in notes.
+
 ## Notes
 
 - Be thorough but efficient in verification

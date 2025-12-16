@@ -1,0 +1,32 @@
+{
+  "description": "Technical terms that appear in pattern lists but are legitimate in context",
+  "terms": {
+    "ecosystem": [
+      "Kubernetes ecosystem",
+      "Docker ecosystem",
+      "npm ecosystem",
+      "Python ecosystem",
+      "developer ecosystem"
+    ],
+    "leverage": ["financial leverage", "leverage ratio", "operating leverage"],
+    "robust": [
+      "robust standard errors",
+      "robust regression",
+      "robust optimization"
+    ],
+    "optimize": [
+      "optimize query",
+      "optimize algorithm",
+      "optimize performance"
+    ],
+    "paradigm": ["programming paradigm", "paradigm shift (when citing Kuhn)"],
+    "scalable": [
+      "horizontally scalable",
+      "vertically scalable",
+      "scalable architecture"
+    ],
+    "orchestration": ["container orchestration", "workflow orchestration"],
+    "pipeline": ["CI/CD pipeline", "data pipeline", "ML pipeline"]
+  },
+  "usage": "Before flagging a pattern, check if it appears in a technical context from this allowlist"
+}

@@ -256,7 +256,26 @@ seamless integration."
     "word_count": 27
   }
 }
-```text
+```
+
+## Output Requirements
+
+1. Return ONLY valid JSON - no markdown code blocks, no explanation text
+2. Ensure all strings are properly escaped (especially quotes and backslashes)
+3. Include empty arrays `[]` rather than omitting fields
+4. Every issue MUST have all required fields: category, priority, pattern_matched, location,
+   context, suggested_action, suggested_replacement
+5. Location format: "paragraph X, sentence Y" (1-indexed)
+6. Context should include 5-10 words before and after the matched pattern
+7. For frequency-based patterns, include occurrence count in the issue
+
+## Validation Checklist Before Responding
+
+- [ ] JSON is syntactically valid
+- [ ] All 15 categories were checked
+- [ ] Each issue has complete metadata
+- [ ] No duplicate issues reported
+- [ ] Priority correctly assigned based on category
 
 ## Notes
 

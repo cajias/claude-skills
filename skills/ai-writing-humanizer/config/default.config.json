@@ -1,0 +1,12 @@
+{
+  "$schema": "./config.schema.json",
+  "mode": "interactive",
+  "max_iterations": 5,
+  "auto_fix_priority": ["critical", "high"],
+  "require_approval_for": ["medium", "low"],
+  "strict_mode": false,
+  "preserve_technical_terms": true,
+  "output_format": "markdown",
+  "categories_to_skip": [],
+  "min_confidence": 0.7
+}

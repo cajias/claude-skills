@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AI Writing Humanizer Configuration",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["interactive", "batch", "report-only"],
+      "default": "interactive",
+      "description": "Processing mode"
+    },
+    "max_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5,
+      "description": "Maximum analysis-fix cycles"
+    },
+    "auto_fix_priority": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["critical", "high", "medium", "low"]
+      },
+      "default": ["critical", "high"],
+      "description": "Priority levels to auto-fix without approval"
+    },
+    "require_approval_for": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["critical", "high", "medium", "low"]
+      },
+      "default": ["medium", "low"],
+      "description": "Priority levels requiring user approval"
+    },
+    "strict_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable aggressive pattern detection"
+    },
+    "preserve_technical_terms": {
+      "type": "boolean",
+      "default": true,
+      "description": "Skip flagging established technical terminology"
+    },
+    "output_format": {
+      "type": "string",
+      "enum": ["markdown", "json", "diff", "html"],
+      "default": "markdown"
+    },
+    "categories_to_skip": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Category IDs to exclude from analysis"
+    },
+    "custom_patterns_file": {
+      "type": "string",
+      "description": "Path to additional custom patterns JSON file"
+    },
+    "min_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "default": 0.7,
+      "description": "Minimum confidence score to report an issue"
+    }
+  },
+  "required": []
+}

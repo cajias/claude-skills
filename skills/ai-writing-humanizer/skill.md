@@ -15,6 +15,38 @@ Before starting, ensure:
 3. You understand the 15 pattern categories and their priorities
 4. You can perform text analysis and pattern matching
 
+## Configuration
+
+The skill supports extensive configuration via `config/default.config.json`:
+
+### Mode Options
+
+| Mode          | Description                                   |
+| ------------- | --------------------------------------------- |
+| `interactive` | Review each change before applying            |
+| `batch`       | Auto-apply changes above confidence threshold |
+| `report-only` | Analyze without making changes                |
+
+### Priority Levels
+
+| Priority   | Auto-fix Default       | Examples                      |
+| ---------- | ---------------------- | ----------------------------- |
+| `critical` | Yes                    | Chatbot artifacts             |
+| `high`     | Yes                    | Buzzwords, inflated symbolism |
+| `medium`   | No (requires approval) | Em dash overuse, transitions  |
+| `low`      | No (requires approval) | Hedge words, formatting       |
+
+### Custom Patterns
+
+Add project-specific patterns by creating a custom patterns file and setting `custom_patterns_file`
+in config.
+
+### Technical Terms Allowlist
+
+The `patterns/technical-terms-allowlist.json` file contains established technical terminology that
+should not be flagged when used in proper context (e.g., "Kubernetes ecosystem", "financial
+leverage").
+
 ## Core Algorithm
 
 ```pseudocode

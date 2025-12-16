@@ -320,6 +320,33 @@ Restructure the sentence or clause. Use when:
 - Multiple patterns in one phrase
 - Simple replacement would be awkward
 
+## Replacement Quality Criteria
+
+Each replacement MUST:
+
+1. Be shorter or equal length to original (prefer concise)
+2. Preserve ALL factual information
+3. Use active voice when possible
+4. Avoid introducing new AI patterns
+5. Sound natural when read aloud
+
+## Confidence Scoring
+
+Assign confidence based on:
+
+- **high** (0.9+): Direct word swap, no context dependency (e.g., "utilize" → "use")
+- **medium** (0.7-0.9): Phrase replacement, minor context consideration
+- **low** (<0.7): Requires restructuring, meaning at risk, or ambiguous
+
+## Anti-Pattern Check
+
+Before suggesting a replacement, verify it does NOT contain:
+
+- Any words from the buzzwords list
+- Any phrases from the inflated symbolism list
+- Em dashes (when replacing non-em-dash text)
+- Three-item lists (when original didn't have one)
+
 ## Output Requirements
 
 1. Provide replacement for EVERY issue in the input
