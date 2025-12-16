@@ -999,49 +999,56 @@
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "generally",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "relatively",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "potentially",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "possibly",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "perhaps",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "likely",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "\\bmight\\b",
@@ -1049,7 +1056,8 @@
           "regex": true,
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "\\bmay\\b",
@@ -1057,14 +1065,16 @@
           "regex": true,
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         },
         {
           "pattern": "could",
           "type": "word",
           "frequency_threshold": {
             "max_per_200_words": 3
-          }
+          },
+          "note": "Flag if >3 hedge words per 200 words"
         }
       ]
     }
