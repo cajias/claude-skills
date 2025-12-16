@@ -1,32 +1,80 @@
 {
-  "description": "Technical terms that appear in pattern lists but are legitimate in context",
-  "terms": {
-    "ecosystem": [
-      "Kubernetes ecosystem",
-      "Docker ecosystem",
-      "npm ecosystem",
-      "Python ecosystem",
-      "developer ecosystem"
-    ],
-    "leverage": ["financial leverage", "leverage ratio", "operating leverage"],
-    "robust": [
-      "robust standard errors",
-      "robust regression",
-      "robust optimization"
-    ],
-    "optimize": [
-      "optimize query",
-      "optimize algorithm",
-      "optimize performance"
-    ],
-    "paradigm": ["programming paradigm", "paradigm shift (when citing Kuhn)"],
-    "scalable": [
-      "horizontally scalable",
-      "vertically scalable",
-      "scalable architecture"
-    ],
-    "orchestration": ["container orchestration", "workflow orchestration"],
-    "pipeline": ["CI/CD pipeline", "data pipeline", "ML pipeline"]
+  "description": "Technical terms that appear in pattern lists but are legitimate in specific contexts",
+  "version": "1.0.0",
+  "allowlist": {
+    "ecosystem": {
+      "allowed_contexts": [
+        "Kubernetes ecosystem",
+        "Docker ecosystem",
+        "npm ecosystem",
+        "Python ecosystem",
+        "developer ecosystem",
+        "open source ecosystem"
+      ],
+      "note": "Legitimate when referring to established technology communities"
+    },
+    "leverage": {
+      "allowed_contexts": [
+        "financial leverage",
+        "leverage ratio",
+        "operating leverage",
+        "leveraged buyout"
+      ],
+      "note": "Legitimate financial/business term"
+    },
+    "robust": {
+      "allowed_contexts": [
+        "robust standard errors",
+        "robust regression",
+        "robust optimization",
+        "robust estimator"
+      ],
+      "note": "Legitimate statistical/mathematical term"
+    },
+    "optimize": {
+      "allowed_contexts": [
+        "optimize query",
+        "optimization algorithm",
+        "compiler optimization",
+        "performance optimization"
+      ],
+      "note": "Legitimate when referring to actual optimization processes"
+    },
+    "paradigm": {
+      "allowed_contexts": [
+        "programming paradigm",
+        "paradigm shift (when citing Kuhn)",
+        "object-oriented paradigm",
+        "functional programming paradigm"
+      ],
+      "note": "Legitimate in academic/technical contexts"
+    },
+    "scalable": {
+      "allowed_contexts": [
+        "horizontally scalable",
+        "vertically scalable",
+        "scalable architecture",
+        "scalability testing"
+      ],
+      "note": "Legitimate when discussing system architecture"
+    },
+    "orchestration": {
+      "allowed_contexts": [
+        "container orchestration",
+        "workflow orchestration",
+        "service orchestration"
+      ],
+      "note": "Legitimate technical term in DevOps/infrastructure"
+    },
+    "pipeline": {
+      "allowed_contexts": [
+        "CI/CD pipeline",
+        "data pipeline",
+        "ML pipeline",
+        "deployment pipeline"
+      ],
+      "note": "Legitimate technical term in software development"
+    }
   },
-  "usage": "Before flagging a pattern, check if it appears in a technical context from this allowlist"
+  "usage": "Before flagging a pattern, check if it appears in a technical context from this allowlist. Each term includes allowed_contexts (specific phrases) and a note explaining when the term is legitimate."
 }

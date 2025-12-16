@@ -8,5 +8,9 @@
   "preserve_technical_terms": true,
   "output_format": "markdown",
   "categories_to_skip": [],
-  "min_confidence": 0.7
+  "strict_thresholds": {
+    "em_dash": 2,
+    "transitions": 1,
+    "hedge_words": 3
+  }
 }
