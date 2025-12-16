@@ -23,10 +23,10 @@ brew install claude-skills
 
 After installation, skills and plugins will be available at:
 
-- Skills: `/opt/homebrew/share/claude-skills/skills/` (Apple Silicon) or
-  `/usr/local/share/claude-skills/skills/` (Intel)
-- Plugins: `/opt/homebrew/share/claude-skills/plugins/` (Apple Silicon) or
-  `/usr/local/share/claude-skills/plugins/` (Intel)
+```bash
+$(brew --prefix)/share/claude-skills/skills/   # Skills
+$(brew --prefix)/share/claude-skills/plugins/  # Plugins
+```
 
 ### Manual Installation
 

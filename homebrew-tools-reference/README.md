@@ -5,9 +5,10 @@ This directory contains reference files for the
 
 ## Files
 
-- **`claude-skills.rb`** - Homebrew formula for installing claude-skills
+- **`claude-skills.rb`** - Homebrew formula for installing claude-skills (contains placeholder
+  values that will be updated by the automated workflow)
 - **`.github/workflows/update-claude-skills.yml`** - GitHub Actions workflow to automatically
-  update the formula
+  update the formula with actual release information
 
 ## Setup Instructions
 
@@ -36,6 +37,16 @@ The workflow requires a `TAP_REPO_TOKEN` secret in the claude-skills repository:
 
 1. Create a GitHub Personal Access Token with `repo` permissions
 2. Add it as a secret named `TAP_REPO_TOKEN` in the claude-skills repository settings
+
+### 4. Initial Formula Update
+
+After adding the files, trigger the first formula update either:
+
+- Wait for the next release in claude-skills repository, or
+- Manually trigger the workflow in homebrew-tools using the "Run workflow" button with an
+  existing release tag
+
+This will replace the placeholder values in `claude-skills.rb` with actual release information.
 
 ## How It Works
 
