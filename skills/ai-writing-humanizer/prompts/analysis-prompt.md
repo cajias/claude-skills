@@ -113,7 +113,15 @@ For each issue found, report:
     "word_count": 0
   }
 }
-```text
+```
+
+## Output Requirements
+
+- Return ONLY valid JSON (no markdown code blocks around it)
+- Ensure all strings are properly escaped
+- Include empty arrays [] rather than omitting fields
+- All field names must match the schema exactly
+- Use null for missing optional values, not undefined or empty strings
 
 ## Analysis Guidelines
 
