@@ -57,7 +57,7 @@ jobs:
           fi
 
           # Calculate SHA256
-          SHA256=$(shasum -a 256 release.tar.gz | awk '{print $1}')
+          SHA256=$(sha256sum release.tar.gz | awk '{print $1}')
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
           echo "SHA256: $SHA256"
 
