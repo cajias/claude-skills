@@ -71,6 +71,18 @@ Transform AI-generated text into natural human-sounding writing:
 - Context-aware replacements that preserve meaning
 - Before/after comparisons and detailed change logs
 
+### [AI Writing Detector](./skills/ai-writing-detector/)
+
+Detect signs of AI-generated writing with detailed analysis and reporting:
+
+- Scans for technical artifacts (definitive AI markers like chatbot phrases and model tokens)
+- Analyzes AI vocabulary density across 6 major pattern categories
+- Weighted confidence scoring system (High/Medium/Low/None)
+- Context-aware detection with false positive protection
+- Detailed reports with specific line references and fix suggestions
+- Complementary to AI Writing Humanizer (detect → humanize → verify)
+- Based on Wikipedia's comprehensive "Signs of AI Writing" guidelines
+
 ## Available Plugins
 
 ### [PR Monitor](./plugins/pr-monitor/)

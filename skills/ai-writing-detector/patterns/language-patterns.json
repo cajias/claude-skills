@@ -455,7 +455,9 @@
           "regex": true,
           "severity": "low",
           "note": "Check if range is meaningful or just dramatic phrasing",
-          "examples": ["from the singularity of the Big Bang to the grand cosmic web"]
+          "examples": [
+            "from the singularity of the Big Bang to the grand cosmic web"
+          ]
         }
       ]
     }

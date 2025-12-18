@@ -299,15 +299,15 @@ The cat sat on the mat. It was gray. The room was quiet. The man read a book.
 
 ### Context Adjustment Guidelines
 
-| Context                 | Adjustment                                          |
-| ----------------------- | --------------------------------------------------- |
-| Academic paper          | Higher threshold for formal vocabulary              |
-| Technical docs          | Allow technical jargon like "ecosystem", "leverage" |
-| Marketing material      | Promotional language may be intentional             |
-| Creative writing        | Metaphors are expected                              |
-| Business communication  | Formality is standard                               |
-| Personal blog           | Informal style with personality suggests human      |
-| Encyclopedia entry      | Neutral tone doesn't indicate AI                    |
+| Context                | Adjustment                                          |
+| ---------------------- | --------------------------------------------------- |
+| Academic paper         | Higher threshold for formal vocabulary              |
+| Technical docs         | Allow technical jargon like "ecosystem", "leverage" |
+| Marketing material     | Promotional language may be intentional             |
+| Creative writing       | Metaphors are expected                              |
+| Business communication | Formality is standard                               |
+| Personal blog          | Informal style with personality suggests human      |
+| Encyclopedia entry     | Neutral tone doesn't indicate AI                    |
 
 ### Red Flags That Override Context
 

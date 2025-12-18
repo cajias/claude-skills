@@ -93,7 +93,7 @@ I've edited this text. Can you check if AI patterns are still present?
 
 ### 1. Technical Artifacts (DEFINITIVE)
 
-**Critical - Smoking Gun Evidence**
+#### Critical - Smoking Gun Evidence
 
 - ChatGPT markers: `turn0search0`, citation formats
 - Knowledge cutoff disclaimers
@@ -101,11 +101,11 @@ I've edited this text. Can you check if AI patterns are still present?
 - Placeholder text: `[Insert Name]`, `2025-xx-xx`
 - Model tokens: `<|endoftext|>`
 
-**If ANY found → HIGH confidence automatically**
+#### If ANY found → HIGH confidence automatically
 
 ### 2. Content Issues
 
-**Patterns in content structure and claims**
+#### Patterns in content structure and claims
 
 - Undue emphasis on symbolism/legacy
 - Promotional/travel brochure language
@@ -116,7 +116,7 @@ I've edited this text. Can you check if AI patterns are still present?
 
 ### 3. Language Patterns
 
-**AI vocabulary and linguistic quirks**
+#### AI vocabulary and linguistic quirks
 
 - High-frequency AI words: delve, leverage, pivotal, seamless, testament
 - Negative parallelisms: "not just X but Y"
@@ -126,7 +126,7 @@ I've edited this text. Can you check if AI patterns are still present?
 
 ### 4. Style and Formatting
 
-**Formatting and stylistic markers**
+#### Formatting and stylistic markers
 
 - Title Case Headers
 - Excessive bold text (>3 per paragraph)
@@ -220,13 +220,13 @@ See the `examples/` directory for:
 
 These skills are complementary:
 
-| Aspect       | ai-writing-detector          | ai-writing-humanizer               |
-| ------------ | ---------------------------- | ---------------------------------- |
-| **Purpose**  | Detect and report            | Fix iteratively                    |
-| **Output**   | Detection report             | Cleaned text                       |
-| **Workflow** | Single-pass analysis         | Loop until clean                   |
-| **Changes**  | No modifications             | Applies changes                    |
-| **Use case** | Audit, review, verification  | Transform and clean text           |
+| Aspect       | ai-writing-detector         | ai-writing-humanizer     |
+| ------------ | --------------------------- | ------------------------ |
+| **Purpose**  | Detect and report           | Fix iteratively          |
+| **Output**   | Detection report            | Cleaned text             |
+| **Workflow** | Single-pass analysis        | Loop until clean         |
+| **Changes**  | No modifications            | Applies changes          |
+| **Use case** | Audit, review, verification | Transform and clean text |
 
 ### Recommended Workflow
 

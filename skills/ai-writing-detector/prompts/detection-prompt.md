@@ -158,14 +158,14 @@ From `patterns/style-patterns.json`:
 
 Use this weighted scoring:
 
-| Category               | Weight | Calculation                  |
-| ---------------------- | ------ | ---------------------------- |
-| Definitive markers     | 50%    | Any found = 50 points        |
-| Content issues         | 20%    | (Count / 10) \* 20           |
-| Language patterns      | 15%    | (Density score / 15) \* 15   |
-| Style issues           | 10%    | (Count / 5) \* 10            |
-| Behavioral indicators  | 5%     | Manual assessment            |
-| **TOTAL**              | 100%   | Sum all weighted scores      |
+| Category              | Weight | Calculation                |
+| --------------------- | ------ | -------------------------- |
+| Definitive markers    | 50%    | Any found = 50 points      |
+| Content issues        | 20%    | (Count / 10) \* 20         |
+| Language patterns     | 15%    | (Density score / 15) \* 15 |
+| Style issues          | 10%    | (Count / 5) \* 10          |
+| Behavioral indicators | 5%     | Manual assessment          |
+| **TOTAL**             | 100%   | Sum all weighted scores    |
 
 **Confidence Levels**:
 

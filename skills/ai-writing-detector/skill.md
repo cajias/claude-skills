@@ -392,9 +392,9 @@ Manual review required:
 
 #### Step 6.3: Check Inline-Header Lists (3.3)
 
-- Pattern: `^\d+\. \*\*[^*]+\*\*: `
+- Pattern: `^\d+\.\s+\*\*[^*]+\*\*:\s+`
 - Example: "1. **Historical Context:** The world..."
-- Pattern: `^[-*] \*\*[^*]+\*\*: `
+- Pattern: `^[-*]\s+\*\*[^*]+\*\*:\s+`
 
 #### Step 6.4: Check Em Dash Usage (3.5)
 
@@ -532,7 +532,7 @@ adjustments = [];
 
 if (document_type === "technical") {
   adjustments.push(
-    "Technical terms like 'ecosystem' and 'leverage' may be legitimate"
+    "Technical terms like 'ecosystem' and 'leverage' may be legitimate",
   );
   // Potentially reduce language_score
 }

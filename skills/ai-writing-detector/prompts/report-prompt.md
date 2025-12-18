@@ -4,7 +4,7 @@ Generate a comprehensive detection report using this structure:
 
 ## Report Format
 
-````markdown
+```markdown
 # AI Writing Detection Report
 
 ## Summary
@@ -279,7 +279,7 @@ Before reviewing the findings, note these important limitations:
 - Pattern Database: patterns/\*.json
 - Detection Methodology: Based on Wikipedia's Signs of AI Writing
 - Analysis Tool: AI Writing Detector Skill v1.0.0
-````
+```
 
 ## Notes for Report Generation
 

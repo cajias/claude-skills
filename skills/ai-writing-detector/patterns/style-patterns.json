@@ -83,7 +83,7 @@
       "description": "Use of 'curly' quotes instead of straight quotes",
       "patterns": [
         {
-          "pattern": "[""'']",
+          "pattern": "[\\u201C\\u201D\\u2018\\u2019]",
           "type": "regex",
           "regex": true,
           "severity": "low",
