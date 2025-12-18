@@ -72,17 +72,25 @@ for skill_dir in "$SKILLS_DIR"/*/; do
     if [ -d "$skill_dir/config" ]; then
         for json_file in "$skill_dir/config"/*.json; do
             if [ -f "$json_file" ]; then
-                if ! python3 -m json.tool "$json_file" > /dev/null 2>&1; then
-                    echo "  ⚠️  Invalid JSON in $(basename "$json_file")"
+                # Try python3 first, fall back to node if available
+                if command -v python3 > /dev/null 2>&1; then
+                    if ! python3 -m json.tool "$json_file" > /dev/null 2>&1; then
+                        echo "  ⚠️  Invalid JSON in $(basename "$json_file")"
+                    fi
+                elif command -v node > /dev/null 2>&1; then
+                    if ! node -e "JSON.parse(require('fs').readFileSync('$json_file', 'utf8'))" > /dev/null 2>&1; then
+                        echo "  ⚠️  Invalid JSON in $(basename "$json_file")"
+                    fi
                 fi
             fi
         done
     fi
     
     # Check for spaces in file/directory names
-    if find "$skill_dir" -name "* *" | grep -q .; then
+    spaces_found=$(find "$skill_dir" -name "* *")
+    if [ -n "$spaces_found" ]; then
         echo "  ⚠️  Found spaces in file/directory names"
-        find "$skill_dir" -name "* *" | while read -r file; do
+        echo "$spaces_found" | while read -r file; do
             echo "     $(basename "$file")"
         done
     fi
