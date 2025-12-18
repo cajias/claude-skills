@@ -145,14 +145,15 @@
         {
           "pattern": "\\bnuanced\\b",
           "regex": true,
-          "severity": "medium",
-          "replacements": ["subtle", "complex"]
+          "severity": "low",
+          "replacements": ["subtle", "complex"],
+          "note": "Common in academic writing; context-dependent"
         },
         {
           "pattern": "\\bcomprehensive\\b",
           "regex": true,
           "severity": "low",
-          "note": "Common in human writing too"
+          "note": "Common in human writing too; legitimate in professional contexts"
         },
         {
           "pattern": "\\bmultifaceted\\b",
@@ -169,7 +170,8 @@
         {
           "pattern": "\\binnovative\\b",
           "regex": true,
-          "severity": "low"
+          "severity": "low",
+          "note": "Widely used in human writing; flag only in clusters"
         },
         {
           "pattern": "\\bseamless\\b",

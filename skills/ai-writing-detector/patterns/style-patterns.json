@@ -55,7 +55,7 @@
       "detection_type": "character_class",
       "severity": "medium",
       "note": "Flag emoji usage in formal/encyclopedic contexts",
-      "pattern": "[\\u{1F300}-\\u{1F9FF}]",
+      "pattern": "[\\uD83C-\\uDBFF][\\uDC00-\\uDFFF]",
       "context_dependent": true
     },
     {
