@@ -121,11 +121,11 @@ effort_estimation_output/
 After collecting metrics:
 
 1. **Review the data** - Check all output files for accuracy
-2. **Apply estimation models** - Use the data with the five models described in `skill.md`
+2. **Apply estimation models** - Use the data with the five models described in `SKILL.md`
 3. **Calculate productivity** - Compare traditional estimates with actual effort
 4. **Generate report** - Create comprehensive markdown report
 
-See the main `skill.md` file for detailed instructions on applying estimation models and generating reports.
+See the main `SKILL.md` file for detailed instructions on applying estimation models and generating reports.
 
 ## Troubleshooting
 
