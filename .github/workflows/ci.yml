@@ -26,7 +26,11 @@ jobs:
         run: npm ci
 
       - name: Run markdownlint
-        run: npm run lint
+        run: npm run lint:md
+        continue-on-error: false
+
+      - name: Lint skill structure
+        run: npm run lint:skills
         continue-on-error: false
 
       - name: Check formatting
