@@ -362,5 +362,5 @@ Upload the following files to Quip using the QuipEditor tool: <file1>, <file2>, 
 ## Related Documentation
 
 - [Quip Upload Example](../examples/quip-upload.md) - Complete workflow example
-- [Special Workflows](../skill.md#special-workflows) - Full workflow documentation
+- [Special Workflows](../SKILL.md#special-workflows) - Full workflow documentation
 - [Agent Configuration](../config/agents.json) - Default agent configuration

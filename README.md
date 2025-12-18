@@ -99,7 +99,7 @@ Automated GitHub pull request monitoring with event-driven hooks:
 Skills can be invoked by Claude when working on related tasks. Each skill directory contains:
 
 - `README.md` - Skill overview and usage guide
-- `skill.md` - The skill prompt and detailed instructions
+- `SKILL.md` - The skill prompt and detailed instructions
 - `examples/` - Example workflows and outputs (when applicable)
 
 ## Using Plugins
@@ -125,7 +125,7 @@ claude plugin install \
 
 1. Create a new directory under `skills/`
 2. Add a `README.md` with skill overview
-3. Add a `skill.md` with detailed instructions
+3. Add a `SKILL.md` with detailed instructions
 4. Include examples if applicable
 5. Update this main README with the new skill
 
