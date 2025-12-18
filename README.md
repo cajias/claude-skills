@@ -71,6 +71,17 @@ Transform AI-generated text into natural human-sounding writing:
 - Context-aware replacements that preserve meaning
 - Before/after comparisons and detailed change logs
 
+### [Tell Q Agent Router](./skills/tell-q-agent-router/)
+
+Intelligently route tasks to Amazon Q CLI agents with automatic agent selection:
+
+- Natural language interface using "tell q to..." pattern
+- Intelligent agent selection based on task analysis and keywords
+- Background execution with progress monitoring
+- Support for explicit agent selection when needed
+- Special workflow patterns (e.g., Quip file upload)
+- Seven specialized agents (AWS, docs, architecture, quality, code dev, default, omega)
+
 ## Available Plugins
 
 ### [PR Monitor](./plugins/pr-monitor/)
