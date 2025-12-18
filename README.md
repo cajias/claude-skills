@@ -71,6 +71,17 @@ Transform AI-generated text into natural human-sounding writing:
 - Context-aware replacements that preserve meaning
 - Before/after comparisons and detailed change logs
 
+### [Q Chat Integration](./skills/q-chat-integration/)
+
+Delegate tasks to Amazon Q CLI agents with specialized tool integrations:
+
+- Seamlessly delegate to Q using natural trigger phrases ("tell Q to...", "ask Q to...")
+- Non-interactive background execution with full tool permissions
+- Perfect for Quip operations, ticket creation, and diagram generation
+- Intelligent context gathering and absolute path resolution
+- Automatic agent routing based on task type (AWS, docs, architecture, quality)
+- Progress monitoring and status reporting
+
 ## Available Plugins
 
 ### [PR Monitor](./plugins/pr-monitor/)
