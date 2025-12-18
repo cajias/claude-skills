@@ -26,7 +26,26 @@ jobs:
         run: npm ci
 
       - name: Run markdownlint
-        run: npm run lint
+        run: npm run lint:md
+        continue-on-error: false
+
+      - name: Run ls-lint
+        run: npx ls-lint
+        continue-on-error: false
+
+      - name: Check required skill files
+        run: |
+          shopt -s nullglob
+          skills=(skills/*/)
+          if [ ${#skills[@]} -eq 0 ]; then
+            echo "Error: No skill directories found"
+            exit 1
+          fi
+          for dir in "${skills[@]}"; do
+            [ -f "$dir/SKILL.md" ] || { echo "Missing SKILL.md in $dir"; exit 1; }
+            [ -f "$dir/README.md" ] || { echo "Missing README.md in $dir"; exit 1; }
+          done
+          echo "✅ All ${#skills[@]} skills have required files"
         continue-on-error: false
 
       - name: Check formatting
