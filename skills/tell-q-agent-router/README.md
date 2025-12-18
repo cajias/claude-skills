@@ -242,6 +242,13 @@ Agent configurations are stored in `config/agents.json`:
 - Modify keyword lists for better matching
 - Adjust agent capabilities
 
+## Prompt Templates
+
+Special workflow prompts are maintained in the `prompts/` directory:
+
+- **[quip-upload-prompt.md](prompts/quip-upload-prompt.md)** - Template for Quip file upload
+  workflow with pattern matching, validation, and transformation logic
+
 ## Error Handling
 
 The skill handles common errors gracefully:

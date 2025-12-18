@@ -182,6 +182,7 @@ Or stop the agent with: stop_bash sessionId: <bash_sessionId>
 4. **Transform task:**
    - Original: "tell q report.md to quip"
    - Transformed: "Upload report.md to Quip using the QuipEditor tool"
+   - See [prompts/quip-upload-prompt.md](prompts/quip-upload-prompt.md) for detailed template
 
 5. **Execute:**
    - Run Q agent with transformed task
