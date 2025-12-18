@@ -223,10 +223,10 @@ Command: q chat --model claude-sonnet-4.5...
 
 ```bash
 # Check status periodically
-read_bash(session_id: "bash_12345", delay: 10)
+read_bash --session-id bash_12345 --delay 10
 
 # Continue checking until complete
-read_bash(session_id: "bash_12345", delay: 15)
+read_bash --session-id bash_12345 --delay 15
 ```
 
 ### Phase 6: Report Results
