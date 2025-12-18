@@ -24,6 +24,10 @@ tell q (.+?) to quip
 
 - Group 1: File path (e.g., "report.md", "docs/architecture.md")
 
+**Note:** The non-greedy quantifier `(.+?)` captures until the first occurrence of " to quip". For
+file paths with spaces, ensure they are properly quoted or use `(.+)` if the pattern is the last
+part of the input.
+
 ## Prompt Transformation
 
 ### Input Format
@@ -124,9 +128,9 @@ This ensures the agent uses the correct tool for Quip integration.
 Upload {file_path} to Quip using the QuipEditor tool
 ```
 
-**Variables:**
+**Template Variables:**
 
-- `{file_path}`: The file path extracted from user input
+- `{file_path}`: The file path extracted from user input (template placeholder, not bash syntax)
 
 ## Agent Selection
 
@@ -144,7 +148,8 @@ Before executing the prompt, validate:
 1. **File exists:**
 
    ```bash
-   if [ -f "{file_path}" ]; then
+   # Replace $file_path with actual file path variable
+   if [ -f "$file_path" ]; then
      echo "File found"
    else
      echo "Error: File not found"
@@ -155,7 +160,8 @@ Before executing the prompt, validate:
 2. **File is readable:**
 
    ```bash
-   if [ -r "{file_path}" ]; then
+   # Replace $file_path with actual file path variable
+   if [ -r "$file_path" ]; then
      echo "File is readable"
    else
      echo "Error: File is not readable"
@@ -166,7 +172,8 @@ Before executing the prompt, validate:
 3. **File has content:**
 
    ```bash
-   if [ -s "{file_path}" ]; then
+   # Replace $file_path with actual file path variable
+   if [ -s "$file_path" ]; then
      echo "File has content"
    else
      echo "Warning: File is empty"
