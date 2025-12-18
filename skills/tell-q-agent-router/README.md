@@ -29,7 +29,7 @@ Use this skill when you need to:
 
 Simply use the "tell q to..." pattern:
 
-```
+```text
 tell q to deploy a Lambda function with S3 trigger
 ```
 
@@ -44,7 +44,7 @@ The skill will:
 
 Specify the agent name directly:
 
-```
+```text
 tell q omega to analyze the current project structure
 ```
 
@@ -52,21 +52,21 @@ tell q omega to analyze the current project structure
 
 Use the special workflow pattern:
 
-```
+```text
 tell q report.md to quip
 ```
 
 ## Available Agents
 
-| Agent | Specialization | Best For |
-|-------|---------------|----------|
-| **aws-expert** | AWS architecture, CDK, APIs | Infrastructure, Lambda, S3, CloudFormation |
-| **amzn-docs** | Documentation writing | README files, API docs, technical writing |
-| **amzn-architecture** | System design, security | Architecture reviews, design docs, GitLab |
-| **amzn-quality** | Code standards, linting | Code reviews, quality checks, standards |
-| **amzn-code-dev** | Development tasks | Feature implementation, code building |
-| **default** | QuipEditor, general tasks | Quip uploads, miscellaneous tasks |
-| **omega** | Project-specific context | General tasks, project exploration |
+| Agent                 | Specialization              | Best For                                   |
+| --------------------- | --------------------------- | ------------------------------------------ |
+| **aws-expert**        | AWS architecture, CDK, APIs | Infrastructure, Lambda, S3, CloudFormation |
+| **amzn-docs**         | Documentation writing       | README files, API docs, technical writing  |
+| **amzn-architecture** | System design, security     | Architecture reviews, design docs, GitLab  |
+| **amzn-quality**      | Code standards, linting     | Code reviews, quality checks, standards    |
+| **amzn-code-dev**     | Development tasks           | Feature implementation, code building      |
+| **default**           | QuipEditor, general tasks   | Quip uploads, miscellaneous tasks          |
+| **omega**             | Project-specific context    | General tasks, project exploration         |
 
 ## Key Features
 
@@ -121,7 +121,7 @@ q chat --agent <agent-name> --no-interactive --trust-all-tools "<task>"
 
 **Input:**
 
-```
+```text
 tell q to create a CDK stack for a serverless REST API
 ```
 
@@ -135,7 +135,7 @@ tell q to create a CDK stack for a serverless REST API
 
 **Input:**
 
-```
+```text
 tell q to write API documentation for our GraphQL endpoints
 ```
 
@@ -149,7 +149,7 @@ tell q to write API documentation for our GraphQL endpoints
 
 **Input:**
 
-```
+```text
 tell q to lint and review all TypeScript files
 ```
 
@@ -163,7 +163,7 @@ tell q to lint and review all TypeScript files
 
 **Input:**
 
-```
+```text
 tell q design-doc.md to quip
 ```
 
@@ -190,7 +190,7 @@ tell q design-doc.md to quip
 
 When you delegate a task, you'll receive:
 
-```
+```text
 Starting Q agent '<agent-name>' in background to: <task-summary>
 
 Command: q chat --agent <agent-name> --no-interactive --trust-all-tools "<task>"

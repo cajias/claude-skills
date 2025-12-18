@@ -4,7 +4,15 @@
       "name": "aws-expert",
       "model": "claude-sonnet-4.5",
       "capabilities": ["AWS architecture", "CDK", "API", "diagrams"],
-      "keywords": ["aws", "cdk", "lambda", "s3", "ec2", "cloudformation", "infrastructure"]
+      "keywords": [
+        "aws",
+        "cdk",
+        "lambda",
+        "s3",
+        "ec2",
+        "cloudformation",
+        "infrastructure"
+      ]
     },
     {
       "name": "amzn-docs",

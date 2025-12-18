@@ -6,7 +6,7 @@ You need comprehensive API documentation for your REST endpoints.
 
 ## User Request
 
-```
+```text
 tell q to write API documentation for our user management endpoints
 ```
 
@@ -32,7 +32,7 @@ q chat --agent amzn-docs --no-interactive --trust-all-tools "write API documenta
 
 ## Response to User
 
-```
+```text
 Starting Q agent 'amzn-docs' in background to: write API documentation for our user management endpoints
 
 Command: q chat --agent amzn-docs --no-interactive --trust-all-tools "write API documentation for our user management endpoints"
@@ -69,7 +69,7 @@ read_bash sessionId: async_session_456 delay: 5
 
 Expected output:
 
-```
+```text
 Analyzing user management endpoints...
 ✓ Found 8 endpoints in src/routes/users.ts
 ✓ Extracted request/response schemas

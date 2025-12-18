@@ -26,16 +26,16 @@ for explicit agent selection and special workflow patterns.
 
 When an agent is NOT explicitly specified, analyze the task and select the most appropriate agent:
 
-| Task Type | Agent | Reason |
-|-----------|-------|--------|
-| Quip Upload/Edit | `default` | Has QuipEditor tool |
-| AWS/CDK/Infrastructure | `aws-expert` | AWS docs, CDK, API, diagram MCP servers |
-| Documentation/Writing | `amzn-docs` | Doc generation, natural writing |
-| Architecture/Design | `amzn-architecture` | Internal tools, GitLab access |
-| Code Quality/Linting | `amzn-quality` | Standards enforcement |
-| Code Development | `amzn-code-dev` | Development specialist |
-| General/Project-specific | `omega` | Project context |
-| Default/Uncertain | `omega` | Safe fallback |
+| Task Type                | Agent               | Reason                                  |
+| ------------------------ | ------------------- | --------------------------------------- |
+| Quip Upload/Edit         | `default`           | Has QuipEditor tool                     |
+| AWS/CDK/Infrastructure   | `aws-expert`        | AWS docs, CDK, API, diagram MCP servers |
+| Documentation/Writing    | `amzn-docs`         | Doc generation, natural writing         |
+| Architecture/Design      | `amzn-architecture` | Internal tools, GitLab access           |
+| Code Quality/Linting     | `amzn-quality`      | Standards enforcement                   |
+| Code Development         | `amzn-code-dev`     | Development specialist                  |
+| General/Project-specific | `omega`             | Project context                         |
+| Default/Uncertain        | `omega`             | Safe fallback                           |
 
 ### Agent Selection Algorithm
 
@@ -67,12 +67,12 @@ q chat --agent <agent-name> --no-interactive --trust-all-tools "<task-prompt>"
 
 ### Parameters
 
-| Parameter | Purpose | Required |
-|-----------|---------|----------|
-| `--agent <name>` | Select specific Q agent | Yes |
-| `--no-interactive` | Non-blocking execution | Yes |
-| `--trust-all-tools` | Full tool permissions | Yes |
-| task-prompt | Task description | Yes |
+| Parameter           | Purpose                 | Required |
+| ------------------- | ----------------------- | -------- |
+| `--agent <name>`    | Select specific Q agent | Yes      |
+| `--no-interactive`  | Non-blocking execution  | Yes      |
+| `--trust-all-tools` | Full tool permissions   | Yes      |
+| task-prompt         | Task description        | Yes      |
 
 ### Execution Mode
 
@@ -147,7 +147,7 @@ This returns a `sessionId` for monitoring.
 
 Provide immediate feedback:
 
-```
+```text
 Starting Q agent '<agent-name>' in background to: <brief-task-summary>
 
 Command: q chat --agent <agent-name> --no-interactive --trust-all-tools "<task>"
@@ -191,7 +191,7 @@ Or stop the agent with: stop_bash sessionId: <bash_sessionId>
 
 ### Success Response
 
-```
+```text
 Starting Q agent '<agent-name>' in background to: <brief-task-summary>
 
 Command: q chat --agent <agent-name> --no-interactive --trust-all-tools "<task>"
@@ -205,7 +205,7 @@ Or stop the agent with: stop_bash sessionId: <sessionId>
 
 **Agent Not Found:**
 
-```
+```text
 Error: Agent '<agent-name>' not found.
 
 Available agents:
@@ -220,7 +220,7 @@ Available agents:
 
 **Q CLI Not Available:**
 
-```
+```text
 Error: Amazon Q CLI (q) is not installed or not in PATH.
 
 To install Q CLI, follow instructions at: <installation-url>
@@ -228,7 +228,7 @@ To install Q CLI, follow instructions at: <installation-url>
 
 **File Not Found (Quip workflow):**
 
-```
+```text
 Error: File '<file-path>' not found for Quip upload.
 
 Please verify the file path and try again.
@@ -240,7 +240,7 @@ Please verify the file path and try again.
 
 **User Input:**
 
-```
+```text
 tell q aws-expert to create a CDK stack for a Lambda function with S3 trigger
 ```
 
@@ -259,7 +259,7 @@ q chat --agent aws-expert --no-interactive --trust-all-tools "create a CDK stack
 
 **User Input:**
 
-```
+```text
 tell q to deploy a serverless API with Lambda and API Gateway
 ```
 
@@ -279,7 +279,7 @@ q chat --agent aws-expert --no-interactive --trust-all-tools "deploy a serverles
 
 **User Input:**
 
-```
+```text
 tell q to write comprehensive API documentation for our REST endpoints
 ```
 
@@ -299,7 +299,7 @@ q chat --agent amzn-docs --no-interactive --trust-all-tools "write comprehensive
 
 **User Input:**
 
-```
+```text
 tell q report.md to quip
 ```
 
@@ -323,7 +323,7 @@ q chat --agent default --no-interactive --trust-all-tools "Upload report.md to Q
 
 **User Input:**
 
-```
+```text
 tell q to implement a new authentication middleware in Express
 ```
 
@@ -343,7 +343,7 @@ q chat --agent amzn-code-dev --no-interactive --trust-all-tools "implement a new
 
 **User Input:**
 
-```
+```text
 tell q to review and lint all TypeScript files for standards compliance
 ```
 
@@ -400,12 +400,12 @@ This terminates the running Q agent.
 
 ### Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Q CLI not found | Install Q CLI or add to PATH |
-| Agent not found | Check agent name spelling, list available agents |
-| Permission denied | Run with appropriate permissions |
-| Task timeout | Increase wait time or check Q agent logs |
+| Issue             | Solution                                         |
+| ----------------- | ------------------------------------------------ |
+| Q CLI not found   | Install Q CLI or add to PATH                     |
+| Agent not found   | Check agent name spelling, list available agents |
+| Permission denied | Run with appropriate permissions                 |
+| Task timeout      | Increase wait time or check Q agent logs         |
 
 ## Best Practices
 

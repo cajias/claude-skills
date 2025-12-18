@@ -6,7 +6,7 @@ You want to use a specific Q agent for a task, overriding automatic agent select
 
 ## User Request
 
-```
+```text
 tell q omega to analyze the current project structure and suggest improvements
 ```
 
@@ -31,7 +31,7 @@ q chat --agent omega --no-interactive --trust-all-tools "analyze the current pro
 
 ## Response to User
 
-```
+```text
 Starting Q agent 'omega' in background to: analyze the current project structure and suggest improvements
 
 Command: q chat --agent omega --no-interactive --trust-all-tools "analyze the current project structure and suggest improvements"
@@ -65,7 +65,7 @@ You might explicitly select an agent when:
 
 ### Example 1: Force aws-expert
 
-```
+```text
 tell q aws-expert to document our Lambda functions
 ```
 
@@ -73,7 +73,7 @@ Even though "document" might suggest `amzn-docs`, you want AWS-specific document
 
 ### Example 2: Use omega for general tasks
 
-```
+```text
 tell q omega to help me understand the authentication flow
 ```
 
@@ -81,7 +81,7 @@ Using `omega` because it has project-specific context.
 
 ### Example 3: Code quality focus
 
-```
+```text
 tell q amzn-quality to review the entire codebase
 ```
 
@@ -89,7 +89,7 @@ Want comprehensive quality review from the quality specialist.
 
 ### Example 4: Architecture review
 
-```
+```text
 tell q amzn-architecture to design a microservices architecture
 ```
 
@@ -119,7 +119,7 @@ When processing a request:
 
 If the specified agent doesn't exist:
 
-```
+```text
 Error: Agent 'invalid-agent' not found.
 
 Available agents:
@@ -162,7 +162,7 @@ Did you mean one of these?
 
 **Request:**
 
-```
+```text
 tell q to create Lambda function documentation
 ```
 
@@ -176,7 +176,7 @@ tell q to create Lambda function documentation
 
 **Request:**
 
-```
+```text
 tell q amzn-docs to create Lambda function documentation
 ```
 

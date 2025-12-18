@@ -6,7 +6,7 @@ You have a markdown report that needs to be uploaded to Quip for team collaborat
 
 ## User Request
 
-```
+```text
 tell q architecture-review.md to quip
 ```
 
@@ -53,7 +53,7 @@ q chat --agent default --no-interactive --trust-all-tools "Upload architecture-r
 
 ## Response to User
 
-```
+```text
 Starting Q agent 'default' in background to: Upload architecture-review.md to Quip
 
 Command: q chat --agent default --no-interactive --trust-all-tools "Upload architecture-review.md to Quip using the QuipEditor tool"
@@ -83,7 +83,7 @@ read_bash sessionId: async_session_789 delay: 5
 
 Expected output:
 
-```
+```text
 Reading architecture-review.md...
 ✓ File loaded (15,234 bytes)
 ✓ Converting markdown to Quip format
@@ -103,7 +103,7 @@ Share this link with your team for collaboration.
 
 ### Pattern 1: Explicit "upload" keyword
 
-```
+```text
 upload report.md to quip
 ```
 
@@ -111,7 +111,7 @@ Same workflow as "tell q \<file\> to quip"
 
 ### Pattern 2: With explicit agent
 
-```
+```text
 tell q default to upload report.md to quip
 ```
 
@@ -123,7 +123,7 @@ Explicitly specifies `default` agent (redundant but supported)
 
 If the file doesn't exist:
 
-```
+```text
 Error: File 'architecture-review.md' not found for Quip upload.
 
 Please verify the file path and try again.
@@ -139,7 +139,7 @@ Files in directory:
 
 If the QuipEditor tool is not configured:
 
-```
+```text
 Error: QuipEditor tool is not available in the default agent.
 
 Please configure the QuipEditor tool in the Q agent configuration.

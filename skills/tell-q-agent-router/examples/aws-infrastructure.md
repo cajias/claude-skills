@@ -6,7 +6,7 @@ You need to create AWS infrastructure using CDK for a serverless application.
 
 ## User Request
 
-```
+```text
 tell q to create a CDK stack for a Lambda function with S3 trigger and DynamoDB table
 ```
 
@@ -32,7 +32,7 @@ q chat --agent aws-expert --no-interactive --trust-all-tools "create a CDK stack
 
 ## Response to User
 
-```
+```text
 Starting Q agent 'aws-expert' in background to: create a CDK stack for a Lambda function with S3 trigger and DynamoDB table
 
 Command: q chat --agent aws-expert --no-interactive --trust-all-tools "create a CDK stack for a Lambda function with S3 trigger and DynamoDB table"
@@ -64,7 +64,7 @@ read_bash sessionId: async_session_123 delay: 5
 
 Expected output:
 
-```
+```text
 Creating CDK stack structure...
 ✓ Created lib/my-stack.ts
 ✓ Configured Lambda function
