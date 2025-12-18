@@ -1,0 +1,148 @@
+{
+  "version": "1.0.0",
+  "category": "false-positives",
+  "description": "Patterns that are NOT reliable AI indicators - avoid false accusations",
+  "warning": "These patterns should NOT be used for AI detection as they commonly appear in human writing",
+  "patterns": [
+    {
+      "id": "6.1",
+      "pattern_type": "Perfect Grammar",
+      "is_reliable": false,
+      "reason": "Skilled human writers exist and produce grammatically correct text",
+      "note": "Do NOT flag perfect grammar as AI indicator",
+      "examples": [
+        "Zero grammatical errors",
+        "Proper punctuation throughout",
+        "Consistent verb tenses"
+      ]
+    },
+    {
+      "id": "6.2",
+      "pattern_type": "Bland or Robotic Prose",
+      "is_reliable": false,
+      "reason": "LLMs are actually effusive and florid, not bland. Bland writing is often human.",
+      "note": "Do NOT flag monotonous or dry prose as AI",
+      "examples": [
+        "Simple declarative sentences",
+        "Minimal adjectives",
+        "Direct, unadorned style"
+      ]
+    },
+    {
+      "id": "6.3",
+      "pattern_type": "Fancy or Academic Words",
+      "is_reliable": false,
+      "reason": "LLMs favor statistically common words. Unusual vocabulary is often human.",
+      "note": "Do NOT flag sophisticated vocabulary as AI",
+      "examples": [
+        "Erudite vocabulary",
+        "Technical jargon",
+        "Discipline-specific terminology",
+        "Low-frequency words"
+      ]
+    },
+    {
+      "id": "6.4",
+      "pattern_type": "Formal Letter-like Writing",
+      "is_reliable": false,
+      "reason": "Formal style is common in business and academic human writing",
+      "note": "Do NOT flag formal tone as AI indicator",
+      "examples": [
+        "Dear Sir/Madam",
+        "Sincerely",
+        "Formal salutations",
+        "Professional closing remarks"
+      ]
+    },
+    {
+      "id": "6.5",
+      "pattern_type": "Use of Conjunctions",
+      "is_reliable": false,
+      "reason": "Conjunctions (and, but, or) are standard in all writing",
+      "note": "Do NOT flag conjunction usage as AI",
+      "examples": [
+        "Starting sentences with 'And'",
+        "Starting sentences with 'But'",
+        "Using 'However' or 'Therefore'"
+      ]
+    },
+    {
+      "id": "6.6",
+      "pattern_type": "Low-frequency Unusual Words",
+      "is_reliable": false,
+      "reason": "AI models prefer high-frequency common words due to training statistics",
+      "note": "Unusual or rare words suggest human authorship",
+      "examples": [
+        "Obscure vocabulary",
+        "Archaic terms",
+        "Neologisms",
+        "Creative word combinations"
+      ]
+    },
+    {
+      "id": "6.7",
+      "pattern_type": "Long Sentences",
+      "is_reliable": false,
+      "reason": "Both AI and humans can write long, complex sentences",
+      "note": "Sentence length alone is not an indicator"
+    },
+    {
+      "id": "6.8",
+      "pattern_type": "Short Sentences",
+      "is_reliable": false,
+      "reason": "Both AI and humans use short sentences for emphasis",
+      "note": "Sentence length alone is not an indicator"
+    },
+    {
+      "id": "6.9",
+      "pattern_type": "Bulleted Lists",
+      "is_reliable": false,
+      "reason": "Lists are common in human documentation and communication",
+      "note": "Format alone is not an indicator"
+    },
+    {
+      "id": "6.10",
+      "pattern_type": "Numbered Lists",
+      "is_reliable": false,
+      "reason": "Numbered lists are standard in human technical and instructional writing",
+      "note": "Format alone is not an indicator"
+    }
+  ],
+  "context_specific_notes": [
+    {
+      "context": "Technical Documentation",
+      "note": "Technical terms like 'ecosystem', 'leverage', 'robust' may be legitimate",
+      "guidance": "Verify if term is used in proper technical context before flagging"
+    },
+    {
+      "context": "Academic Writing",
+      "note": "Formal language and complex vocabulary are expected",
+      "guidance": "Higher threshold for vocabulary-based detection"
+    },
+    {
+      "context": "Marketing Copy",
+      "note": "Promotional language may be intentional, not AI-generated",
+      "guidance": "Consider whether promotional tone matches content purpose"
+    },
+    {
+      "context": "Creative Writing",
+      "note": "Metaphors like 'tapestry' and 'landscape' may be stylistic choices",
+      "guidance": "Literary devices should not be automatically flagged"
+    }
+  ],
+  "detection_accuracy_notes": {
+    "expert_accuracy": "~90% (10% false positives)",
+    "non_expert_accuracy": "Barely better than random chance",
+    "automated_tools": "Significant error rates (GPTZero, etc.)",
+    "recommendation": "Use multiple indicators, never rely on single pattern"
+  },
+  "important_caveats": [
+    "These are POTENTIAL signs, not definitive proof",
+    "Many patterns existed in human writing before LLMs",
+    "False accusations harm collaboration and trust",
+    "Context matters - consider the full picture",
+    "Do NOT solely rely on AI detection tools",
+    "When in doubt, assume human authorship",
+    "Focus on DEFINITIVE markers (technical artifacts) for high confidence"
+  ]
+}

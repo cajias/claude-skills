@@ -1,0 +1,269 @@
+{
+  "version": "1.0.0",
+  "category": "content-issues",
+  "description": "Content-level AI writing patterns including undue emphasis, superficial analysis, and formulaic structures",
+  "patterns": [
+    {
+      "id": "1.1",
+      "subcategory": "Undue Emphasis on Symbolism/Legacy/Importance",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "marking a pivotal moment",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "represents a significant shift",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "highlighting the enduring legacy",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "reflects the transformative power",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "contributes to the broader history",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "plays a role in the ecosystem",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "vital not only for .+ but also for",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": "1.2",
+      "subcategory": "Undue Emphasis on Notability/Attribution",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "has been featured in .+, .+, and other prominent",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Lists media outlets without context"
+        },
+        {
+          "pattern": "maintains an active social media presence",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "independent coverage",
+          "type": "phrase",
+          "severity": "low",
+          "note": "May be legitimate in some contexts"
+        }
+      ]
+    },
+    {
+      "id": "1.3",
+      "subcategory": "Superficial Analyses",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "highlighting its significance as",
+          "type": "phrase",
+          "severity": "high"
+        },
+        {
+          "pattern": "underscoring its role in",
+          "type": "phrase",
+          "severity": "high"
+        },
+        {
+          "pattern": "reflecting the influence of",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "emphasizing the importance of",
+          "type": "phrase",
+          "severity": "high"
+        },
+        {
+          "pattern": "(\\w+) (highlighting|underscoring|emphasizing)",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Inanimate subjects 'highlighting' or 'underscoring'"
+        }
+      ]
+    },
+    {
+      "id": "1.4",
+      "subcategory": "Promotional/Advertisement Language",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "nestled within the breathtaking",
+          "type": "phrase",
+          "severity": "high"
+        },
+        {
+          "pattern": "offers visitors a fascinating glimpse",
+          "type": "phrase",
+          "severity": "high"
+        },
+        {
+          "pattern": "seamlessly connecting",
+          "type": "phrase",
+          "severity": "medium"
+        },
+        {
+          "pattern": "showcasing the .+ rich heritage",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium"
+        },
+        {
+          "pattern": "dependable, value-driven experiences",
+          "type": "phrase",
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": "1.5",
+      "subcategory": "Didactic Disclaimers",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "it'?s important to note that",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "delete"
+        },
+        {
+          "pattern": "it is crucial to differentiate",
+          "type": "phrase",
+          "severity": "high",
+          "action": "delete"
+        },
+        {
+          "pattern": "however,? it should be noted",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "delete"
+        }
+      ]
+    },
+    {
+      "id": "1.6",
+      "subcategory": "Section Summaries",
+      "priority": "medium",
+      "patterns": [
+        {
+          "pattern": "^in summary,?",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "action": "delete",
+          "note": "Flag if at end of section"
+        },
+        {
+          "pattern": "to summarize",
+          "type": "phrase",
+          "severity": "medium",
+          "action": "delete"
+        },
+        {
+          "pattern": "in conclusion",
+          "type": "phrase",
+          "severity": "medium",
+          "action": "delete"
+        }
+      ]
+    },
+    {
+      "id": "1.7",
+      "subcategory": "Challenges and Future Prospects Formula",
+      "priority": "medium",
+      "patterns": [
+        {
+          "pattern": "despite its .+, .+ faces challenges",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Formulaic structure"
+        },
+        {
+          "pattern": "future investments? in .+ could enhance",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Formulaic future section"
+        }
+      ],
+      "structural": {
+        "check_for_sections": [
+          "Challenges",
+          "Future Prospects",
+          "Challenges and Opportunities"
+        ],
+        "note": "Flag if both sections present in article"
+      }
+    },
+    {
+      "id": "1.8",
+      "subcategory": "Treating Titles as Proper Nouns",
+      "priority": "medium",
+      "patterns": [
+        {
+          "pattern": "the ['\"]effects? of .+['\"] refers to",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "medium"
+        },
+        {
+          "pattern": "the ['\"]list of .+['\"] is a curated compilation",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "medium"
+        }
+      ]
+    },
+    {
+      "id": "1.9",
+      "subcategory": "Outlines of Negatives Pattern",
+      "priority": "medium",
+      "patterns": [
+        {
+          "pattern": "no .+\\. no .+\\. just",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "medium",
+          "note": "Staccato negative lists"
+        },
+        {
+          "pattern": "not a .+, not a .+ — just",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "medium",
+          "note": "Staccato negative lists with em dash"
+        }
+      ]
+    }
+  ]
+}

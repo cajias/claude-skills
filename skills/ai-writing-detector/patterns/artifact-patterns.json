@@ -1,0 +1,338 @@
+{
+  "version": "1.0.0",
+  "category": "technical-artifacts",
+  "description": "DEFINITIVE markers of AI generation - these are smoking guns",
+  "priority": "critical",
+  "note": "ANY match in this category indicates HIGH CONFIDENCE AI detection",
+  "patterns": [
+    {
+      "id": "4.1",
+      "subcategory": "ChatGPT Artifacts",
+      "patterns": [
+        {
+          "pattern": "turn0search0",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "ChatGPT internal marker (Feb 2025+)"
+        },
+        {
+          "pattern": "turn0image0",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "ChatGPT internal marker"
+        },
+        {
+          "pattern": "turn\\d+search\\d+",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": ":contentReference\\[oaicite:\\d+\\]\\{index=\\d+\\}",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "ChatGPT citation format"
+        },
+        {
+          "pattern": "\\[oai_citation:\\d+‡[^\\]]+\\]",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "ChatGPT citation marker"
+        }
+      ]
+    },
+    {
+      "id": "4.2",
+      "subcategory": "Grok Artifacts",
+      "patterns": [
+        {
+          "pattern": "<grok_card>",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "Grok AI marker"
+        },
+        {
+          "pattern": "</grok_card>",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive"
+        }
+      ]
+    },
+    {
+      "id": "4.3",
+      "subcategory": "UTM Parameters",
+      "patterns": [
+        {
+          "pattern": "utm_source=chatgpt\\.com",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "URL tracking from ChatGPT"
+        },
+        {
+          "pattern": "utm_source=claude\\.ai",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive"
+        }
+      ]
+    },
+    {
+      "id": "4.4",
+      "subcategory": "Knowledge Cutoff Disclaimers",
+      "patterns": [
+        {
+          "pattern": "as of my last knowledge update",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "as of my knowledge cutoff",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "my training data (?:only )?(?:goes up to|ends|cuts off)",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "based on my training",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        }
+      ]
+    },
+    {
+      "id": "4.5",
+      "subcategory": "Prompt Refusals",
+      "patterns": [
+        {
+          "pattern": "as an AI language model,? I can'?t",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "as an AI,? I (?:don'?t|cannot|can'?t)",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "I'?m (?:just )?an AI",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "as a language model",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        }
+      ]
+    },
+    {
+      "id": "4.6",
+      "subcategory": "Placeholder Text",
+      "patterns": [
+        {
+          "pattern": "\\[Entertainer'?s Name\\]",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "\\[Your Name\\]",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "\\[Insert .+\\]",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "202[0-9]-xx-xx",
+          "type": "regex",
+          "regex": true,
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "Placeholder dates"
+        },
+        {
+          "pattern": "\\[TBD\\]",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "high",
+          "note": "May be intentional placeholder"
+        }
+      ]
+    },
+    {
+      "id": "4.7",
+      "subcategory": "Collaborative Artifacts",
+      "patterns": [
+        {
+          "pattern": "would you like me to",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "shall I (?:continue|proceed|elaborate)",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "let me know if you(?:'d| would) like",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "I hope this helps",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "feel free to ask",
+          "type": "phrase",
+          "case_sensitive": false,
+          "severity": "critical",
+          "confidence": "definitive"
+        }
+      ]
+    },
+    {
+      "id": "4.8",
+      "subcategory": "Broken References",
+      "description": "Hallucinated citations",
+      "detection_type": "manual_verification",
+      "note": "Check DOIs, ISBNs, URLs for validity",
+      "patterns": [
+        {
+          "pattern": "DOI:\\s*10\\.\\d+/[^\\s]+",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "verify_doi",
+          "note": "Extract and verify DOI exists"
+        },
+        {
+          "pattern": "ISBN[:-]?\\s*(?:97[89][- ]?)?\\d{9}[\\dX]",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "verify_isbn",
+          "note": "Extract and verify ISBN exists"
+        }
+      ]
+    },
+    {
+      "id": "4.9",
+      "subcategory": "Abrupt Cutoffs",
+      "patterns": [
+        {
+          "pattern": "<\\|endoftext\\|>",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive",
+          "note": "GPT model end token"
+        },
+        {
+          "pattern": "<\\|im_end\\|>",
+          "type": "literal",
+          "severity": "critical",
+          "confidence": "definitive"
+        },
+        {
+          "pattern": "\\[Response truncated\\]",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "high"
+        }
+      ]
+    },
+    {
+      "id": "4.10",
+      "subcategory": "Footnote Markers",
+      "patterns": [
+        {
+          "pattern": "↩",
+          "type": "literal",
+          "severity": "medium",
+          "note": "Unusual footnote return character, often from AI copying web content"
+        }
+      ]
+    },
+    {
+      "id": "4.11",
+      "subcategory": "Subject Lines in Body",
+      "description": "Email subject lines copied into body text",
+      "patterns": [
+        {
+          "pattern": "^Subject:\\s*",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "high",
+          "note": "Subject line at start of document"
+        },
+        {
+          "pattern": "^Re:\\s+",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "note": "Email reply marker"
+        }
+      ]
+    }
+  ]
+}

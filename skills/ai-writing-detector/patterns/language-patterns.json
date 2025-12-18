@@ -1,0 +1,463 @@
+{
+  "version": "1.0.0",
+  "category": "language-and-grammar",
+  "description": "Language patterns including AI vocabulary, parallelisms, and stylistic quirks",
+  "patterns": [
+    {
+      "id": "2.1",
+      "subcategory": "Overused AI Vocabulary",
+      "priority": "high",
+      "description": "Words and phrases AI models use disproportionately",
+      "density_threshold": {
+        "per_word_count": 500,
+        "max_occurrences": 5,
+        "note": "Flag if total AI vocabulary density exceeds threshold"
+      },
+      "verbs": [
+        {
+          "pattern": "\\bdelve\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["explore", "examine", "look at"]
+        },
+        {
+          "pattern": "\\bunderscore\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["emphasize", "highlight", "show"]
+        },
+        {
+          "pattern": "\\bhighlight\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["show", "emphasize"]
+        },
+        {
+          "pattern": "\\bemphasize\\b",
+          "regex": true,
+          "severity": "low",
+          "note": "Lower severity as it's more common in human writing"
+        },
+        {
+          "pattern": "\\bshowcase\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["show", "display", "feature"]
+        },
+        {
+          "pattern": "\\bleverage\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["use", "utilize", "apply"]
+        },
+        {
+          "pattern": "\\bnavigate\\b",
+          "regex": true,
+          "severity": "medium",
+          "context_dependent": true,
+          "note": "Flag only in metaphorical usage"
+        },
+        {
+          "pattern": "\\bfoster\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["encourage", "promote", "support"]
+        },
+        {
+          "pattern": "\\bspearhead\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["lead", "initiate"]
+        },
+        {
+          "pattern": "\\bbolster\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["strengthen", "support"]
+        },
+        {
+          "pattern": "\\bfortify\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["strengthen", "reinforce"]
+        },
+        {
+          "pattern": "\\bgrapple\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["struggle with", "deal with"]
+        },
+        {
+          "pattern": "\\bhone\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["refine", "improve"]
+        },
+        {
+          "pattern": "\\bunderpin\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["support", "form the basis of"]
+        },
+        {
+          "pattern": "\\bbroaden\\b",
+          "regex": true,
+          "severity": "low"
+        },
+        {
+          "pattern": "\\belevate\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["raise", "improve"]
+        },
+        {
+          "pattern": "\\bstreamline\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["simplify", "improve"]
+        },
+        {
+          "pattern": "\\bharness\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["use", "utilize"]
+        }
+      ],
+      "adjectives": [
+        {
+          "pattern": "\\bcrucial\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["important", "essential"]
+        },
+        {
+          "pattern": "\\bpivotal\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["important", "key", "central"]
+        },
+        {
+          "pattern": "\\bintricate\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["complex", "detailed"]
+        },
+        {
+          "pattern": "\\bnuanced\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["subtle", "complex"]
+        },
+        {
+          "pattern": "\\bcomprehensive\\b",
+          "regex": true,
+          "severity": "low",
+          "note": "Common in human writing too"
+        },
+        {
+          "pattern": "\\bmultifaceted\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["complex", "varied"]
+        },
+        {
+          "pattern": "\\brobust\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["strong", "reliable", "sturdy"]
+        },
+        {
+          "pattern": "\\binnovative\\b",
+          "regex": true,
+          "severity": "low"
+        },
+        {
+          "pattern": "\\bseamless\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["smooth", "integrated"]
+        },
+        {
+          "pattern": "\\bholistic\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["complete", "comprehensive", "overall"]
+        },
+        {
+          "pattern": "\\bgroundbreaking\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["innovative", "new", "pioneering"]
+        },
+        {
+          "pattern": "cutting-edge",
+          "regex": false,
+          "severity": "medium",
+          "replacements": ["modern", "advanced", "latest"]
+        },
+        {
+          "pattern": "\\bmeticulous\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["careful", "detailed", "thorough"]
+        },
+        {
+          "pattern": "\\bversatile\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["flexible", "adaptable"]
+        },
+        {
+          "pattern": "\\bdynamic\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["active", "changing", "energetic"]
+        }
+      ],
+      "nouns": [
+        {
+          "pattern": "\\btapestry\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["mix", "combination", "variety"],
+          "note": "Unless literal textile"
+        },
+        {
+          "pattern": "\\blandscape\\b",
+          "regex": true,
+          "severity": "medium",
+          "context_dependent": true,
+          "note": "Flag only in metaphorical usage (business landscape, etc.)"
+        },
+        {
+          "pattern": "\\bparadigm\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["model", "framework", "approach"]
+        },
+        {
+          "pattern": "\\brealm\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["area", "field", "domain"]
+        },
+        {
+          "pattern": "\\bsynergy\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["cooperation", "collaboration"]
+        },
+        {
+          "pattern": "\\btrajectory\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["path", "course", "direction"]
+        },
+        {
+          "pattern": "\\bcornerstone\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["foundation", "basis"]
+        },
+        {
+          "pattern": "\\bcatalyst\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["trigger", "cause"]
+        },
+        {
+          "pattern": "\\bbeacon\\b",
+          "regex": true,
+          "severity": "medium",
+          "context_dependent": true,
+          "note": "Flag only in metaphorical usage"
+        },
+        {
+          "pattern": "\\btestament\\b",
+          "regex": true,
+          "severity": "high",
+          "replacements": ["proof", "evidence", "demonstration"]
+        },
+        {
+          "pattern": "\\bhallmark\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["characteristic", "feature"]
+        },
+        {
+          "pattern": "\\bconfluence\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["combination", "meeting point"]
+        },
+        {
+          "pattern": "\\bnexus\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["connection", "link", "center"]
+        },
+        {
+          "pattern": "\\bmosaic\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["mix", "combination"]
+        },
+        {
+          "pattern": "\\bbedrock\\b",
+          "regex": true,
+          "severity": "medium",
+          "replacements": ["foundation", "basis"]
+        }
+      ],
+      "phrases": [
+        {
+          "pattern": "rich tapestry",
+          "severity": "high",
+          "replacements": ["mix", "variety", "combination"]
+        },
+        {
+          "pattern": "broader landscape",
+          "severity": "high",
+          "replacements": ["wider context", "field"]
+        },
+        {
+          "pattern": "key role",
+          "severity": "medium",
+          "replacements": ["important part", "major function"]
+        },
+        {
+          "pattern": "integral role",
+          "severity": "medium",
+          "replacements": ["essential part", "important function"]
+        },
+        {
+          "pattern": "pivotal role",
+          "severity": "high",
+          "replacements": ["important part", "central function"]
+        },
+        {
+          "pattern": "a testament to",
+          "severity": "high",
+          "replacements": ["shows", "demonstrates", "proves"]
+        },
+        {
+          "pattern": "poised to",
+          "severity": "medium",
+          "replacements": ["ready to", "about to"]
+        },
+        {
+          "pattern": "at the forefront",
+          "severity": "medium",
+          "replacements": ["leading", "ahead in"]
+        }
+      ]
+    },
+    {
+      "id": "2.2",
+      "subcategory": "Negative Parallelisms",
+      "priority": "high",
+      "patterns": [
+        {
+          "pattern": "constitutes not only .+ but",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "rephrase"
+        },
+        {
+          "pattern": "it'?s not just about .+; it'?s about",
+          "type": "regex",
+          "regex": true,
+          "case_sensitive": false,
+          "severity": "high",
+          "action": "rephrase"
+        },
+        {
+          "pattern": "(not just|not only|not merely|more than just) .+ (but|but also|rather)",
+          "type": "regex",
+          "regex": true,
+          "severity": "high",
+          "action": "rephrase"
+        }
+      ]
+    },
+    {
+      "id": "2.3",
+      "subcategory": "Rule of Three",
+      "priority": "medium",
+      "description": "AI suspiciously favors three-item lists",
+      "detection_type": "frequency",
+      "patterns": [
+        {
+          "pattern": "\\w+,\\s+\\w+,?\\s+and\\s+\\w+",
+          "type": "regex",
+          "regex": true,
+          "severity": "low",
+          "note": "Flag only when appearing multiple times in same section",
+          "frequency_threshold": {
+            "max_per_section": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "2.4",
+      "subcategory": "Vague Attributions (Weasel Words)",
+      "priority": "medium",
+      "patterns": [
+        {
+          "pattern": "has been described as",
+          "severity": "medium",
+          "action": "cite_source_or_remove"
+        },
+        {
+          "pattern": "is of interest to researchers",
+          "severity": "medium",
+          "action": "cite_or_remove"
+        },
+        {
+          "pattern": "experts believe",
+          "severity": "medium",
+          "action": "cite_experts_or_remove"
+        },
+        {
+          "pattern": "studies show",
+          "severity": "medium",
+          "action": "cite_studies_or_remove"
+        },
+        {
+          "pattern": "research suggests",
+          "severity": "medium",
+          "action": "cite_research_or_remove"
+        }
+      ]
+    },
+    {
+      "id": "2.5",
+      "subcategory": "Elegant Variation",
+      "priority": "low",
+      "description": "Subject called by different titles throughout text",
+      "detection_type": "manual_review",
+      "examples": [
+        "Subject by name, then 'the protagonist', then 'the key figure'",
+        "Company name, then 'the organization', then 'the entity'"
+      ],
+      "note": "Requires contextual analysis - flag multiple different titles for same subject"
+    },
+    {
+      "id": "2.6",
+      "subcategory": "False Ranges",
+      "priority": "low",
+      "patterns": [
+        {
+          "pattern": "from .+ to .+",
+          "type": "regex",
+          "regex": true,
+          "severity": "low",
+          "note": "Check if range is meaningful or just dramatic phrasing",
+          "examples": ["from the singularity of the Big Bang to the grand cosmic web"]
+        }
+      ]
+    }
+  ]
+}

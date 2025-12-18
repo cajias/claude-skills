@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "category": "style-and-formatting",
+  "description": "Stylistic and formatting patterns common in AI-generated text",
+  "patterns": [
+    {
+      "id": "3.1",
+      "subcategory": "Title Case in Headings",
+      "priority": "low",
+      "description": "Every main word capitalized in headings",
+      "detection_type": "structural",
+      "severity": "low",
+      "note": "Check if headings consistently use Title Case When They Should Use Sentence case"
+    },
+    {
+      "id": "3.2",
+      "subcategory": "Excessive Boldface",
+      "priority": "low",
+      "description": "Overuse of bold text for emphasis",
+      "detection_type": "frequency",
+      "severity": "low",
+      "threshold": {
+        "max_per_paragraph": 3,
+        "note": "Flag if >3 bold phrases per paragraph on average"
+      }
+    },
+    {
+      "id": "3.3",
+      "subcategory": "Inline-Header Vertical Lists",
+      "priority": "medium",
+      "description": "Lists with bold inline headers",
+      "patterns": [
+        {
+          "pattern": "^\\d+\\.\\s+\\*\\*[^*]+\\*\\*:?\\s+",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Pattern like: 1. **Historical Context:** The world...",
+          "example": "1. **Historical Context:** The world began..."
+        },
+        {
+          "pattern": "^[-*]\\s+\\*\\*[^*]+\\*\\*:?\\s+",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Pattern like: - **Key Point:** This is important"
+        }
+      ]
+    },
+    {
+      "id": "3.4",
+      "subcategory": "Emoji Usage",
+      "priority": "medium",
+      "description": "Emojis in formal documents",
+      "detection_type": "character_class",
+      "severity": "medium",
+      "note": "Flag emoji usage in formal/encyclopedic contexts",
+      "pattern": "[\\u{1F300}-\\u{1F9FF}]",
+      "context_dependent": true
+    },
+    {
+      "id": "3.5",
+      "subcategory": "Excessive Em Dashes",
+      "priority": "medium",
+      "description": "Overuse of em dashes (—)",
+      "detection_type": "frequency",
+      "patterns": [
+        {
+          "pattern": "—",
+          "type": "punctuation",
+          "severity": "medium",
+          "threshold": {
+            "max_per_500_words": 2,
+            "note": "Flag if >2 em dashes per 500 words"
+          }
+        }
+      ]
+    },
+    {
+      "id": "3.6",
+      "subcategory": "Curly Quotes and Apostrophes",
+      "priority": "low",
+      "description": "Use of 'curly' quotes instead of straight quotes",
+      "patterns": [
+        {
+          "pattern": "[""'']",
+          "type": "regex",
+          "regex": true,
+          "severity": "low",
+          "note": "May indicate copy-paste from AI interface",
+          "context_dependent": true
+        }
+      ]
+    },
+    {
+      "id": "3.7",
+      "subcategory": "Markdown in Non-Markdown Contexts",
+      "priority": "medium",
+      "description": "Markdown syntax in plain text",
+      "patterns": [
+        {
+          "pattern": "\\*\\*[^*]+\\*\\*",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Bold markdown in plain text context"
+        },
+        {
+          "pattern": "\\*[^*\\s][^*]*\\*",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Italic markdown in plain text context"
+        },
+        {
+          "pattern": "^#+\\s+",
+          "type": "regex",
+          "regex": true,
+          "severity": "medium",
+          "note": "Markdown headers in plain text"
+        },
+        {
+          "pattern": "^[-*+]\\s+",
+          "type": "regex",
+          "regex": true,
+          "severity": "low",
+          "note": "Markdown list syntax"
+        }
+      ]
+    }
+  ]
+}
