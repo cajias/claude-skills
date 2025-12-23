@@ -1,10 +1,32 @@
-# README Generator Skill
+---
+description: Evaluate and improve README files with iterative refinement
+argument-hint: [mode: generate|improve|evaluate]
+---
+
+# README Generator
 
 ## Objective
 
 Generate or improve README files through iterative analysis and refinement. Analyze project
 codebase, create or enhance README content following best practices, evaluate quality, and apply
 improvements until quality threshold is met or maximum iterations reached.
+
+## Command Arguments
+
+Parse `$ARGUMENTS` to determine the operation mode:
+
+- **No arguments or "improve"** (default): Enhance existing README iteratively
+- **"generate"**: Create README from scratch by analyzing codebase
+- **"evaluate"**: Evaluate quality and return feedback only (no changes)
+
+**Usage Examples:**
+
+```text
+/dev:review-readme              # Improve existing README
+/dev:review-readme improve      # Same as above (explicit)
+/dev:review-readme generate     # Generate from scratch
+/dev:review-readme evaluate     # Evaluate only, no changes
+```
 
 ## Prerequisites
 
@@ -13,11 +35,33 @@ Before starting, ensure:
 1. You have access to the project repository and its files
 2. You can read and analyze code in the project's primary language(s)
 3. You understand the project's purpose and key features
-4. You have access to the configuration in `config/default.config.json`
+4. You have access to the configuration in `config/readme-generator/default.config.json`
+
+## Reading the README
+
+Use `@README.md` to reference and read the existing README file in the project root.
+
+## Gathering Project Context
+
+Use `!` bash execution to gather project context:
+
+```bash
+# Check project structure
+!ls -la
+
+# Look for package manifests
+!find . -maxdepth 2 -name "package.json" -o -name "setup.py" -o -name "Cargo.toml" -o -name "go.mod" -o -name "pom.xml"
+
+# Read package metadata (example for Node.js)
+!cat package.json
+
+# Check for other relevant files
+!ls -la src/ lib/ docs/
+```
 
 ## Configuration
 
-The skill supports extensive configuration via `config/default.config.json`:
+The command supports extensive configuration via `config/readme-generator/default.config.json`:
 
 ### Core Settings
 
@@ -703,6 +747,11 @@ Track these metrics for each README generation:
 - **Sections added**: New sections created
 - **Examples added**: Number of code examples added
 - **Time to completion**: Total time spent
+
+## References
+
+- [banesullivan/README](https://github.com/banesullivan/README) - README template and best practices
+- [Art of README](https://github.com/hackergrrl/art-of-readme) - README writing guide
 
 ## Version
 
