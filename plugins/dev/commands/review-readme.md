@@ -43,7 +43,7 @@ Use `@README.md` to reference and read the existing README file in the project r
 
 ## Gathering Project Context
 
-Use `!` bash execution to gather project context:
+Use Claude Code's `!` prefix (bash execution) to gather project context:
 
 ```bash
 # Check project structure
