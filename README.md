@@ -82,19 +82,19 @@ Delegate tasks to Amazon Q CLI agents with specialized tool integrations:
 - Automatic agent routing based on task type (AWS, docs, architecture, quality)
 - Progress monitoring and status reporting
 
-### [README Generator](./skills/readme-generator/)
-
-Generate and iteratively improve README files through automated analysis and refinement:
-
-- Intelligent codebase analysis to extract features and usage patterns
-- Generates comprehensive README following best practices and templates
-- Iterative evaluation and improvement loop until quality threshold met
-- Supports multiple modes: generate from scratch, improve existing, or target specific sections
-- Based on banesullivan/README template and Art of README guidelines
-- Configurable quality criteria and section requirements
-- Detailed change tracking and final quality reports
-
 ## Available Plugins
+
+### [Dev](./plugins/dev/)
+
+Development workflow tools with slash commands for README generation and code review:
+
+- `/dev:review-readme` command for README creation and improvement
+- Intelligent codebase analysis to extract features and usage patterns
+- Iterative evaluation and improvement loop until quality threshold met
+- Three modes: generate from scratch, improve existing, or evaluate only
+- Based on banesullivan/README template and best practices
+- Configurable quality criteria and section requirements
+- Detailed change tracking and quality reports
 
 ### [PR Monitor](./plugins/pr-monitor/)
 

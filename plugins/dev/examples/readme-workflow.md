@@ -1,6 +1,6 @@
 # Example Workflow: Generating README for a Sample Project
 
-This example demonstrates the README Generator skill workflow on a fictional Node.js library
+This example demonstrates the README Generator plugin workflow on a fictional Node.js library
 called `json-validator`.
 
 ## Initial Setup
@@ -48,7 +48,7 @@ A JSON validator library.
 ### User Request
 
 ```text
-Use the README Generator skill to improve the README for this project. Focus on making it
+Use /dev:review-readme to improve the README for this project. Focus on making it
 comprehensive and following best practices.
 ```
 
@@ -56,7 +56,7 @@ comprehensive and following best practices.
 
 #### Context Gathering
 
-The skill analyzes the project:
+The command analyzes the project:
 
 ```text
 ✓ Package manager: npm
@@ -91,7 +91,7 @@ Current README is minimal and needs substantial improvement.
 
 #### Generation Phase
 
-The skill generates improved content:
+The command generates improved content:
 
 ````markdown
 # json-validator
@@ -359,10 +359,10 @@ Result: Updates all sections except the preserved ones.
    "Focus on comprehensive API documentation and usage examples."
    ```
 
-3. **Review generated content**: The skill aims for quality, but manual review of technical
+3. **Review generated content**: The command aims for quality, but manual review of technical
    details is recommended.
 
-4. **Iterate as needed**: If the first result isn't perfect, you can run the skill again or
+4. **Iterate as needed**: If the first result isn't perfect, you can run the command again or
    request specific improvements.
 
 ## Common Issues and Solutions
@@ -371,7 +371,7 @@ Result: Updates all sections except the preserved ones.
 
 **Problem**: Code examples are too simple or don't show real use cases.
 
-**Solution**: The skill tries to analyze tests and actual code usage. If examples are still
+**Solution**: The command tries to analyze tests and actual code usage. If examples are still
 generic, you can provide specific use cases to include.
 
 ### Issue: Missing project-specific details
@@ -385,5 +385,5 @@ instructions, environment requirements, or domain-specific considerations.
 
 **Problem**: Score improves but doesn't reach the threshold.
 
-**Solution**: The skill will stop at max_iterations. Review remaining issues in the report and
+**Solution**: The command will stop at max_iterations. Review remaining issues in the report and
 address manually or adjust the threshold.
