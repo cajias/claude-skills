@@ -173,6 +173,15 @@ The skill supports extensive configuration via `config/default.config.json`:
 
 The skill evaluates README quality based on:
 
+### Core Questions (from banesullivan/README)
+
+Every README should answer these fundamental questions:
+
+- ✓ **Does this solve my problem?** Clear problem statement and value proposition
+- ✓ **Can I use this code?** Installation, usage examples, prerequisites
+- ✓ **Who made this?** Authors, contributors, license
+- ✓ **How can I learn more?** Documentation links, related projects, support
+
 ### Essential Sections (High Priority)
 
 - ✓ **Highlights**: Clear value proposition and key features
@@ -185,6 +194,19 @@ The skill evaluates README quality based on:
 - ✓ **Configuration**: For configurable tools
 - ✓ **Contributing**: Guidelines for contributors
 - ✓ **License**: License information
+
+### Quality Attributes
+
+- ✓ **Cognitive Funneling**: Broad to specific organization (overview → details)
+- ✓ **Caveats Upfront**: Limitations and prerequisites mentioned early
+- ✓ **Inviting Tone**: Friendly, approachable language
+- ✓ **Visual Elements**: Screenshots, GIFs, diagrams where appropriate
+
+### Trust Signals
+
+- ✓ **Badges**: Build status, version, license
+- ✓ **Related Projects**: Alternatives and comparisons
+- ✓ **Active Maintenance**: Recent commits and issue activity
 
 ### Quality Checks (All Priorities)
 

@@ -232,7 +232,19 @@ function generate_readme(project_path, config):
 
 **Goal**: Assess README quality against comprehensive criteria
 
-1. **Check essential sections**:
+1. **Evaluate against Core Questions** (from banesullivan/README):
+
+   Every README should answer these fundamental questions for the reader:
+
+   ```text
+   Core Questions:
+   - [ ] Does this solve my problem? (Clear problem statement and value proposition)
+   - [ ] Can I use this code? (Installation, usage examples, prerequisites)
+   - [ ] Who made this? (Authors, contributors, license)
+   - [ ] How can I learn more? (Documentation links, related projects, support)
+   ```
+
+2. **Check essential sections**:
 
    ```text
    Critical (must have):
@@ -247,7 +259,7 @@ function generate_readme(project_path, config):
    - [ ] License information
    ```
 
-2. **Validate content quality**:
+3. **Validate content quality**:
 
    For each section, check:
    - Is content present and non-empty?
@@ -255,7 +267,43 @@ function generate_readme(project_path, config):
    - Is content clear and well-formatted?
    - Does it contain specific, actionable information?
 
-3. **Evaluate code examples**:
+4. **Assess quality attributes**:
+
+   ```text
+   Cognitive Funneling:
+   - [ ] Broad to specific organization (overview → details)
+   - [ ] Logical flow from problem to solution to usage
+   - [ ] Progressive disclosure of complexity
+
+   Caveats Upfront:
+   - [ ] Limitations mentioned early (not buried at end)
+   - [ ] Prerequisites clearly stated before installation
+   - [ ] Platform/version requirements prominent
+
+   Tone Assessment:
+   - [ ] Inviting and approachable language
+   - [ ] Friendly without being unprofessional
+   - [ ] Encouraging to potential users/contributors
+
+   Visual Elements:
+   - [ ] Screenshots for UI/visual projects
+   - [ ] GIFs/demos for interactive features
+   - [ ] Diagrams for architecture/workflows (when helpful)
+   - [ ] Code examples properly highlighted
+   ```
+
+5. **Check trust signals**:
+
+   ```text
+   - [ ] Build/CI status badges (passing tests)
+   - [ ] Version/release badges
+   - [ ] License badge
+   - [ ] Related projects or alternatives mentioned
+   - [ ] Comparison with similar tools (when appropriate)
+   - [ ] Active maintenance indicators (recent commits, issues)
+   ```
+
+6. **Evaluate code examples**:
 
    ```text
    For usage examples:
@@ -265,7 +313,7 @@ function generate_readme(project_path, config):
    - [ ] Examples include expected output (when helpful)
    ```
 
-4. **Check installation instructions**:
+7. **Check installation instructions**:
 
    ```text
    - [ ] At least one installation method documented
@@ -274,7 +322,7 @@ function generate_readme(project_path, config):
    - [ ] Multiple installation methods (when applicable)
    ```
 
-5. **Validate links and references**:
+8. **Validate links and references**:
 
    ```text
    - [ ] All markdown links have valid syntax
@@ -283,7 +331,7 @@ function generate_readme(project_path, config):
    - [ ] References to files/paths are accurate
    ```
 
-6. **Assess structure and formatting**:
+9. **Assess structure and formatting**:
 
    ```text
    - [ ] Consistent heading hierarchy
@@ -292,24 +340,29 @@ function generate_readme(project_path, config):
    - [ ] No broken formatting
    ```
 
-7. **Calculate quality score**:
+10. **Calculate quality score**:
 
-   ```text
-   Score = (
-     essential_sections_score * 0.4 +
-     content_quality_score * 0.3 +
-     examples_score * 0.2 +
-     formatting_score * 0.1
-   )
+```text
+Score = (
+  essential_sections_score * 0.4 +
+  content_quality_score * 0.3 +
+  examples_score * 0.2 +
+  formatting_score * 0.1
+)
 
-   Where each component is 0-100
-   ```
+Where each component is 0-100
+```
 
-8. **Categorize issues by priority**:
-   - **Critical**: Missing essential sections, broken examples
-   - **High**: Incomplete sections, missing examples, broken links
-   - **Medium**: Thin content, minor formatting issues
-   - **Low**: Style inconsistencies, optional improvements
+<!-- markdownlint-disable MD029 -->
+
+11. **Categorize issues by priority**:
+
+<!-- markdownlint-enable MD029 -->
+
+- **Critical**: Missing essential sections, broken examples
+- **High**: Incomplete sections, missing examples, broken links
+- **Medium**: Thin content, minor formatting issues
+- **Low**: Style inconsistencies, optional improvements
 
 ### Phase 4: Generate Improvement Plan
 
