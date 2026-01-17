@@ -4,6 +4,25 @@ This directory contains Claude Code plugins that extend functionality through ho
 
 ## Available Plugins
 
+### [Dev](./dev/)
+
+Development workflow tools with slash commands for README generation and code review.
+
+**Features:**
+
+- `/dev:review-readme` command for README creation and improvement
+- Three modes: generate from scratch, improve existing, or evaluate only
+- Iterative quality evaluation and improvement
+- Based on banesullivan/README best practices
+- Configurable quality criteria and section control
+
+**Installation:**
+
+```bash
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/dev
+```
+
 ### [PR Monitor](./pr-monitor/)
 
 Automated GitHub pull request monitoring with event-driven hooks.

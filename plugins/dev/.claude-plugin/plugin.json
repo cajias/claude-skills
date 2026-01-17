@@ -1,0 +1,9 @@
+{
+  "name": "dev",
+  "version": "1.0.0",
+  "description": "Development workflow tools - README generation, code review, and more",
+  "author": "cajias",
+  "repository": "https://github.com/cajias/claude-skills",
+  "license": "MIT",
+  "keywords": ["dev", "readme", "documentation", "workflow", "review"]
+}
