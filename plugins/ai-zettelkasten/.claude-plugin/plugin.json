@@ -1,0 +1,30 @@
+{
+  "name": "ai-zettelkasten",
+  "version": "2.0.0",
+  "description": "True Zettelkasten for Claude Code - atomic notes, semantic search, and automatic hubs",
+  "author": {
+    "name": "cajias"
+  },
+  "license": "MIT",
+  "keywords": [
+    "zettelkasten",
+    "knowledge-management",
+    "obsidian",
+    "s3-vectors",
+    "semantic-search",
+    "memory"
+  ],
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ai-zettelkasten zk-extract"
+          }
+        ]
+      }
+    ]
+  }
+}
