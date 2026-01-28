@@ -81,6 +81,7 @@ Intelligently route tasks to Amazon Q CLI agents with automatic agent selection:
 - Support for explicit agent selection when needed
 - Special workflow patterns (e.g., Quip file upload)
 - Seven specialized agents (AWS, docs, architecture, quality, code dev, default, omega)
+
 ### [Q Chat Integration](./skills/q-chat-integration/)
 
 Delegate tasks to Amazon Q CLI agents with specialized tool integrations:
