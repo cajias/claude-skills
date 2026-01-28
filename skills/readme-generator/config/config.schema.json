@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "README Generator Configuration",
+  "description": "Configuration schema for the README Generator skill",
+  "type": "object",
+  "properties": {
+    "max_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5,
+      "description": "Maximum number of improvement iterations"
+    },
+    "score_threshold": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 85,
+      "description": "Target quality score (0-100) to reach before stopping"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["generate", "improve", "sections"],
+      "default": "improve",
+      "description": "Generation mode: generate (from scratch), improve (existing), or sections (targeted)"
+    },
+    "preserve_custom": {
+      "type": "boolean",
+      "default": true,
+      "description": "Keep custom sections not in standard templates"
+    },
+    "sections_to_generate": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "highlights",
+          "installation",
+          "usage",
+          "api",
+          "configuration",
+          "examples",
+          "contributing",
+          "license",
+          "changelog",
+          "faq",
+          "troubleshooting",
+          "acknowledgments"
+        ]
+      },
+      "default": [
+        "highlights",
+        "installation",
+        "usage",
+        "api",
+        "configuration",
+        "contributing",
+        "license"
+      ],
+      "description": "List of sections to generate or improve"
+    },
+    "preserve_sections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Sections to leave unchanged during improvement"
+    },
+    "require_sections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": ["highlights", "installation", "usage"],
+      "description": "Sections that must be present in the final README"
+    },
+    "require_code_examples": {
+      "type": "boolean",
+      "default": true,
+      "description": "Require code examples in the usage section"
+    },
+    "require_installation": {
+      "type": "boolean",
+      "default": true,
+      "description": "Require installation instructions"
+    },
+    "min_section_length": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 50,
+      "description": "Minimum character length for sections"
+    },
+    "check_links": {
+      "type": "boolean",
+      "default": true,
+      "description": "Validate all links in the README"
+    },
+    "strict_mode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Enable more rigorous quality requirements"
+    },
+    "evaluation_weights": {
+      "type": "object",
+      "properties": {
+        "essential_sections": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.4
+        },
+        "content_quality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.3
+        },
+        "examples": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.2
+        },
+        "formatting": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.1
+        }
+      },
+      "description": "Weights for different evaluation components (should sum to 1.0)"
+    },
+    "priority_thresholds": {
+      "type": "object",
+      "properties": {
+        "critical_block": {
+          "type": "boolean",
+          "default": true,
+          "description": "Block completion if critical issues remain"
+        },
+        "high_priority_max": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 2,
+          "description": "Maximum allowed high-priority issues before blocking"
+        }
+      },
+      "description": "Thresholds for issue priorities"
+    }
+  },
+  "required": ["max_iterations", "score_threshold", "mode"]
+}
