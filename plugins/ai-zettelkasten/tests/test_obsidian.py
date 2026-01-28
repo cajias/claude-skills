@@ -118,3 +118,80 @@ class TestObsidianVault:
         promoted = vault.read_note(permanent_path)
         assert promoted.note_type == NoteType.PERMANENT
         assert promoted.status == "approved"
+
+
+class TestHubManagement:
+    def test_write_hub_note(self, tmp_path):
+        """Write a hub note to the hubs folder."""
+        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+
+        vault = ObsidianVault(tmp_path)
+        hub = Note(
+            id="hub-aws-lambda",
+            title="Hub: AWS Lambda",
+            content="Auto-generated hub for AWS Lambda notes.",
+            knowledge_type=KnowledgeType.FACT,
+            note_type=NoteType.HUB,
+            status="generated",
+            tags=["aws", "lambda"],
+        )
+
+        path = vault.write_hub(hub)
+
+        assert path.exists()
+        assert "hubs" in str(path)
+        assert path.name == "hub-aws-lambda.md"
+
+    def test_list_hubs(self, tmp_path):
+        """List all hub notes in the vault."""
+        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+
+        vault = ObsidianVault(tmp_path)
+
+        # Create two hub notes
+        for i in range(2):
+            hub = Note(
+                id=f"hub-test-{i}",
+                title=f"Hub: Test {i}",
+                content=f"Test hub {i}",
+                knowledge_type=KnowledgeType.FACT,
+                note_type=NoteType.HUB,
+                status="generated",
+                tags=["test"],
+            )
+            vault.write_hub(hub)
+
+        hubs = vault.list_hubs()
+
+        assert len(hubs) == 2
+
+    def test_read_hub(self, tmp_path):
+        """Read a hub note by ID."""
+        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+
+        vault = ObsidianVault(tmp_path)
+        hub = Note(
+            id="hub-read-test",
+            title="Hub: Read Test",
+            content="Testing hub reading",
+            knowledge_type=KnowledgeType.FACT,
+            note_type=NoteType.HUB,
+            status="generated",
+            tags=["testing"],
+        )
+        vault.write_hub(hub)
+
+        read_hub = vault.read_hub("hub-read-test")
+
+        assert read_hub is not None
+        assert read_hub.title == "Hub: Read Test"
+        assert read_hub.note_type == NoteType.HUB
+
+    def test_read_hub_not_found(self, tmp_path):
+        """Return None when hub doesn't exist."""
+        from ai_zettelkasten.obsidian import ObsidianVault
+
+        vault = ObsidianVault(tmp_path)
+        result = vault.read_hub("nonexistent-hub")
+
+        assert result is None

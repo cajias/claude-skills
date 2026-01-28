@@ -214,3 +214,35 @@ class ObsidianVault:
         path.unlink()
 
         return new_path
+
+    def write_hub(self, hub: Note) -> Path:
+        """Write a hub note to the hubs folder."""
+        if hub.note_type != NoteType.HUB:
+            hub.note_type = NoteType.HUB
+
+        folder = self.root / "knowledge-base" / "hubs"
+        folder.mkdir(parents=True, exist_ok=True)
+
+        # Use hub ID as filename
+        filename = f"{hub.id}.md"
+        path = folder / filename
+
+        path.write_text(hub.to_markdown())
+        return path
+
+    def list_hubs(self) -> list[Path]:
+        """List all hub note paths."""
+        hubs_folder = self.root / "knowledge-base" / "hubs"
+        if not hubs_folder.exists():
+            return []
+        return list(hubs_folder.glob("hub-*.md"))
+
+    def read_hub(self, hub_id: str) -> Optional[Note]:
+        """Read a hub note by ID. Returns None if not found."""
+        hubs_folder = self.root / "knowledge-base" / "hubs"
+        path = hubs_folder / f"{hub_id}.md"
+
+        if not path.exists():
+            return None
+
+        return self.read_note(path)
