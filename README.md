@@ -71,6 +71,17 @@ Transform AI-generated text into natural human-sounding writing:
 - Context-aware replacements that preserve meaning
 - Before/after comparisons and detailed change logs
 
+### [Quip Document Writer](./skills/quip-document-writer/)
+
+Transfer markdown documents to Quip with proper formatting validation:
+
+- Section-by-section transfer approach with validation
+- Automatic conversion of numbered lists to HTML to prevent rendering failures
+- Smart handling of images, tables, and Mermaid diagrams
+- Comprehensive verification after each section upload
+- Detailed TODO lists for manual follow-up tasks
+- Handles common Quip markdown import issues
+
 ### [Tell Q Agent Router](./skills/tell-q-agent-router/)
 
 Intelligently route tasks to Amazon Q CLI agents with automatic agent selection:
