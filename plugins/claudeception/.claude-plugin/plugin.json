@@ -1,0 +1,40 @@
+{
+  "name": "claudeception",
+  "version": "1.3.0",
+  "description": "Continuous learning system that extracts reusable skills from Claude Code sessions. Analyzes conversations for non-obvious discoveries, debugging insights, and workarounds, then creates SKILL.md files for future use.",
+  "author": {
+    "name": "cajias"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "learning",
+    "extraction",
+    "knowledge-management",
+    "meta-skill"
+  ],
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/run-extract.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/capture-decision.py"
+          }
+        ]
+      }
+    ]
+  }
+}
