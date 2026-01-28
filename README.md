@@ -82,7 +82,41 @@ Transfer markdown documents to Quip with proper formatting validation:
 - Detailed TODO lists for manual follow-up tasks
 - Handles common Quip markdown import issues
 
+### [Tell Q Agent Router](./skills/tell-q-agent-router/)
+
+Intelligently route tasks to Amazon Q CLI agents with automatic agent selection:
+
+- Natural language interface using "tell q to..." pattern
+- Intelligent agent selection based on task analysis and keywords
+- Background execution with progress monitoring
+- Support for explicit agent selection when needed
+- Special workflow patterns (e.g., Quip file upload)
+- Seven specialized agents (AWS, docs, architecture, quality, code dev, default, omega)
+
+### [Q Chat Integration](./skills/q-chat-integration/)
+
+Delegate tasks to Amazon Q CLI agents with specialized tool integrations:
+
+- Seamlessly delegate to Q using natural trigger phrases ("tell Q to...", "ask Q to...")
+- Non-interactive background execution with full tool permissions
+- Perfect for Quip operations, ticket creation, and diagram generation
+- Intelligent context gathering and absolute path resolution
+- Automatic agent routing based on task type (AWS, docs, architecture, quality)
+- Progress monitoring and status reporting
+
 ## Available Plugins
+
+### [Dev](./plugins/dev/)
+
+Development workflow tools with slash commands for README generation and code review:
+
+- `/dev:review-readme` command for README creation and improvement
+- Intelligent codebase analysis to extract features and usage patterns
+- Iterative evaluation and improvement loop until quality threshold met
+- Three modes: generate from scratch, improve existing, or evaluate only
+- Based on banesullivan/README template and best practices
+- Configurable quality criteria and section requirements
+- Detailed change tracking and quality reports
 
 ### [PR Monitor](./plugins/pr-monitor/)
 

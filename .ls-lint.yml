@@ -1,0 +1,22 @@
+ls:
+  skills/*:
+    .dir: kebab-case
+
+  skills/*/examples:
+    .md: kebab-case | PascalCase
+
+  skills/*/config:
+    .json: kebab-case
+
+  skills/*/patterns:
+    .json: kebab-case | PascalCase
+
+  skills/*/prompts:
+    .md: kebab-case
+
+ignore:
+  - node_modules
+  - .git
+  - homebrew-tools-reference
+  - plugins
+  - mcp-server

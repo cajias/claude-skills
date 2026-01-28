@@ -1,0 +1,76 @@
+{
+  "agents": {
+    "aws-expert": {
+      "name": "aws-expert",
+      "description": "AWS architecture, CDK, CloudFormation, and API specialist",
+      "use_cases": [
+        "AWS infrastructure design",
+        "CDK code generation",
+        "CloudFormation templates",
+        "AWS service configuration",
+        "API Gateway setup",
+        "Lambda functions"
+      ]
+    },
+    "amzn-docs": {
+      "name": "amzn-docs",
+      "description": "Documentation specialist for writing and organizing documentation",
+      "use_cases": [
+        "Technical documentation",
+        "README files",
+        "API documentation",
+        "User guides",
+        "Architecture documentation"
+      ]
+    },
+    "amzn-architecture": {
+      "name": "amzn-architecture",
+      "description": "System design and architecture specialist with security expertise",
+      "use_cases": [
+        "Architecture decisions",
+        "Security reviews",
+        "System design",
+        "Design patterns",
+        "Scalability planning"
+      ]
+    },
+    "amzn-quality": {
+      "name": "amzn-quality",
+      "description": "Code quality and standards specialist",
+      "use_cases": [
+        "Code linting",
+        "Code standards",
+        "Best practices review",
+        "Code quality assessment",
+        "Static analysis"
+      ]
+    },
+    "default": {
+      "name": "default",
+      "description": "General purpose agent with QuipEditor tool support",
+      "use_cases": [
+        "Quip document operations",
+        "General tasks",
+        "Document updates",
+        "Content creation"
+      ]
+    }
+  },
+  "routing_hints": {
+    "quip": "default",
+    "document": "default",
+    "aws": "aws-expert",
+    "cdk": "aws-expert",
+    "cloudformation": "aws-expert",
+    "infrastructure": "aws-expert",
+    "docs": "amzn-docs",
+    "documentation": "amzn-docs",
+    "readme": "amzn-docs",
+    "architecture": "amzn-architecture",
+    "design": "amzn-architecture",
+    "security": "amzn-architecture",
+    "quality": "amzn-quality",
+    "linting": "amzn-quality",
+    "standards": "amzn-quality"
+  }
+}

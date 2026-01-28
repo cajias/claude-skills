@@ -1,0 +1,54 @@
+{
+  "agents": [
+    {
+      "name": "aws-expert",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["AWS architecture", "CDK", "API", "diagrams"],
+      "keywords": [
+        "aws",
+        "cdk",
+        "lambda",
+        "s3",
+        "ec2",
+        "cloudformation",
+        "infrastructure"
+      ]
+    },
+    {
+      "name": "amzn-docs",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["Documentation", "Natural writing"],
+      "keywords": ["documentation", "write", "document", "readme", "docs"]
+    },
+    {
+      "name": "amzn-architecture",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["Design", "Security", "Internal systems"],
+      "keywords": ["architecture", "design", "security", "gitlab"]
+    },
+    {
+      "name": "amzn-quality",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["Code quality", "Standards"],
+      "keywords": ["quality", "lint", "standards", "review"]
+    },
+    {
+      "name": "amzn-code-dev",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["Code development"],
+      "keywords": ["develop", "implement", "code", "build"]
+    },
+    {
+      "name": "default",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["QuipEditor", "General"],
+      "keywords": ["quip", "upload"]
+    },
+    {
+      "name": "omega",
+      "model": "claude-sonnet-4.5",
+      "capabilities": ["Project context"],
+      "keywords": []
+    }
+  ]
+}
