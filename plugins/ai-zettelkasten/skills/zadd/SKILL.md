@@ -12,7 +12,7 @@ Manually add a piece of knowledge to the Zettelkasten.
 
 ## Usage
 
-```
+```bash
 /zadd <content>
 /zadd --type fact|decision|pattern|correction <content>
 /zadd --tags "tag1,tag2" <content>
@@ -64,15 +64,15 @@ item = ExtractionItem(
 result = extractor.process_item(item)
 ```
 
-5. **Find related notes** for linking suggestions:
+1. **Find related notes** for linking suggestions:
 
 ```python
 related = extractor.find_related(content, top_k=3)
 ```
 
-6. **Report result**:
+1. **Report result**:
 
-```
+```text
 ✅ Added to knowledge base:
 
 Type: fact
@@ -88,7 +88,7 @@ Status: Pending review
 
 ## Examples
 
-```
+```bash
 /zadd S3 Vectors has 50 metadata keys per vector
 → Type: fact, Tags: aws, s3-vectors, limits
 

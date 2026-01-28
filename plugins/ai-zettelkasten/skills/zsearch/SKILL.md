@@ -12,7 +12,7 @@ Search your knowledge base using natural language.
 
 ## Usage
 
-```
+```bash
 /zsearch <query>
 /zsearch <query> --type fact|decision|pattern|correction
 /zsearch <query> --project <name>
@@ -35,7 +35,7 @@ if parsed_args.project:
     filters["project"] = parsed_args.project
 ```
 
-2. **Generate embedding and search**:
+1. **Generate embedding and search**:
 
 ```python
 from ai_zettelkasten.extractor import KnowledgeExtractor
@@ -48,9 +48,9 @@ results = extractor.vectors.query(
 )
 ```
 
-3. **Display results** ranked by similarity:
+1. **Display results** ranked by similarity:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📚 Search: "S3 Vectors setup"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -75,15 +75,15 @@ results = extractor.vectors.query(
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-4. **Offer actions**:
+1. **Offer actions**:
 
-```
+```text
 [1-3] Open note  [r] Refine search  [q] Quit
 ```
 
 ## Examples
 
-```
+```bash
 /zsearch lambda cold starts
 → Finds notes about Lambda performance
 

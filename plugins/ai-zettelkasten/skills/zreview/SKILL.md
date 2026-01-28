@@ -13,7 +13,7 @@ Review and curate recently extracted knowledge. Approve, edit, or discard items 
 
 ## Usage
 
-```
+```bash
 /zreview              # Review all pending
 /zreview --today      # Today's extractions only
 /zreview --type fact  # Filter by type
@@ -34,9 +34,9 @@ vault = ObsidianVault(Path(os.environ.get("OBSIDIAN_VAULT")))
 pending = vault.list_pending_notes()
 ```
 
-2. **For each note**, display review interface:
+1. **For each note**, display review interface:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 Review Queue (1/5)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -59,9 +59,10 @@ Tags: aws, s3-vectors, bedrock
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-3. **Handle actions**:
+1. **Handle actions**:
 
 **[a]pprove:**
+
 ```python
 # Promote note to permanent
 permanent_path = vault.promote_note(fleeting_path)
@@ -78,6 +79,7 @@ print(f"✅ Promoted to {permanent_path}")
 ```
 
 **[e]dit:**
+
 ```python
 # Open note content for editing
 edited_content = get_user_edit(note.content)
@@ -94,6 +96,7 @@ vectors.update_vector(note.id, new_embedding, metadata)
 ```
 
 **[d]iscard:**
+
 ```python
 # Move to archive
 archive_path = vault.root / "knowledge-base" / "fleeting" / ".archive"
@@ -107,6 +110,7 @@ print("🗑️ Moved to archive")
 ```
 
 **[l]ink:**
+
 ```python
 # Show all notes for manual linking
 all_notes = vault.list_all_notes()
@@ -116,9 +120,9 @@ selected = user_select_notes(all_notes)
 note.links.extend(selected)
 ```
 
-4. **After all reviews**, show summary:
+1. **After all reviews**, show summary:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Review Complete
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

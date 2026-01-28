@@ -24,16 +24,16 @@ export OBSIDIAN_VAULT=~/Documents/obsidian-vault-work
 
 ## Skills
 
-| Skill | Description |
-|-------|-------------|
-| `/zadd` | Manually capture knowledge |
+| Skill      | Description                    |
+| ---------- | ------------------------------ |
+| `/zadd`    | Manually capture knowledge     |
 | `/zreview` | Review and approve extractions |
-| `/zsearch` | Semantic search |
-| `/zhubs` | Browse topic clusters (P1) |
+| `/zsearch` | Semantic search                |
+| `/zhubs`   | Browse topic clusters (P1)     |
 
 ## Architecture
 
-```
+```text
 knowledge-base/
 ├── fleeting/     # Pending review
 ├── permanent/    # Approved notes
@@ -43,12 +43,12 @@ knowledge-base/
 
 ## Knowledge Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| **Fact** | Information discovered | "S3 Vectors uses 1536 dimensions" |
-| **Decision** | Choice with rationale | "Chose uvx over pip for isolation" |
-| **Pattern** | Reusable approach | "Always use Mermaid for diagrams" |
-| **Correction** | Mistake fixed | "boto3 lacks s3vectors, use CLI" |
+| Type           | Description            | Example                            |
+| -------------- | ---------------------- | ---------------------------------- |
+| **Fact**       | Information discovered | "S3 Vectors uses 1536 dimensions"  |
+| **Decision**   | Choice with rationale  | "Chose uvx over pip for isolation" |
+| **Pattern**    | Reusable approach      | "Always use Mermaid for diagrams"  |
+| **Correction** | Mistake fixed          | "boto3 lacks s3vectors, use CLI"   |
 
 ## Workflow
 
@@ -67,11 +67,11 @@ pytest tests/ -v
 
 ## Configuration
 
-| Environment Variable | Default | Description |
-|---------------------|---------|-------------|
-| `ZETTELKASTEN_BUCKET` | zettelkasten-prod | S3 Vectors bucket |
-| `ZETTELKASTEN_INDEX` | knowledge-index | S3 Vectors index |
-| `OBSIDIAN_VAULT` | ~/Documents/obsidian-vault-work | Vault path |
+| Environment Variable  | Default                         | Description       |
+| --------------------- | ------------------------------- | ----------------- |
+| `ZETTELKASTEN_BUCKET` | zettelkasten-prod               | S3 Vectors bucket |
+| `ZETTELKASTEN_INDEX`  | knowledge-index                 | S3 Vectors index  |
+| `OBSIDIAN_VAULT`      | ~/Documents/obsidian-vault-work | Vault path        |
 
 ## License
 

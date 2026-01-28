@@ -12,7 +12,7 @@ Browse and manage auto-generated hub notes that cluster related knowledge.
 
 ## Usage
 
-```
+```bash
 /zhubs                    # List all hubs
 /zhubs <hub-name>         # View specific hub
 /zhubs --regenerate       # Force reclustering
@@ -35,9 +35,9 @@ vault = ObsidianVault(Path(os.environ.get("OBSIDIAN_VAULT", "~/Documents/obsidia
 hubs = vault.list_hubs()
 ```
 
-2. **Display hub list**:
+1. **Display hub list**:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📚 Knowledge Hubs
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -67,9 +67,9 @@ hubs = vault.list_hubs()
 hub = vault.read_hub(hub_name)
 ```
 
-2. **Display hub details**:
+1. **Display hub details**:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📖 Hub: AWS Serverless Patterns
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -117,7 +117,7 @@ print(f"Generated {len(new_hubs)} hubs from {n} permanent notes")
 
 ## Examples
 
-```
+```bash
 /zhubs
 → Lists all 5 hubs with member counts and tags
 
