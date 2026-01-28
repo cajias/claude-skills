@@ -286,3 +286,69 @@ class S3VectorsStore:
         except Exception as e:
             print(f"Error deleting vector: {e}")
             return False
+
+    def query_all(
+        self,
+        filter: Optional[dict[str, Any]] = None,
+        include_embeddings: bool = False
+    ) -> list[dict]:
+        """Query all vectors matching the filter.
+
+        Uses pagination to fetch all results. For clustering, set include_embeddings=True
+        to get the vector data for similarity computation.
+
+        Args:
+            filter: Optional metadata filter (e.g., {"status": "approved"})
+            include_embeddings: Whether to include vector embeddings in results
+
+        Returns:
+            List of all matching vectors with metadata
+        """
+        all_vectors = []
+        next_token = None
+
+        # Build filter in S3V format
+        s3v_filter = None
+        if filter:
+            s3v_filter = {}
+            for key, value in filter.items():
+                s3v_filter[key] = {"$eq": value}
+
+        while True:
+            kwargs = {
+                "vectorBucketName": self.bucket,
+                "indexName": self.index,
+                "returnMetadata": True,
+            }
+
+            if s3v_filter:
+                kwargs["filter"] = s3v_filter
+            if next_token:
+                kwargs["nextToken"] = next_token
+
+            try:
+                if include_embeddings:
+                    # Use list_vectors to get embeddings
+                    response = self.client.list_vectors(**kwargs)
+                    vectors = response.get("vectors", [])
+                    # Convert data format
+                    for v in vectors:
+                        if "data" in v and "float32" in v["data"]:
+                            v["embedding"] = v["data"]["float32"]
+                else:
+                    # Use list_vectors for metadata only
+                    response = self.client.list_vectors(**kwargs)
+                    vectors = response.get("vectors", [])
+
+                all_vectors.extend(vectors)
+
+                # Check for more pages
+                next_token = response.get("nextToken")
+                if not next_token:
+                    break
+
+            except Exception as e:
+                print(f"Error in query_all: {e}")
+                break
+
+        return all_vectors

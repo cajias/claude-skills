@@ -332,3 +332,81 @@ class TestS3VectorsStore:
             mock_client.put_vectors.assert_called_once()
             call_kwargs = mock_client.put_vectors.call_args.kwargs
             assert len(call_kwargs["vectors"]) == 2
+
+
+class TestS3VectorsBulkOperations:
+    def test_query_all_returns_all_matching(self):
+        """query_all should return all vectors matching filter."""
+        mock_response = {
+            "vectors": [
+                {"key": "note-1", "metadata": {"status": "approved"}},
+                {"key": "note-2", "metadata": {"status": "approved"}},
+                {"key": "note-3", "metadata": {"status": "approved"}},
+            ]
+        }
+
+        with patch("boto3.client") as mock_boto:
+            mock_client = MagicMock()
+            mock_client.list_vectors.return_value = mock_response
+            mock_boto.return_value = mock_client
+
+            store = S3VectorsStore("test-bucket", "test-index")
+            results = store.query_all(filter={"status": "approved"})
+
+            assert len(results) == 3
+            assert all(r["metadata"]["status"] == "approved" for r in results)
+
+    def test_query_all_with_embeddings(self):
+        """query_all should include embeddings when requested."""
+        mock_response = {
+            "vectors": [
+                {"key": "note-1", "data": {"float32": [0.1] * 1536}, "metadata": {"title": "Note 1"}},
+            ]
+        }
+
+        with patch("boto3.client") as mock_boto:
+            mock_client = MagicMock()
+            mock_client.list_vectors.return_value = mock_response
+            mock_boto.return_value = mock_client
+
+            store = S3VectorsStore("test-bucket", "test-index")
+            results = store.query_all(filter={"status": "approved"}, include_embeddings=True)
+
+            # Check that embeddings are included
+            mock_client.list_vectors.assert_called()
+
+    def test_query_all_empty_result(self):
+        """query_all should return empty list when no matches."""
+        mock_response = {"vectors": []}
+
+        with patch("boto3.client") as mock_boto:
+            mock_client = MagicMock()
+            mock_client.list_vectors.return_value = mock_response
+            mock_boto.return_value = mock_client
+
+            store = S3VectorsStore("test-bucket", "test-index")
+            results = store.query_all(filter={"status": "nonexistent"})
+
+            assert results == []
+
+    def test_query_all_pagination(self):
+        """query_all should handle pagination for large result sets."""
+        # First page
+        page1 = {
+            "vectors": [{"key": f"note-{i}", "metadata": {}} for i in range(100)],
+            "nextToken": "token123"
+        }
+        # Second page (last)
+        page2 = {
+            "vectors": [{"key": f"note-{i}", "metadata": {}} for i in range(100, 150)],
+        }
+
+        with patch("boto3.client") as mock_boto:
+            mock_client = MagicMock()
+            mock_client.list_vectors.side_effect = [page1, page2]
+            mock_boto.return_value = mock_client
+
+            store = S3VectorsStore("test-bucket", "test-index")
+            results = store.query_all(filter={}, include_embeddings=True)
+
+            assert len(results) == 150
