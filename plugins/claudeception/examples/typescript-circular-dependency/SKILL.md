@@ -15,24 +15,24 @@ date: 2024-03-10
 
 ## Problem
 
-Circular dependencies occur when module A imports from module B, which imports 
-(directly or indirectly) from module A. TypeScript compiles successfully, but at 
-runtime, one of the imports evaluates to `undefined` because the module hasn't 
+Circular dependencies occur when module A imports from module B, which imports
+(directly or indirectly) from module A. TypeScript compiles successfully, but at
+runtime, one of the imports evaluates to `undefined` because the module hasn't
 finished initializing yet.
 
 ## Context / Trigger Conditions
 
 Common error messages:
 
-```
+```text
 ReferenceError: Cannot access 'UserService' before initialization
 ```
 
-```
+```text
 TypeError: Cannot read properties of undefined (reading 'create')
 ```
 
-```
+```text
 TypeError: (0 , _service.doSomething) is not a function
 ```
 
@@ -72,37 +72,42 @@ npx tsc --listFiles | head -50
 
 Common circular dependency patterns:
 
-**Pattern A: Service-to-Service**
-```
+### Pattern A: Service-to-Service
+
+```text
 services/userService.ts → services/orderService.ts → services/userService.ts
 ```
 
-**Pattern B: Type imports**
-```
+### Pattern B: Type imports
+
+```text
 types/user.ts → types/order.ts → types/user.ts
 ```
 
-**Pattern C: Index barrel files**
-```
+### Pattern C: Index barrel files
+
+```text
 components/index.ts → components/Button.tsx → components/index.ts
 ```
 
 ### Step 3: Resolution Strategies
 
-**Strategy 1: Extract Shared Dependencies**
+#### Strategy 1: Extract Shared Dependencies
 
 Before:
+
 ```typescript
 // userService.ts
 import { OrderService } from './orderService';
 export class UserService { ... }
 
-// orderService.ts  
+// orderService.ts
 import { UserService } from './userService';
 export class OrderService { ... }
 ```
 
 After:
+
 ```typescript
 // types/interfaces.ts (new file - no imports from services)
 export interface IUserService { ... }
@@ -113,13 +118,13 @@ import { IOrderService } from '../types/interfaces';
 export class UserService implements IUserService { ... }
 ```
 
-**Strategy 2: Dependency Injection**
+#### Strategy 2: Dependency Injection
 
 ```typescript
 // orderService.ts
 export class OrderService {
   constructor(private userService: IUserService) {}
-  
+
   // Instead of importing UserService directly
 }
 
@@ -128,38 +133,40 @@ const userService = new UserService();
 const orderService = new OrderService(userService);
 ```
 
-**Strategy 3: Dynamic Imports**
+#### Strategy 3: Dynamic Imports
 
 ```typescript
 // Only import when needed, not at module level
 async function processOrder() {
-  const { UserService } = await import('./userService');
+  const { UserService } = await import("./userService");
   // ...
 }
 ```
 
-**Strategy 4: Use Type-Only Imports**
+#### Strategy 4: Use Type-Only Imports
 
 If you only need types (not values), use type-only imports:
 
 ```typescript
 // This doesn't create a runtime dependency
-import type { User } from './userService';
+import type { User } from "./userService";
 ```
 
-**Strategy 5: Restructure Barrel Files**
+#### Strategy 5: Restructure Barrel Files
 
 Before (problematic):
+
 ```typescript
 // components/index.ts
-export * from './Button';
-export * from './Modal';  // Modal imports Button from './index'
+export * from "./Button";
+export * from "./Modal"; // Modal imports Button from './index'
 ```
 
 After:
+
 ```typescript
 // components/Modal.tsx
-import { Button } from './Button';  // Direct import, not from index
+import { Button } from "./Button"; // Direct import, not from index
 ```
 
 ### Step 4: Prevent Future Cycles
@@ -180,11 +187,11 @@ Or configure ESLint:
 ```javascript
 // .eslintrc.js
 module.exports = {
-  plugins: ['import'],
+  plugins: ["import"],
   rules: {
-    'import/no-cycle': ['error', { maxDepth: 10 }]
-  }
-}
+    "import/no-cycle": ["error", { maxDepth: 10 }],
+  },
+};
 ```
 
 ## Verification
@@ -199,6 +206,7 @@ module.exports = {
 **Problem**: `OrderService` is undefined when imported in `UserService`
 
 **Detection**:
+
 ```bash
 $ madge --circular src/
 Circular dependencies found!
@@ -220,7 +228,7 @@ export class UserService {
   constructor(private orderService: IOrderService) {}
 }
 
-// MODIFIED: src/services/orderService.ts  
+// MODIFIED: src/services/orderService.ts
 // No longer imports UserService
 export class OrderService implements IOrderService {
   async createOrder(userId: string): Promise<Order> { ... }

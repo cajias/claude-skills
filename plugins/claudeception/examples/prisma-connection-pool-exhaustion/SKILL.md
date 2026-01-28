@@ -15,9 +15,9 @@ date: 2024-02-20
 
 ## Problem
 
-Serverless functions create a new Prisma client instance on each cold start. Each 
-instance opens multiple database connections (default: 5 per instance). With many 
-concurrent requests, this quickly exhausts the database's connection limit (often 
+Serverless functions create a new Prisma client instance on each cold start. Each
+instance opens multiple database connections (default: 5 per instance). With many
+concurrent requests, this quickly exhausts the database's connection limit (often
 20-100 for managed databases).
 
 ## Context / Trigger Conditions
@@ -32,6 +32,7 @@ This skill applies when you see:
 - Database dashboard shows connections at or near limit
 
 Environment indicators:
+
 - Deploying to Vercel, AWS Lambda, Netlify Functions, or similar
 - Using Prisma with PostgreSQL, MySQL, or another connection-based database
 - Database is managed (PlanetScale, Supabase, Neon, RDS, etc.)
@@ -40,24 +41,27 @@ Environment indicators:
 
 ### Step 1: Use Connection Pooling Service
 
-The recommended solution is to use a connection pooler like PgBouncer or Prisma 
+The recommended solution is to use a connection pooler like PgBouncer or Prisma
 Accelerate, which sits between your serverless functions and the database.
 
 **For Supabase:**
-```
+
+```bash
 # .env
 # Use the pooled connection string (port 6543, not 5432)
 DATABASE_URL="postgresql://user:pass@db.xxx.supabase.co:6543/postgres?pgbouncer=true"
 ```
 
 **For Neon:**
-```
-# .env  
+
+```bash
+# .env
 DATABASE_URL="postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/dbname?sslmode=require"
 # Neon has built-in pooling
 ```
 
 **For Prisma Accelerate:**
+
 ```bash
 npx prisma generate --accelerate
 ```
@@ -79,19 +83,21 @@ In your connection URL or Prisma client:
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-export const prisma = globalForPrisma.prisma || new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL + '?connection_limit=1'
-    }
-  }
-})
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    datasources: {
+      db: {
+        url: process.env.DATABASE_URL + "?connection_limit=1",
+      },
+    },
+  });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
 
 ### Step 3: Singleton Pattern (Development)
@@ -100,22 +106,22 @@ Prevent hot-reload from creating new clients:
 
 ```typescript
 // lib/prisma.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+  prisma: PrismaClient | undefined;
+};
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient()
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 ```
 
 ### Step 4: URL Parameters
 
 Add these to your connection string:
 
-```
+```text
 ?connection_limit=1&pool_timeout=20&connect_timeout=10
 ```
 
@@ -135,14 +141,16 @@ After applying fixes:
 ## Example
 
 **Before** (error under load):
-```
+
+```text
 [ERROR] PrismaClientKnownRequestError:
 Invalid `prisma.user.findMany()` invocation:
 Timed out fetching a new connection from the connection pool.
 ```
 
 **After** (with connection pooling):
-```
+
+```bash
 # Using Supabase pooler URL
 DATABASE_URL="postgresql://...@db.xxx.supabase.co:6543/postgres?pgbouncer=true&connection_limit=1"
 ```
@@ -154,8 +162,8 @@ Database connections stable at 10-15 even under heavy load.
 - Different managed databases have different pooling solutions—check your provider's docs
 - PlanetScale (MySQL) uses a different architecture and doesn't have this issue
 - `connection_limit=1` is aggressive; start there and increase if you see latency
-- The singleton pattern only helps in development; in production serverless, each 
+- The singleton pattern only helps in development; in production serverless, each
   instance is isolated
-- If using Prisma with Next.js API routes, each route invocation may be a separate 
+- If using Prisma with Next.js API routes, each route invocation may be a separate
   serverless function
-- Consider Prisma Accelerate for built-in caching + pooling: https://www.prisma.io/accelerate
+- Consider Prisma Accelerate for built-in caching + pooling: <https://www.prisma.io/accelerate>

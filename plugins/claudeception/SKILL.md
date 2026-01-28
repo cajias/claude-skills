@@ -22,12 +22,14 @@ Save valuable learnings as reusable skills.
 ## What Makes a Good Skill
 
 **Extract when:**
+
 - Solution required real investigation (not just docs lookup)
 - Error message was misleading
 - Workaround for a tool/framework limitation
 - Pattern would help future similar situations
 
 **Skip when:**
+
 - Straightforward documentation lookup
 - One-time project-specific fix
 - Common knowledge
@@ -63,15 +65,19 @@ description: |
 # Title
 
 ## Problem
+
 What went wrong
 
 ## When to Use
+
 Exact symptoms, error messages, scenarios
 
 ## Solution
+
 Step-by-step fix
 
 ## Verification
+
 How to confirm it worked
 ```
 
@@ -84,6 +90,7 @@ How to confirm it worked
 ## Quality Gate
 
 Before creating, verify:
+
 - [ ] Required real investigation
 - [ ] Would help someone else
 - [ ] Trigger conditions are specific

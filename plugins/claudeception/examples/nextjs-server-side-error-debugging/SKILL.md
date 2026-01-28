@@ -15,8 +15,8 @@ date: 2024-01-15
 
 ## Problem
 
-Server-side errors in Next.js don't appear in the browser console, making debugging 
-frustrating when you're looking in the wrong place. The browser shows a generic error 
+Server-side errors in Next.js don't appear in the browser console, making debugging
+frustrating when you're looking in the wrong place. The browser shows a generic error
 page or 500 status, but no stack trace or useful error information appears in DevTools.
 
 ## Context / Trigger Conditions
@@ -30,6 +30,7 @@ This skill applies when:
 - The error is intermittent and hard to reproduce in the browser
 
 Common misleading symptoms:
+
 - "Unhandled Runtime Error" modal that doesn't show the real cause
 - Network tab shows 500 but response body is empty or generic
 - Error disappears when you add console.log (timing issue)
@@ -38,7 +39,7 @@ Common misleading symptoms:
 
 ### Step 1: Check the Terminal
 
-The actual error with full stack trace appears in the terminal where `npm run dev` 
+The actual error with full stack trace appears in the terminal where `npm run dev`
 or `next dev` is running. This is the **first place to look**.
 
 ```bash
@@ -58,7 +59,7 @@ export async function getServerSideProps(context) {
     const data = await fetchSomething();
     return { props: { data } };
   } catch (error) {
-    console.error('getServerSideProps error:', error);
+    console.error("getServerSideProps error:", error);
     // Return error state instead of throwing
     return { props: { error: error.message } };
   }
@@ -68,6 +69,7 @@ export async function getServerSideProps(context) {
 ### Step 3: For Production Errors
 
 Check your hosting provider's logs:
+
 - **Vercel**: Dashboard → Project → Logs (Functions tab)
 - **AWS**: CloudWatch Logs
 - **Netlify**: Functions tab in dashboard
@@ -84,6 +86,7 @@ Check your hosting provider's logs:
 ## Verification
 
 After checking the terminal, you should see:
+
 - Full stack trace with file name and line number
 - The actual error message (not generic 500)
 - Variable values if you added console.log statements
@@ -93,11 +96,12 @@ After checking the terminal, you should see:
 **Symptom**: User reports page shows "Internal Server Error" after clicking a link.
 
 **Investigation**:
+
 1. Open browser DevTools → Console: Empty
 2. Network tab shows: `GET /dashboard → 500`
 3. Check terminal running `npm run dev`:
 
-```
+```text
 Error: Cannot read property 'id' of undefined
     at getServerSideProps (/app/pages/dashboard.tsx:15:25)
     at renderToHTML (/app/node_modules/next/dist/server/render.js:428:22)
@@ -107,12 +111,12 @@ Error: Cannot read property 'id' of undefined
 
 ## Notes
 
-- In development, Next.js sometimes shows an error overlay, but it often has less 
+- In development, Next.js sometimes shows an error overlay, but it often has less
   detail than the terminal output
-- `reactStrictMode: true` in `next.config.js` causes double-execution of server 
+- `reactStrictMode: true` in `next.config.js` causes double-execution of server
   functions in development, which can make debugging confusing
 - For API routes, the error appears in the same terminal as page errors
 - Client-side errors (in useEffect, event handlers) DO appear in browser console—
   this skill only applies to server-side code
-- If using `next start` (production mode locally), errors may be less verbose; 
+- If using `next start` (production mode locally), errors may be less verbose;
   check `NODE_ENV` and consider adding custom error logging

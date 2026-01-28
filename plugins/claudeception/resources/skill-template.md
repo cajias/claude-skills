@@ -15,7 +15,7 @@ date: YYYY-MM-DD
 
 ## Problem
 
-[Clear, concise description of the problem this skill addresses. 
+[Clear, concise description of the problem this skill addresses.
 What pain point does this solve? Why is it non-obvious?]
 
 ## Context / Trigger Conditions
@@ -60,12 +60,14 @@ What pain point does this solve? Why is it non-obvious?]
 **Scenario**: [Concrete example of when this skill applies]
 
 **Before**:
-```
+
+```text
 [Error message or problematic code]
 ```
 
 **After**:
-```
+
+```text
 [Fixed code or successful output]
 ```
 
@@ -80,7 +82,7 @@ What pain point does this solve? Why is it non-obvious?]
 
 ---
 
-<!-- 
+<!--
 Extraction Checklist (remove before saving):
 - [ ] Name is descriptive and uses kebab-case
 - [ ] Description includes specific error messages/symptoms
