@@ -25,6 +25,17 @@
           }
         ]
       }
+    ],
+    "PreToolCall": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uvx --from ai-zettelkasten zk-suggest"
+          }
+        ]
+      }
     ]
   }
 }
