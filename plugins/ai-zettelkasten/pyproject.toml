@@ -1,0 +1,29 @@
+[project]
+name = "ai-zettelkasten"
+version = "2.0.0"
+description = "Claude Code plugin for Zettelkasten knowledge management"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.35.0",
+    "rich>=13.0.0",
+    "pyyaml>=6.0",
+    "numpy>=1.26.0",
+    "scikit-learn>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[project.scripts]
+zk-extract = "ai_zettelkasten.cli:extract_main"
+zk-suggest = "ai_zettelkasten.cli:suggest_main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_zettelkasten"]
