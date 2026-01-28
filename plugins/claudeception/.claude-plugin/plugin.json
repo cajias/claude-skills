@@ -1,6 +1,6 @@
 {
   "name": "claudeception",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Continuous learning system that extracts reusable skills from Claude Code sessions. Analyzes conversations for non-obvious discoveries, debugging insights, and workarounds, then creates SKILL.md files for future use.",
   "author": {
     "name": "cajias"
