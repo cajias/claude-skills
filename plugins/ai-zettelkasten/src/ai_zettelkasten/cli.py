@@ -92,15 +92,75 @@ def extract_main():
 
 
 def suggest_main():
-    """Entry point for proactive suggestion hook.
+    """Entry point for proactive suggestion hook (PreToolCall).
 
-    This will be implemented in P1 to provide proactive knowledge suggestions
-    based on the current conversation context.
+    Called by the PreToolCall hook to detect extractable knowledge in
+    Edit and Write operations. Reads tool call context from stdin and
+    uses the Suggester module to analyze content for patterns worth capturing.
+
+    Input format (JSON on stdin):
+        {
+            "tool_name": "Edit" or "Write",
+            "tool_input": {
+                "file_path": "/path/to/file",
+                "content": "..." (for Write),
+                "new_string": "..." (for Edit)
+            }
+        }
 
     Returns:
-        0 (placeholder implementation)
+        0 (always succeeds silently)
     """
-    console.print("[dim]Proactive suggestions not yet implemented.[/dim]")
+    # Check for stdin input
+    if sys.stdin.isatty():
+        return 0  # Silent exit if no input
+
+    # Read tool call context from stdin
+    try:
+        input_data = sys.stdin.read().strip()
+        if not input_data:
+            return 0
+
+        # PreToolCall provides tool_name and tool_input
+        data = json.loads(input_data)
+    except json.JSONDecodeError:
+        return 0  # Silent fail for invalid input
+
+    tool_name = data.get("tool_name", "")
+    tool_input = data.get("tool_input", {})
+
+    # Only analyze Edit and Write operations
+    if tool_name not in ["Edit", "Write"]:
+        return 0
+
+    # Get the content being written
+    content = ""
+    file_path = ""
+
+    if tool_name == "Write":
+        content = tool_input.get("content", "")
+        file_path = tool_input.get("file_path", "")
+    elif tool_name == "Edit":
+        content = tool_input.get("new_string", "")
+        file_path = tool_input.get("file_path", "")
+
+    if not content:
+        return 0
+
+    # Analyze for extractable knowledge
+    from .suggester import Suggester
+
+    suggester = Suggester()
+    suggestions = suggester.analyze(file_path, content)
+
+    if not suggestions:
+        return 0
+
+    # Output suggestions for Claude to present to user
+    console.print()
+    for suggestion in suggestions[:3]:  # Limit to top 3
+        console.print(suggester.format_suggestion(suggestion))
+
     return 0
 
 
