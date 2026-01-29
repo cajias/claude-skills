@@ -1,7 +1,7 @@
 {
   "name": "claudeception",
-  "version": "1.4.0",
-  "description": "Continuous learning system that extracts reusable skills from Claude Code sessions. Analyzes conversations for non-obvious discoveries, debugging insights, and workarounds, then creates SKILL.md files for future use.",
+  "version": "4.0.0",
+  "description": "Continuous learning system that extracts reusable skills from Claude Code sessions. Uses multi-hook architecture with breakthrough scoring, TF-IDF duplicate detection, and user/project skill taxonomy.",
   "author": {
     "name": "cajias"
   },
@@ -11,16 +11,28 @@
     "learning",
     "extraction",
     "knowledge-management",
-    "meta-skill"
+    "meta-skill",
+    "continuous-learning"
   ],
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/signal_accumulator.py"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/run-extract.sh"
+            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/correction_handler.py"
           }
         ]
       }
@@ -31,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/capture-decision.py"
+            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/extraction_engine.py"
           }
         ]
       }

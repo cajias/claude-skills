@@ -1,0 +1,601 @@
+#!/usr/bin/env python3
+"""
+Claudeception v4.0 - Session State Management Module
+
+This module manages session state for tracking signals during a Claude Code session.
+It supports:
+- Session initialization and lifecycle management
+- Signal recording (errors, retries, web searches, corrections)
+- Breakthrough score calculation
+- Thread-safe file access with locking
+
+State File: ~/.claude/claudeception-metrics/session-state.json
+
+Environment Variables:
+- CLAUDECEPTION_DEBUG: Set to "true" for verbose logging (default: true)
+- CLAUDECEPTION_LOG_FILE: Log file path (default: ~/.claude/claudeception.log)
+- CLAUDECEPTION_STATE_DIR: State directory (default: ~/.claude/claudeception-metrics)
+"""
+
+import fcntl
+import json
+import os
+import sys
+import time
+from contextlib import contextmanager
+from dataclasses import dataclass, field, asdict
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+
+# Configuration
+DEBUG = os.environ.get('CLAUDECEPTION_DEBUG', 'true').lower() == 'true'
+LOG_FILE = Path(os.environ.get('CLAUDECEPTION_LOG_FILE',
+                               os.path.expanduser('~/.claude/claudeception.log')))
+STATE_DIR = Path(os.environ.get('CLAUDECEPTION_STATE_DIR',
+                                os.path.expanduser('~/.claude/claudeception-metrics')))
+STATE_FILE = STATE_DIR / 'session-state.json'
+LOCK_FILE = STATE_DIR / '.session-state.lock'
+
+# Lock timeout in seconds
+LOCK_TIMEOUT = 10.0
+LOCK_RETRY_INTERVAL = 0.1
+
+
+class SessionStateError(Exception):
+    """Base exception for session state errors."""
+    pass
+
+
+class LockAcquisitionError(SessionStateError):
+    """Raised when unable to acquire file lock."""
+    pass
+
+
+class SessionNotInitializedError(SessionStateError):
+    """Raised when accessing state without an active session."""
+    pass
+
+
+def log(message: str, level: str = 'INFO') -> None:
+    """
+    Append message to log file and stderr.
+
+    Args:
+        message: Log message
+        level: Log level (DEBUG, INFO, WARNING, ERROR)
+    """
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+    log_entry = f"{timestamp} [{level}] [session_state] {message}"
+
+    try:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(LOG_FILE, 'a') as f:
+            f.write(f"{log_entry}\n")
+    except Exception as e:
+        print(f"Log write error: {e}", file=sys.stderr)
+
+    if DEBUG or level in ('WARNING', 'ERROR'):
+        print(log_entry, file=sys.stderr)
+
+
+def ensure_state_directory() -> None:
+    """Ensure the state directory exists."""
+    try:
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        log(f"State directory ensured: {STATE_DIR}", 'DEBUG')
+    except Exception as e:
+        log(f"Failed to create state directory: {e}", 'ERROR')
+        raise SessionStateError(f"Cannot create state directory: {e}")
+
+
+@contextmanager
+def file_lock(timeout: float = LOCK_TIMEOUT):
+    """
+    Context manager for acquiring an exclusive file lock.
+
+    Implements advisory locking with timeout for concurrent access safety.
+
+    Args:
+        timeout: Maximum time to wait for lock acquisition
+
+    Yields:
+        Lock file handle
+
+    Raises:
+        LockAcquisitionError: If lock cannot be acquired within timeout
+    """
+    ensure_state_directory()
+
+    start_time = time.monotonic()
+    lock_fd = None
+
+    try:
+        # Open/create the lock file
+        lock_fd = open(LOCK_FILE, 'w')
+
+        while True:
+            try:
+                # Try to acquire exclusive lock (non-blocking)
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                log("Lock acquired", 'DEBUG')
+                break
+            except (IOError, OSError) as e:
+                elapsed = time.monotonic() - start_time
+                if elapsed >= timeout:
+                    log(f"Lock acquisition timeout after {elapsed:.2f}s", 'ERROR')
+                    raise LockAcquisitionError(
+                        f"Failed to acquire lock within {timeout}s"
+                    )
+                # Wait before retrying
+                time.sleep(LOCK_RETRY_INTERVAL)
+
+        yield lock_fd
+
+    finally:
+        if lock_fd:
+            try:
+                # Release the lock
+                fcntl.flock(lock_fd.fileno(), fcntl.LOCK_UN)
+                lock_fd.close()
+                log("Lock released", 'DEBUG')
+            except Exception as e:
+                log(f"Error releasing lock: {e}", 'WARNING')
+
+
+@dataclass
+class ExchangeSummary:
+    """Summary of a single exchange (user prompt + assistant response)."""
+    exchange_id: str
+    timestamp: str
+    user_prompt_preview: str
+    assistant_response_preview: str
+    tool_calls_count: int = 0
+    errors_in_exchange: int = 0
+    duration_seconds: float = 0.0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'ExchangeSummary':
+        return cls(**data)
+
+
+@dataclass
+class SessionState:
+    """
+    Session state tracking all signals during a Claude Code session.
+
+    Attributes:
+        session_id: Unique identifier for the session
+        session_start: ISO timestamp when session started
+        error_count: Number of tool/operation errors
+        retry_count: Number of retry attempts
+        web_search_count: Number of web fetches/searches
+        correction_count: Number of user corrections
+        teaching_count: Number of teaching signals detected (v4.1)
+        exchanges: List of exchange summaries
+        last_updated: ISO timestamp of last state update
+        metadata: Additional session metadata
+    """
+    session_id: str
+    session_start: str
+    error_count: int = 0
+    retry_count: int = 0
+    web_search_count: int = 0
+    correction_count: int = 0
+    teaching_count: int = 0  # v4.1: Teaching signals (3.0x weight like corrections)
+    exchanges: List[Dict[str, Any]] = field(default_factory=list)
+    last_updated: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if not self.last_updated:
+            self.last_updated = datetime.now().isoformat()
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'session_id': self.session_id,
+            'session_start': self.session_start,
+            'error_count': self.error_count,
+            'retry_count': self.retry_count,
+            'web_search_count': self.web_search_count,
+            'correction_count': self.correction_count,
+            'teaching_count': self.teaching_count,
+            'exchanges': self.exchanges,
+            'last_updated': self.last_updated,
+            'metadata': self.metadata,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'SessionState':
+        return cls(
+            session_id=data.get('session_id', ''),
+            session_start=data.get('session_start', ''),
+            error_count=data.get('error_count', 0),
+            retry_count=data.get('retry_count', 0),
+            web_search_count=data.get('web_search_count', 0),
+            correction_count=data.get('correction_count', 0),
+            teaching_count=data.get('teaching_count', 0),
+            exchanges=data.get('exchanges', []),
+            last_updated=data.get('last_updated', ''),
+            metadata=data.get('metadata', {}),
+        )
+
+
+def _read_state_file() -> Optional[Dict[str, Any]]:
+    """
+    Read state from file (internal, assumes lock is held).
+
+    Returns:
+        State dictionary or None if file doesn't exist
+    """
+    if not STATE_FILE.exists():
+        return None
+
+    try:
+        with open(STATE_FILE, 'r') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        log(f"Corrupted state file, will recreate: {e}", 'WARNING')
+        return None
+    except Exception as e:
+        log(f"Error reading state file: {e}", 'ERROR')
+        raise SessionStateError(f"Cannot read state file: {e}")
+
+
+def _write_state_file(state: Dict[str, Any]) -> None:
+    """
+    Write state to file (internal, assumes lock is held).
+
+    Args:
+        state: State dictionary to write
+    """
+    ensure_state_directory()
+
+    try:
+        # Write to temp file first, then rename (atomic on POSIX)
+        temp_file = STATE_FILE.with_suffix('.tmp')
+        with open(temp_file, 'w') as f:
+            json.dump(state, f, indent=2)
+        temp_file.rename(STATE_FILE)
+        log(f"State written to {STATE_FILE}", 'DEBUG')
+    except Exception as e:
+        log(f"Error writing state file: {e}", 'ERROR')
+        raise SessionStateError(f"Cannot write state file: {e}")
+
+
+def init_session(session_id: str, metadata: Optional[Dict[str, Any]] = None) -> SessionState:
+    """
+    Initialize state for a new session.
+
+    Creates a fresh session state, clearing any previous state.
+
+    Args:
+        session_id: Unique identifier for the session
+        metadata: Optional additional metadata to store
+
+    Returns:
+        Initialized SessionState object
+    """
+    log(f"Initializing session: {session_id}")
+
+    now = datetime.now().isoformat()
+    state = SessionState(
+        session_id=session_id,
+        session_start=now,
+        last_updated=now,
+        metadata=metadata or {},
+    )
+
+    with file_lock():
+        _write_state_file(state.to_dict())
+
+    log(f"Session initialized: {session_id}")
+    return state
+
+
+def record_signal(
+    signal_type: str,
+    data: Optional[Dict[str, Any]] = None
+) -> SessionState:
+    """
+    Record a signal (error, retry, web search, correction, teaching, exchange).
+
+    Supported signal types:
+    - 'error': Increment error_count
+    - 'retry': Increment retry_count
+    - 'web_search': Increment web_search_count
+    - 'correction': Increment correction_count
+    - 'teaching': Increment teaching_count (v4.1: teaching patterns)
+    - 'exchange': Add exchange summary to exchanges list
+
+    Args:
+        signal_type: Type of signal to record
+        data: Additional data for the signal (required for 'exchange')
+
+    Returns:
+        Updated SessionState object
+
+    Raises:
+        SessionNotInitializedError: If no active session
+        ValueError: If invalid signal type
+    """
+    valid_signals = {'error', 'retry', 'web_search', 'correction', 'teaching', 'exchange'}
+    if signal_type not in valid_signals:
+        raise ValueError(f"Invalid signal type: {signal_type}. Valid: {valid_signals}")
+
+    with file_lock():
+        state_dict = _read_state_file()
+
+        if not state_dict:
+            raise SessionNotInitializedError(
+                "No active session. Call init_session() first."
+            )
+
+        state = SessionState.from_dict(state_dict)
+
+        # Update counters based on signal type
+        if signal_type == 'error':
+            state.error_count += 1
+            log(f"Recorded error (total: {state.error_count})")
+        elif signal_type == 'retry':
+            state.retry_count += 1
+            log(f"Recorded retry (total: {state.retry_count})")
+        elif signal_type == 'web_search':
+            state.web_search_count += 1
+            log(f"Recorded web search (total: {state.web_search_count})")
+        elif signal_type == 'correction':
+            state.correction_count += 1
+            log(f"Recorded correction (total: {state.correction_count})")
+        elif signal_type == 'teaching':
+            state.teaching_count += 1
+            log(f"Recorded teaching (total: {state.teaching_count})")
+        elif signal_type == 'exchange':
+            if data:
+                state.exchanges.append(data)
+                log(f"Recorded exchange (total: {len(state.exchanges)})")
+            else:
+                log("Exchange signal received without data, skipping", 'WARNING')
+
+        state.last_updated = datetime.now().isoformat()
+        _write_state_file(state.to_dict())
+
+        return state
+
+
+def get_session_state() -> Optional[SessionState]:
+    """
+    Get the current session state.
+
+    Returns:
+        SessionState object or None if no active session
+    """
+    with file_lock():
+        state_dict = _read_state_file()
+
+        if not state_dict:
+            log("No active session state found", 'DEBUG')
+            return None
+
+        return SessionState.from_dict(state_dict)
+
+
+def calculate_breakthrough_score() -> float:
+    """
+    Calculate the breakthrough score for the current session.
+
+    Formula: (errors*2 + retries*1.5 + web_searches*1 + corrections*3) / duration_minutes
+
+    A higher score indicates more "breakthrough" activity - situations where
+    Claude had to work through challenges, search for information, or
+    receive user corrections. This suggests valuable learning opportunities.
+
+    Returns:
+        Breakthrough score (0.0 if session not started or zero duration)
+
+    Raises:
+        SessionNotInitializedError: If no active session
+    """
+    state = get_session_state()
+
+    if not state:
+        raise SessionNotInitializedError(
+            "No active session. Call init_session() first."
+        )
+
+    # Calculate duration in minutes
+    try:
+        start_time = datetime.fromisoformat(state.session_start)
+        duration = datetime.now() - start_time
+        duration_minutes = duration.total_seconds() / 60.0
+    except (ValueError, TypeError) as e:
+        log(f"Error parsing session start time: {e}", 'ERROR')
+        duration_minutes = 0.0
+
+    # Avoid division by zero
+    if duration_minutes <= 0:
+        log("Session duration is zero or negative, returning 0.0", 'DEBUG')
+        return 0.0
+
+    # Calculate weighted signal sum
+    weighted_sum = (
+        state.error_count * 2.0 +
+        state.retry_count * 1.5 +
+        state.web_search_count * 1.0 +
+        state.correction_count * 3.0
+    )
+
+    score = weighted_sum / duration_minutes
+
+    log(f"Breakthrough score: {score:.4f} "
+        f"(errors={state.error_count}, retries={state.retry_count}, "
+        f"web_searches={state.web_search_count}, corrections={state.correction_count}, "
+        f"duration={duration_minutes:.2f}min)")
+
+    return score
+
+
+def clear_session() -> bool:
+    """
+    Clear the session state (cleanup after extraction).
+
+    Removes the session state file and lock file.
+
+    Returns:
+        True if cleanup was successful, False otherwise
+    """
+    log("Clearing session state")
+
+    success = True
+
+    with file_lock():
+        # Remove state file
+        if STATE_FILE.exists():
+            try:
+                STATE_FILE.unlink()
+                log(f"Removed state file: {STATE_FILE}")
+            except Exception as e:
+                log(f"Error removing state file: {e}", 'ERROR')
+                success = False
+
+    # Remove lock file (outside the lock context)
+    if LOCK_FILE.exists():
+        try:
+            LOCK_FILE.unlink()
+            log(f"Removed lock file: {LOCK_FILE}")
+        except Exception as e:
+            log(f"Error removing lock file: {e}", 'WARNING')
+            # Don't fail for lock file removal
+
+    if success:
+        log("Session cleared successfully")
+    else:
+        log("Session cleared with errors", 'WARNING')
+
+    return success
+
+
+def get_session_duration_minutes() -> float:
+    """
+    Get the current session duration in minutes.
+
+    Returns:
+        Duration in minutes, or 0.0 if no active session
+    """
+    state = get_session_state()
+
+    if not state:
+        return 0.0
+
+    try:
+        start_time = datetime.fromisoformat(state.session_start)
+        duration = datetime.now() - start_time
+        return duration.total_seconds() / 60.0
+    except (ValueError, TypeError):
+        return 0.0
+
+
+def get_signal_summary() -> Dict[str, Any]:
+    """
+    Get a summary of all signals in the current session.
+
+    Returns:
+        Dictionary with signal counts and breakthrough score,
+        or empty dict if no active session
+    """
+    state = get_session_state()
+
+    if not state:
+        return {}
+
+    try:
+        score = calculate_breakthrough_score()
+    except SessionNotInitializedError:
+        score = 0.0
+
+    return {
+        'session_id': state.session_id,
+        'duration_minutes': get_session_duration_minutes(),
+        'error_count': state.error_count,
+        'retry_count': state.retry_count,
+        'web_search_count': state.web_search_count,
+        'correction_count': state.correction_count,
+        'exchange_count': len(state.exchanges),
+        'breakthrough_score': score,
+        'last_updated': state.last_updated,
+    }
+
+
+# CLI interface for testing
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='Claudeception Session State Manager'
+    )
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+
+    # init command
+    init_parser = subparsers.add_parser('init', help='Initialize a new session')
+    init_parser.add_argument('session_id', help='Session ID')
+
+    # record command
+    record_parser = subparsers.add_parser('record', help='Record a signal')
+    record_parser.add_argument(
+        'signal_type',
+        choices=['error', 'retry', 'web_search', 'correction'],
+        help='Type of signal'
+    )
+
+    # get command
+    subparsers.add_parser('get', help='Get current session state')
+
+    # score command
+    subparsers.add_parser('score', help='Calculate breakthrough score')
+
+    # summary command
+    subparsers.add_parser('summary', help='Get signal summary')
+
+    # clear command
+    subparsers.add_parser('clear', help='Clear session state')
+
+    args = parser.parse_args()
+
+    if args.command == 'init':
+        state = init_session(args.session_id)
+        print(json.dumps(state.to_dict(), indent=2))
+    elif args.command == 'record':
+        try:
+            state = record_signal(args.signal_type)
+            print(json.dumps(state.to_dict(), indent=2))
+        except SessionNotInitializedError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+    elif args.command == 'get':
+        state = get_session_state()
+        if state:
+            print(json.dumps(state.to_dict(), indent=2))
+        else:
+            print("No active session")
+    elif args.command == 'score':
+        try:
+            score = calculate_breakthrough_score()
+            print(f"Breakthrough score: {score:.4f}")
+        except SessionNotInitializedError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+    elif args.command == 'summary':
+        summary = get_signal_summary()
+        if summary:
+            print(json.dumps(summary, indent=2))
+        else:
+            print("No active session")
+    elif args.command == 'clear':
+        success = clear_session()
+        print("Session cleared" if success else "Clear failed")
+        sys.exit(0 if success else 1)
+    else:
+        parser.print_help()

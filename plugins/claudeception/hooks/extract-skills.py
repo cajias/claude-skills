@@ -30,8 +30,32 @@ from typing import Optional, List, Dict, Any
 
 
 # Configuration
-SKILLS_DIR = Path(os.environ.get('CLAUDECEPTION_SKILLS_DIR',
-                                  os.path.expanduser('~/.claude/my-claude-skills/skills')))
+def get_skills_dir() -> Path:
+    """
+    Determine skills directory with project-level override support.
+    Priority: 1) Env var  2) Project .claude/settings.json  3) Default
+    """
+    # Check env var first
+    env_dir = os.environ.get('CLAUDECEPTION_SKILLS_DIR')
+    if env_dir:
+        return Path(env_dir).expanduser()
+
+    # Check for project-level settings in cwd
+    project_settings = Path('.claude/settings.json')
+    if project_settings.exists():
+        try:
+            with open(project_settings) as f:
+                settings = json.load(f)
+                project_dir = settings.get('env', {}).get('CLAUDECEPTION_SKILLS_DIR')
+                if project_dir:
+                    return Path(project_dir).resolve()
+        except Exception:
+            pass
+
+    # Default to user-level
+    return Path(os.path.expanduser('~/.claude/my-claude-skills/skills'))
+
+SKILLS_DIR = get_skills_dir()
 DRY_RUN = os.environ.get('CLAUDECEPTION_DRY_RUN', 'false').lower() == 'true'
 DEBUG = os.environ.get('CLAUDECEPTION_DEBUG', 'true').lower() == 'true'
 LOG_FILE = Path(os.environ.get('CLAUDECEPTION_LOG_FILE',
@@ -181,6 +205,19 @@ future Claude sessions or users. Look for:
 - Must be **verified** (actually worked, not theoretical)
 - Should benefit **future sessions** (worth remembering)
 
+**IMPORTANT - Distinguish Context from Knowledge:**
+Tool/API limitations, MCP server quirks, and framework workarounds are ALWAYS reusable
+even when discovered during project-specific work. Ask yourself:
+
+| Question | If Yes → | If No → |
+|----------|----------|---------|
+| Is this about HOW a tool/API/framework behaves? | Extract it | - |
+| Would another user hit this same limitation? | Extract it | - |
+| Is this ONLY about this specific project's structure? | - | Skip it |
+
+Example: "Obsidian MCP patch_content can't target nested headings" = EXTRACT (tool limitation)
+Example: "Our project uses folder X for configs" = SKIP (project-specific)
+
 **Recent Conversation:**
 --------------------------------------------------------------------------------
 {conversation[:3000]}
@@ -305,6 +342,7 @@ def process_skill_json(data: Dict[Any, Any]) -> int:
 def main():
     """Main entry point."""
     log("Claudeception extraction started")
+    log(f"Skills directory: {SKILLS_DIR} (cwd: {os.getcwd()})")
 
     # Check if we have input
     if sys.stdin.isatty():
