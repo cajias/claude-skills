@@ -96,14 +96,22 @@ def process_user_prompt(data: dict) -> None:
 
     log(f"Processing prompt: {prompt[:100]}...")
 
-    # Ensure session is initialized
+    # Ensure session is initialized (only if no state exists)
     if session_id:
         try:
             state = get_session_state()
-            if not state or getattr(state, "session_id", None) != session_id:
+            if state is None:
+                # No session exists - create one
                 init_session(session_id, {"source": "knowledge_handler"})
-        except Exception:
-            init_session(session_id, {"source": "knowledge_handler"})
+            elif getattr(state, "session_id", None) != session_id:
+                # Different session - log but don't reinitialize to preserve existing signals
+                log(f"Session mismatch: state has {getattr(state, 'session_id', 'unknown')}, got {session_id}")
+        except Exception as e:
+            # Only initialize if we truly have no state
+            log(f"Error getting session state: {e}")
+            state = get_session_state()
+            if state is None:
+                init_session(session_id, {"source": "knowledge_handler"})
 
     # Unified knowledge detection (corrections + teaching)
     result = detect_knowledge(prompt, assistant_response="")

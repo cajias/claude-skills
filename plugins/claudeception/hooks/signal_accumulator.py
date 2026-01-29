@@ -44,14 +44,23 @@ def process_tool_use(data: dict) -> None:
 
     log(f"Processing tool use: {tool_name}")
 
-    # Ensure session is initialized
+    # Ensure session is initialized (only if no state exists)
     if session_id:
         try:
             state = get_session_state()
-            if not state or state.get("session_id") != session_id:
+            if state is None:
+                # No session exists - create one
                 init_session(session_id, {"source": "signal_accumulator"})
-        except Exception:
-            init_session(session_id, {"source": "signal_accumulator"})
+            elif state.session_id != session_id:
+                # Different session - this shouldn't happen often, log it
+                log(f"Session mismatch: state has {state.session_id}, got {session_id}")
+                # Don't reinitialize - preserve existing signals until Stop hook clears it
+        except Exception as e:
+            # Only initialize if we truly have no state
+            log(f"Error getting session state: {e}")
+            state = get_session_state()
+            if state is None:
+                init_session(session_id, {"source": "signal_accumulator"})
 
     # Check for errors
     exit_code = tool_output.get("exit_code")
