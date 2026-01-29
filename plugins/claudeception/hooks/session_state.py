@@ -373,11 +373,11 @@ def get_session_state() -> Optional[SessionState]:
 def calculate_breakthrough_score() -> float:
     """Calculate the breakthrough score for the current session.
 
-    Formula: (errors*2 + retries*1.5 + web_searches*1 + corrections*3) / duration_minutes
+    Formula: (errors*2 + retries*1.5 + web_searches*1 + corrections*3 + teaching*3) / duration_minutes
 
     A higher score indicates more "breakthrough" activity - situations where
     Claude had to work through challenges, search for information, or
-    receive user corrections. This suggests valuable learning opportunities.
+    receive user corrections/teaching. This suggests valuable learning opportunities.
 
     Returns:
         Breakthrough score (0.0 if session not started or zero duration)
@@ -405,9 +405,13 @@ def calculate_breakthrough_score() -> float:
         log("Session duration is zero or negative, returning 0.0", "DEBUG")
         return 0.0
 
-    # Calculate weighted signal sum
+    # Calculate weighted signal sum (corrections and teaching both have 3.0x weight)
     weighted_sum = (
-        state.error_count * 2.0 + state.retry_count * 1.5 + state.web_search_count * 1.0 + state.correction_count * 3.0
+        state.error_count * 2.0
+        + state.retry_count * 1.5
+        + state.web_search_count * 1.0
+        + state.correction_count * 3.0
+        + state.teaching_count * 3.0  # v4.1: Teaching signals have same weight as corrections
     )
 
     score = weighted_sum / duration_minutes
@@ -416,7 +420,7 @@ def calculate_breakthrough_score() -> float:
         f"Breakthrough score: {score:.4f} "
         f"(errors={state.error_count}, retries={state.retry_count}, "
         f"web_searches={state.web_search_count}, corrections={state.correction_count}, "
-        f"duration={duration_minutes:.2f}min)"
+        f"teaching={state.teaching_count}, duration={duration_minutes:.2f}min)"
     )
 
     return score
