@@ -166,8 +166,8 @@ class SessionState:
         error_count: Number of tool/operation errors
         retry_count: Number of retry attempts
         web_search_count: Number of web fetches/searches
-        correction_count: Number of user corrections
-        teaching_count: Number of teaching signals detected (v4.1)
+        corrections: List of correction data (count derived via property)
+        teachings: List of teaching data (count derived via property)
         exchanges: List of exchange summaries
         last_updated: ISO timestamp of last state update
         metadata: Additional session metadata
@@ -178,13 +178,21 @@ class SessionState:
     error_count: int = 0
     retry_count: int = 0
     web_search_count: int = 0
-    correction_count: int = 0
-    teaching_count: int = 0  # v4.1: Teaching signals (3.0x weight like corrections)
-    corrections: list[dict[str, Any]] = field(default_factory=list)  # v4.1.1: Store correction content
-    teachings: list[dict[str, Any]] = field(default_factory=list)  # v4.1.1: Store teaching content
+    corrections: list[dict[str, Any]] = field(default_factory=list)  # v4.1.2: Store correction content
+    teachings: list[dict[str, Any]] = field(default_factory=list)  # v4.1.2: Store teaching content
     exchanges: list[dict[str, Any]] = field(default_factory=list)
     last_updated: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def correction_count(self) -> int:
+        """Derive count from list length."""
+        return len(self.corrections)
+
+    @property
+    def teaching_count(self) -> int:
+        """Derive count from list length."""
+        return len(self.teachings)
 
     def __post_init__(self):
         if not self.last_updated:
@@ -197,8 +205,6 @@ class SessionState:
             "error_count": self.error_count,
             "retry_count": self.retry_count,
             "web_search_count": self.web_search_count,
-            "correction_count": self.correction_count,
-            "teaching_count": self.teaching_count,
             "corrections": self.corrections,
             "teachings": self.teachings,
             "exchanges": self.exchanges,
@@ -214,8 +220,6 @@ class SessionState:
             error_count=data.get("error_count", 0),
             retry_count=data.get("retry_count", 0),
             web_search_count=data.get("web_search_count", 0),
-            correction_count=data.get("correction_count", 0),
-            teaching_count=data.get("teaching_count", 0),
             corrections=data.get("corrections", []),
             teachings=data.get("teachings", []),
             exchanges=data.get("exchanges", []),
@@ -302,8 +306,8 @@ def record_signal(signal_type: str, data: Optional[dict[str, Any]] = None) -> Se
     - 'error': Increment error_count
     - 'retry': Increment retry_count
     - 'web_search': Increment web_search_count
-    - 'correction': Increment correction_count
-    - 'teaching': Increment teaching_count (v4.1: teaching patterns)
+    - 'correction': Append to corrections list (count derived from length)
+    - 'teaching': Append to teachings list (count derived from length)
     - 'exchange': Add exchange summary to exchanges list
 
     Args:
@@ -342,15 +346,17 @@ def record_signal(signal_type: str, data: Optional[dict[str, Any]] = None) -> Se
             state.web_search_count += 1
             log(f"Recorded web search (total: {state.web_search_count})")
         elif signal_type == "correction":
-            state.correction_count += 1
             if data:
                 state.corrections.append(data)
-            log(f"Recorded correction (total: {state.correction_count})")
+                log(f"Recorded correction (total: {state.correction_count})")
+            else:
+                log("Correction signal received without data, skipping", "WARNING")
         elif signal_type == "teaching":
-            state.teaching_count += 1
             if data:
                 state.teachings.append(data)
-            log(f"Recorded teaching (total: {state.teaching_count})")
+                log(f"Recorded teaching (total: {state.teaching_count})")
+            else:
+                log("Teaching signal received without data, skipping", "WARNING")
         elif signal_type == "exchange":
             if data:
                 state.exchanges.append(data)
