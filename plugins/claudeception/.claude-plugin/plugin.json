@@ -1,6 +1,6 @@
 {
   "name": "claudeception",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Continuous learning system that extracts reusable skills from Claude Code sessions. Uses multi-hook architecture with breakthrough scoring, TF-IDF duplicate detection, user/project skill taxonomy, and unified knowledge detection (corrections + teaching patterns).",
   "author": {
     "name": "cajias"

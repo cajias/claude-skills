@@ -234,6 +234,12 @@ def classify_skill(skill_data: dict, cwd: str = "") -> str:
             log("  → USER (tool-related tags)")
             return SkillLevel.USER.value
 
+        # v4.2.0: Allow corrections through - they're explicit user feedback
+        source = skill_data.get("source", "")
+        if source == "correction" or "correction" in {t.lower() for t in tags}:
+            log("  → USER (correction - explicit user feedback)")
+            return SkillLevel.USER.value
+
         log("  → SKIP (no strong signals)")
         return SkillLevel.SKIP.value
 
