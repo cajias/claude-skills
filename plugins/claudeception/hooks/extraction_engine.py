@@ -251,9 +251,9 @@ def extract_skills_from_session(session_data: dict, signal_summary: dict) -> int
     skills_created = 0
     skills_to_create = []
 
-    # Corrections are high-value signals
+    # Corrections are high-value signals (lowered threshold v4.2.1)
     for correction in corrections:
-        if correction.get("confidence", 0) >= 0.7:
+        if correction.get("confidence", 0) >= 0.5:
             insight = correction.get("extracted_knowledge", "") or correction.get("extracted_insight", "")
             if insight:
                 skills_to_create.append(
