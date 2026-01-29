@@ -1,0 +1,19 @@
+{
+  "description": "Enforces AWS commands are wrapped with isengardcli for proper authentication",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": {
+          "tool_name": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/check-aws-credentials.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

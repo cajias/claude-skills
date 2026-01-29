@@ -1,0 +1,15 @@
+{
+  "name": "obsidian-memory",
+  "description": "Persistent memory system using Obsidian vault. Teaches Claude when/how to use Obsidian for storing decisions, learnings, workflow facts, and retrieving context.",
+  "version": "1.2.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "obsidian",
+    "memory",
+    "knowledge-base",
+    "persistent-storage",
+    "mcp"
+  ]
+}

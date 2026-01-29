@@ -1,0 +1,8 @@
+{
+  "name": "iterm-job-controller",
+  "description": "iTerm2 terminal job dispatcher and session controller - manages terminal sessions, dispatches jobs, and monitors their progress",
+  "version": "1.0.0",
+  "author": {
+    "name": "cajias"
+  }
+}

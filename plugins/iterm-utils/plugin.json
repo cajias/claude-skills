@@ -1,0 +1,8 @@
+{
+  "name": "iterm-utils",
+  "description": "iTerm2 utilities for Claude Code - pane and session management",
+  "version": "1.0.0",
+  "author": { "name": "cajias" },
+  "license": "MIT",
+  "keywords": ["iterm2", "terminal", "sessions", "panes"]
+}
