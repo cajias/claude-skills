@@ -180,6 +180,8 @@ class SessionState:
     web_search_count: int = 0
     correction_count: int = 0
     teaching_count: int = 0  # v4.1: Teaching signals (3.0x weight like corrections)
+    corrections: list[dict[str, Any]] = field(default_factory=list)  # v4.1.1: Store correction content
+    teachings: list[dict[str, Any]] = field(default_factory=list)  # v4.1.1: Store teaching content
     exchanges: list[dict[str, Any]] = field(default_factory=list)
     last_updated: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -197,6 +199,8 @@ class SessionState:
             "web_search_count": self.web_search_count,
             "correction_count": self.correction_count,
             "teaching_count": self.teaching_count,
+            "corrections": self.corrections,
+            "teachings": self.teachings,
             "exchanges": self.exchanges,
             "last_updated": self.last_updated,
             "metadata": self.metadata,
@@ -212,6 +216,8 @@ class SessionState:
             web_search_count=data.get("web_search_count", 0),
             correction_count=data.get("correction_count", 0),
             teaching_count=data.get("teaching_count", 0),
+            corrections=data.get("corrections", []),
+            teachings=data.get("teachings", []),
             exchanges=data.get("exchanges", []),
             last_updated=data.get("last_updated", ""),
             metadata=data.get("metadata", {}),
@@ -337,9 +343,13 @@ def record_signal(signal_type: str, data: Optional[dict[str, Any]] = None) -> Se
             log(f"Recorded web search (total: {state.web_search_count})")
         elif signal_type == "correction":
             state.correction_count += 1
+            if data:
+                state.corrections.append(data)
             log(f"Recorded correction (total: {state.correction_count})")
         elif signal_type == "teaching":
             state.teaching_count += 1
+            if data:
+                state.teachings.append(data)
             log(f"Recorded teaching (total: {state.teaching_count})")
         elif signal_type == "exchange":
             if data:
@@ -508,6 +518,9 @@ def get_signal_summary() -> dict[str, Any]:
         "retry_count": state.retry_count,
         "web_search_count": state.web_search_count,
         "correction_count": state.correction_count,
+        "teaching_count": state.teaching_count,
+        "corrections": state.corrections,  # v4.1.1: Include correction content for skill extraction
+        "teachings": state.teachings,  # v4.1.1: Include teaching content for skill extraction
         "exchange_count": len(state.exchanges),
         "breakthrough_score": score,
         "last_updated": state.last_updated,
