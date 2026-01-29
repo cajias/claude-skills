@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Claudeception v4.0 - Extraction Engine
+"""Claudeception v4.0 - Extraction Engine.
 
 Stop hook that performs skill extraction at end of session.
 Uses breakthrough scoring, TF-IDF duplicate detection, and taxonomy classification.
@@ -14,15 +13,15 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 
 # Configuration
-LOG_FILE = Path(os.environ.get('CLAUDECEPTION_LOG_FILE',
-                                os.path.expanduser('~/.claude/claudeception.log')))
-DEBUG = os.environ.get('CLAUDECEPTION_DEBUG', 'true').lower() == 'true'
-DRY_RUN = os.environ.get('CLAUDECEPTION_DRY_RUN', 'false').lower() == 'true'
-METRICS_DIR = Path(os.path.expanduser('~/.claude/claudeception-metrics'))
-EVENTS_DIR = METRICS_DIR / 'events'
+LOG_FILE = Path(os.environ.get("CLAUDECEPTION_LOG_FILE", os.path.expanduser("~/.claude/claudeception.log")))
+DEBUG = os.environ.get("CLAUDECEPTION_DEBUG", "true").lower() == "true"
+DRY_RUN = os.environ.get("CLAUDECEPTION_DRY_RUN", "false").lower() == "true"
+METRICS_DIR = Path(os.path.expanduser("~/.claude/claudeception-metrics"))
+EVENTS_DIR = METRICS_DIR / "events"
 
 # Breakthrough score threshold for extraction
 BREAKTHROUGH_THRESHOLD = 0.15
@@ -32,19 +31,22 @@ script_dir = Path(__file__).parent
 sys.path.insert(0, str(script_dir))
 
 try:
-    from session_state import get_session_state, calculate_breakthrough_score, clear_session, get_signal_summary
+    from session_state import calculate_breakthrough_score, clear_session, get_signal_summary
+
     HAS_SESSION_STATE = True
 except ImportError:
     HAS_SESSION_STATE = False
 
 try:
-    from duplicate_detector import find_similar_skills, should_reject_duplicate
+    from duplicate_detector import should_reject_duplicate
+
     HAS_DUPLICATE_DETECTOR = True
 except ImportError:
     HAS_DUPLICATE_DETECTOR = False
 
 try:
     from taxonomy_classifier import classify_skill, get_target_directory
+
     HAS_TAXONOMY = True
 except ImportError:
     HAS_TAXONOMY = False
@@ -52,11 +54,11 @@ except ImportError:
 
 def log(message: str) -> None:
     """Append message to log file."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"{timestamp} - [extraction-engine] {message}"
     try:
         LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(LOG_FILE, 'a') as f:
+        with open(LOG_FILE, "a") as f:
             f.write(f"{log_entry}\n")
     except Exception:
         pass
@@ -70,14 +72,14 @@ def ensure_directories() -> None:
     EVENTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def emit_event(event: Dict[str, Any]) -> None:
+def emit_event(event: dict[str, Any]) -> None:
     """Write event to daily JSONL log."""
     ensure_directories()
-    today = datetime.now().strftime('%Y-%m-%d')
+    today = datetime.now().strftime("%Y-%m-%d")
     events_file = EVENTS_DIR / f"{today}.jsonl"
     try:
-        with open(events_file, 'a') as f:
-            f.write(json.dumps(event) + '\n')
+        with open(events_file, "a") as f:
+            f.write(json.dumps(event) + "\n")
         log(f"Emitted {event.get('event_type', 'unknown')} event")
     except Exception as e:
         log(f"Error writing event: {e}")
@@ -85,13 +87,13 @@ def emit_event(event: Dict[str, Any]) -> None:
 
 def to_kebab_case(text: str) -> str:
     """Convert text to kebab-case."""
-    text = re.sub(r'[^a-zA-Z0-9\s-]', '', text)
-    text = re.sub(r'\s+', '-', text.strip().lower())
-    text = re.sub(r'-+', '-', text)
+    text = re.sub(r"[^a-zA-Z0-9\s-]", "", text)
+    text = re.sub(r"\s+", "-", text.strip().lower())
+    text = re.sub(r"-+", "-", text)
     return text[:50]
 
 
-SKILL_TEMPLATE = '''---
+SKILL_TEMPLATE = """---
 name: {name}
 description: |
   {description}
@@ -129,23 +131,23 @@ breakthrough_score: {breakthrough_score}
 - Confidence: {confidence}
 - Corrections detected: {corrections_count}
 
-'''
+"""
 
 
-def create_skill(skill_data: Dict, target_dir: Path, breakthrough_score: float,
-                 level: str, corrections_count: int) -> bool:
+def create_skill(
+    skill_data: dict, target_dir: Path, breakthrough_score: float, level: str, corrections_count: int
+) -> bool:
     """Create a skill file from extracted data."""
-
-    name = skill_data.get('name', '')
+    name = skill_data.get("name", "")
     if not name:
-        name = to_kebab_case(skill_data.get('title', 'unnamed-skill'))
+        name = to_kebab_case(skill_data.get("title", "unnamed-skill"))
     name = to_kebab_case(name)
 
     if not name or len(name) < 3:
         name = f"skill-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
     skill_dir = target_dir / name
-    skill_file = skill_dir / 'SKILL.md'
+    skill_file = skill_dir / "SKILL.md"
 
     # Check if exists
     if skill_file.exists():
@@ -157,30 +159,32 @@ def create_skill(skill_data: Dict, target_dir: Path, breakthrough_score: float,
         should_reject, reason = should_reject_duplicate(skill_data)
         if should_reject:
             log(f"Duplicate rejected: {reason}")
-            emit_event({
-                'event_type': 'skill_rejected',
-                'timestamp': datetime.now().isoformat(),
-                'skill_name': name,
-                'reason': 'duplicate',
-                'details': reason
-            })
+            emit_event(
+                {
+                    "event_type": "skill_rejected",
+                    "timestamp": datetime.now().isoformat(),
+                    "skill_name": name,
+                    "reason": "duplicate",
+                    "details": reason,
+                }
+            )
             return False
 
     # Prepare template
     template_data = {
-        'name': name,
-        'title': skill_data.get('title', 'Untitled Skill'),
-        'description': skill_data.get('description', 'No description'),
-        'problem': skill_data.get('problem', 'Not specified'),
-        'triggers': skill_data.get('triggers', '- Not specified'),
-        'solution': skill_data.get('solution', 'Not specified'),
-        'verification': skill_data.get('verification', '- Verify the approach works'),
-        'tags': str(skill_data.get('tags', [])),
-        'confidence': skill_data.get('confidence', 0.5),
-        'date': datetime.now().strftime('%Y-%m-%d'),
-        'level': level,
-        'breakthrough_score': f"{breakthrough_score:.2f}",
-        'corrections_count': corrections_count
+        "name": name,
+        "title": skill_data.get("title", "Untitled Skill"),
+        "description": skill_data.get("description", "No description"),
+        "problem": skill_data.get("problem", "Not specified"),
+        "triggers": skill_data.get("triggers", "- Not specified"),
+        "solution": skill_data.get("solution", "Not specified"),
+        "verification": skill_data.get("verification", "- Verify the approach works"),
+        "tags": str(skill_data.get("tags", [])),
+        "confidence": skill_data.get("confidence", 0.5),
+        "date": datetime.now().strftime("%Y-%m-%d"),
+        "level": level,
+        "breakthrough_score": f"{breakthrough_score:.2f}",
+        "corrections_count": corrections_count,
     }
 
     content = SKILL_TEMPLATE.format(**template_data)
@@ -194,14 +198,16 @@ def create_skill(skill_data: Dict, target_dir: Path, breakthrough_score: float,
         skill_file.write_text(content)
         log(f"Created skill: {name} at {skill_file}")
 
-        emit_event({
-            'event_type': 'skill_created',
-            'timestamp': datetime.now().isoformat(),
-            'skill_name': name,
-            'level': level,
-            'breakthrough_score': breakthrough_score,
-            'target_dir': str(target_dir)
-        })
+        emit_event(
+            {
+                "event_type": "skill_created",
+                "timestamp": datetime.now().isoformat(),
+                "skill_name": name,
+                "level": level,
+                "breakthrough_score": breakthrough_score,
+                "target_dir": str(target_dir),
+            }
+        )
 
         return True
     except Exception as e:
@@ -209,33 +215,34 @@ def create_skill(skill_data: Dict, target_dir: Path, breakthrough_score: float,
         return False
 
 
-def extract_skills_from_session(session_data: Dict, signal_summary: Dict) -> int:
-    """
-    Extract skills from session based on accumulated signals.
+def extract_skills_from_session(session_data: dict, signal_summary: dict) -> int:
+    """Extract skills from session based on accumulated signals.
 
     Returns number of skills created.
     """
-    cwd = session_data.get('cwd', '')
-    session_id = session_data.get('session_id', '')
-    transcript_path = session_data.get('transcript_path', '')
+    cwd = session_data.get("cwd", "")
+    session_id = session_data.get("session_id", "")
+    session_data.get("transcript_path", "")
 
     log(f"Extracting skills from session {session_id}")
     log(f"Signal summary: {json.dumps(signal_summary, indent=2)}")
 
-    breakthrough_score = signal_summary.get('breakthrough_score', 0)
-    corrections = signal_summary.get('corrections', [])
-    errors = signal_summary.get('errors', [])
+    breakthrough_score = signal_summary.get("breakthrough_score", 0)
+    corrections = signal_summary.get("corrections", [])
+    errors = signal_summary.get("errors", [])
 
     # Check if session meets extraction threshold
     if breakthrough_score < BREAKTHROUGH_THRESHOLD:
         log(f"Breakthrough score {breakthrough_score:.2f} below threshold {BREAKTHROUGH_THRESHOLD}")
-        emit_event({
-            'event_type': 'extraction_skipped',
-            'timestamp': datetime.now().isoformat(),
-            'session_id': session_id,
-            'reason': 'below_threshold',
-            'breakthrough_score': breakthrough_score
-        })
+        emit_event(
+            {
+                "event_type": "extraction_skipped",
+                "timestamp": datetime.now().isoformat(),
+                "session_id": session_id,
+                "reason": "below_threshold",
+                "breakthrough_score": breakthrough_score,
+            }
+        )
         return 0
 
     log(f"Breakthrough score {breakthrough_score:.2f} meets threshold!")
@@ -246,44 +253,48 @@ def extract_skills_from_session(session_data: Dict, signal_summary: Dict) -> int
 
     # Corrections are high-value signals
     for correction in corrections:
-        if correction.get('confidence', 0) >= 0.7:
-            insight = correction.get('extracted_insight', '')
+        if correction.get("confidence", 0) >= 0.7:
+            insight = correction.get("extracted_insight", "")
             if insight:
-                skills_to_create.append({
-                    'name': to_kebab_case(insight[:30]),
-                    'title': insight[:60],
-                    'description': f"Learned from user correction: {insight}",
-                    'problem': correction.get('prompt', '')[:200],
-                    'triggers': f"When making similar mistakes to: {correction.get('correction_type', 'unknown')}",
-                    'solution': insight,
-                    'verification': '- Apply the corrected approach and verify user acceptance',
-                    'tags': ['correction', 'learned', correction.get('correction_type', 'pattern')],
-                    'confidence': correction.get('confidence', 0.7),
-                    'source': 'correction'
-                })
+                skills_to_create.append(
+                    {
+                        "name": to_kebab_case(insight[:30]),
+                        "title": insight[:60],
+                        "description": f"Learned from user correction: {insight}",
+                        "problem": correction.get("prompt", "")[:200],
+                        "triggers": f"When making similar mistakes to: {correction.get('correction_type', 'unknown')}",
+                        "solution": insight,
+                        "verification": "- Apply the corrected approach and verify user acceptance",
+                        "tags": ["correction", "learned", correction.get("correction_type", "pattern")],
+                        "confidence": correction.get("confidence", 0.7),
+                        "source": "correction",
+                    }
+                )
 
     # Errors with resolutions could be skills
     error_groups = {}
     for error in errors:
-        tool = error.get('tool', 'unknown')
+        tool = error.get("tool", "unknown")
         if tool not in error_groups:
             error_groups[tool] = []
         error_groups[tool].append(error)
 
     for tool, tool_errors in error_groups.items():
         if len(tool_errors) >= 2:  # Multiple errors with same tool = learning opportunity
-            skills_to_create.append({
-                'name': f"{tool.lower()}-error-handling",
-                'title': f"Handling {tool} Errors",
-                'description': f"Patterns for handling common {tool} errors",
-                'problem': f"Encountered {len(tool_errors)} errors with {tool}",
-                'triggers': f"When using {tool} and encountering errors",
-                'solution': f"Review error patterns and apply appropriate fixes",
-                'verification': f'- {tool} operations complete successfully',
-                'tags': ['error-handling', tool.lower(), 'debugging'],
-                'confidence': 0.6,
-                'source': 'error_pattern'
-            })
+            skills_to_create.append(
+                {
+                    "name": f"{tool.lower()}-error-handling",
+                    "title": f"Handling {tool} Errors",
+                    "description": f"Patterns for handling common {tool} errors",
+                    "problem": f"Encountered {len(tool_errors)} errors with {tool}",
+                    "triggers": f"When using {tool} and encountering errors",
+                    "solution": "Review error patterns and apply appropriate fixes",
+                    "verification": f"- {tool} operations complete successfully",
+                    "tags": ["error-handling", tool.lower(), "debugging"],
+                    "confidence": 0.6,
+                    "source": "error_pattern",
+                }
+            )
 
     log(f"Proposed {len(skills_to_create)} skills from signals")
 
@@ -294,8 +305,8 @@ def extract_skills_from_session(session_data: Dict, signal_summary: Dict) -> int
             level = classify_skill(skill_data, cwd)
             target_dir = get_target_directory(level, cwd)
         else:
-            level = 'user'
-            target_dir = Path(os.path.expanduser('~/.claude/my-claude-skills/skills'))
+            level = "user"
+            target_dir = Path(os.path.expanduser("~/.claude/my-claude-skills/skills"))
 
         if target_dir is None:
             log(f"Skill '{skill_data.get('name')}' classified as skip")
@@ -307,11 +318,11 @@ def extract_skills_from_session(session_data: Dict, signal_summary: Dict) -> int
     return skills_created
 
 
-def read_transcript(transcript_path: str) -> List[Dict]:
+def read_transcript(transcript_path: str) -> list[dict]:
     """Read session transcript."""
     messages = []
     try:
-        with open(transcript_path, 'r') as f:
+        with open(transcript_path) as f:
             for line in f:
                 try:
                     msg = json.loads(line.strip())
@@ -323,7 +334,7 @@ def read_transcript(transcript_path: str) -> List[Dict]:
     return messages
 
 
-def main():
+def main() -> int:
     """Main entry point for Stop hook."""
     log("=" * 70)
     log("Extraction engine started (Stop hook)")
@@ -346,16 +357,16 @@ def main():
     if HAS_SESSION_STATE:
         try:
             signal_summary = get_signal_summary() or {}
-            log(f"Retrieved signal summary")
+            log("Retrieved signal summary")
         except Exception as e:
             log(f"Error getting signal summary: {e}")
 
     # Add breakthrough score if not present
-    if 'breakthrough_score' not in signal_summary and HAS_SESSION_STATE:
+    if "breakthrough_score" not in signal_summary and HAS_SESSION_STATE:
         try:
-            signal_summary['breakthrough_score'] = calculate_breakthrough_score()
+            signal_summary["breakthrough_score"] = calculate_breakthrough_score()
         except Exception:
-            signal_summary['breakthrough_score'] = 0
+            signal_summary["breakthrough_score"] = 0
 
     # Extract skills
     skills_created = 0
@@ -363,15 +374,17 @@ def main():
         skills_created = extract_skills_from_session(session_data, signal_summary)
 
     # Emit summary event
-    emit_event({
-        'event_type': 'session_extraction_complete',
-        'timestamp': datetime.now().isoformat(),
-        'session_id': session_data.get('session_id', 'unknown'),
-        'breakthrough_score': signal_summary.get('breakthrough_score', 0),
-        'skills_created': skills_created,
-        'corrections_count': len(signal_summary.get('corrections', [])),
-        'errors_count': len(signal_summary.get('errors', []))
-    })
+    emit_event(
+        {
+            "event_type": "session_extraction_complete",
+            "timestamp": datetime.now().isoformat(),
+            "session_id": session_data.get("session_id", "unknown"),
+            "breakthrough_score": signal_summary.get("breakthrough_score", 0),
+            "skills_created": skills_created,
+            "corrections_count": len(signal_summary.get("corrections", [])),
+            "errors_count": len(signal_summary.get("errors", [])),
+        }
+    )
 
     # Clear session state
     if HAS_SESSION_STATE:
@@ -387,5 +400,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""
-Tests for knowledge_detector.py - Unified correction + teaching detection.
+"""Tests for knowledge_detector.py - Unified correction + teaching detection.
 
 TDD RED Phase: These tests should FAIL until implementation is complete.
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
+
 
 # Add hooks directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -167,10 +168,7 @@ class TestUnifiedKnowledgeDetection:
         """Corrections should still be detected in unified function."""
         from knowledge_detector import detect_knowledge
 
-        result = detect_knowledge(
-            user_message="No, that's wrong. I meant to use POST not GET",
-            assistant_response=""
-        )
+        result = detect_knowledge(user_message="No, that's wrong. I meant to use POST not GET", assistant_response="")
 
         assert result.is_correction is True
         assert result.correction_confidence >= 0.7
@@ -180,8 +178,7 @@ class TestUnifiedKnowledgeDetection:
         from knowledge_detector import detect_knowledge
 
         result = detect_knowledge(
-            user_message="Remember that we always use snake_case for database columns",
-            assistant_response=""
+            user_message="Remember that we always use snake_case for database columns", assistant_response=""
         )
 
         assert result.is_teaching is True
@@ -194,7 +191,7 @@ class TestUnifiedKnowledgeDetection:
 
         result = detect_knowledge(
             user_message="Actually, I prefer tabs over spaces",
-            assistant_response="Key insight: The formatter config needs to be updated."
+            assistant_response="Key insight: The formatter config needs to be updated.",
         )
 
         # User message has teaching (preference)
@@ -206,16 +203,13 @@ class TestUnifiedKnowledgeDetection:
         """KnowledgeResult should be serializable."""
         from knowledge_detector import detect_knowledge
 
-        result = detect_knowledge(
-            user_message="Remember that X",
-            assistant_response=""
-        )
+        result = detect_knowledge(user_message="Remember that X", assistant_response="")
 
         result_dict = result.to_dict()
 
         assert isinstance(result_dict, dict)
-        assert 'is_teaching' in result_dict
-        assert 'is_correction' in result_dict
+        assert "is_teaching" in result_dict
+        assert "is_correction" in result_dict
 
 
 class TestClassificationPrompt:
@@ -223,43 +217,36 @@ class TestClassificationPrompt:
 
     def test_generate_classification_options(self):
         """Should generate proper classification options."""
-        from knowledge_detector import generate_classification_prompt, detect_knowledge
+        from knowledge_detector import detect_knowledge, generate_classification_prompt
 
-        result = detect_knowledge(
-            user_message="Remember that our API uses JWT tokens",
-            assistant_response=""
-        )
+        result = detect_knowledge(user_message="Remember that our API uses JWT tokens", assistant_response="")
 
         prompt = generate_classification_prompt(result)
 
-        assert 'questions' in prompt
-        assert len(prompt['questions']) > 0
-        assert 'options' in prompt['questions'][0]
+        assert "questions" in prompt
+        assert len(prompt["questions"]) > 0
+        assert "options" in prompt["questions"][0]
 
         # Should have user-level, project-level, skip options
-        labels = [opt['label'] for opt in prompt['questions'][0]['options']]
-        assert any('user' in label.lower() for label in labels)
-        assert any('project' in label.lower() for label in labels)
+        labels = [opt["label"] for opt in prompt["questions"][0]["options"]]
+        assert any("user" in label.lower() for label in labels)
+        assert any("project" in label.lower() for label in labels)
 
     def test_user_project_default_heuristics(self):
         """Should provide heuristic defaults for classification."""
-        from knowledge_detector import suggest_classification, detect_knowledge
+        from knowledge_detector import detect_knowledge, suggest_classification
 
         # Tool-related should suggest user-level
         result1 = detect_knowledge(
-            user_message="Remember that Docker needs to restart after config changes",
-            assistant_response=""
+            user_message="Remember that Docker needs to restart after config changes", assistant_response=""
         )
         suggestion1 = suggest_classification(result1)
-        assert suggestion1 in ['user', 'project', 'skip']
+        assert suggestion1 in ["user", "project", "skip"]
 
         # Project-specific path should suggest project-level
-        result2 = detect_knowledge(
-            user_message="Remember that /src/config uses JSON format",
-            assistant_response=""
-        )
+        result2 = detect_knowledge(user_message="Remember that /src/config uses JSON format", assistant_response="")
         suggestion2 = suggest_classification(result2)
-        assert suggestion2 in ['user', 'project', 'skip']
+        assert suggestion2 in ["user", "project", "skip"]
 
 
 class TestIntegrationWithExistingCorrection:
@@ -274,7 +261,7 @@ class TestIntegrationWithExistingCorrection:
             "Actually, I meant something else",
             "You misunderstood, I wanted X",
             "Wrong, it should be Y",
-            "That's incorrect"
+            "That's incorrect",
         ]
 
         for phrase in correction_phrases:
@@ -287,11 +274,11 @@ class TestIntegrationWithExistingCorrection:
 
         result = detect_knowledge(
             user_message="thats worng, I meant X",  # typos
-            assistant_response=""
+            assistant_response="",
         )
 
         assert result.is_correction is True
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

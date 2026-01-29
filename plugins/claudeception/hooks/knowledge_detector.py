@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Claudeception v4.1 - Unified Knowledge Detection Module
+"""Claudeception v4.1 - Unified Knowledge Detection Module.
 
 Detects knowledge signals from both user messages and Claude responses:
 
@@ -27,14 +26,15 @@ This module provides unified detection for the v4.1 breakthrough scoring system.
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # Import correction detection from existing module
-from correction_detector import detect_correction, CorrectionType
+from correction_detector import detect_correction
 
 
 class TeachingType(Enum):
     """Types of teaching patterns in user messages."""
+
     EXPLICIT_INSTRUCTION = "explicit_instruction"
     STANDING_RULE = "standing_rule"
     PROHIBITION = "prohibition"
@@ -46,6 +46,7 @@ class TeachingType(Enum):
 
 class ResponseKnowledgeType(Enum):
     """Types of knowledge synthesis in Claude responses."""
+
     KEY_INSIGHT = "key_insight"
     INSIGHT_BLOCK = "insight_block"
     IMPORTANT_NOTE = "important_note"
@@ -56,13 +57,14 @@ class ResponseKnowledgeType(Enum):
 @dataclass
 class TeachingResult:
     """Result of teaching pattern detection."""
+
     is_teaching: bool
     confidence: float
     teaching_type: str
     extracted_knowledge: str
-    matched_patterns: List[str] = field(default_factory=list)
+    matched_patterns: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "is_teaching": self.is_teaching,
@@ -76,13 +78,14 @@ class TeachingResult:
 @dataclass
 class ResponseKnowledgeResult:
     """Result of response knowledge synthesis detection."""
+
     has_knowledge: bool
     confidence: float
     knowledge_type: str
     extracted_knowledge: str
-    matched_patterns: List[str] = field(default_factory=list)
+    matched_patterns: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "has_knowledge": self.has_knowledge,
@@ -96,6 +99,7 @@ class ResponseKnowledgeResult:
 @dataclass
 class KnowledgeResult:
     """Unified result combining all knowledge detection signals."""
+
     # Teaching detection
     is_teaching: bool = False
     teaching_confidence: float = 0.0
@@ -118,7 +122,7 @@ class KnowledgeResult:
     total_confidence: float = 0.0
     extracted_knowledge: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "is_teaching": self.is_teaching,
@@ -140,32 +144,27 @@ class KnowledgeResult:
 
 # Teaching patterns in user messages
 # Format: (regex pattern, confidence, teaching_type)
-TEACHING_PATTERNS: List[Tuple[str, float, TeachingType]] = [
+TEACHING_PATTERNS: list[tuple[str, float, TeachingType]] = [
     # Explicit instruction patterns (highest confidence)
     (r"remember\s+that\s+(.+?)(?:\.|$)", 0.95, TeachingType.EXPLICIT_INSTRUCTION),
     (r"keep\s+in\s+mind\s+that\s+(.+?)(?:\.|$)", 0.90, TeachingType.EXPLICIT_INSTRUCTION),
     (r"note\s+that\s+(.+?)(?:\.|$)", 0.80, TeachingType.EXPLICIT_INSTRUCTION),
-
     # Standing rules
     (r"always\s+(?:do\s+|use\s+|run\s+)?(.+?)(?:\.|$)", 0.90, TeachingType.STANDING_RULE),
     (r"make\s+sure\s+(?:to\s+)?always\s+(.+?)(?:\.|$)", 0.85, TeachingType.STANDING_RULE),
     (r"(?:you\s+)?should\s+always\s+(.+?)(?:\.|$)", 0.85, TeachingType.STANDING_RULE),
-
     # Prohibitions
     (r"never\s+(?:do\s+|use\s+)?(.+?)(?:\.|$)", 0.90, TeachingType.PROHIBITION),
     (r"don'?t\s+ever\s+(.+?)(?:\.|$)", 0.90, TeachingType.PROHIBITION),
     (r"avoid\s+(.+?)(?:\.|$)", 0.75, TeachingType.PROHIBITION),
-
     # Pattern teaching
     (r"the\s+pattern\s+(?:here\s+)?is\s+(?:to\s+)?(.+?)(?:\.|$)", 0.85, TeachingType.PATTERN_TEACHING),
     (r"the\s+(?:rule|convention)\s+is\s+(?:to\s+)?(.+?)(?:\.|$)", 0.85, TeachingType.PATTERN_TEACHING),
     (r"(?:our|the)\s+approach\s+is\s+(?:to\s+)?(.+?)(?:\.|$)", 0.80, TeachingType.PATTERN_TEACHING),
-
     # Preferences
     (r"i\s+prefer\s+(.+?)\s+(?:over|to|instead)", 0.85, TeachingType.PREFERENCE),
     (r"i\s+(?:like|want)\s+(?:it\s+)?when\s+(?:you\s+)?(.+?)(?:\.|$)", 0.80, TeachingType.PREFERENCE),
     (r"(?:my|i)\s+prefer(?:ence|red)?\s+(?:is\s+)?(.+?)(?:\.|$)", 0.80, TeachingType.PREFERENCE),
-
     # Memory requests
     (r"for\s+future\s+reference[,:\s]+(.+?)(?:\.|$)", 0.90, TeachingType.MEMORY_REQUEST),
     (r"save\s+(?:this|that)\s+for\s+later", 0.85, TeachingType.MEMORY_REQUEST),
@@ -175,21 +174,18 @@ TEACHING_PATTERNS: List[Tuple[str, float, TeachingType]] = [
 
 # Response knowledge patterns (in Claude responses)
 # Format: (regex pattern, confidence, knowledge_type)
-RESPONSE_KNOWLEDGE_PATTERNS: List[Tuple[str, float, ResponseKnowledgeType]] = [
+RESPONSE_KNOWLEDGE_PATTERNS: list[tuple[str, float, ResponseKnowledgeType]] = [
     # Key insight markers
     (r"key\s+insight[:\s]+(.+?)(?:\n|$)", 0.85, ResponseKnowledgeType.KEY_INSIGHT),
     (r"important\s+insight[:\s]+(.+?)(?:\n|$)", 0.85, ResponseKnowledgeType.KEY_INSIGHT),
     (r"main\s+insight[:\s]+(.+?)(?:\n|$)", 0.80, ResponseKnowledgeType.KEY_INSIGHT),
-
     # Insight blocks (★ format) - handle indentation with \s*
     (r"★\s*[Ii]nsight[^\n]*\n(.+?)(?:\n\s*`─|$)", 0.90, ResponseKnowledgeType.INSIGHT_BLOCK),
     (r"`★\s*[Ii]nsight[^`]*`\s*\n(.+?)(?:\n\s*`─|$)", 0.90, ResponseKnowledgeType.INSIGHT_BLOCK),
-
     # Important/Note markers
     (r"IMPORTANT[:\s]+(.+?)(?:\n|$)", 0.80, ResponseKnowledgeType.IMPORTANT_NOTE),
     (r"NOTE[:\s]+(.+?)(?:\n|$)", 0.75, ResponseKnowledgeType.IMPORTANT_NOTE),
     (r"⚠️?\s*(?:Warning|Important)[:\s]+(.+?)(?:\n|$)", 0.80, ResponseKnowledgeType.IMPORTANT_NOTE),
-
     # Synthesis patterns
     (r"the\s+(?:key|main|core)\s+(?:point|takeaway)\s+is[:\s]+(.+?)(?:\n|$)", 0.80, ResponseKnowledgeType.SYNTHESIS),
     (r"in\s+summary[:\s]+(.+?)(?:\n|$)", 0.75, ResponseKnowledgeType.SYNTHESIS),
@@ -199,13 +195,11 @@ RESPONSE_KNOWLEDGE_PATTERNS: List[Tuple[str, float, ResponseKnowledgeType]] = [
 def normalize_text(text: str) -> str:
     """Normalize text for pattern matching."""
     text = text.lower()
-    text = " ".join(text.split())
-    return text
+    return " ".join(text.split())
 
 
 def detect_teaching(user_message: str) -> TeachingResult:
-    """
-    Detect teaching patterns in a user message.
+    """Detect teaching patterns in a user message.
 
     Analyzes the message for patterns indicating the user is teaching
     Claude something to remember (rules, preferences, patterns, etc.)
@@ -226,7 +220,7 @@ def detect_teaching(user_message: str) -> TeachingResult:
         )
 
     normalized = normalize_text(user_message)
-    matched_patterns: List[str] = []
+    matched_patterns: list[str] = []
     max_confidence = 0.0
     detected_type = TeachingType.UNKNOWN
     extracted_knowledge = ""
@@ -261,8 +255,7 @@ def detect_teaching(user_message: str) -> TeachingResult:
 
 
 def detect_response_knowledge(assistant_response: str) -> ResponseKnowledgeResult:
-    """
-    Detect knowledge synthesis patterns in Claude's response.
+    """Detect knowledge synthesis patterns in Claude's response.
 
     Analyzes the response for patterns indicating Claude has synthesized
     useful knowledge (insights, important notes, summaries).
@@ -286,7 +279,7 @@ def detect_response_knowledge(assistant_response: str) -> ResponseKnowledgeResul
     text = assistant_response
     normalized = normalize_text(assistant_response)
 
-    matched_patterns: List[str] = []
+    matched_patterns: list[str] = []
     max_confidence = 0.0
     detected_type = ResponseKnowledgeType.UNKNOWN
     extracted_knowledge = ""
@@ -305,10 +298,7 @@ def detect_response_knowledge(assistant_response: str) -> ResponseKnowledgeResul
                     max_confidence = confidence
                     detected_type = knowledge_type
 
-                    if match.groups():
-                        extracted_knowledge = match.group(1).strip()
-                    else:
-                        extracted_knowledge = assistant_response.strip()[:200]
+                    extracted_knowledge = match.group(1).strip() if match.groups() else assistant_response.strip()[:200]
 
     has_knowledge = max_confidence >= 0.5
 
@@ -321,12 +311,8 @@ def detect_response_knowledge(assistant_response: str) -> ResponseKnowledgeResul
     )
 
 
-def detect_knowledge(
-    user_message: str,
-    assistant_response: str = ""
-) -> KnowledgeResult:
-    """
-    Unified knowledge detection combining all signals.
+def detect_knowledge(user_message: str, assistant_response: str = "") -> KnowledgeResult:
+    """Unified knowledge detection combining all signals.
 
     Detects:
     1. Teaching patterns in user message
@@ -386,9 +372,8 @@ def detect_knowledge(
     return result
 
 
-def generate_classification_prompt(knowledge_result: KnowledgeResult) -> Dict[str, Any]:
-    """
-    Generate a classification prompt for user/project level classification.
+def generate_classification_prompt(knowledge_result: KnowledgeResult) -> dict[str, Any]:
+    """Generate a classification prompt for user/project level classification.
 
     Creates an AskUserQuestion-compatible format for asking the user
     how to classify the extracted knowledge.
@@ -405,31 +390,29 @@ def generate_classification_prompt(knowledge_result: KnowledgeResult) -> Dict[st
         preview += "..."
 
     return {
-        "questions": [{
-            "question": f"How should this knowledge be classified?\n\"{preview}\"",
-            "header": "Scope",
-            "options": [
-                {
-                    "label": "User-level",
-                    "description": "Applies across all projects (personal preferences, tool knowledge)"
-                },
-                {
-                    "label": "Project-level",
-                    "description": "Specific to this project only (local patterns, file paths)"
-                },
-                {
-                    "label": "Skip",
-                    "description": "Don't extract this as a skill"
-                }
-            ],
-            "multiSelect": False
-        }]
+        "questions": [
+            {
+                "question": f'How should this knowledge be classified?\n"{preview}"',
+                "header": "Scope",
+                "options": [
+                    {
+                        "label": "User-level",
+                        "description": "Applies across all projects (personal preferences, tool knowledge)",
+                    },
+                    {
+                        "label": "Project-level",
+                        "description": "Specific to this project only (local patterns, file paths)",
+                    },
+                    {"label": "Skip", "description": "Don't extract this as a skill"},
+                ],
+                "multiSelect": False,
+            }
+        ]
     }
 
 
 def suggest_classification(knowledge_result: KnowledgeResult) -> str:
-    """
-    Provide a heuristic suggestion for classification.
+    """Provide a heuristic suggestion for classification.
 
     Uses simple heuristics to suggest whether knowledge should be
     user-level, project-level, or skipped.
@@ -444,19 +427,35 @@ def suggest_classification(knowledge_result: KnowledgeResult) -> str:
 
     # Project-level indicators (paths, specific services, accounts)
     project_indicators = [
-        r"/src/", r"/lib/", r"/config/", r"/app/",  # Common paths
+        r"/src/",
+        r"/lib/",
+        r"/config/",
+        r"/app/",  # Common paths
         r"\b\d{12}\b",  # AWS account IDs
-        r"\.json\b", r"\.yaml\b", r"\.yml\b",  # Config file types
-        r"\bthis\s+project\b", r"\bthis\s+repo\b",
-        r"\bour\s+api\b", r"\bour\s+service\b",
+        r"\.json\b",
+        r"\.yaml\b",
+        r"\.yml\b",  # Config file types
+        r"\bthis\s+project\b",
+        r"\bthis\s+repo\b",
+        r"\bour\s+api\b",
+        r"\bour\s+service\b",
     ]
 
     # User-level indicators (tools, general patterns)
     user_indicators = [
-        r"\bdocker\b", r"\bgit\b", r"\bnpm\b", r"\bpython\b",
-        r"\btypescript\b", r"\brust\b", r"\bgo\b",
-        r"\balways\b", r"\bnever\b", r"\bprefer\b",
-        r"\brestart\b", r"\bconfig\b", r"\bchanges\b",
+        r"\bdocker\b",
+        r"\bgit\b",
+        r"\bnpm\b",
+        r"\bpython\b",
+        r"\btypescript\b",
+        r"\brust\b",
+        r"\bgo\b",
+        r"\balways\b",
+        r"\bnever\b",
+        r"\bprefer\b",
+        r"\brestart\b",
+        r"\bconfig\b",
+        r"\bchanges\b",
     ]
 
     project_score = sum(1 for p in project_indicators if re.search(p, knowledge))
@@ -468,25 +467,24 @@ def suggest_classification(knowledge_result: KnowledgeResult) -> str:
 
     if project_score > user_score:
         return "project"
-    elif user_score > project_score:
+    if user_score > project_score:
         return "user"
-    else:
-        # Default to project if unclear (safer)
-        return "project"
+    # Default to project if unclear (safer)
+    return "project"
 
 
 # Module exports
 __all__ = [
-    "detect_teaching",
-    "detect_response_knowledge",
-    "detect_knowledge",
-    "generate_classification_prompt",
-    "suggest_classification",
-    "TeachingType",
+    "KnowledgeResult",
+    "ResponseKnowledgeResult",
     "ResponseKnowledgeType",
     "TeachingResult",
-    "ResponseKnowledgeResult",
-    "KnowledgeResult",
+    "TeachingType",
+    "detect_knowledge",
+    "detect_response_knowledge",
+    "detect_teaching",
+    "generate_classification_prompt",
+    "suggest_classification",
 ]
 
 
@@ -524,7 +522,6 @@ if __name__ == "__main__":
 
         Key insight: The connection pool exhaustion happens because
         Lambda doesn't reuse connections across cold starts.""",
-
         """Done! I've updated the file as requested.""",  # No knowledge
     ]
 
@@ -540,6 +537,6 @@ if __name__ == "__main__":
     print("\n--- Unified Detection ---")
     unified_result = detect_knowledge(
         "Remember that we always use snake_case for database columns",
-        "Key insight: The naming convention ensures consistency."
+        "Key insight: The naming convention ensures consistency.",
     )
     print(json.dumps(unified_result.to_dict(), indent=2))

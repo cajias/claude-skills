@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Tests for the Claudeception Correction Detection Module.
+"""Tests for the Claudeception Correction Detection Module.
 
 Run with: python -m pytest test_correction_detector.py -v
 Or: python test_correction_detector.py
@@ -8,19 +7,22 @@ Or: python test_correction_detector.py
 
 try:
     import pytest
+
     HAS_PYTEST = True
 except ImportError:
     HAS_PYTEST = False
 
+import sys
+
 from correction_detector import (
-    detect_correction,
-    extract_correction_insight,
+    CorrectionType,
     analyze_correction_batch,
-    normalize_text,
+    detect_correction,
+    detect_negation_with_reference,
+    extract_correction_insight,
     fix_common_typos,
     fuzzy_match,
-    detect_negation_with_reference,
-    CorrectionType,
+    normalize_text,
 )
 
 
@@ -287,10 +289,7 @@ class TestDetectCorrection:
 
     def test_with_previous_response(self):
         """Test detection with previous response context."""
-        result = detect_correction(
-            "That's not correct",
-            previous_response="The answer is 42"
-        )
+        result = detect_correction("That's not correct", previous_response="The answer is 42")
         assert result["is_correction"] is True
 
 
@@ -354,7 +353,7 @@ class TestAnalyzeCorrectionBatch:
 
         assert len(results) == 3
         assert results[0]["is_correction"] is False  # "Help me with Python"
-        assert results[1]["is_correction"] is True   # "No, that's wrong"
+        assert results[1]["is_correction"] is True  # "No, that's wrong"
         assert results[2]["is_correction"] is False  # "Perfect, thanks!"
 
     def test_batch_with_context(self):
@@ -395,15 +394,11 @@ class TestHelperFunctions:
 
     def test_detect_negation_with_reference(self):
         """Test negation with reference detection."""
-        detected, confidence = detect_negation_with_reference(
-            "that answer is wrong"
-        )
+        detected, confidence = detect_negation_with_reference("that answer is wrong")
         assert detected is True
         assert confidence > 0.4
 
-        detected, confidence = detect_negation_with_reference(
-            "hello world"
-        )
+        detected, confidence = detect_negation_with_reference("hello world")
         assert detected is False
 
 
@@ -421,7 +416,7 @@ class TestCorrectionTypes:
             CorrectionType.MISUNDERSTANDING: "You misunderstood me",
         }
 
-        for expected_type, message in test_cases.items():
+        for message in test_cases.values():
             result = detect_correction(message)
             assert result["is_correction"] is True, f"Failed for: {message}"
             # Just verify it was detected; exact type matching can vary
@@ -432,39 +427,29 @@ class TestRealWorldExamples:
 
     def test_code_review_correction(self):
         """Test code review style correction."""
-        result = detect_correction(
-            "No, don't use var, use const instead"
-        )
+        result = detect_correction("No, don't use var, use const instead")
         assert result["is_correction"] is True
         assert result["confidence"] >= 0.7
 
     def test_file_path_correction(self):
         """Test file path correction."""
-        result = detect_correction(
-            "Wrong file, I meant src/main.py not src/utils.py"
-        )
+        result = detect_correction("Wrong file, I meant src/main.py not src/utils.py")
         assert result["is_correction"] is True
 
     def test_language_correction(self):
         """Test programming language correction."""
-        result = detect_correction(
-            "I asked for TypeScript, not JavaScript"
-        )
+        result = detect_correction("I asked for TypeScript, not JavaScript")
         assert result["is_correction"] is True
 
     def test_frustrated_correction(self):
         """Test frustrated/emphatic correction."""
-        result = detect_correction(
-            "No no no! That's completely wrong!"
-        )
+        result = detect_correction("No no no! That's completely wrong!")
         assert result["is_correction"] is True
         assert result["confidence"] >= 0.85
 
     def test_polite_correction(self):
         """Test polite correction."""
-        result = detect_correction(
-            "I think there might be a misunderstanding - I was asking about the API"
-        )
+        result = detect_correction("I think there might be a misunderstanding - I was asking about the API")
         assert result["is_correction"] is True
 
 
@@ -490,10 +475,7 @@ def run_tests_without_pytest():
     for test_class in test_classes:
         print(f"\n{test_class.__name__}:")
         instance = test_class()
-        test_methods = [
-            m for m in dir(instance)
-            if m.startswith("test_")
-        ]
+        test_methods = [m for m in dir(instance) if m.startswith("test_")]
 
         for method_name in test_methods:
             try:
@@ -516,7 +498,8 @@ def run_tests_without_pytest():
 if __name__ == "__main__":
     if HAS_PYTEST:
         import pytest
+
         pytest.main([__file__, "-v", "--tb=short"])
     else:
         success = run_tests_without_pytest()
-        exit(0 if success else 1)
+        sys.exit(0 if success else 1)

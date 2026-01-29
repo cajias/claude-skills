@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Claudeception - Skill Extraction Hook
+"""Claudeception - Skill Extraction Hook.
 
 Called on UserPromptSubmit to analyze recent conversation exchanges
 for skill-worthy knowledge and create new SKILL.md files.
@@ -26,44 +25,44 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict, Any
+from typing import Any, Optional
 
 
 # Configuration
 def get_skills_dir() -> Path:
-    """
-    Determine skills directory with project-level override support.
-    Priority: 1) Env var  2) Project .claude/settings.json  3) Default
+    """Determine skills directory with project-level override support.
+
+    Priority: 1) Env var  2) Project .claude/settings.json  3) Default.
     """
     # Check env var first
-    env_dir = os.environ.get('CLAUDECEPTION_SKILLS_DIR')
+    env_dir = os.environ.get("CLAUDECEPTION_SKILLS_DIR")
     if env_dir:
         return Path(env_dir).expanduser()
 
     # Check for project-level settings in cwd
-    project_settings = Path('.claude/settings.json')
+    project_settings = Path(".claude/settings.json")
     if project_settings.exists():
         try:
             with open(project_settings) as f:
                 settings = json.load(f)
-                project_dir = settings.get('env', {}).get('CLAUDECEPTION_SKILLS_DIR')
+                project_dir = settings.get("env", {}).get("CLAUDECEPTION_SKILLS_DIR")
                 if project_dir:
                     return Path(project_dir).resolve()
         except Exception:
             pass
 
     # Default to user-level
-    return Path(os.path.expanduser('~/.claude/my-claude-skills/skills'))
+    return Path(os.path.expanduser("~/.claude/my-claude-skills/skills"))
+
 
 SKILLS_DIR = get_skills_dir()
-DRY_RUN = os.environ.get('CLAUDECEPTION_DRY_RUN', 'false').lower() == 'true'
-DEBUG = os.environ.get('CLAUDECEPTION_DEBUG', 'true').lower() == 'true'
-LOG_FILE = Path(os.environ.get('CLAUDECEPTION_LOG_FILE',
-                                os.path.expanduser('~/.claude/claudeception.log')))
-MAX_EXCHANGES = int(os.environ.get('CLAUDECEPTION_MAX_EXCHANGES', '5'))
+DRY_RUN = os.environ.get("CLAUDECEPTION_DRY_RUN", "false").lower() == "true"
+DEBUG = os.environ.get("CLAUDECEPTION_DEBUG", "true").lower() == "true"
+LOG_FILE = Path(os.environ.get("CLAUDECEPTION_LOG_FILE", os.path.expanduser("~/.claude/claudeception.log")))
+MAX_EXCHANGES = int(os.environ.get("CLAUDECEPTION_MAX_EXCHANGES", "5"))
 
 
-SKILL_TEMPLATE = '''---
+SKILL_TEMPLATE = """---
 name: {name}
 description: |
   {description}
@@ -97,17 +96,17 @@ tags: {tags}
 - Confidence: {confidence}
 - Review and refine this skill for accuracy
 
-'''
+"""
 
 
 def log(message: str) -> None:
     """Append message to log file and stderr."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"{timestamp} - {message}"
 
     # Always write to log file
     try:
-        with open(LOG_FILE, 'a') as f:
+        with open(LOG_FILE, "a") as f:
             f.write(f"{log_entry}\n")
     except Exception as e:
         print(f"Log error: {e}", file=sys.stderr)
@@ -119,19 +118,19 @@ def log(message: str) -> None:
 
 def to_kebab_case(text: str) -> str:
     """Convert text to kebab-case for skill names."""
-    text = re.sub(r'[^a-zA-Z0-9\s-]', '', text)
-    text = re.sub(r'\s+', '-', text.strip().lower())
-    text = re.sub(r'-+', '-', text)
+    text = re.sub(r"[^a-zA-Z0-9\s-]", "", text)
+    text = re.sub(r"\s+", "-", text.strip().lower())
+    text = re.sub(r"-+", "-", text)
     return text[:50]
 
 
 def skill_exists(name: str) -> bool:
     """Check if a skill with this name already exists."""
-    skill_path = SKILLS_DIR / name / 'SKILL.md'
+    skill_path = SKILLS_DIR / name / "SKILL.md"
     return skill_path.exists()
 
 
-def find_similar_skills(keywords: List[str]) -> List[str]:
+def find_similar_skills(keywords: list[str]) -> list[str]:
     """Find existing skills that might be similar based on keywords."""
     similar = []
     if not SKILLS_DIR.exists():
@@ -139,7 +138,7 @@ def find_similar_skills(keywords: List[str]) -> List[str]:
 
     for skill_dir in SKILLS_DIR.iterdir():
         if skill_dir.is_dir():
-            skill_file = skill_dir / 'SKILL.md'
+            skill_file = skill_dir / "SKILL.md"
             if skill_file.exists():
                 try:
                     content = skill_file.read_text().lower()
@@ -151,25 +150,25 @@ def find_similar_skills(keywords: List[str]) -> List[str]:
     return similar
 
 
-def extract_recent_exchanges(session_data: Dict[Any, Any], max_exchanges: int = 5) -> str:
+def extract_recent_exchanges(session_data: dict[Any, Any], max_exchanges: int = 5) -> str:
     """Extract the last N exchanges from session data."""
     conversation = ""
 
     if isinstance(session_data, dict):
-        if 'messages' in session_data:
-            messages = session_data.get('messages', [])
-            recent_messages = messages[-(max_exchanges * 2):] if len(messages) > max_exchanges * 2 else messages
+        if "messages" in session_data:
+            messages = session_data.get("messages", [])
+            recent_messages = messages[-(max_exchanges * 2) :] if len(messages) > max_exchanges * 2 else messages
 
             for msg in recent_messages:
                 if isinstance(msg, dict):
-                    role = msg.get('role', 'unknown')
-                    content = msg.get('content', '')
+                    role = msg.get("role", "unknown")
+                    content = msg.get("content", "")
                     conversation += f"[{role}]: {content}\n\n"
-        elif 'conversation' in session_data:
-            full_text = str(session_data['conversation'])
-            chunks = full_text.split('\n\n')
-            recent_chunks = chunks[-(max_exchanges * 2):] if len(chunks) > max_exchanges * 2 else chunks
-            conversation = '\n\n'.join(recent_chunks)
+        elif "conversation" in session_data:
+            full_text = str(session_data["conversation"])
+            chunks = full_text.split("\n\n")
+            recent_chunks = chunks[-(max_exchanges * 2) :] if len(chunks) > max_exchanges * 2 else chunks
+            conversation = "\n\n".join(recent_chunks)
         else:
             conversation = json.dumps(session_data)
     else:
@@ -178,12 +177,12 @@ def extract_recent_exchanges(session_data: Dict[Any, Any], max_exchanges: int = 
     return conversation
 
 
-def output_extraction_prompt(conversation: str):
-    """
-    Output a prompt for the LLM to analyze and extract skills.
+def output_extraction_prompt(conversation: str) -> None:
+    """Output a prompt for the LLM to analyze and extract skills.
+
     The LLM will respond with JSON containing skill data.
     """
-    prompt = f'''
+    prompt = f"""
 ================================================================================
 CLAUDECEPTION - SKILL EXTRACTION ANALYSIS
 ================================================================================
@@ -247,15 +246,15 @@ If nothing notable was learned, respond:
 "No skill-worthy knowledge to extract from this conversation."
 
 ================================================================================
-'''
+"""
     print(prompt)
 
 
-def create_skill(skill_data: Dict[str, Any]) -> bool:
+def create_skill(skill_data: dict[str, Any]) -> bool:
     """Create a new skill from extracted data."""
-    name = skill_data.get('name', '')
+    name = skill_data.get("name", "")
     if not name:
-        name = to_kebab_case(skill_data.get('title', 'unnamed-skill'))
+        name = to_kebab_case(skill_data.get("title", "unnamed-skill"))
 
     # Ensure name is valid
     name = to_kebab_case(name)
@@ -268,27 +267,27 @@ def create_skill(skill_data: Dict[str, Any]) -> bool:
         return False
 
     # Check for similar skills
-    keywords = re.findall(r'\b[a-zA-Z]{4,}\b', skill_data.get('title', ''))[:5]
+    keywords = re.findall(r"\b[a-zA-Z]{4,}\b", skill_data.get("title", ""))[:5]
     similar = find_similar_skills(keywords)
     if similar:
         log(f"Similar skills exist: {similar} - skipping to avoid duplicate")
         return False
 
     skill_dir = SKILLS_DIR / name
-    skill_file = skill_dir / 'SKILL.md'
+    skill_file = skill_dir / "SKILL.md"
 
     # Prepare template data
     template_data = {
-        'name': name,
-        'title': skill_data.get('title', 'Untitled Skill'),
-        'description': skill_data.get('description', 'No description provided'),
-        'problem': skill_data.get('problem', 'Not specified'),
-        'triggers': skill_data.get('triggers', '- Not specified'),
-        'solution': skill_data.get('solution', 'Not specified'),
-        'verification': skill_data.get('verification', '- Verify the approach works as expected'),
-        'tags': str(skill_data.get('tags', [])),
-        'confidence': skill_data.get('confidence', 0.5),
-        'date': datetime.now().strftime('%Y-%m-%d'),
+        "name": name,
+        "title": skill_data.get("title", "Untitled Skill"),
+        "description": skill_data.get("description", "No description provided"),
+        "problem": skill_data.get("problem", "Not specified"),
+        "triggers": skill_data.get("triggers", "- Not specified"),
+        "solution": skill_data.get("solution", "Not specified"),
+        "verification": skill_data.get("verification", "- Verify the approach works as expected"),
+        "tags": str(skill_data.get("tags", [])),
+        "confidence": skill_data.get("confidence", 0.5),
+        "date": datetime.now().strftime("%Y-%m-%d"),
     }
 
     content = SKILL_TEMPLATE.format(**template_data)
@@ -308,17 +307,17 @@ def create_skill(skill_data: Dict[str, Any]) -> bool:
         return False
 
 
-def process_skill_json(data: Dict[Any, Any]) -> int:
+def process_skill_json(data: dict[Any, Any]) -> int:
     """Process JSON containing skill extraction data from LLM."""
-    skills = data.get('skills', [])
+    skills = data.get("skills", [])
 
     if not skills:
         log("No skills in JSON data")
         return 0
 
-    log(f"\n{'='*70}")
+    log(f"\n{'=' * 70}")
     log(f"LLM EXTRACTED {len(skills)} SKILLS:")
-    log(f"{'='*70}")
+    log(f"{'=' * 70}")
 
     created = 0
     for idx, skill in enumerate(skills, 1):
@@ -331,15 +330,15 @@ def process_skill_json(data: Dict[Any, Any]) -> int:
 
         if create_skill(skill):
             created += 1
-            log(f"  ✓ Skill created successfully")
+            log("  ✓ Skill created successfully")
         else:
-            log(f"  ✗ Skill creation skipped/failed")
+            log("  ✗ Skill creation skipped/failed")
 
     log(f"\nCreated {created}/{len(skills)} skills")
     return created
 
 
-def main():
+def main() -> Optional[int]:
     """Main entry point."""
     log("Claudeception extraction started")
     log(f"Skills directory: {SKILLS_DIR} (cwd: {os.getcwd()})")
@@ -367,7 +366,7 @@ def main():
         data = json.loads(input_data)
 
         # Check if this is skill extraction JSON from LLM
-        if 'skills' in data:
+        if "skills" in data:
             log("Detected skill extraction JSON from LLM")
             created = process_skill_json(data)
             log(f"Skill extraction complete: {created} skills created")
@@ -381,13 +380,13 @@ def main():
             return 0
 
         log(f"Analyzing last {MAX_EXCHANGES} exchanges ({len(conversation)} chars)")
-        log(f"\n{'='*70}")
+        log(f"\n{'=' * 70}")
         log("CONVERSATION PREVIEW:")
-        log(f"{'='*70}")
+        log(f"{'=' * 70}")
         log(conversation[:500])
         if len(conversation) > 500:
             log("... (truncated)")
-        log(f"{'='*70}")
+        log(f"{'=' * 70}")
 
         # Output the extraction prompt for Claude to analyze
         output_extraction_prompt(conversation)
@@ -412,5 +411,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
