@@ -20,6 +20,9 @@ dev = [
 [project.scripts]
 zk-extract = "ai_zettelkasten.cli:extract_main"
 zk-suggest = "ai_zettelkasten.cli:suggest_main"
+zk-index = "ai_zettelkasten.cli:index_main"
+zk-sync = "ai_zettelkasten.cli:sync_main"
+zk-search = "ai_zettelkasten.cli:search_main"
 
 [build-system]
 requires = ["hatchling"]

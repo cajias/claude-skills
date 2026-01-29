@@ -1,9 +1,6 @@
 ---
 name: zsearch
-description: |
-  Semantic search across your knowledge base. Find relevant facts, decisions,
-  patterns, and corrections using natural language queries.
-version: 2.0.0
+description: Semantic search across your knowledge base using natural language queries.
 ---
 
 # /zsearch - Semantic Knowledge Search
@@ -15,81 +12,40 @@ Search your knowledge base using natural language.
 ```bash
 /zsearch <query>
 /zsearch <query> --type fact|decision|pattern|correction
-/zsearch <query> --project <name>
-/zsearch <query> --recent 7d
-/zsearch <query> --hub <hub-name>
+/zsearch <query> --top 10
 ```
 
 ## Implementation
 
-When this skill is invoked:
+Run the search command with AWS credentials:
 
-1. **Parse query and filters**:
-
-```python
-query = parsed_args.query
-filters = {}
-if parsed_args.type:
-    filters["knowledge_type"] = parsed_args.type
-if parsed_args.project:
-    filters["project"] = parsed_args.project
+```bash
+isengardcli run --account 806230523044 -- bash -c '
+export ZETTELKASTEN_BUCKET=zettelkasten-cajias
+export ZETTELKASTEN_INDEX=knowledge-index
+export ZETTELKASTEN_ROLE_ARN=arn:aws:iam::806230523044:role/ZettelkastenPluginRole
+uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-search "QUERY" [OPTIONS]
+'
 ```
 
-1. **Generate embedding and search**:
+Replace `QUERY` with the user's search terms and `[OPTIONS]` with any flags.
 
-```python
-from ai_zettelkasten.extractor import KnowledgeExtractor
+## Options
 
-extractor = KnowledgeExtractor(vault_path, bucket, index)
-results = extractor.vectors.query(
-    extractor.embeddings.embed(query),
-    top_k=10,
-    filter=filters
-)
-```
-
-1. **Display results** ranked by similarity:
-
-```text
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📚 Search: "S3 Vectors setup"
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. [0.92] S3 Vectors Embedding Dimensions
-   Type: fact | Tags: aws, s3-vectors, bedrock
-   "Bedrock Titan uses 1536 dimensions..."
-   📄 permanent/s3-vectors-dimensions.md
-
-2. [0.85] Chose S3 Vectors over Aurora
-   Type: decision | Tags: architecture, aws
-   "Decided on S3 Vectors for simplicity..."
-   📄 permanent/chose-s3-vectors.md
-
-3. [0.78] S3 Vectors Setup Pattern
-   Type: pattern | Tags: aws, infrastructure
-   "Always create index before bucket..."
-   📄 permanent/s3-vectors-setup.md
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-3 results | Showing top matches (similarity > 0.7)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-1. **Offer actions**:
-
-```text
-[1-3] Open note  [r] Refine search  [q] Quit
-```
+| Flag | Description |
+|------|-------------|
+| `--type`, `-t` | Filter by knowledge type (fact, decision, pattern, correction) |
+| `--top`, `-n` | Number of results (default: 5) |
 
 ## Examples
 
 ```bash
-/zsearch lambda cold starts
-→ Finds notes about Lambda performance
+# Basic search
+zk-search "lambda cold starts"
 
-/zsearch --type decision database choice
-→ Finds decision notes about databases
+# Filter by type
+zk-search "database choice" --type decision
 
-/zsearch --project omega interceptor pattern
-→ Finds project-specific notes
+# Get more results
+zk-search "AWS patterns" --top 10
 ```

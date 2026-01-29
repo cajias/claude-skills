@@ -2,7 +2,33 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Optional
+import os
 import boto3
+
+
+def _get_assumed_role_session(region: str = "us-east-1") -> boto3.Session:
+    """Get a boto3 session with assumed role credentials.
+
+    If ZETTELKASTEN_ROLE_ARN is set, assumes that role.
+    Otherwise, returns default session.
+    """
+    role_arn = os.environ.get("ZETTELKASTEN_ROLE_ARN")
+    if not role_arn:
+        return boto3.Session(region_name=region)
+
+    sts = boto3.client("sts", region_name=region)
+    response = sts.assume_role(
+        RoleArn=role_arn,
+        RoleSessionName="zettelkasten-plugin"
+    )
+    credentials = response["Credentials"]
+
+    return boto3.Session(
+        aws_access_key_id=credentials["AccessKeyId"],
+        aws_secret_access_key=credentials["SecretAccessKey"],
+        aws_session_token=credentials["SessionToken"],
+        region_name=region
+    )
 
 
 @dataclass
@@ -122,10 +148,8 @@ class S3VectorsStore:
         """
         self.bucket = bucket
         self.index = index
-        self.client = boto3.client(
-            "s3vectors",
-            region_name=region or "us-east-1"
-        )
+        session = _get_assumed_role_session(region or "us-east-1")
+        self.client = session.client("s3vectors")
 
     def put_vector(
         self,

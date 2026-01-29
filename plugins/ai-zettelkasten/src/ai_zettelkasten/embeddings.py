@@ -1,7 +1,8 @@
 """Bedrock Titan embeddings for semantic search."""
 import json
 from typing import Optional
-import boto3
+
+from .s3vectors import _get_assumed_role_session
 
 # Titan embedding model configuration
 TITAN_MODEL_ID = "amazon.titan-embed-text-v1"
@@ -16,10 +17,8 @@ class BedrockEmbeddings:
         self.model_id = TITAN_MODEL_ID
         self.dimensions = TITAN_DIMENSIONS
         self.max_input = TITAN_MAX_INPUT
-        self.client = boto3.client(
-            "bedrock-runtime",
-            region_name=region or "us-east-1"
-        )
+        session = _get_assumed_role_session(region or "us-east-1")
+        self.client = session.client("bedrock-runtime")
 
     def embed(self, text: str) -> list[float]:
         """Generate embedding for a single text."""
