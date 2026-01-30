@@ -35,6 +35,26 @@ class BedrockEmbeddings:
         result = json.loads(response["body"].read())
         return result["embedding"]
 
-    def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for multiple texts."""
-        return [self.embed(text) for text in texts]
+    def embed_batch(self, texts: list[str], max_workers: int = 10) -> list[list[float]]:
+        """Generate embeddings for multiple texts in parallel.
+
+        Uses ThreadPoolExecutor for concurrent API calls since Bedrock
+        Titan doesn't have a native batch embedding endpoint.
+
+        Args:
+            texts: List of texts to embed
+            max_workers: Number of parallel workers (default: 10)
+
+        Returns:
+            List of embeddings in the same order as input texts
+        """
+        from concurrent.futures import ThreadPoolExecutor
+
+        if len(texts) <= 1:
+            return [self.embed(text) for text in texts]
+
+        # Use thread pool for parallel API calls
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            embeddings = list(executor.map(self.embed, texts))
+
+        return embeddings

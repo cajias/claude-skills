@@ -1,6 +1,6 @@
 [project]
 name = "ai-zettelkasten"
-version = "2.0.0"
+version = "2.14.0"
 description = "Claude Code plugin for Zettelkasten knowledge management"
 requires-python = ">=3.11"
 dependencies = [
@@ -23,6 +23,22 @@ zk-suggest = "ai_zettelkasten.cli:suggest_main"
 zk-index = "ai_zettelkasten.cli:index_main"
 zk-sync = "ai_zettelkasten.cli:sync_main"
 zk-search = "ai_zettelkasten.cli:search_main"
+zk-dupes = "ai_zettelkasten.cli:dupes_main"
+zk-cluster = "ai_zettelkasten.cli:cluster_main"
+zk-hub-check = "ai_zettelkasten.cli:hub_check_main"
+zk-orphans = "ai_zettelkasten.cli:orphans_main"
+zk-related = "ai_zettelkasten.cli:related_main"
+zk-hub-review = "ai_zettelkasten.cli:hub_review_main"
+zk-fix-ids = "ai_zettelkasten.cli:fix_ids_main"
+zk-suggest-links = "ai_zettelkasten.cli:suggest_links_main"
+zk-hub-assign = "ai_zettelkasten.cli:hub_assign_main"
+zk-link-loop = "ai_zettelkasten.cli:link_loop_main"
+zk-link-ranked = "ai_zettelkasten.cli:link_ranked_main"
+zk-merge-dupes = "ai_zettelkasten.cli:merge_duplicates_main"
+zk-prune-links = "ai_zettelkasten.cli:prune_links_main"
+zk-tag-consolidate = "ai_zettelkasten.cli:tag_consolidate_main"
+zk-tag-audit = "ai_zettelkasten.cli:tag_audit_main"
+zk-link = "ai_zettelkasten.cli:suggest_links_main"
 
 [build-system]
 requires = ["hatchling"]

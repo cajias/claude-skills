@@ -352,7 +352,9 @@ class S3VectorsStore:
 
             try:
                 if include_embeddings:
-                    # Use list_vectors to get embeddings
+                    # Include returnData to get embeddings
+                    kwargs["returnData"] = True
+                    kwargs["maxResults"] = 100
                     response = self.client.list_vectors(**kwargs)
                     vectors = response.get("vectors", [])
                     # Convert data format
@@ -361,6 +363,7 @@ class S3VectorsStore:
                             v["embedding"] = v["data"]["float32"]
                 else:
                     # Use list_vectors for metadata only
+                    kwargs["maxResults"] = 100
                     response = self.client.list_vectors(**kwargs)
                     vectors = response.get("vectors", [])
 
