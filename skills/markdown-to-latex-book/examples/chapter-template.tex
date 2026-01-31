@@ -1,0 +1,162 @@
+% Chapter Template
+% Save as chapters/ch01-name.tex
+
+\chapter{Chapter Title}
+\label{ch:chapterlabel}
+
+Opening paragraph introducing the chapter content. This should set context
+and explain what the reader will learn.
+
+% ============================================================================
+\section{First Major Section}
+% ============================================================================
+
+Section introduction text.
+
+\subsection{Subsection Title}
+
+Regular paragraph text with \textbf{bold} and \textit{italic} formatting.
+Code inline looks like \texttt{variable\_name} or \texttt{function()}.
+
+% Problem-Pattern structure (common in technical guides)
+\begin{problembox}
+Describe the problem or challenge that readers face. Be specific about
+the symptoms and why this matters.
+\end{problembox}
+
+\begin{solutionbox}
+Present the solution or pattern that addresses the problem. Include
+specific, actionable guidance.
+\end{solutionbox}
+
+\subsection{Code Examples}
+
+Example with syntax highlighting:
+
+\begin{lstlisting}[language=typescript]
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+async function getUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`);
+  return response.json();
+}
+\end{lstlisting}
+
+Bash commands:
+
+\begin{lstlisting}[language=bash]
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+\end{lstlisting}
+
+\subsection{Tables}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Column 1} & \textbf{Column 2 (Flexible)} & \textbf{Column 3} \\
+\midrule
+Item A & Description that can wrap to multiple lines if needed & Value \\
+Item B & Another description & Value \\
+Item C & Yet another description & Value \\
+\bottomrule
+\end{tabularx}
+\caption{Descriptive caption for the table}
+\label{tab:tablename}
+\end{table}
+
+Reference the table: See Table~\ref{tab:tablename}.
+
+\subsection{Figures and Diagrams}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=2cm,
+    box/.style={draw, rounded corners, minimum width=2cm, minimum height=1cm, align=center}
+]
+    \node[box, fill=blue!10] (a) {Step 1};
+    \node[box, fill=orange!10, right=of a] (b) {Step 2};
+    \node[box, fill=green!10, right=of b] (c) {Step 3};
+
+    \draw[->, thick] (a) -- (b);
+    \draw[->, thick] (b) -- (c);
+\end{tikzpicture}
+\caption{Workflow diagram showing the three-step process}
+\label{fig:workflow}
+\end{figure}
+
+Reference the figure: See Figure~\ref{fig:workflow}.
+
+\subsection{Lists}
+
+Bullet list:
+\begin{itemize}
+    \item First item
+    \item Second item with more detail
+    \item Third item
+\end{itemize}
+
+Numbered list:
+\begin{enumerate}
+    \item First step
+    \item Second step
+    \item Third step
+\end{enumerate}
+
+% ============================================================================
+\section{Second Major Section}
+% ============================================================================
+
+Continue with more content...
+
+\begin{tipbox}
+Helpful tips or best practices go in tip boxes. These highlight
+information the reader should pay special attention to.
+\end{tipbox}
+
+\begin{warningbox}
+Warnings about common mistakes or potential issues. Use sparingly
+for genuine cautions.
+\end{warningbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+Concluding section that recaps key points:
+
+\begin{table}[htbp]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Concept} & \textbf{Key Takeaway} \\
+\midrule
+Concept 1 & Main point to remember \\
+Concept 2 & Another key insight \\
+Concept 3 & Final important point \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================================
+\section{Related}
+% ============================================================================
+
+Cross-references to other chapters:
+\begin{itemize}
+    \item Chapter~\ref{ch:another} --- Related topic
+    \item Appendix~\ref{app:reference} --- Detailed reference material
+\end{itemize}
