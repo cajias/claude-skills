@@ -3,9 +3,9 @@
 This module provides LLM-based validation of proposed links between notes,
 ensuring meaningful Zettelkasten connections rather than just topical similarity.
 """
+
 import json
 from dataclasses import dataclass
-from typing import Optional
 
 import boto3
 
@@ -100,11 +100,13 @@ class LinkValidator:
         try:
             response = self.client.invoke_model(
                 modelId=self.model_id,
-                body=json.dumps({
-                    "anthropic_version": "bedrock-2023-05-31",
-                    "max_tokens": 200,
-                    "messages": [{"role": "user", "content": prompt}]
-                })
+                body=json.dumps(
+                    {
+                        "anthropic_version": "bedrock-2023-05-31",
+                        "max_tokens": 200,
+                        "messages": [{"role": "user", "content": prompt}],
+                    }
+                ),
             )
 
             result = json.loads(response["body"].read())
@@ -114,19 +116,21 @@ class LinkValidator:
             if output_text.startswith("```"):
                 # Extract JSON from code block
                 lines = output_text.split("\n")
-                json_lines = [l for l in lines if not l.startswith("```")]
+                json_lines = [line for line in lines if not line.startswith("```")]
                 output_text = "\n".join(json_lines)
 
             output = json.loads(output_text)
 
             confidence = float(output.get("confidence", 0))
-            should_link = output.get("should_link", False) and confidence >= self.min_confidence
+            should_link = (
+                output.get("should_link", False) and confidence >= self.min_confidence
+            )
 
             return ValidationResult(
                 should_link=should_link,
                 relationship=output.get("relationship", "ELABORATES"),
                 confidence=confidence,
-                reason=output.get("reason", "")
+                reason=output.get("reason", ""),
             )
 
         except json.JSONDecodeError as e:
@@ -135,7 +139,7 @@ class LinkValidator:
                 should_link=False,
                 relationship="UNKNOWN",
                 confidence=0.0,
-                reason=f"Invalid response format: {e}"
+                reason=f"Invalid response format: {e}",
             )
         except Exception as e:
             # On any error, reject conservatively
@@ -143,7 +147,7 @@ class LinkValidator:
                 should_link=False,
                 relationship="UNKNOWN",
                 confidence=0.0,
-                reason=f"Validation error: {e}"
+                reason=f"Validation error: {e}",
             )
 
     def validate_batch(

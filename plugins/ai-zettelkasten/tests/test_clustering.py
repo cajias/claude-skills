@@ -1,16 +1,15 @@
 """Tests for semantic clustering and hub generation."""
+
 import pytest
 import numpy as np
 from unittest.mock import MagicMock, patch
-from pathlib import Path
 
 from ai_zettelkasten.clustering import (
     HubGenerator,
     Cluster,
     generate_hub_name,
-    compute_similarity_matrix
+    compute_similarity_matrix,
 )
-from ai_zettelkasten.obsidian import NoteType
 
 
 class TestComputeSimilarity:
@@ -60,7 +59,7 @@ class TestCluster:
         cluster = Cluster(
             id=0,
             member_ids=["note-1", "note-2", "note-3"],
-            centroid=np.array([0.5, 0.5, 0.5])
+            centroid=np.array([0.5, 0.5, 0.5]),
         )
         assert len(cluster.member_ids) == 3
         assert "note-1" in cluster.member_ids
@@ -71,9 +70,21 @@ class TestHubGenerator:
         """Only cluster vectors above similarity threshold."""
         # Create mock vectors - 2 similar, 1 different
         mock_vectors = [
-            {"key": "note-1", "embedding": [1.0, 0.0, 0.0], "metadata": {"tags": "aws,lambda"}},
-            {"key": "note-2", "embedding": [0.95, 0.05, 0.0], "metadata": {"tags": "aws,lambda"}},
-            {"key": "note-3", "embedding": [0.0, 1.0, 0.0], "metadata": {"tags": "python,testing"}},
+            {
+                "key": "note-1",
+                "embedding": [1.0, 0.0, 0.0],
+                "metadata": {"tags": "aws,lambda"},
+            },
+            {
+                "key": "note-2",
+                "embedding": [0.95, 0.05, 0.0],
+                "metadata": {"tags": "aws,lambda"},
+            },
+            {
+                "key": "note-3",
+                "embedding": [0.0, 1.0, 0.0],
+                "metadata": {"tags": "python,testing"},
+            },
         ]
 
         with patch("ai_zettelkasten.clustering.S3VectorsStore") as mock_store:
@@ -83,7 +94,7 @@ class TestHubGenerator:
                 vectors_store=mock_store.return_value,
                 vault=MagicMock(),
                 threshold=0.9,
-                min_size=2
+                min_size=2,
             )
             clusters = generator._compute_clusters(mock_vectors)
 
@@ -93,8 +104,16 @@ class TestHubGenerator:
     def test_min_size_filter(self):
         """Filter out clusters smaller than min_size."""
         mock_vectors = [
-            {"key": "note-1", "embedding": [1.0, 0.0, 0.0], "metadata": {"tags": "aws"}},
-            {"key": "note-2", "embedding": [0.0, 1.0, 0.0], "metadata": {"tags": "python"}},
+            {
+                "key": "note-1",
+                "embedding": [1.0, 0.0, 0.0],
+                "metadata": {"tags": "aws"},
+            },
+            {
+                "key": "note-2",
+                "embedding": [0.0, 1.0, 0.0],
+                "metadata": {"tags": "python"},
+            },
         ]
 
         with patch("ai_zettelkasten.clustering.S3VectorsStore") as mock_store:
@@ -104,7 +123,7 @@ class TestHubGenerator:
                 vectors_store=mock_store.return_value,
                 vault=MagicMock(),
                 threshold=0.75,
-                min_size=3  # Require 3 members
+                min_size=3,  # Require 3 members
             )
             clusters = generator._compute_clusters(mock_vectors)
             valid_clusters = [c for c in clusters if len(c.member_ids) >= 3]
@@ -114,9 +133,21 @@ class TestHubGenerator:
     def test_generate_hubs_creates_hub_notes(self, tmp_path):
         """generate_hubs should create hub note files."""
         mock_vectors = [
-            {"key": "note-1", "embedding": [1.0, 0.0] + [0.0]*1534, "metadata": {"tags": "aws,lambda", "title": "Note 1"}},
-            {"key": "note-2", "embedding": [0.99, 0.01] + [0.0]*1534, "metadata": {"tags": "aws,lambda", "title": "Note 2"}},
-            {"key": "note-3", "embedding": [0.98, 0.02] + [0.0]*1534, "metadata": {"tags": "aws,api", "title": "Note 3"}},
+            {
+                "key": "note-1",
+                "embedding": [1.0, 0.0] + [0.0] * 1534,
+                "metadata": {"tags": "aws,lambda", "title": "Note 1"},
+            },
+            {
+                "key": "note-2",
+                "embedding": [0.99, 0.01] + [0.0] * 1534,
+                "metadata": {"tags": "aws,lambda", "title": "Note 2"},
+            },
+            {
+                "key": "note-3",
+                "embedding": [0.98, 0.02] + [0.0] * 1534,
+                "metadata": {"tags": "aws,api", "title": "Note 3"},
+            },
         ]
 
         with patch("ai_zettelkasten.clustering.S3VectorsStore") as mock_store:
@@ -124,16 +155,19 @@ class TestHubGenerator:
             mock_store.return_value.update_metadata.return_value = True
 
             from ai_zettelkasten.obsidian import ObsidianVault
+
             vault = ObsidianVault(tmp_path)
 
             generator = HubGenerator(
                 vectors_store=mock_store.return_value,
                 vault=vault,
                 threshold=0.9,
-                min_size=2
+                min_size=2,
             )
-            hubs = generator.generate_hubs()
+            generator.generate_hubs()
 
             # Should create at least one hub
             hub_files = list((tmp_path / "knowledge-base" / "hubs").glob("*.md"))
-            assert len(hub_files) >= 0  # May be 0 if clustering doesn't find valid clusters
+            assert (
+                len(hub_files) >= 0
+            )  # May be 0 if clustering doesn't find valid clusters

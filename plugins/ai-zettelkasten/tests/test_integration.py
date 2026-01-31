@@ -1,7 +1,5 @@
 """Integration tests for AI Zettelkasten."""
-import pytest
-import json
-from pathlib import Path
+
 from unittest.mock import patch, MagicMock
 
 from ai_zettelkasten.extractor import KnowledgeExtractor
@@ -13,9 +11,10 @@ class TestEndToEnd:
 
     def test_extract_review_search_workflow(self, tmp_path):
         """Test complete workflow: extract -> review -> search."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             # Setup mocks
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
@@ -29,7 +28,13 @@ class TestEndToEnd:
 
             # 1. Extract items
             items = [
-                {"type": "fact", "title": "Test Fact", "content": "Content", "tags": ["test"], "confidence": 0.9}
+                {
+                    "type": "fact",
+                    "title": "Test Fact",
+                    "content": "Content",
+                    "tags": ["test"],
+                    "confidence": 0.9,
+                }
             ]
             summary = extractor.process_items(items)
             assert summary["stored"] == 1
@@ -48,19 +53,44 @@ class TestEndToEnd:
 
     def test_multiple_knowledge_types(self, tmp_path):
         """Test extraction of all knowledge types."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(tmp_path, "bucket", "index")
 
             items = [
-                {"type": "fact", "title": "Fact", "content": "A fact", "tags": [], "confidence": 0.8},
-                {"type": "decision", "title": "Decision", "content": "A decision", "tags": [], "confidence": 0.9},
-                {"type": "pattern", "title": "Pattern", "content": "A pattern", "tags": [], "confidence": 0.85},
-                {"type": "correction", "title": "Correction", "content": "A correction", "tags": [], "confidence": 0.95},
+                {
+                    "type": "fact",
+                    "title": "Fact",
+                    "content": "A fact",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "decision",
+                    "title": "Decision",
+                    "content": "A decision",
+                    "tags": [],
+                    "confidence": 0.9,
+                },
+                {
+                    "type": "pattern",
+                    "title": "Pattern",
+                    "content": "A pattern",
+                    "tags": [],
+                    "confidence": 0.85,
+                },
+                {
+                    "type": "correction",
+                    "title": "Correction",
+                    "content": "A correction",
+                    "tags": [],
+                    "confidence": 0.95,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -70,7 +100,7 @@ class TestEndToEnd:
 
     def test_vault_folder_structure(self, tmp_path):
         """Test that vault creates correct folder structure."""
-        vault = ObsidianVault(tmp_path)
+        ObsidianVault(tmp_path)
 
         assert (tmp_path / "knowledge-base" / "fleeting").exists()
         assert (tmp_path / "knowledge-base" / "permanent").exists()
@@ -105,9 +135,10 @@ class TestEndToEnd:
 
     def test_extract_with_tags_and_source_session(self, tmp_path):
         """Test extraction preserves tags and source session."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
@@ -121,7 +152,7 @@ class TestEndToEnd:
                     "content": "Decided to use Lambda over EC2",
                     "tags": ["aws", "architecture", "lambda"],
                     "confidence": 0.95,
-                    "source_session": "session-abc123"
+                    "source_session": "session-abc123",
                 }
             ]
 
@@ -137,13 +168,18 @@ class TestEndToEnd:
 
     def test_search_filtering_by_distance(self, tmp_path):
         """Test that search filters results by similarity threshold."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.query.return_value = [
                 {"key": "close", "distance": 0.1, "metadata": {"title": "Close Match"}},
-                {"key": "medium", "distance": 0.3, "metadata": {"title": "Medium Match"}},
+                {
+                    "key": "medium",
+                    "distance": 0.3,
+                    "metadata": {"title": "Medium Match"},
+                },
                 {"key": "far", "distance": 0.6, "metadata": {"title": "Far Match"}},
             ]
 
@@ -160,9 +196,10 @@ class TestEndToEnd:
 
     def test_partial_failure_workflow(self, tmp_path):
         """Test workflow continues when some items fail."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             # First item succeeds, second fails embedding
             mock_embed.return_value.embed.side_effect = [
                 [0.1] * 1536,
@@ -175,9 +212,27 @@ class TestEndToEnd:
             vault = ObsidianVault(tmp_path)
 
             items = [
-                {"type": "fact", "title": "Success 1", "content": "C1", "tags": [], "confidence": 0.8},
-                {"type": "fact", "title": "Fail Item", "content": "C2", "tags": [], "confidence": 0.8},
-                {"type": "fact", "title": "Success 2", "content": "C3", "tags": [], "confidence": 0.8},
+                {
+                    "type": "fact",
+                    "title": "Success 1",
+                    "content": "C1",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "fact",
+                    "title": "Fail Item",
+                    "content": "C2",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "fact",
+                    "title": "Success 2",
+                    "content": "C3",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -223,9 +278,10 @@ class TestEndToEnd:
 
     def test_duplicate_title_handling(self, tmp_path):
         """Test that duplicate titles create separate files."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
@@ -234,9 +290,27 @@ class TestEndToEnd:
 
             # Create items with same title
             items = [
-                {"type": "fact", "title": "Same Title", "content": "First content", "tags": [], "confidence": 0.8},
-                {"type": "fact", "title": "Same Title", "content": "Second content", "tags": [], "confidence": 0.8},
-                {"type": "fact", "title": "Same Title", "content": "Third content", "tags": [], "confidence": 0.8},
+                {
+                    "type": "fact",
+                    "title": "Same Title",
+                    "content": "First content",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "fact",
+                    "title": "Same Title",
+                    "content": "Second content",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "fact",
+                    "title": "Same Title",
+                    "content": "Third content",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -263,7 +337,7 @@ class TestP1ProactiveFeatures:
         suggester = Suggester()
 
         # Realistic Python code with extractable knowledge
-        code = '''
+        code = """
         # NOTE: S3 Vectors has a maximum of 50 metadata keys per vector
         MAX_METADATA_KEYS = 50
 
@@ -278,7 +352,7 @@ class TestP1ProactiveFeatures:
         def validate_embedding(embedding):
             if len(embedding) != TITAN_DIMENSIONS:
                 raise ValueError("Invalid embedding dimensions")
-        '''
+        """
 
         suggestions = suggester.analyze("config.py", code)
 
@@ -291,19 +365,26 @@ class TestP1ProactiveFeatures:
 
     def test_clustering_with_mock_vectors(self, tmp_path):
         """Test hub generation with mocked vector store."""
-        from unittest.mock import MagicMock, patch
-        import numpy as np
+        from unittest.mock import patch
         from ai_zettelkasten.clustering import HubGenerator
         from ai_zettelkasten.obsidian import ObsidianVault
 
         # Create similar vectors (should cluster)
         similar_vectors = [
-            {"key": f"note-{i}", "embedding": [1.0 - i*0.01, 0.0] + [0.0]*1534,
-             "metadata": {"tags": "aws,lambda", "title": f"Note {i}", "knowledge_type": "fact", "status": "approved"}}
+            {
+                "key": f"note-{i}",
+                "embedding": [1.0 - i * 0.01, 0.0] + [0.0] * 1534,
+                "metadata": {
+                    "tags": "aws,lambda",
+                    "title": f"Note {i}",
+                    "knowledge_type": "fact",
+                    "status": "approved",
+                },
+            }
             for i in range(5)
         ]
 
-        with patch("ai_zettelkasten.clustering.S3VectorsStore") as mock_store_class:
+        with patch("ai_zettelkasten.clustering.S3VectorsStore"):
             mock_store = MagicMock()
             mock_store.query_all.return_value = similar_vectors
             mock_store.update_metadata.return_value = True
@@ -311,22 +392,19 @@ class TestP1ProactiveFeatures:
             vault = ObsidianVault(tmp_path)
 
             generator = HubGenerator(
-                vectors_store=mock_store,
-                vault=vault,
-                threshold=0.9,
-                min_size=3
+                vectors_store=mock_store, vault=vault, threshold=0.9, min_size=3
             )
 
-            hubs = generator.generate_hubs()
+            generator.generate_hubs()
 
             # Should create at least one hub from the 5 similar notes
-            hub_files = list((tmp_path / "knowledge-base" / "hubs").glob("*.md"))
+            list((tmp_path / "knowledge-base" / "hubs").glob("*.md"))
             # May or may not create hub depending on actual clustering
             # At minimum, verify the process completes without error
 
     def test_full_proactive_workflow(self, tmp_path):
         """Test complete workflow: detect → capture → cluster."""
-        from unittest.mock import MagicMock, patch
+        from unittest.mock import patch
         from ai_zettelkasten.suggester import Suggester
         from ai_zettelkasten.extractor import KnowledgeExtractor
         from ai_zettelkasten.obsidian import ObsidianVault
@@ -340,21 +418,26 @@ class TestP1ProactiveFeatures:
         suggestion = suggestions[0]
 
         # 2. Capture the suggestion as a fleeting note
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(tmp_path, "bucket", "index")
             # Use process_items which accepts dicts
-            result = extractor.process_items([{
-                "type": suggestion.knowledge_type.value,
-                "title": "Lambda Cold Start Performance",
-                "content": suggestion.content,
-                "tags": suggestion.tags,
-                "confidence": suggestion.confidence
-            }])
+            result = extractor.process_items(
+                [
+                    {
+                        "type": suggestion.knowledge_type.value,
+                        "title": "Lambda Cold Start Performance",
+                        "content": suggestion.content,
+                        "tags": suggestion.tags,
+                        "confidence": suggestion.confidence,
+                    }
+                ]
+            )
 
             assert result["stored"] == 1
 
@@ -365,7 +448,12 @@ class TestP1ProactiveFeatures:
 
     def test_hub_management_methods(self, tmp_path):
         """Test ObsidianVault hub methods work together."""
-        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+        from ai_zettelkasten.obsidian import (
+            ObsidianVault,
+            Note,
+            NoteType,
+            KnowledgeType,
+        )
 
         vault = ObsidianVault(tmp_path)
 

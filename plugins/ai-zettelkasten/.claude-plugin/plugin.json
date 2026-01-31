@@ -1,6 +1,6 @@
 {
   "name": "ai-zettelkasten",
-  "version": "2.4.0",
+  "version": "2.0.0",
   "description": "True Zettelkasten for Claude Code - atomic notes, semantic search, and automatic hubs",
   "author": {
     "name": "cajias"
@@ -21,29 +21,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-extract"
+            "command": "uvx --from ai-zettelkasten zk-extract"
           }
         ]
       }
     ],
-    "PreToolUse": [
+    "PreToolCall": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-suggest"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "ZETTELKASTEN_BUCKET=zettelkasten-cajias ZETTELKASTEN_INDEX=knowledge-index ZETTELKASTEN_ROLE_ARN=arn:aws:iam::806230523044:role/ZettelkastenPluginRole OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-index"
+            "command": "uvx --from ai-zettelkasten zk-suggest"
           }
         ]
       }

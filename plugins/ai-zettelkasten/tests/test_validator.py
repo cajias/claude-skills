@@ -1,6 +1,6 @@
 """Tests for the link validator module."""
+
 import json
-import pytest
 from unittest.mock import MagicMock, patch
 
 from ai_zettelkasten.validator import LinkValidator, ValidationResult, VALIDATION_PROMPT
@@ -14,7 +14,7 @@ class TestValidationResult:
             should_link=True,
             relationship="ELABORATES",
             confidence=0.85,
-            reason="These notes share the same concept"
+            reason="These notes share the same concept",
         )
         assert result.should_link is True
         assert result.relationship == "ELABORATES"
@@ -26,7 +26,7 @@ class TestValidationResult:
             should_link=False,
             relationship="UNKNOWN",
             confidence=0.0,
-            reason="No meaningful connection"
+            reason="No meaningful connection",
         )
         assert result.should_link is False
 
@@ -42,7 +42,9 @@ class TestLinkValidator:
         validator = LinkValidator(min_confidence=0.8, region="eu-west-1")
 
         assert validator.min_confidence == 0.8
-        mock_boto.client.assert_called_once_with("bedrock-runtime", region_name="eu-west-1")
+        mock_boto.client.assert_called_once_with(
+            "bedrock-runtime", region_name="eu-west-1"
+        )
 
     @patch("ai_zettelkasten.validator.boto3")
     def test_validate_returns_valid_result(self, mock_boto):
@@ -50,17 +52,23 @@ class TestLinkValidator:
         mock_boto.client.return_value = mock_client
 
         # Mock successful LLM response
-        mock_response = {
-            "body": MagicMock()
-        }
-        mock_response["body"].read.return_value = json.dumps({
-            "content": [{"text": json.dumps({
-                "should_link": True,
-                "relationship": "ELABORATES",
-                "confidence": 0.85,
-                "reason": "Source expands on target concept"
-            })}]
-        }).encode()
+        mock_response = {"body": MagicMock()}
+        mock_response["body"].read.return_value = json.dumps(
+            {
+                "content": [
+                    {
+                        "text": json.dumps(
+                            {
+                                "should_link": True,
+                                "relationship": "ELABORATES",
+                                "confidence": 0.85,
+                                "reason": "Source expands on target concept",
+                            }
+                        )
+                    }
+                ]
+            }
+        ).encode()
         mock_client.invoke_model.return_value = mock_response
 
         validator = LinkValidator(min_confidence=0.7)
@@ -68,7 +76,7 @@ class TestLinkValidator:
             source_title="Test Source",
             source_content="Source content here",
             target_title="Test Target",
-            target_content="Target content here"
+            target_content="Target content here",
         )
 
         assert result.should_link is True
@@ -82,17 +90,23 @@ class TestLinkValidator:
         mock_boto.client.return_value = mock_client
 
         # Mock response with low confidence
-        mock_response = {
-            "body": MagicMock()
-        }
-        mock_response["body"].read.return_value = json.dumps({
-            "content": [{"text": json.dumps({
-                "should_link": True,
-                "relationship": "ELABORATES",
-                "confidence": 0.5,  # Below threshold
-                "reason": "Weak connection"
-            })}]
-        }).encode()
+        mock_response = {"body": MagicMock()}
+        mock_response["body"].read.return_value = json.dumps(
+            {
+                "content": [
+                    {
+                        "text": json.dumps(
+                            {
+                                "should_link": True,
+                                "relationship": "ELABORATES",
+                                "confidence": 0.5,  # Below threshold
+                                "reason": "Weak connection",
+                            }
+                        )
+                    }
+                ]
+            }
+        ).encode()
         mock_client.invoke_model.return_value = mock_response
 
         validator = LinkValidator(min_confidence=0.7)
@@ -100,7 +114,7 @@ class TestLinkValidator:
             source_title="Test Source",
             source_content="Source content",
             target_title="Test Target",
-            target_content="Target content"
+            target_content="Target content",
         )
 
         assert result.should_link is False  # Rejected due to low confidence
@@ -111,12 +125,10 @@ class TestLinkValidator:
         mock_boto.client.return_value = mock_client
 
         # Mock invalid JSON response
-        mock_response = {
-            "body": MagicMock()
-        }
-        mock_response["body"].read.return_value = json.dumps({
-            "content": [{"text": "This is not valid JSON"}]
-        }).encode()
+        mock_response = {"body": MagicMock()}
+        mock_response["body"].read.return_value = json.dumps(
+            {"content": [{"text": "This is not valid JSON"}]}
+        ).encode()
         mock_client.invoke_model.return_value = mock_response
 
         validator = LinkValidator()
@@ -124,7 +136,7 @@ class TestLinkValidator:
             source_title="Test Source",
             source_content="Source content",
             target_title="Test Target",
-            target_content="Target content"
+            target_content="Target content",
         )
 
         assert result.should_link is False
@@ -144,7 +156,7 @@ class TestLinkValidator:
             source_title="Test Source",
             source_content="Source content",
             target_title="Test Target",
-            target_content="Target content"
+            target_content="Target content",
         )
 
         assert result.should_link is False
@@ -157,17 +169,23 @@ class TestLinkValidator:
         mock_boto.client.return_value = mock_client
 
         # Mock response for batch
-        mock_response = {
-            "body": MagicMock()
-        }
-        mock_response["body"].read.return_value = json.dumps({
-            "content": [{"text": json.dumps({
-                "should_link": True,
-                "relationship": "SUPPORTS",
-                "confidence": 0.9,
-                "reason": "Strong support"
-            })}]
-        }).encode()
+        mock_response = {"body": MagicMock()}
+        mock_response["body"].read.return_value = json.dumps(
+            {
+                "content": [
+                    {
+                        "text": json.dumps(
+                            {
+                                "should_link": True,
+                                "relationship": "SUPPORTS",
+                                "confidence": 0.9,
+                                "reason": "Strong support",
+                            }
+                        )
+                    }
+                ]
+            }
+        ).encode()
         mock_client.invoke_model.return_value = mock_response
 
         validator = LinkValidator()
@@ -179,7 +197,7 @@ class TestLinkValidator:
         results = validator.validate_batch(
             source_title="Source",
             source_content="Source content",
-            candidates=candidates
+            candidates=candidates,
         )
 
         assert len(results) == 2
@@ -191,18 +209,18 @@ class TestLinkValidator:
         mock_boto.client.return_value = mock_client
 
         # Mock response wrapped in markdown code block
-        json_content = json.dumps({
-            "should_link": True,
-            "relationship": "APPLIES",
-            "confidence": 0.88,
-            "reason": "Applies the pattern"
-        })
-        mock_response = {
-            "body": MagicMock()
-        }
-        mock_response["body"].read.return_value = json.dumps({
-            "content": [{"text": f"```json\n{json_content}\n```"}]
-        }).encode()
+        json_content = json.dumps(
+            {
+                "should_link": True,
+                "relationship": "APPLIES",
+                "confidence": 0.88,
+                "reason": "Applies the pattern",
+            }
+        )
+        mock_response = {"body": MagicMock()}
+        mock_response["body"].read.return_value = json.dumps(
+            {"content": [{"text": f"```json\n{json_content}\n```"}]}
+        ).encode()
         mock_client.invoke_model.return_value = mock_response
 
         validator = LinkValidator()
@@ -210,7 +228,7 @@ class TestLinkValidator:
             source_title="Test",
             source_content="Content",
             target_title="Target",
-            target_content="Target content"
+            target_content="Target content",
         )
 
         assert result.should_link is True
@@ -241,7 +259,7 @@ class TestValidationPrompt:
             source_title="Test Source",
             source_content_preview="Source content preview",
             target_title="Test Target",
-            target_content_preview="Target content preview"
+            target_content_preview="Target content preview",
         )
         assert "Test Source" in formatted
         assert "Test Target" in formatted

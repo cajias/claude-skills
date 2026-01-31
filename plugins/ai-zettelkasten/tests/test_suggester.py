@@ -1,5 +1,5 @@
 """Tests for proactive suggestion detection."""
-import pytest
+
 from ai_zettelkasten.suggester import Suggester, Suggestion
 from ai_zettelkasten.obsidian import KnowledgeType
 
@@ -8,22 +8,25 @@ class TestSuggester:
     def test_detect_fact_from_comment(self):
         """Detect facts from NOTE: or IMPORTANT: comments."""
         suggester = Suggester()
-        content = '''
+        content = """
         # NOTE: S3 Vectors has a 50 metadata key limit per vector
         METADATA_LIMIT = 50
-        '''
+        """
         suggestions = suggester.analyze("config.py", content)
         assert len(suggestions) >= 1
         assert suggestions[0].knowledge_type == KnowledgeType.FACT
-        assert "50" in suggestions[0].content or "metadata" in suggestions[0].content.lower()
+        assert (
+            "50" in suggestions[0].content
+            or "metadata" in suggestions[0].content.lower()
+        )
 
     def test_detect_decision_from_chose(self):
         """Detect decisions from chose/decided/selected keywords."""
         suggester = Suggester()
-        content = '''
+        content = """
         # We chose uvx over pip because it provides better dependency isolation
         PACKAGE_MANAGER = "uvx"
-        '''
+        """
         suggestions = suggester.analyze("setup.py", content)
         assert len(suggestions) >= 1
         assert suggestions[0].knowledge_type == KnowledgeType.DECISION
@@ -31,11 +34,11 @@ class TestSuggester:
     def test_detect_pattern_from_always(self):
         """Detect patterns from always/never/pattern keywords."""
         suggester = Suggester()
-        content = '''
+        content = """
         # Always validate input before processing - prevents injection attacks
         def process(input: str):
             validate(input)
-        '''
+        """
         suggestions = suggester.analyze("utils.py", content)
         assert len(suggestions) >= 1
         assert suggestions[0].knowledge_type == KnowledgeType.PATTERN
@@ -43,10 +46,10 @@ class TestSuggester:
     def test_detect_correction_from_fixed(self):
         """Detect corrections from fixed/was wrong/actually keywords."""
         suggester = Suggester()
-        content = '''
+        content = """
         # Fixed: was using 1024 dimensions but Titan actually uses 1536
         TITAN_DIMENSIONS = 1536
-        '''
+        """
         suggestions = suggester.analyze("embeddings.py", content)
         assert len(suggestions) >= 1
         assert suggestions[0].knowledge_type == KnowledgeType.CORRECTION
@@ -54,9 +57,9 @@ class TestSuggester:
     def test_extract_tags_from_content(self):
         """Extract relevant tags from suggestion content."""
         suggester = Suggester()
-        content = '''
+        content = """
         # NOTE: AWS Lambda cold start times increase with package size
-        '''
+        """
         suggestions = suggester.analyze("lambda.py", content)
         assert len(suggestions) >= 1
         tags = suggestions[0].tags
@@ -65,10 +68,10 @@ class TestSuggester:
     def test_no_suggestions_for_plain_code(self):
         """Return empty list for code without extractable knowledge."""
         suggester = Suggester()
-        content = '''
+        content = """
         def add(a, b):
             return a + b
-        '''
+        """
         suggestions = suggester.analyze("math.py", content)
         assert len(suggestions) == 0
 
@@ -80,7 +83,7 @@ class TestSuggester:
             knowledge_type=KnowledgeType.FACT,
             tags=["aws", "s3-vectors"],
             confidence=0.85,
-            source_line=5
+            source_line=5,
         )
         formatted = suggester.format_suggestion(suggestion)
         assert "Worth capturing" in formatted

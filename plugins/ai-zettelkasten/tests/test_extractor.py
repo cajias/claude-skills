@@ -1,5 +1,5 @@
 """Tests for knowledge extraction service."""
-import pytest
+
 from unittest.mock import MagicMock, patch
 from pathlib import Path
 
@@ -14,7 +14,7 @@ class TestExtractionItem:
             "title": "Test Fact",
             "content": "This is content",
             "tags": ["aws", "test"],
-            "confidence": 0.9
+            "confidence": 0.9,
         }
         item = ExtractionItem.from_dict(d)
         assert item.knowledge_type == KnowledgeType.FACT
@@ -27,7 +27,7 @@ class TestExtractionItem:
             "title": "Architecture Decision",
             "content": "Use Lambda over EC2",
             "tags": ["architecture"],
-            "confidence": 0.95
+            "confidence": 0.95,
         }
         item = ExtractionItem.from_dict(d)
         assert item.knowledge_type == KnowledgeType.DECISION
@@ -39,7 +39,7 @@ class TestExtractionItem:
             "title": "Retry Pattern",
             "content": "Use exponential backoff",
             "tags": ["patterns"],
-            "confidence": 0.85
+            "confidence": 0.85,
         }
         item = ExtractionItem.from_dict(d)
         assert item.knowledge_type == KnowledgeType.PATTERN
@@ -50,7 +50,7 @@ class TestExtractionItem:
             "title": "Lambda Memory Fix",
             "content": "Actually use 256MB not 128MB",
             "tags": ["lambda"],
-            "confidence": 0.9
+            "confidence": 0.9,
         }
         item = ExtractionItem.from_dict(d)
         assert item.knowledge_type == KnowledgeType.CORRECTION
@@ -71,7 +71,7 @@ class TestExtractionItem:
             "content": "Content",
             "tags": [],
             "confidence": 0.8,
-            "source_session": "session-123"
+            "source_session": "session-123",
         }
         item = ExtractionItem.from_dict(d)
         assert item.source_session == "session-123"
@@ -79,16 +79,15 @@ class TestExtractionItem:
 
 class TestKnowledgeExtractor:
     def test_process_item_creates_note(self, tmp_path):
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             item = ExtractionItem(
@@ -96,7 +95,7 @@ class TestKnowledgeExtractor:
                 title="Test Fact",
                 content="Test content",
                 tags=["test"],
-                confidence=0.85
+                confidence=0.85,
             )
 
             result = extractor.process_item(item)
@@ -106,16 +105,15 @@ class TestKnowledgeExtractor:
 
     def test_process_item_creates_note_file(self, tmp_path):
         """Verify the actual file is created in the vault."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             item = ExtractionItem(
@@ -123,7 +121,7 @@ class TestKnowledgeExtractor:
                 title="My Test Note",
                 content="This is test content",
                 tags=["test"],
-                confidence=0.85
+                confidence=0.85,
             )
 
             result = extractor.process_item(item)
@@ -139,18 +137,17 @@ class TestKnowledgeExtractor:
 
     def test_process_item_calls_embeddings(self, tmp_path):
         """Verify embeddings are generated with correct text."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_instance = MagicMock()
             mock_instance.embed.return_value = [0.1] * 1536
             mock_embed.return_value = mock_instance
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             item = ExtractionItem(
@@ -158,7 +155,7 @@ class TestKnowledgeExtractor:
                 title="Embedding Test",
                 content="Content for embedding",
                 tags=[],
-                confidence=0.8
+                confidence=0.8,
             )
 
             extractor.process_item(item)
@@ -171,18 +168,17 @@ class TestKnowledgeExtractor:
 
     def test_process_item_stores_vector(self, tmp_path):
         """Verify vector is stored with correct metadata."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.5] * 1536
             mock_store_instance = MagicMock()
             mock_store_instance.put_vector.return_value = True
             mock_store.return_value = mock_store_instance
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test-bucket",
-                index="test-index"
+                vault_path=tmp_path, bucket="test-bucket", index="test-index"
             )
 
             item = ExtractionItem(
@@ -190,7 +186,7 @@ class TestKnowledgeExtractor:
                 title="Store Test",
                 content="Content to store",
                 tags=["aws", "decision"],
-                confidence=0.9
+                confidence=0.9,
             )
 
             extractor.process_item(item)
@@ -211,15 +207,16 @@ class TestKnowledgeExtractor:
 
     def test_process_item_handles_embedding_error(self, tmp_path):
         """Verify partial status when embedding fails."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
-            mock_embed.return_value.embed.side_effect = Exception("Embedding service down")
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore"),
+        ):
+            mock_embed.return_value.embed.side_effect = Exception(
+                "Embedding service down"
+            )
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             item = ExtractionItem(
@@ -227,7 +224,7 @@ class TestKnowledgeExtractor:
                 title="Error Test",
                 content="Content",
                 tags=[],
-                confidence=0.8
+                confidence=0.8,
             )
 
             result = extractor.process_item(item)
@@ -239,16 +236,15 @@ class TestKnowledgeExtractor:
 
     def test_process_item_handles_storage_error(self, tmp_path):
         """Verify partial status when vector storage fails."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = False
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             item = ExtractionItem(
@@ -256,7 +252,7 @@ class TestKnowledgeExtractor:
                 title="Storage Fail Test",
                 content="Content",
                 tags=[],
-                confidence=0.8
+                confidence=0.8,
             )
 
             result = extractor.process_item(item)
@@ -265,21 +261,32 @@ class TestKnowledgeExtractor:
             assert "Vector storage failed" in result["error"]
 
     def test_process_items_batch(self, tmp_path):
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             items = [
-                {"type": "fact", "title": "Fact 1", "content": "C1", "tags": [], "confidence": 0.8},
-                {"type": "decision", "title": "Decision 1", "content": "C2", "tags": [], "confidence": 0.9},
+                {
+                    "type": "fact",
+                    "title": "Fact 1",
+                    "content": "C1",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "decision",
+                    "title": "Decision 1",
+                    "content": "C2",
+                    "tags": [],
+                    "confidence": 0.9,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -289,9 +296,10 @@ class TestKnowledgeExtractor:
 
     def test_process_items_batch_with_mixed_results(self, tmp_path):
         """Test batch processing with some failures."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             # First embed succeeds, second fails
             mock_embed.return_value.embed.side_effect = [
                 [0.1] * 1536,
@@ -300,14 +308,24 @@ class TestKnowledgeExtractor:
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             items = [
-                {"type": "fact", "title": "Success Item", "content": "C1", "tags": [], "confidence": 0.8},
-                {"type": "fact", "title": "Fail Item", "content": "C2", "tags": [], "confidence": 0.8},
+                {
+                    "type": "fact",
+                    "title": "Success Item",
+                    "content": "C1",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
+                {
+                    "type": "fact",
+                    "title": "Fail Item",
+                    "content": "C2",
+                    "tags": [],
+                    "confidence": 0.8,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -318,20 +336,25 @@ class TestKnowledgeExtractor:
 
     def test_process_items_returns_individual_results(self, tmp_path):
         """Verify individual results are included in summary."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.put_vector.return_value = True
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             items = [
-                {"type": "pattern", "title": "Pattern 1", "content": "C1", "tags": ["p1"], "confidence": 0.8},
+                {
+                    "type": "pattern",
+                    "title": "Pattern 1",
+                    "content": "C1",
+                    "tags": ["p1"],
+                    "confidence": 0.8,
+                },
             ]
 
             summary = extractor.process_items(items)
@@ -341,18 +364,21 @@ class TestKnowledgeExtractor:
             assert summary["results"][0]["title"] == "Pattern 1"
 
     def test_find_related_notes(self, tmp_path):
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.query.return_value = [
-                {"key": "related-1", "distance": 0.2, "metadata": {"title": "Related Note"}}
+                {
+                    "key": "related-1",
+                    "distance": 0.2,
+                    "metadata": {"title": "Related Note"},
+                }
             ]
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             related = extractor.find_related("Test query")
@@ -362,18 +388,17 @@ class TestKnowledgeExtractor:
 
     def test_find_related_calls_embeddings(self, tmp_path):
         """Verify query is embedded before searching."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_instance = MagicMock()
             mock_instance.embed.return_value = [0.2] * 1536
             mock_embed.return_value = mock_instance
             mock_store.return_value.query.return_value = []
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             extractor.find_related("Search for AWS Lambda")
@@ -382,18 +407,17 @@ class TestKnowledgeExtractor:
 
     def test_find_related_with_top_k(self, tmp_path):
         """Verify top_k parameter is passed to query."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store_instance = MagicMock()
             mock_store_instance.query.return_value = []
             mock_store.return_value = mock_store_instance
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             extractor.find_related("Query", top_k=20)
@@ -404,9 +428,10 @@ class TestKnowledgeExtractor:
 
     def test_find_related_filters_by_threshold(self, tmp_path):
         """Verify results are filtered by similarity threshold."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.query.return_value = [
                 {"key": "close", "distance": 0.1, "metadata": {"title": "Close Match"}},
@@ -414,9 +439,7 @@ class TestKnowledgeExtractor:
             ]
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             # Default threshold is 0.75, so distance must be < 0.25
@@ -427,19 +450,22 @@ class TestKnowledgeExtractor:
 
     def test_find_related_custom_threshold(self, tmp_path):
         """Verify custom threshold works correctly."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
             mock_embed.return_value.embed.return_value = [0.1] * 1536
             mock_store.return_value.query.return_value = [
                 {"key": "close", "distance": 0.1, "metadata": {"title": "Close Match"}},
-                {"key": "medium", "distance": 0.4, "metadata": {"title": "Medium Match"}},
+                {
+                    "key": "medium",
+                    "distance": 0.4,
+                    "metadata": {"title": "Medium Match"},
+                },
             ]
 
             extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test"
+                vault_path=tmp_path, bucket="test", index="test"
             )
 
             # Threshold 0.5 means distance must be < 0.5
@@ -449,14 +475,12 @@ class TestKnowledgeExtractor:
 
     def test_extractor_uses_custom_region(self, tmp_path):
         """Verify region is passed to both services."""
-        with patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed, \
-             patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store:
-
-            extractor = KnowledgeExtractor(
-                vault_path=tmp_path,
-                bucket="test",
-                index="test",
-                region="eu-west-1"
+        with (
+            patch("ai_zettelkasten.extractor.BedrockEmbeddings") as mock_embed,
+            patch("ai_zettelkasten.extractor.S3VectorsStore") as mock_store,
+        ):
+            KnowledgeExtractor(
+                vault_path=tmp_path, bucket="test", index="test", region="eu-west-1"
             )
 
             mock_embed.assert_called_once_with("eu-west-1")

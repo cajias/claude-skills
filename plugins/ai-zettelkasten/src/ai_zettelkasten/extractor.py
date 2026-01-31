@@ -1,9 +1,10 @@
 """Knowledge extraction service - orchestrates note creation and storage."""
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
-from .obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+from .obsidian import ObsidianVault, Note, KnowledgeType
 from .embeddings import BedrockEmbeddings
 from .s3vectors import S3VectorsStore, VectorMetadata
 
@@ -23,6 +24,7 @@ class ExtractionItem:
         confidence: Confidence score (0-1) for this extraction
         source_session: Optional ID of the Claude session that produced this
     """
+
     knowledge_type: KnowledgeType
     title: str
     content: str
@@ -92,11 +94,7 @@ class KnowledgeExtractor:
     """
 
     def __init__(
-        self,
-        vault_path: Path,
-        bucket: str,
-        index: str,
-        region: Optional[str] = None
+        self, vault_path: Path, bucket: str, index: str, region: Optional[str] = None
     ):
         """Initialize the knowledge extractor.
 
@@ -219,10 +217,7 @@ class KnowledgeExtractor:
         }
 
     def find_related(
-        self,
-        query: str,
-        top_k: int = 5,
-        threshold: float = 0.75
+        self, query: str, top_k: int = 5, threshold: float = 0.75
     ) -> list[dict]:
         """Find notes related to a query.
 
@@ -242,9 +237,6 @@ class KnowledgeExtractor:
         results = self.vectors.query(embedding, top_k=top_k)
 
         # Filter by similarity threshold (distance < 1-threshold)
-        filtered = [
-            r for r in results
-            if r.get("distance", 1.0) < (1 - threshold)
-        ]
+        filtered = [r for r in results if r.get("distance", 1.0) < (1 - threshold)]
 
         return filtered

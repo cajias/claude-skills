@@ -27,6 +27,11 @@
     "*.md": [
       "npx markdownlint --fix",
       "npx prettier --write"
+    ],
+    "plugins/ai-zettelkasten/**/*.py": [
+      "bash -c 'cd plugins/ai-zettelkasten && uvx ruff format -- \"$@\"' --",
+      "bash -c 'cd plugins/ai-zettelkasten && uvx ruff check --fix -- \"$@\"' --",
+      "bash -c 'cd plugins/ai-zettelkasten && uvx ruff check -- \"$@\"' --"
     ]
   },
   "keywords": [

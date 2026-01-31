@@ -1,4 +1,5 @@
 """Semantic clustering for automatic hub generation."""
+
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -14,6 +15,7 @@ from .s3vectors import S3VectorsStore
 @dataclass
 class Cluster:
     """A cluster of semantically related notes."""
+
     id: int
     member_ids: list[str]
     centroid: np.ndarray
@@ -48,7 +50,7 @@ class HubGenerator:
         vectors_store: S3VectorsStore,
         vault: ObsidianVault,
         threshold: float = 0.75,
-        min_size: int = 3
+        min_size: int = 3,
     ):
         self.vectors = vectors_store
         self.vault = vault
@@ -74,7 +76,7 @@ class HubGenerator:
         for cluster in valid_clusters:
             hub = self._create_hub_note(cluster, permanent)
             if hub:
-                path = self.vault.write_hub(hub)
+                self.vault.write_hub(hub)
                 hubs.append(hub)
 
                 # Update member metadata with hub assignment
@@ -89,14 +91,14 @@ class HubGenerator:
             return []
 
         # Extract embeddings
-        embeddings = np.array([v['embedding'] for v in vectors])
+        embeddings = np.array([v["embedding"] for v in vectors])
 
         # Agglomerative clustering with distance threshold
         clustering = AgglomerativeClustering(
             n_clusters=None,
             distance_threshold=1 - self.threshold,
-            metric='cosine',
-            linkage='average'
+            metric="cosine",
+            linkage="average",
         )
 
         try:
@@ -108,7 +110,7 @@ class HubGenerator:
         clusters = []
         for cluster_id in np.unique(labels):
             member_indices = np.where(labels == cluster_id)[0]
-            member_ids = [vectors[i]['key'] for i in member_indices]
+            member_ids = [vectors[i]["key"] for i in member_indices]
 
             # Compute centroid
             cluster_embeddings = embeddings[member_indices]
@@ -117,16 +119,18 @@ class HubGenerator:
             # Collect tags
             tags = []
             for i in member_indices:
-                meta_tags = vectors[i].get('metadata', {}).get('tags', '')
+                meta_tags = vectors[i].get("metadata", {}).get("tags", "")
                 if meta_tags:
-                    tags.extend(meta_tags.split(','))
+                    tags.extend(meta_tags.split(","))
 
-            clusters.append(Cluster(
-                id=int(cluster_id),
-                member_ids=member_ids,
-                centroid=centroid,
-                tags=list(set(tags))
-            ))
+            clusters.append(
+                Cluster(
+                    id=int(cluster_id),
+                    member_ids=member_ids,
+                    centroid=centroid,
+                    tags=list(set(tags)),
+                )
+            )
 
         return clusters
 
@@ -134,24 +138,26 @@ class HubGenerator:
         """Create a hub note from a cluster."""
         # Gather member info
         members_by_type = {
-            'fact': [],
-            'decision': [],
-            'pattern': [],
-            'correction': [],
+            "fact": [],
+            "decision": [],
+            "pattern": [],
+            "correction": [],
         }
 
         for v in vectors:
-            if v['key'] in cluster.member_ids:
-                ktype = v.get('metadata', {}).get('knowledge_type', 'fact')
-                title = v.get('metadata', {}).get('title', v['key'])
-                members_by_type.get(ktype, members_by_type['fact']).append(title)
+            if v["key"] in cluster.member_ids:
+                ktype = v.get("metadata", {}).get("knowledge_type", "fact")
+                title = v.get("metadata", {}).get("title", v["key"])
+                members_by_type.get(ktype, members_by_type["fact"]).append(title)
 
         # Generate hub name
         tags_list = [cluster.tags]
         hub_name = generate_hub_name(tags_list)
 
         # Build content
-        content_parts = [f"Auto-generated hub connecting {len(cluster.member_ids)} related notes.\n"]
+        content_parts = [
+            f"Auto-generated hub connecting {len(cluster.member_ids)} related notes.\n"
+        ]
 
         for ktype, members in members_by_type.items():
             if members:

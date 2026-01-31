@@ -1,8 +1,4 @@
 """Tests for Obsidian note management."""
-import pytest
-from pathlib import Path
-import tempfile
-import yaml
 
 from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
 
@@ -123,7 +119,12 @@ class TestObsidianVault:
 class TestHubManagement:
     def test_write_hub_note(self, tmp_path):
         """Write a hub note to the hubs folder."""
-        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+        from ai_zettelkasten.obsidian import (
+            ObsidianVault,
+            Note,
+            NoteType,
+            KnowledgeType,
+        )
 
         vault = ObsidianVault(tmp_path)
         hub = Note(
@@ -144,7 +145,12 @@ class TestHubManagement:
 
     def test_list_hubs(self, tmp_path):
         """List all hub notes in the vault."""
-        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+        from ai_zettelkasten.obsidian import (
+            ObsidianVault,
+            Note,
+            NoteType,
+            KnowledgeType,
+        )
 
         vault = ObsidianVault(tmp_path)
 
@@ -167,7 +173,12 @@ class TestHubManagement:
 
     def test_read_hub(self, tmp_path):
         """Read a hub note by ID."""
-        from ai_zettelkasten.obsidian import ObsidianVault, Note, NoteType, KnowledgeType
+        from ai_zettelkasten.obsidian import (
+            ObsidianVault,
+            Note,
+            NoteType,
+            KnowledgeType,
+        )
 
         vault = ObsidianVault(tmp_path)
         hub = Note(

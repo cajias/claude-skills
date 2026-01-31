@@ -1,4 +1,5 @@
 """CLI entry points for AI Zettelkasten."""
+
 import json
 import os
 import sys
@@ -15,7 +16,11 @@ console = Console()
 # Configuration from environment
 BUCKET = os.environ.get("ZETTELKASTEN_BUCKET", "zettelkasten-prod")
 INDEX = os.environ.get("ZETTELKASTEN_INDEX", "knowledge-index")
-VAULT = Path(os.environ.get("OBSIDIAN_VAULT", os.path.expanduser("~/Documents/obsidian-vault-work")))
+VAULT = Path(
+    os.environ.get(
+        "OBSIDIAN_VAULT", os.path.expanduser("~/Documents/obsidian-vault-work")
+    )
+)
 
 
 def extract_main():
@@ -82,11 +87,13 @@ def extract_main():
         table.add_row(
             result["title"][:40],
             result["type"],
-            f"[{status_style}]{result['status']}[/{status_style}]"
+            f"[{status_style}]{result['status']}[/{status_style}]",
         )
 
     console.print(table)
-    console.print(f"\n[bold]Summary:[/bold] {summary['stored']} stored, {summary['partial']} partial, {summary['errors']} errors")
+    console.print(
+        f"\n[bold]Summary:[/bold] {summary['stored']} stored, {summary['partial']} partial, {summary['errors']} errors"
+    )
 
     return 0 if summary["errors"] == 0 else 1
 
@@ -204,7 +211,7 @@ def index_main():
         return 0
 
     file_path = tool_input.get("file_path", "")
-    content = tool_input.get("content", "")
+    tool_input.get("content", "")
 
     # Only index files in knowledge-base folder
     kb_path = str(VAULT / "knowledge-base")
@@ -247,7 +254,7 @@ def index_main():
         else:
             console.print(f"[yellow]⚠️ Index failed:[/yellow] {note.title}")
 
-    except Exception as e:
+    except Exception:
         # Silently skip if credentials unavailable - user can run /zsync manually
         pass
 
@@ -369,7 +376,9 @@ def sync_main():
     errors = 0
 
     with ThreadPoolExecutor(max_workers=EMBEDDING_WORKERS) as executor:
-        futures = {executor.submit(generate_embedding, item): item for item in notes_to_sync}
+        futures = {
+            executor.submit(generate_embedding, item): item for item in notes_to_sync
+        }
 
         for future in as_completed(futures):
             note_id, embedding, metadata, title, error = future.result()
@@ -383,7 +392,7 @@ def sync_main():
     # Phase 4: Upload vectors in batches
     synced = 0
     for i in range(0, len(embedded_notes), VECTOR_BATCH_SIZE):
-        batch = embedded_notes[i:i + VECTOR_BATCH_SIZE]
+        batch = embedded_notes[i : i + VECTOR_BATCH_SIZE]
         if vectors.batch_put_vectors(batch):
             synced += len(batch)
         else:
@@ -436,7 +445,11 @@ def search_main():
 
         # Filter by type if specified
         if args.type:
-            results = [r for r in results if r.get("metadata", {}).get("knowledge_type") == args.type]
+            results = [
+                r
+                for r in results
+                if r.get("metadata", {}).get("knowledge_type") == args.type
+            ]
 
         console.print()
         console.print("=" * 50)
@@ -460,7 +473,7 @@ def search_main():
 
             console.print(f"[bold]{i}.[/bold] [{similarity:.2f}] [cyan]{title}[/cyan]")
             console.print(f"   Type: [magenta]{ktype}[/magenta] | Tags: {tags}")
-            console.print(f"   [dim]\"{preview}...\"[/dim]")
+            console.print(f'   [dim]"{preview}..."[/dim]')
             console.print(f"   [dim]{path}[/dim]")
             console.print()
 
@@ -494,7 +507,9 @@ def dupes_main():
     from .s3vectors import S3VectorsStore
 
     parser = argparse.ArgumentParser(description="Find duplicate notes")
-    parser.add_argument("--threshold", "-t", type=int, default=85, help="Similarity threshold (0-100)")
+    parser.add_argument(
+        "--threshold", "-t", type=int, default=85, help="Similarity threshold (0-100)"
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0  # Convert to 0-1 range
@@ -538,7 +553,7 @@ def dupes_main():
             checked.add(key)
 
             if (i + 1) % 50 == 0:
-                console.print(f"  Checked {i+1}/{len(all_vectors)}...")
+                console.print(f"  Checked {i + 1}/{len(all_vectors)}...")
 
         console.print()
         console.print("=" * 60)
@@ -624,7 +639,6 @@ def cluster_main():
         for pattern, title in seeds:
             # Find seed vector
             seed_vec = None
-            seed_key = None
 
             # Prefer permanent notes as seeds
             for v in all_vectors:
@@ -633,7 +647,6 @@ def cluster_main():
                     vec_data = v.get("embedding") or v.get("data", {}).get("float32")
                     if vec_data:
                         seed_vec = vec_data
-                        seed_key = key
                         break
 
             # Fallback to any note
@@ -641,10 +654,11 @@ def cluster_main():
                 for v in all_vectors:
                     key = v.get("key", "")
                     if pattern in key.lower():
-                        vec_data = v.get("embedding") or v.get("data", {}).get("float32")
+                        vec_data = v.get("embedding") or v.get("data", {}).get(
+                            "float32"
+                        )
                         if vec_data:
                             seed_vec = vec_data
-                            seed_key = key
                             break
 
             if not seed_vec:
@@ -703,7 +717,9 @@ def hub_check_main():
     from .obsidian import ObsidianVault
 
     parser = argparse.ArgumentParser(description="Validate hub assignments")
-    parser.add_argument("--threshold", "-t", type=int, default=60, help="Similarity threshold (0-100)")
+    parser.add_argument(
+        "--threshold", "-t", type=int, default=60, help="Similarity threshold (0-100)"
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -711,7 +727,7 @@ def hub_check_main():
     try:
         vectors = S3VectorsStore(BUCKET, INDEX)
         embeddings = BedrockEmbeddings()
-        vault = ObsidianVault(VAULT)
+        ObsidianVault(VAULT)
 
         console.print("Fetching all vectors...")
         all_vectors = vectors.query_all(include_embeddings=True)
@@ -731,7 +747,9 @@ def hub_check_main():
                     hub_embeddings[hub_name] = hub_emb
                     console.print(f"[dim]Loaded hub: {hub_name}[/dim]")
                 except Exception as e:
-                    console.print(f"[yellow]Could not embed hub {hub_name}: {e}[/yellow]")
+                    console.print(
+                        f"[yellow]Could not embed hub {hub_name}: {e}[/yellow]"
+                    )
 
         if not hub_embeddings:
             console.print("[yellow]No hubs found to validate against.[/yellow]")
@@ -781,7 +799,7 @@ def hub_check_main():
                             if hub_ref in hub_embeddings:
                                 assigned_hub = hub_ref
                             break
-                except:
+                except Exception:
                     pass
 
             if not assigned_hub:
@@ -789,16 +807,21 @@ def hub_check_main():
 
             # Calculate similarity to assigned hub
             import numpy as np
+
             vec_arr = np.array(vec_data)
             hub_arr = np.array(hub_embeddings[assigned_hub])
-            similarity = np.dot(vec_arr, hub_arr) / (np.linalg.norm(vec_arr) * np.linalg.norm(hub_arr))
+            similarity = np.dot(vec_arr, hub_arr) / (
+                np.linalg.norm(vec_arr) * np.linalg.norm(hub_arr)
+            )
 
             # Find best matching hub
             best_hub = None
             best_sim = 0
             for hub_name, hub_emb in hub_embeddings.items():
                 hub_arr = np.array(hub_emb)
-                sim = np.dot(vec_arr, hub_arr) / (np.linalg.norm(vec_arr) * np.linalg.norm(hub_arr))
+                sim = np.dot(vec_arr, hub_arr) / (
+                    np.linalg.norm(vec_arr) * np.linalg.norm(hub_arr)
+                )
                 if sim > best_sim:
                     best_sim = sim
                     best_hub = hub_name
@@ -806,26 +829,34 @@ def hub_check_main():
             title = meta.get("title", key)
 
             if similarity < threshold and best_hub != assigned_hub:
-                mismatches.append({
-                    "title": title,
-                    "assigned": assigned_hub,
-                    "assigned_sim": similarity * 100,
-                    "suggested": best_hub,
-                    "suggested_sim": best_sim * 100,
-                    "path": obsidian_path
-                })
+                mismatches.append(
+                    {
+                        "title": title,
+                        "assigned": assigned_hub,
+                        "assigned_sim": similarity * 100,
+                        "suggested": best_hub,
+                        "suggested_sim": best_sim * 100,
+                        "path": obsidian_path,
+                    }
+                )
             else:
                 well_assigned += 1
 
         # Report mismatches
         if mismatches:
-            console.print(f"[yellow]⚠️  Found {len(mismatches)} potential misassignments:[/yellow]")
+            console.print(
+                f"[yellow]⚠️  Found {len(mismatches)} potential misassignments:[/yellow]"
+            )
             console.print()
 
             for m in sorted(mismatches, key=lambda x: x["assigned_sim"]):
                 console.print(f"[cyan]{m['title'][:50]}[/cyan]")
-                console.print(f"   Current: [red]{m['assigned']}[/red] ({m['assigned_sim']:.1f}%)")
-                console.print(f"   Suggest: [green]{m['suggested']}[/green] ({m['suggested_sim']:.1f}%)")
+                console.print(
+                    f"   Current: [red]{m['assigned']}[/red] ({m['assigned_sim']:.1f}%)"
+                )
+                console.print(
+                    f"   Suggest: [green]{m['suggested']}[/green] ({m['suggested_sim']:.1f}%)"
+                )
                 console.print()
         else:
             console.print("[green]✓ All notes are well-assigned to their hubs![/green]")
@@ -839,6 +870,7 @@ def hub_check_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -858,12 +890,17 @@ def orphans_main():
         1 on error
     """
     import argparse
-    import numpy as np
 
     from .s3vectors import S3VectorsStore
 
     parser = argparse.ArgumentParser(description="Find orphan notes")
-    parser.add_argument("--threshold", "-t", type=int, default=50, help="Max similarity threshold (0-100)")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=50,
+        help="Max similarity threshold (0-100)",
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -904,17 +941,19 @@ def orphans_main():
                 max_sim = max(similarities)
 
                 if max_sim < threshold:
-                    orphans.append({
-                        "key": key,
-                        "title": meta.get("title", key),
-                        "avg_sim": avg_sim * 100,
-                        "max_sim": max_sim * 100,
-                        "note_type": meta.get("note_type", "unknown"),
-                        "path": meta.get("obsidian_path", "")
-                    })
+                    orphans.append(
+                        {
+                            "key": key,
+                            "title": meta.get("title", key),
+                            "avg_sim": avg_sim * 100,
+                            "max_sim": max_sim * 100,
+                            "note_type": meta.get("note_type", "unknown"),
+                            "path": meta.get("obsidian_path", ""),
+                        }
+                    )
 
             if (i + 1) % 50 == 0:
-                console.print(f"  Analyzed {i+1}/{len(all_vectors)}...")
+                console.print(f"  Analyzed {i + 1}/{len(all_vectors)}...")
 
         console.print()
         console.print("=" * 70)
@@ -932,7 +971,9 @@ def orphans_main():
             for o in orphans[:20]:
                 marker = "★" if o["note_type"] == "permanent" else "○"
                 console.print(f"{marker} [cyan]{o['title'][:50]}[/cyan]")
-                console.print(f"   Max similarity: [yellow]{o['max_sim']:.1f}%[/yellow]")
+                console.print(
+                    f"   Max similarity: [yellow]{o['max_sim']:.1f}%[/yellow]"
+                )
                 console.print(f"   Avg similarity: {o['avg_sim']:.1f}%")
                 console.print()
 
@@ -1025,7 +1066,7 @@ def related_main():
             if tags:
                 console.print(f"   Tags: [magenta]{tags}[/magenta]")
             if preview:
-                console.print(f"   [dim]\"{preview}...\"[/dim]")
+                console.print(f'   [dim]"{preview}..."[/dim]')
             console.print()
 
             count += 1
@@ -1070,7 +1111,9 @@ def hub_review_main():
     from .embeddings import BedrockEmbeddings
 
     parser = argparse.ArgumentParser(description="Comprehensive hub review")
-    parser.add_argument("--clusters", "-c", type=int, default=10, help="Number of clusters")
+    parser.add_argument(
+        "--clusters", "-c", type=int, default=10, help="Number of clusters"
+    )
 
     args = parser.parse_args()
 
@@ -1092,10 +1135,7 @@ def hub_review_main():
                 hub_name = hub_file.stem
                 content = hub_file.read_text()
                 hub_emb = embeddings.embed(f"{hub_name}\n\n{content[:1000]}")
-                hub_data[hub_name] = {
-                    "embedding": hub_emb,
-                    "path": str(hub_file)
-                }
+                hub_data[hub_name] = {"embedding": hub_emb, "path": str(hub_file)}
 
         console.print(f"  Found {len(hub_data)} existing hubs")
 
@@ -1105,7 +1145,7 @@ def hub_review_main():
         console.print(f"  Total vectors: {len(all_vectors)}")
 
         # 3. Categorize notes
-        permanent_dir = VAULT / "knowledge-base" / "permanent"
+        VAULT / "knowledge-base" / "permanent"
         permanent_notes = []
         notes_with_hub = []
         notes_without_hub = []
@@ -1128,7 +1168,7 @@ def hub_review_main():
                 "title": meta.get("title", key),
                 "path": path,
                 "embedding": vec_data,
-                "tags": meta.get("tags", "").split(",") if meta.get("tags") else []
+                "tags": meta.get("tags", "").split(",") if meta.get("tags") else [],
             }
 
             # Check if has hub assignment
@@ -1149,7 +1189,7 @@ def hub_review_main():
                                 hub_ref = hub_ref[5:]
                             assigned_hub = hub_ref
                             break
-                except:
+                except Exception:
                     pass
 
             note_info["assigned_hub"] = assigned_hub
@@ -1168,7 +1208,9 @@ def hub_review_main():
         # 4. Discover clusters using k-means
         console.print("[dim]Discovering semantic clusters...[/dim]")
         if len(permanent_notes) < args.clusters:
-            console.print(f"[yellow]Not enough notes for {args.clusters} clusters[/yellow]")
+            console.print(
+                f"[yellow]Not enough notes for {args.clusters} clusters[/yellow]"
+            )
             return 0
 
         from sklearn.cluster import KMeans
@@ -1204,7 +1246,21 @@ def hub_review_main():
 
             # Count word frequency
             word_freq = defaultdict(int)
-            stopwords = {"the", "a", "an", "to", "for", "of", "in", "on", "with", "and", "is", "are", "be"}
+            stopwords = {
+                "the",
+                "a",
+                "an",
+                "to",
+                "for",
+                "of",
+                "in",
+                "on",
+                "with",
+                "and",
+                "is",
+                "are",
+                "be",
+            }
             for w in all_words:
                 if len(w) > 2 and w not in stopwords:
                     word_freq[w] += 1
@@ -1217,20 +1273,24 @@ def hub_review_main():
             best_sim = 0
             for hub_name, hub_info in hub_data.items():
                 hub_emb = np.array(hub_info["embedding"])
-                sim = np.dot(centroid, hub_emb) / (np.linalg.norm(centroid) * np.linalg.norm(hub_emb))
+                sim = np.dot(centroid, hub_emb) / (
+                    np.linalg.norm(centroid) * np.linalg.norm(hub_emb)
+                )
                 if sim > best_sim:
                     best_sim = sim
                     best_hub = hub_name
 
-            cluster_analysis.append({
-                "id": cluster_id,
-                "label": cluster_label,
-                "size": len(cluster_notes),
-                "keywords": [w[0] for w in top_words],
-                "best_hub": best_hub,
-                "hub_similarity": best_sim * 100,
-                "notes": cluster_notes
-            })
+            cluster_analysis.append(
+                {
+                    "id": cluster_id,
+                    "label": cluster_label,
+                    "size": len(cluster_notes),
+                    "keywords": [w[0] for w in top_words],
+                    "best_hub": best_hub,
+                    "hub_similarity": best_sim * 100,
+                    "notes": cluster_notes,
+                }
+            )
 
         # Sort by size
         cluster_analysis.sort(key=lambda x: -x["size"])
@@ -1269,14 +1329,29 @@ def hub_review_main():
         table.add_column("Status", style="dim")
 
         table.add_row("Permanent notes", str(len(permanent_notes)), "")
-        table.add_row("Notes with hub", str(len(notes_with_hub)),
-                      "[green]✓[/green]" if len(notes_with_hub) > len(permanent_notes) * 0.8 else "[yellow]low[/yellow]")
-        table.add_row("Notes without hub", str(len(notes_without_hub)),
-                      "[green]✓[/green]" if len(notes_without_hub) < 20 else "[red]needs work[/red]")
+        table.add_row(
+            "Notes with hub",
+            str(len(notes_with_hub)),
+            "[green]✓[/green]"
+            if len(notes_with_hub) > len(permanent_notes) * 0.8
+            else "[yellow]low[/yellow]",
+        )
+        table.add_row(
+            "Notes without hub",
+            str(len(notes_without_hub)),
+            "[green]✓[/green]"
+            if len(notes_without_hub) < 20
+            else "[red]needs work[/red]",
+        )
         table.add_row("Existing hubs", str(len(hub_data)), "")
         table.add_row("Semantic clusters", str(args.clusters), "")
-        table.add_row("Gap clusters", str(len(gap_clusters)),
-                      "[green]✓[/green]" if len(gap_clusters) == 0 else "[yellow]new hubs needed[/yellow]")
+        table.add_row(
+            "Gap clusters",
+            str(len(gap_clusters)),
+            "[green]✓[/green]"
+            if len(gap_clusters) == 0
+            else "[yellow]new hubs needed[/yellow]",
+        )
 
         console.print(table)
         console.print()
@@ -1291,16 +1366,22 @@ def hub_review_main():
             console.print()
 
         if notes_without_hub:
-            console.print(f"[bold]Notes Needing Hub Assignment:[/bold] {len(notes_without_hub)}")
+            console.print(
+                f"[bold]Notes Needing Hub Assignment:[/bold] {len(notes_without_hub)}"
+            )
 
             # Group unassigned by best-fit cluster
             unassigned_by_cluster = defaultdict(list)
             for n in notes_without_hub:
                 unassigned_by_cluster[n["cluster"]].append(n)
 
-            for cluster_id, notes in sorted(unassigned_by_cluster.items(), key=lambda x: -len(x[1]))[:5]:
+            for cluster_id, notes in sorted(
+                unassigned_by_cluster.items(), key=lambda x: -len(x[1])
+            )[:5]:
                 c = next(ca for ca in cluster_analysis if ca["id"] == cluster_id)
-                console.print(f"  → {c['label']}: {len(notes)} notes → assign to '{c['best_hub']}'")
+                console.print(
+                    f"  → {c['label']}: {len(notes)} notes → assign to '{c['best_hub']}'"
+                )
 
         console.print()
         console.print("=" * 70)
@@ -1310,6 +1391,7 @@ def hub_review_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -1334,7 +1416,9 @@ def fix_ids_main():
     import re
 
     parser = argparse.ArgumentParser(description="Fix note ID prefixes")
-    parser.add_argument("--dry-run", "-n", action="store_true", help="Show changes without applying")
+    parser.add_argument(
+        "--dry-run", "-n", action="store_true", help="Show changes without applying"
+    )
 
     args = parser.parse_args()
 
@@ -1350,7 +1434,7 @@ def fix_ids_main():
                 content = note_file.read_text()
 
                 # Extract current ID
-                match = re.search(r'^id:\s*(.+)$', content, re.MULTILINE)
+                match = re.search(r"^id:\s*(.+)$", content, re.MULTILINE)
                 if not match:
                     continue
 
@@ -1364,19 +1448,21 @@ def fix_ids_main():
                     new_id = "perm-" + current_id[9:]
 
                 if new_id:
-                    fixes.append({
-                        "file": note_file,
-                        "old_id": current_id,
-                        "new_id": new_id,
-                        "type": "permanent"
-                    })
+                    fixes.append(
+                        {
+                            "file": note_file,
+                            "old_id": current_id,
+                            "new_id": new_id,
+                            "type": "permanent",
+                        }
+                    )
 
         # Check fleeting notes
         if fleeting_dir.exists():
             for note_file in fleeting_dir.glob("*.md"):
                 content = note_file.read_text()
 
-                match = re.search(r'^id:\s*(.+)$', content, re.MULTILINE)
+                match = re.search(r"^id:\s*(.+)$", content, re.MULTILINE)
                 if not match:
                     continue
 
@@ -1387,12 +1473,14 @@ def fix_ids_main():
                     new_id = "flee-" + current_id[5:]
 
                 if new_id:
-                    fixes.append({
-                        "file": note_file,
-                        "old_id": current_id,
-                        "new_id": new_id,
-                        "type": "fleeting"
-                    })
+                    fixes.append(
+                        {
+                            "file": note_file,
+                            "old_id": current_id,
+                            "new_id": new_id,
+                            "type": "fleeting",
+                        }
+                    )
 
         if not fixes:
             console.print("[green]✓ All note IDs have correct prefixes![/green]")
@@ -1403,7 +1491,9 @@ def fix_ids_main():
 
         for fix in fixes[:20]:
             console.print(f"  {fix['file'].name}")
-            console.print(f"    [red]{fix['old_id']}[/red] → [green]{fix['new_id']}[/green]")
+            console.print(
+                f"    [red]{fix['old_id']}[/red] → [green]{fix['new_id']}[/green]"
+            )
 
         if len(fixes) > 20:
             console.print(f"  ... and {len(fixes) - 20} more")
@@ -1416,7 +1506,9 @@ def fix_ids_main():
             # Apply fixes
             for fix in fixes:
                 content = fix["file"].read_text()
-                new_content = content.replace(f"id: {fix['old_id']}", f"id: {fix['new_id']}", 1)
+                new_content = content.replace(
+                    f"id: {fix['old_id']}", f"id: {fix['new_id']}", 1
+                )
                 fix["file"].write_text(new_content)
 
             console.print(f"[green]✓ Fixed {len(fixes)} note IDs[/green]")
@@ -1452,10 +1544,7 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
         return 1
 
     # Build inventory of existing notes
-    existing_notes = {
-        note.stem: note
-        for note in permanent_dir.glob("*.md")
-    }
+    existing_notes = {note.stem: note for note in permanent_dir.glob("*.md")}
 
     console.print(f"[dim]Found {len(existing_notes)} existing notes[/dim]")
 
@@ -1466,7 +1555,7 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
     for note in permanent_dir.glob("*.md"):
         content = note.read_text()
         # Match [[link]] or [[link|alias]]
-        links = re.findall(r'\[\[([^\]|]+)(?:\|[^\]]+)?\]\]', content)
+        links = re.findall(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]", content)
         links_by_file[note] = links
         all_links.update(links)
 
@@ -1534,7 +1623,9 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
             best_idx = similarities.argmax()
             if similarities[best_idx] > 0.3:
                 replacements[broken] = existing_names[best_idx]
-                console.print(f"  [[{broken}]] → [[{existing_names[best_idx]}]] ({similarities[best_idx]*100:.0f}%)")
+                console.print(
+                    f"  [[{broken}]] → [[{existing_names[best_idx]}]] ({similarities[best_idx] * 100:.0f}%)"
+                )
             else:
                 unfixable.append(broken)
         except Exception:
@@ -1551,7 +1642,7 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
     # Confirm and apply fixes
     if not args.yes:
         confirm = input(f"\nApply {len(replacements)} fixes? [y/N]: ")
-        if confirm.lower() != 'y':
+        if confirm.lower() != "y":
             console.print("[yellow]Aborted.[/yellow]")
             return 0
 
@@ -1570,9 +1661,9 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
                 replacement = replacements[link]
                 # Replace [[broken]] or [[broken|alias]] with [[replacement]]
                 content = re.sub(
-                    rf'\[\[{re.escape(link)}(\|[^\]]+)?\]\]',
-                    f'[[{replacement}]]',
-                    content
+                    rf"\[\[{re.escape(link)}(\|[^\]]+)?\]\]",
+                    f"[[{replacement}]]",
+                    content,
                 )
                 needs_update = True
                 fixed_links += 1
@@ -1586,7 +1677,9 @@ def _handle_fix_audit_mode(args, vectors, embeddings, RELATIONSHIP_TYPES):
     console.print("=" * 70)
     console.print(f"[bold]Fixed {fixed_links} links in {fixed_files} files[/bold]")
     if unfixable:
-        console.print(f"[yellow]Unfixable links kept as placeholders: {len(unfixable)}[/yellow]")
+        console.print(
+            f"[yellow]Unfixable links kept as placeholders: {len(unfixable)}[/yellow]"
+        )
     console.print("=" * 70)
 
     return 0
@@ -1631,22 +1724,48 @@ def suggest_links_main():
     parser = argparse.ArgumentParser(description="Suggest Zettelkasten links")
     parser.add_argument("note_path", nargs="?", help="Path to note file")
     parser.add_argument("--all", "-a", action="store_true", help="Analyze all notes")
-    parser.add_argument("--threshold", "-t", type=int, default=65, help="Similarity threshold")
-    parser.add_argument("--top", "-n", type=int, default=5, help="Max suggestions per note")
-    parser.add_argument("--apply", action="store_true", help="Apply suggestions to notes")
+    parser.add_argument(
+        "--threshold", "-t", type=int, default=65, help="Similarity threshold"
+    )
+    parser.add_argument(
+        "--top", "-n", type=int, default=5, help="Max suggestions per note"
+    )
+    parser.add_argument(
+        "--apply", action="store_true", help="Apply suggestions to notes"
+    )
     parser.add_argument("--yes", "-y", action="store_true", help="Skip confirmation")
-    parser.add_argument("--bidirectional", "-b", action="store_true", default=True,
-                        help="Create backlinks in target notes (default: True)")
-    parser.add_argument("--no-bidirectional", dest="bidirectional", action="store_false",
-                        help="Disable bidirectional linking")
-    parser.add_argument("--no-validate", action="store_true",
-                        help="Skip LLM validation (faster, uses heuristics only)")
-    parser.add_argument("--min-confidence", type=int, default=70,
-                        help="Minimum LLM confidence to accept link (0-100, default: 70)")
-    parser.add_argument("--fix", action="store_true",
-                        help="Repair broken links using semantic matching")
-    parser.add_argument("--audit", action="store_true",
-                        help="Show link health report without making changes")
+    parser.add_argument(
+        "--bidirectional",
+        "-b",
+        action="store_true",
+        default=True,
+        help="Create backlinks in target notes (default: True)",
+    )
+    parser.add_argument(
+        "--no-bidirectional",
+        dest="bidirectional",
+        action="store_false",
+        help="Disable bidirectional linking",
+    )
+    parser.add_argument(
+        "--no-validate",
+        action="store_true",
+        help="Skip LLM validation (faster, uses heuristics only)",
+    )
+    parser.add_argument(
+        "--min-confidence",
+        type=int,
+        default=70,
+        help="Minimum LLM confidence to accept link (0-100, default: 70)",
+    )
+    parser.add_argument(
+        "--fix", action="store_true", help="Repair broken links using semantic matching"
+    )
+    parser.add_argument(
+        "--audit",
+        action="store_true",
+        help="Show link health report without making changes",
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -1665,11 +1784,11 @@ def suggest_links_main():
 
     # Inverse relationships for bidirectional linking
     INVERSE_RELATIONSHIPS = {
-        "SOLVES": "SOLVES",           # Symmetric - both solve each other's context
-        "ENABLES": "SEQUENCE",        # If A enables B, B follows A
-        "ELABORATES": "ABSTRACTS",    # If A elaborates B, B abstracts A
-        "CONTRADICTS": "CONTRADICTS", # Symmetric
-        "SUPPORTS": "APPLIES",        # If A supports B, B applies A
+        "SOLVES": "SOLVES",  # Symmetric - both solve each other's context
+        "ENABLES": "SEQUENCE",  # If A enables B, B follows A
+        "ELABORATES": "ABSTRACTS",  # If A elaborates B, B abstracts A
+        "CONTRADICTS": "CONTRADICTS",  # Symmetric
+        "SUPPORTS": "APPLIES",  # If A supports B, B applies A
         "APPLIES": "SUPPORTS",
         "ABSTRACTS": "ELABORATES",
         "SEQUENCE": "ENABLES",
@@ -1688,10 +1807,13 @@ def suggest_links_main():
         if not args.no_validate:
             try:
                 from .validator import LinkValidator
+
                 validator = LinkValidator(min_confidence=args.min_confidence / 100.0)
                 console.print("[dim]LLM validation enabled[/dim]")
             except ImportError:
-                console.print("[yellow]Warning: validator module not found, using heuristics only[/yellow]")
+                console.print(
+                    "[yellow]Warning: validator module not found, using heuristics only[/yellow]"
+                )
 
         # Collect notes to analyze
         notes_to_analyze = []
@@ -1701,7 +1823,9 @@ def suggest_links_main():
         elif args.all:
             permanent_dir = VAULT / "knowledge-base" / "permanent"
             if permanent_dir.exists():
-                notes_to_analyze = list(permanent_dir.glob("*.md"))  # All permanent notes
+                notes_to_analyze = list(
+                    permanent_dir.glob("*.md")
+                )  # All permanent notes
         else:
             console.print("[yellow]Specify a note path or use --all[/yellow]")
             return 1
@@ -1720,11 +1844,11 @@ def suggest_links_main():
             content = note_path.read_text()
 
             # Extract title
-            title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+            title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
             title = title_match.group(1) if title_match else note_path.stem
 
             # Extract existing links
-            existing_links = set(re.findall(r'\[\[([^\]|]+)', content))
+            existing_links = set(re.findall(r"\[\[([^\]|]+)", content))
 
             # Get note embedding
             note_text = f"{title}\n\n{content[:1500]}"
@@ -1747,7 +1871,10 @@ def suggest_links_main():
 
                 # Skip already linked
                 candidate_stem = Path(candidate_path).stem if candidate_path else key
-                if candidate_stem in existing_links or candidate_title in existing_links:
+                if (
+                    candidate_stem in existing_links
+                    or candidate_title in existing_links
+                ):
                     continue
 
                 # Check similarity threshold
@@ -1759,7 +1886,7 @@ def suggest_links_main():
                 # Determine relationship type based on knowledge types
                 source_type = "pattern"  # Default
                 if "knowledge_type:" in content:
-                    kt_match = re.search(r'knowledge_type:\s*(\w+)', content)
+                    kt_match = re.search(r"knowledge_type:\s*(\w+)", content)
                     if kt_match:
                         source_type = kt_match.group(1)
 
@@ -1796,17 +1923,23 @@ def suggest_links_main():
                     llm_confidence = validation.confidence
                     validated = True
 
-                suggestions.append({
-                    "from_title": title,
-                    "from_path": str(note_path),
-                    "to_title": candidate_title,
-                    "to_path": candidate_path,
-                    "similarity": similarity * 100,
-                    "relationship": relationship,
-                    "relationship_desc": RELATIONSHIP_TYPES.get(relationship, "relates to"),
-                    "validated": validated,
-                    "confidence": llm_confidence * 100 if validated else similarity * 100,
-                })
+                suggestions.append(
+                    {
+                        "from_title": title,
+                        "from_path": str(note_path),
+                        "to_title": candidate_title,
+                        "to_path": candidate_path,
+                        "similarity": similarity * 100,
+                        "relationship": relationship,
+                        "relationship_desc": RELATIONSHIP_TYPES.get(
+                            relationship, "relates to"
+                        ),
+                        "validated": validated,
+                        "confidence": llm_confidence * 100
+                        if validated
+                        else similarity * 100,
+                    }
+                )
 
                 if len(suggestions) >= args.top:
                     break
@@ -1824,7 +1957,9 @@ def suggest_links_main():
         console.print()
 
         if not all_suggestions:
-            console.print("[green]✓ No new link suggestions - notes are well-connected![/green]")
+            console.print(
+                "[green]✓ No new link suggestions - notes are well-connected![/green]"
+            )
         else:
             # Group by source note
             by_source = {}
@@ -1843,7 +1978,9 @@ def suggest_links_main():
                     conf = s.get("confidence", s["similarity"])
                     validated = s.get("validated", False)
                     status = "[green]✓[/green]" if validated else ""
-                    console.print(f"  → [cyan]{rel}[/cyan] [[{target}]] ({conf:.0f}%) {status}")
+                    console.print(
+                        f"  → [cyan]{rel}[/cyan] [[{target}]] ({conf:.0f}%) {status}"
+                    )
                     console.print(f"    [dim]This note {desc} '{target}'[/dim]")
                 console.print()
 
@@ -1857,8 +1994,10 @@ def suggest_links_main():
         # Apply mode - actually add links to notes
         if args.apply:
             if not args.yes:
-                confirm = input(f"\nApply {len(all_suggestions)} links to notes? [y/N]: ")
-                if confirm.lower() != 'y':
+                confirm = input(
+                    f"\nApply {len(all_suggestions)} links to notes? [y/N]: "
+                )
+                if confirm.lower() != "y":
                     console.print("[yellow]Aborted.[/yellow]")
                     return 0
 
@@ -1888,7 +2027,9 @@ def suggest_links_main():
                     # Build links section
                     links_to_add = []
                     for s in suggestions:
-                        target_stem = Path(s["to_path"]).stem if s["to_path"] else s["to_title"]
+                        target_stem = (
+                            Path(s["to_path"]).stem if s["to_path"] else s["to_title"]
+                        )
                         rel = s["relationship"]
                         desc = s["relationship_desc"]
                         target_display = s["to_title"][:50]
@@ -1900,7 +2041,7 @@ def suggest_links_main():
                     if "## Related" in content:
                         # Append to existing section
                         # Find the section and add after it
-                        lines = content.split('\n')
+                        lines = content.split("\n")
                         new_lines = []
                         in_related = False
                         added = False
@@ -1932,15 +2073,21 @@ def suggest_links_main():
                                 new_lines.append(link)
                             added = True
 
-                        content = '\n'.join(new_lines)
+                        content = "\n".join(new_lines)
                     else:
                         # Add new ## Related section before ## Hub if exists, else at end
-                        related_section = "\n## Related\n\n" + "\n".join(links_to_add) + "\n"
+                        related_section = (
+                            "\n## Related\n\n" + "\n".join(links_to_add) + "\n"
+                        )
 
                         if "## Hub" in content:
-                            content = content.replace("## Hub", related_section + "\n## Hub")
+                            content = content.replace(
+                                "## Hub", related_section + "\n## Hub"
+                            )
                         elif "## See Also" in content:
-                            content = content.replace("## See Also", related_section + "\n## See Also")
+                            content = content.replace(
+                                "## See Also", related_section + "\n## See Also"
+                            )
                         else:
                             content = content.rstrip() + "\n" + related_section
 
@@ -1982,11 +2129,13 @@ def suggest_links_main():
                             source_title = bl["from_title"][:50]
                             fwd_rel = bl["relationship"]
                             inv_rel = INVERSE_RELATIONSHIPS.get(fwd_rel, fwd_rel)
-                            backlink_lines.append(f"- {inv_rel}: [[{source_stem}|{source_title}]]")
+                            backlink_lines.append(
+                                f"- {inv_rel}: [[{source_stem}|{source_title}]]"
+                            )
 
                         # Add backlinks using same logic as forward links
                         if "## Related" in target_content:
-                            lines = target_content.split('\n')
+                            lines = target_content.split("\n")
                             new_lines = []
                             in_related = False
                             added = False
@@ -2012,25 +2161,37 @@ def suggest_links_main():
                                     new_lines.append(bl_line)
                                 added = True
 
-                            target_content = '\n'.join(new_lines)
+                            target_content = "\n".join(new_lines)
                         else:
-                            related_section = "\n## Related\n\n" + "\n".join(backlink_lines) + "\n"
+                            related_section = (
+                                "\n## Related\n\n" + "\n".join(backlink_lines) + "\n"
+                            )
                             if "## Hub" in target_content:
-                                target_content = target_content.replace("## Hub", related_section + "\n## Hub")
+                                target_content = target_content.replace(
+                                    "## Hub", related_section + "\n## Hub"
+                                )
                             else:
-                                target_content = target_content.rstrip() + "\n" + related_section
+                                target_content = (
+                                    target_content.rstrip() + "\n" + related_section
+                                )
 
                         target_note.write_text(target_content)
                         backlinks_applied += len(backlinks)
-                        console.print(f"  ← {target_note.stem}: +{len(backlinks)} backlinks")
+                        console.print(
+                            f"  ← {target_note.stem}: +{len(backlinks)} backlinks"
+                        )
 
                     except Exception as e:
-                        console.print(f"[red]Error creating backlinks in {target_path}: {e}[/red]")
+                        console.print(
+                            f"[red]Error creating backlinks in {target_path}: {e}[/red]"
+                        )
                         errors += 1
 
             console.print()
             console.print("=" * 70)
-            console.print(f"[bold]Applied {applied} links to {len(by_source_path)} notes[/bold]")
+            console.print(
+                f"[bold]Applied {applied} links to {len(by_source_path)} notes[/bold]"
+            )
             if args.bidirectional:
                 console.print(f"[bold]Created {backlinks_applied} backlinks[/bold]")
             if errors:
@@ -2038,16 +2199,23 @@ def suggest_links_main():
             console.print("=" * 70)
         else:
             console.print()
-            console.print("[dim]Zettelkasten principle: Links should connect ideas meaningfully,[/dim]")
-            console.print("[dim]not just because topics are similar. Review suggestions carefully.[/dim]")
+            console.print(
+                "[dim]Zettelkasten principle: Links should connect ideas meaningfully,[/dim]"
+            )
+            console.print(
+                "[dim]not just because topics are similar. Review suggestions carefully.[/dim]"
+            )
             console.print()
-            console.print("[cyan]Run with --apply to add these links to your notes[/cyan]")
+            console.print(
+                "[cyan]Run with --apply to add these links to your notes[/cyan]"
+            )
 
         return 0
 
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -2080,14 +2248,28 @@ def hub_assign_main():
     from .embeddings import BedrockEmbeddings
 
     parser = argparse.ArgumentParser(description="Bulk assign notes to hubs")
-    parser.add_argument("--threshold", "-t", type=int, default=50,
-                        help="Minimum similarity to assign (0-100, default: 50)")
-    parser.add_argument("--dry-run", "-n", action="store_true",
-                        help="Show what would be changed without modifying files")
-    parser.add_argument("--yes", "-y", action="store_true",
-                        help="Skip confirmation prompt")
-    parser.add_argument("--update-vectors", "-u", action="store_true",
-                        help="Also update S3 Vectors metadata")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=50,
+        help="Minimum similarity to assign (0-100, default: 50)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "-n",
+        action="store_true",
+        help="Show what would be changed without modifying files",
+    )
+    parser.add_argument(
+        "--yes", "-y", action="store_true", help="Skip confirmation prompt"
+    )
+    parser.add_argument(
+        "--update-vectors",
+        "-u",
+        action="store_true",
+        help="Also update S3 Vectors metadata",
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -2111,19 +2293,23 @@ def hub_assign_main():
                 content = hub_file.read_text()
 
                 # Extract hub title from markdown
-                title_match = __import__('re').search(r'^#\s+(.+)$', content, __import__('re').MULTILINE)
+                title_match = __import__("re").search(
+                    r"^#\s+(.+)$", content, __import__("re").MULTILINE
+                )
                 hub_title = title_match.group(1) if title_match else hub_name
 
                 hub_emb = embeddings.embed(f"{hub_name}\n\n{content[:1000]}")
                 hub_data[hub_name] = {
                     "embedding": hub_emb,
                     "path": str(hub_file),
-                    "title": hub_title
+                    "title": hub_title,
                 }
 
         if not hub_data:
             console.print("[red]No hubs found![/red]")
-            console.print("Create hubs first using /zadd or manually in knowledge-base/hubs/")
+            console.print(
+                "Create hubs first using /zadd or manually in knowledge-base/hubs/"
+            )
             return 1
 
         console.print(f"  Found {len(hub_data)} hubs")
@@ -2166,7 +2352,7 @@ def hub_assign_main():
                         if in_hub_section and "[[" in line and "]]" in line:
                             has_hub = True
                             break
-                except:
+                except Exception:
                     pass
 
             if has_hub:
@@ -2178,24 +2364,30 @@ def hub_assign_main():
                 for hub_name, hub_info in hub_data.items():
                     hub_emb = np.array(hub_info["embedding"])
                     vec_arr = np.array(vec_data)
-                    sim = np.dot(vec_arr, hub_emb) / (np.linalg.norm(vec_arr) * np.linalg.norm(hub_emb))
+                    sim = np.dot(vec_arr, hub_emb) / (
+                        np.linalg.norm(vec_arr) * np.linalg.norm(hub_emb)
+                    )
                     if sim > best_sim:
                         best_sim = sim
                         best_hub = hub_name
 
                 if best_hub and best_sim >= threshold:
-                    unassigned_notes.append({
-                        "key": key,
-                        "title": meta.get("title", key),
-                        "path": path,
-                        "best_hub": best_hub,
-                        "hub_title": hub_data[best_hub]["title"],
-                        "similarity": best_sim * 100,
-                        "embedding": vec_data
-                    })
+                    unassigned_notes.append(
+                        {
+                            "key": key,
+                            "title": meta.get("title", key),
+                            "path": path,
+                            "best_hub": best_hub,
+                            "hub_title": hub_data[best_hub]["title"],
+                            "similarity": best_sim * 100,
+                            "embedding": vec_data,
+                        }
+                    )
 
         console.print(f"  Already assigned: {assigned_count}")
-        console.print(f"  Unassigned (above {args.threshold}% threshold): {len(unassigned_notes)}")
+        console.print(
+            f"  Unassigned (above {args.threshold}% threshold): {len(unassigned_notes)}"
+        )
         console.print()
 
         if not unassigned_notes:
@@ -2289,7 +2481,9 @@ def hub_assign_main():
                             found_hub_section = True
                             # Add blank line and hub link
                             new_lines.append("")
-                            new_lines.append(f"[[hubs/{hub_name}|{hub_data[hub_name]['title']}]]")
+                            new_lines.append(
+                                f"[[hubs/{hub_name}|{hub_data[hub_name]['title']}]]"
+                            )
 
                     content = "\n".join(new_lines)
                 else:
@@ -2328,7 +2522,11 @@ def hub_assign_main():
 
                     # Add new hub to hub_ids
                     hub_ids_list = [h for h in current_hub_ids.split(",") if h]
-                    hub_id = f"hub-{note['best_hub']}" if not note['best_hub'].startswith("hub-") else note['best_hub']
+                    hub_id = (
+                        f"hub-{note['best_hub']}"
+                        if not note["best_hub"].startswith("hub-")
+                        else note["best_hub"]
+                    )
 
                     if hub_id not in hub_ids_list:
                         hub_ids_list.append(hub_id)
@@ -2339,14 +2537,18 @@ def hub_assign_main():
                         knowledge_type=current_meta.get("knowledge_type", "fact"),
                         status=current_meta.get("status", "approved"),
                         title=current_meta.get("title", ""),
-                        tags=current_meta.get("tags", "").split(",") if current_meta.get("tags") else [],
+                        tags=current_meta.get("tags", "").split(",")
+                        if current_meta.get("tags")
+                        else [],
                         obsidian_path=current_meta.get("obsidian_path", ""),
                         content_preview=current_meta.get("content_preview", ""),
                         scope=current_meta.get("scope", "global"),
                         project=current_meta.get("project", ""),
                         hub_ids=hub_ids_list,
                         link_count=int(current_meta.get("link_count", 0)),
-                        linked_ids=current_meta.get("linked_ids", "").split(",") if current_meta.get("linked_ids") else [],
+                        linked_ids=current_meta.get("linked_ids", "").split(",")
+                        if current_meta.get("linked_ids")
+                        else [],
                         created=current_meta.get("created"),
                         promoted=current_meta.get("promoted"),
                     )
@@ -2354,7 +2556,7 @@ def hub_assign_main():
                     if vectors.update_metadata(note["key"], updated_meta):
                         vector_updates += 1
 
-                except Exception as e:
+                except Exception:
                     pass  # Silent fail for vector updates
 
             console.print(f"  Updated {vector_updates} vectors")
@@ -2387,6 +2589,7 @@ def hub_assign_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -2417,19 +2620,36 @@ def link_loop_main():
     import time
 
     parser = argparse.ArgumentParser(description="Iterative link building loop")
-    parser.add_argument("--threshold", "-t", type=int, default=70,
-                        help="Minimum similarity for links (0-100, default: 70)")
-    parser.add_argument("--top", "-n", type=int, default=3,
-                        help="Max links per note per iteration (default: 3)")
-    parser.add_argument("--max-iterations", "-m", type=int, default=10,
-                        help="Maximum iterations before stopping (default: 10)")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=70,
+        help="Minimum similarity for links (0-100, default: 70)",
+    )
+    parser.add_argument(
+        "--top",
+        "-n",
+        type=int,
+        default=3,
+        help="Max links per note per iteration (default: 3)",
+    )
+    parser.add_argument(
+        "--max-iterations",
+        "-m",
+        type=int,
+        default=10,
+        help="Maximum iterations before stopping (default: 10)",
+    )
 
     args = parser.parse_args()
 
     console.print("=" * 70)
     console.print("[bold]ZETTELKASTEN LINK LOOP[/bold]")
     console.print("=" * 70)
-    console.print(f"Threshold: {args.threshold}%  |  Top: {args.top} links/note  |  Max iterations: {args.max_iterations}")
+    console.print(
+        f"Threshold: {args.threshold}%  |  Top: {args.top} links/note  |  Max iterations: {args.max_iterations}"
+    )
     console.print()
 
     iteration = 1
@@ -2445,24 +2665,15 @@ def link_loop_main():
 
         threshold = args.threshold / 100.0
 
-        RELATIONSHIP_TYPES = {
-            "SOLVES": "addresses problem in",
-            "ENABLES": "is prerequisite for",
-            "ELABORATES": "expands on",
-            "CONTRADICTS": "challenges or limits",
-            "SUPPORTS": "provides evidence for",
-            "APPLIES": "applies principle from",
-            "ABSTRACTS": "generalizes from",
-            "SEQUENCE": "logically follows",
-        }
-
         try:
             vectors = S3VectorsStore(BUCKET, INDEX)
             embeddings = BedrockEmbeddings()
 
             permanent_dir = VAULT / "knowledge-base" / "permanent"
             if not permanent_dir.exists():
-                console.print(f"[red]Permanent notes directory not found: {permanent_dir}[/red]")
+                console.print(
+                    f"[red]Permanent notes directory not found: {permanent_dir}[/red]"
+                )
                 return 1
 
             notes_to_analyze = list(permanent_dir.glob("*.md"))
@@ -2475,13 +2686,15 @@ def link_loop_main():
                     continue
 
                 content = note_path.read_text()
-                title_match = re.search(r'^#\s+(.+)$', content, re.MULTILINE)
+                title_match = re.search(r"^#\s+(.+)$", content, re.MULTILINE)
                 title = title_match.group(1) if title_match else note_path.stem
-                existing_links = set(re.findall(r'\[\[([^\]|]+)', content))
+                existing_links = set(re.findall(r"\[\[([^\]|]+)", content))
 
                 note_text = f"{title}\n\n{content[:1500]}"
                 note_emb = embeddings.embed(note_text)
-                results = vectors.query(note_emb, top_k=args.top + len(existing_links) + 1)
+                results = vectors.query(
+                    note_emb, top_k=args.top + len(existing_links) + 1
+                )
 
                 suggestions = []
                 for r in results:
@@ -2493,8 +2706,13 @@ def link_loop_main():
                     if candidate_path == str(note_path):
                         continue
 
-                    candidate_stem = Path(candidate_path).stem if candidate_path else key
-                    if candidate_stem in existing_links or candidate_title in existing_links:
+                    candidate_stem = (
+                        Path(candidate_path).stem if candidate_path else key
+                    )
+                    if (
+                        candidate_stem in existing_links
+                        or candidate_title in existing_links
+                    ):
                         continue
 
                     dist = r.get("distance", 2)
@@ -2504,7 +2722,7 @@ def link_loop_main():
 
                     source_type = "pattern"
                     if "knowledge_type:" in content:
-                        kt_match = re.search(r'knowledge_type:\s*(\w+)', content)
+                        kt_match = re.search(r"knowledge_type:\s*(\w+)", content)
                         if kt_match:
                             source_type = kt_match.group(1)
 
@@ -2517,19 +2735,23 @@ def link_loop_main():
                         relationship = "SUPPORTS"
                     elif "problem" in title.lower() or "anti-pattern" in title.lower():
                         relationship = "SOLVES"
-                    elif "prerequisite" in content.lower() or "before" in content.lower():
+                    elif (
+                        "prerequisite" in content.lower() or "before" in content.lower()
+                    ):
                         relationship = "ENABLES"
                     elif similarity > 0.85:
                         relationship = "ELABORATES"
 
-                    suggestions.append({
-                        "from_title": title,
-                        "from_path": str(note_path),
-                        "to_title": candidate_title,
-                        "to_path": candidate_path,
-                        "similarity": similarity * 100,
-                        "relationship": relationship,
-                    })
+                    suggestions.append(
+                        {
+                            "from_title": title,
+                            "from_path": str(note_path),
+                            "to_title": candidate_title,
+                            "to_path": candidate_path,
+                            "similarity": similarity * 100,
+                            "relationship": relationship,
+                        }
+                    )
 
                     if len(suggestions) >= args.top:
                         break
@@ -2539,7 +2761,9 @@ def link_loop_main():
             console.print(f"Total suggestions: {len(all_suggestions)}")
 
             if not all_suggestions:
-                console.print("[green]✓ Convergence reached - no new links to add![/green]")
+                console.print(
+                    "[green]✓ Convergence reached - no new links to add![/green]"
+                )
                 break
 
             # Apply links
@@ -2561,14 +2785,16 @@ def link_loop_main():
 
                     links_to_add = []
                     for s in suggestions:
-                        target_stem = Path(s["to_path"]).stem if s["to_path"] else s["to_title"]
+                        target_stem = (
+                            Path(s["to_path"]).stem if s["to_path"] else s["to_title"]
+                        )
                         rel = s["relationship"]
                         target_display = s["to_title"][:50]
                         link_line = f"- {rel}: [[{target_stem}|{target_display}]]"
                         links_to_add.append(link_line)
 
                     if "## Related" in content:
-                        lines = content.split('\n')
+                        lines = content.split("\n")
                         new_lines = []
                         in_related = False
                         added = False
@@ -2593,13 +2819,19 @@ def link_loop_main():
                             for link in links_to_add:
                                 new_lines.append(link)
 
-                        content = '\n'.join(new_lines)
+                        content = "\n".join(new_lines)
                     else:
-                        related_section = "\n## Related\n\n" + "\n".join(links_to_add) + "\n"
+                        related_section = (
+                            "\n## Related\n\n" + "\n".join(links_to_add) + "\n"
+                        )
                         if "## Hub" in content:
-                            content = content.replace("## Hub", related_section + "\n## Hub")
+                            content = content.replace(
+                                "## Hub", related_section + "\n## Hub"
+                            )
                         elif "## See Also" in content:
-                            content = content.replace("## See Also", related_section + "\n## See Also")
+                            content = content.replace(
+                                "## See Also", related_section + "\n## See Also"
+                            )
                         else:
                             content = content.rstrip() + "\n" + related_section
 
@@ -2609,7 +2841,9 @@ def link_loop_main():
                 except Exception:
                     pass
 
-            console.print(f"[green]Applied {applied} links to {len(by_source_path)} notes[/green]")
+            console.print(
+                f"[green]Applied {applied} links to {len(by_source_path)} notes[/green]"
+            )
             total_added += applied
             iteration += 1
 
@@ -2619,6 +2853,7 @@ def link_loop_main():
         except Exception as e:
             console.print(f"[red]Error in iteration {iteration}: {e}[/red]")
             import traceback
+
             traceback.print_exc()
             return 1
 
@@ -2664,15 +2899,21 @@ def link_ranked_main():
     from collections import defaultdict
 
     from .s3vectors import S3VectorsStore
-    from .embeddings import BedrockEmbeddings
 
     parser = argparse.ArgumentParser(description="Similarity-ranked link building")
-    parser.add_argument("--threshold", "-t", type=int, default=70,
-                        help="Minimum similarity (0-100, default: 70)")
-    parser.add_argument("--max-links", "-m", type=int, default=5,
-                        help="Max links per note (default: 5)")
-    parser.add_argument("--dry-run", "-n", action="store_true",
-                        help="Preview without applying")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=70,
+        help="Minimum similarity (0-100, default: 70)",
+    )
+    parser.add_argument(
+        "--max-links", "-m", type=int, default=5, help="Max links per note (default: 5)"
+    )
+    parser.add_argument(
+        "--dry-run", "-n", action="store_true", help="Preview without applying"
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -2682,14 +2923,6 @@ def link_ranked_main():
     console.print("=" * 70)
     console.print(f"Threshold: {args.threshold}%  |  Max links/note: {args.max_links}")
     console.print()
-
-    RELATIONSHIP_TYPES = {
-        "SOLVES": "addresses problem in",
-        "ENABLES": "is prerequisite for",
-        "ELABORATES": "expands on",
-        "SUPPORTS": "provides evidence for",
-        "APPLIES": "applies principle from",
-    }
 
     try:
         vectors = S3VectorsStore(BUCKET, INDEX)
@@ -2732,7 +2965,7 @@ def link_ranked_main():
                 note_path = Path(path)
                 if note_path.exists():
                     content = note_path.read_text()
-                    links = re.findall(r'\[\[([^\]|]+)', content)
+                    links = re.findall(r"\[\[([^\]|]+)", content)
                     existing_links[path] = set(links)
             except Exception:
                 pass
@@ -2763,15 +2996,17 @@ def link_ranked_main():
                 similarity = np.dot(emb_i, emb_j) / (norm_i * norm_j)
 
                 if similarity >= threshold:
-                    pairs.append({
-                        "key_a": keys[i],
-                        "key_b": keys[j],
-                        "similarity": similarity,
-                        "path_a": key_to_path[keys[i]],
-                        "path_b": key_to_path[keys[j]],
-                        "title_a": key_to_meta[keys[i]].get("title", keys[i]),
-                        "title_b": key_to_meta[keys[j]].get("title", keys[j]),
-                    })
+                    pairs.append(
+                        {
+                            "key_a": keys[i],
+                            "key_b": keys[j],
+                            "similarity": similarity,
+                            "path_a": key_to_path[keys[i]],
+                            "path_b": key_to_path[keys[j]],
+                            "title_a": key_to_meta[keys[i]].get("title", keys[i]),
+                            "title_b": key_to_meta[keys[j]].get("title", keys[j]),
+                        }
+                    )
 
         console.print(f"  Pairs above {args.threshold}%: {len(pairs)}")
 
@@ -2780,10 +3015,14 @@ def link_ranked_main():
         pairs.sort(key=lambda x: x["similarity"], reverse=True)
 
         # Step 5: Create links respecting max per note
-        console.print("[bold]Step 5:[/bold] Creating links (highest similarity first)...")
+        console.print(
+            "[bold]Step 5:[/bold] Creating links (highest similarity first)..."
+        )
 
         link_count = defaultdict(int)  # path -> number of new links added
-        links_to_add = defaultdict(list)  # path -> [(target_stem, target_title, similarity)]
+        links_to_add = defaultdict(
+            list
+        )  # path -> [(target_stem, target_title, similarity)]
 
         for pair in pairs:
             path_a = pair["path_a"]
@@ -2816,7 +3055,9 @@ def link_ranked_main():
         console.print("[bold]Top 10 highest similarity pairs:[/bold]")
         for pair in pairs[:10]:
             sim = pair["similarity"] * 100
-            console.print(f"  [{sim:.1f}%] {pair['title_a'][:30]} ↔ {pair['title_b'][:30]}")
+            console.print(
+                f"  [{sim:.1f}%] {pair['title_a'][:30]} ↔ {pair['title_b'][:30]}"
+            )
 
         if args.dry_run:
             console.print()
@@ -2850,7 +3091,7 @@ def link_ranked_main():
                 # Add to ## Related section
                 if "## Related" in content:
                     # Find the section and append
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     new_lines = []
                     in_related = False
                     added = False
@@ -2869,7 +3110,14 @@ def link_ranked_main():
                                 new_lines.append(line)
                                 added = True
                                 in_related = False
-                            elif line.strip() == "" and i + 1 < len(lines) and (lines[i+1].startswith("## ") or lines[i+1].startswith("# ")):
+                            elif (
+                                line.strip() == ""
+                                and i + 1 < len(lines)
+                                and (
+                                    lines[i + 1].startswith("## ")
+                                    or lines[i + 1].startswith("# ")
+                                )
+                            ):
                                 # Empty line before next section
                                 for ll in link_lines:
                                     new_lines.append(ll)
@@ -2881,19 +3129,21 @@ def link_ranked_main():
                         for ll in link_lines:
                             new_lines.append(ll)
 
-                    content = '\n'.join(new_lines)
+                    content = "\n".join(new_lines)
                 else:
                     # Create ## Related section
                     related_section = "\n## Related\n\n" + "\n".join(link_lines) + "\n"
                     if "## Hub" in content:
-                        content = content.replace("## Hub", related_section + "\n## Hub")
+                        content = content.replace(
+                            "## Hub", related_section + "\n## Hub"
+                        )
                     else:
                         content = content.rstrip() + "\n" + related_section
 
                 note_path.write_text(content)
                 applied += len(links)
 
-            except Exception as e:
+            except Exception:
                 errors += 1
 
         console.print()
@@ -2901,7 +3151,9 @@ def link_ranked_main():
         console.print("[bold]COMPLETE[/bold]")
         console.print("=" * 70)
         console.print(f"Links applied: {applied}")
-        console.print(f"Notes modified: {len([p for p, l in links_to_add.items() if l])}")
+        console.print(
+            f"Notes modified: {len([p for p, links in links_to_add.items() if links])}"
+        )
         if errors:
             console.print(f"[yellow]Errors: {errors}[/yellow]")
         console.print()
@@ -2912,6 +3164,7 @@ def link_ranked_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -2936,10 +3189,16 @@ def merge_duplicates_main():
     from .s3vectors import S3VectorsStore
 
     parser = argparse.ArgumentParser(description="Merge duplicate notes")
-    parser.add_argument("--threshold", "-t", type=int, default=90,
-                        help="Minimum similarity (0-100, default: 90)")
-    parser.add_argument("--dry-run", "-n", action="store_true",
-                        help="Preview without applying")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=90,
+        help="Minimum similarity (0-100, default: 90)",
+    )
+    parser.add_argument(
+        "--dry-run", "-n", action="store_true", help="Preview without applying"
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -2994,14 +3253,17 @@ def merge_duplicates_main():
                     continue
                 similarity = np.dot(emb_i, emb_j) / (norm_i * norm_j)
                 if similarity >= threshold:
-                    duplicates.append({
-                        "key_a": keys[i], "key_b": keys[j],
-                        "similarity": similarity,
-                        "path_a": key_to_path[keys[i]],
-                        "path_b": key_to_path[keys[j]],
-                        "title_a": key_to_meta[keys[i]].get("title", keys[i]),
-                        "title_b": key_to_meta[keys[j]].get("title", keys[j]),
-                    })
+                    duplicates.append(
+                        {
+                            "key_a": keys[i],
+                            "key_b": keys[j],
+                            "similarity": similarity,
+                            "path_a": key_to_path[keys[i]],
+                            "path_b": key_to_path[keys[j]],
+                            "title_a": key_to_meta[keys[i]].get("title", keys[i]),
+                            "title_b": key_to_meta[keys[j]].get("title", keys[j]),
+                        }
+                    )
 
         console.print(f"  Found {len(duplicates)} duplicate pairs")
 
@@ -3022,8 +3284,8 @@ def merge_duplicates_main():
                 score += 100
             try:
                 content = Path(path).read_text()
-                score += len(re.findall(r'\[\[', content))
-            except:
+                score += len(re.findall(r"\[\[", content))
+            except Exception:
                 pass
             return score
 
@@ -3040,10 +3302,13 @@ def merge_duplicates_main():
             else:
                 primary, secondary = path_b, path_a
 
-            merge_plan.append({
-                "primary": primary, "secondary": secondary,
-                "similarity": dup["similarity"],
-            })
+            merge_plan.append(
+                {
+                    "primary": primary,
+                    "secondary": secondary,
+                    "similarity": dup["similarity"],
+                }
+            )
             processed.add(secondary)
 
         console.print(f"  Merge plan: {len(merge_plan)} pairs")
@@ -3065,7 +3330,9 @@ def merge_duplicates_main():
         # Execute merges
         console.print("\n[bold]Step 4:[/bold] Executing merges...")
 
-        archive_dir = VAULT / "knowledge-base" / "permanent" / ".archive" / "merged-duplicates"
+        archive_dir = (
+            VAULT / "knowledge-base" / "permanent" / ".archive" / "merged-duplicates"
+        )
         archive_dir.mkdir(parents=True, exist_ok=True)
 
         merged, errors = 0, 0
@@ -3080,10 +3347,12 @@ def merge_duplicates_main():
                 primary_content = primary_path.read_text()
 
                 # Add merge reference
-                merge_note = f"\n\n## Merged From\n\n- [[{secondary_path.stem}]] (archived, {m['similarity']*100:.0f}% similar)\n"
+                merge_note = f"\n\n## Merged From\n\n- [[{secondary_path.stem}]] (archived, {m['similarity'] * 100:.0f}% similar)\n"
                 if "## Merged From" not in primary_content:
                     if "## Hub" in primary_content:
-                        primary_content = primary_content.replace("## Hub", merge_note + "## Hub")
+                        primary_content = primary_content.replace(
+                            "## Hub", merge_note + "## Hub"
+                        )
                     else:
                         primary_content = primary_content.rstrip() + merge_note
                     primary_path.write_text(primary_content)
@@ -3106,6 +3375,7 @@ def merge_duplicates_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -3125,10 +3395,16 @@ def prune_links_main():
     from .s3vectors import S3VectorsStore
 
     parser = argparse.ArgumentParser(description="Prune low-similarity links")
-    parser.add_argument("--threshold", "-t", type=int, default=80,
-                        help="Minimum similarity to keep link (0-100, default: 80)")
-    parser.add_argument("--dry-run", "-n", action="store_true",
-                        help="Preview without applying")
+    parser.add_argument(
+        "--threshold",
+        "-t",
+        type=int,
+        default=80,
+        help="Minimum similarity to keep link (0-100, default: 80)",
+    )
+    parser.add_argument(
+        "--dry-run", "-n", action="store_true", help="Preview without applying"
+    )
 
     args = parser.parse_args()
     threshold = args.threshold / 100.0
@@ -3198,12 +3474,14 @@ def prune_links_main():
                                 sim = np.dot(source_emb, target_emb) / (norm_s * norm_t)
 
                                 if sim < threshold:
-                                    to_remove.append({
-                                        "path": str(note_path),
-                                        "line": line.strip(),
-                                        "target": target_stem,
-                                        "similarity": sim,
-                                    })
+                                    to_remove.append(
+                                        {
+                                            "path": str(note_path),
+                                            "line": line.strip(),
+                                            "target": target_stem,
+                                            "similarity": sim,
+                                        }
+                                    )
 
         console.print(f"  Checked {total_checked} links")
         console.print(f"  Found {len(to_remove)} links below {args.threshold}%")
@@ -3270,7 +3548,7 @@ def prune_links_main():
 
         console.print()
         console.print("=" * 70)
-        console.print(f"[bold]COMPLETE[/bold]")
+        console.print("[bold]COMPLETE[/bold]")
         console.print(f"Links removed: {removed}")
         console.print(f"Files modified: {files_modified}")
         console.print("=" * 70)
@@ -3280,6 +3558,7 @@ def prune_links_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -3304,13 +3583,29 @@ def tag_consolidate_main():
     import re
     import yaml
 
-    parser = argparse.ArgumentParser(description="Consolidate tags across knowledge base")
-    parser.add_argument("--from", "-f", dest="from_tags", required=True,
-                        help="Comma-separated list of tags to replace")
-    parser.add_argument("--to", "-t", dest="to_tag", required=True,
-                        help="Target tag to consolidate into")
-    parser.add_argument("--dry-run", "-n", action="store_true",
-                        help="Preview changes without modifying files")
+    parser = argparse.ArgumentParser(
+        description="Consolidate tags across knowledge base"
+    )
+    parser.add_argument(
+        "--from",
+        "-f",
+        dest="from_tags",
+        required=True,
+        help="Comma-separated list of tags to replace",
+    )
+    parser.add_argument(
+        "--to",
+        "-t",
+        dest="to_tag",
+        required=True,
+        help="Target tag to consolidate into",
+    )
+    parser.add_argument(
+        "--dry-run",
+        "-n",
+        action="store_true",
+        help="Preview changes without modifying files",
+    )
 
     args = parser.parse_args()
 
@@ -3328,11 +3623,15 @@ def tag_consolidate_main():
             return 1
 
         if target_tag in source_tags:
-            console.print(f"[yellow]Warning: Target tag '{target_tag}' is in source tags list[/yellow]")
+            console.print(
+                f"[yellow]Warning: Target tag '{target_tag}' is in source tags list[/yellow]"
+            )
 
         # Display header
         source_display = ", ".join(source_tags)
-        console.print(f"[bold]Tag Consolidation:[/bold] {source_display} -> {target_tag}")
+        console.print(
+            f"[bold]Tag Consolidation:[/bold] {source_display} -> {target_tag}"
+        )
         console.print()
 
         # Scan directories
@@ -3395,18 +3694,24 @@ def tag_consolidate_main():
                             deduped_tags.append(tag)
 
                     # Store change info
-                    affected_files.append({
-                        "path": md_file,
-                        "relative_path": md_file.relative_to(VAULT / "knowledge-base"),
-                        "old_tags": old_tags,
-                        "new_tags": deduped_tags,
-                        "replaced_count": len(found_source_tags),
-                        "frontmatter": frontmatter,
-                        "body": body,
-                    })
+                    affected_files.append(
+                        {
+                            "path": md_file,
+                            "relative_path": md_file.relative_to(
+                                VAULT / "knowledge-base"
+                            ),
+                            "old_tags": old_tags,
+                            "new_tags": deduped_tags,
+                            "replaced_count": len(found_source_tags),
+                            "frontmatter": frontmatter,
+                            "body": body,
+                        }
+                    )
 
                 except Exception as e:
-                    console.print(f"[yellow]Warning: Could not process {md_file.name}: {e}[/yellow]")
+                    console.print(
+                        f"[yellow]Warning: Could not process {md_file.name}: {e}[/yellow]"
+                    )
                     continue
 
         # Report changes
@@ -3445,11 +3750,13 @@ def tag_consolidate_main():
                     file_info["frontmatter"],
                     default_flow_style=False,
                     sort_keys=False,
-                    allow_unicode=True
+                    allow_unicode=True,
                 )
 
                 # Reconstruct file content
-                new_content = f"---\n{new_frontmatter_str.strip()}\n---\n{file_info['body']}"
+                new_content = (
+                    f"---\n{new_frontmatter_str.strip()}\n---\n{file_info['body']}"
+                )
 
                 # Write back
                 file_info["path"].write_text(new_content)
@@ -3463,6 +3770,7 @@ def tag_consolidate_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -3489,8 +3797,13 @@ def tag_audit_main():
     import yaml
 
     parser = argparse.ArgumentParser(description="Generate tag audit report")
-    parser.add_argument("--output", "-o", type=str, default=None,
-                        help="Output file path (default: knowledge-base/.reports/tag-audit-{date}.md)")
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        default=None,
+        help="Output file path (default: knowledge-base/.reports/tag-audit-{date}.md)",
+    )
 
     args = parser.parse_args()
 
@@ -3533,7 +3846,10 @@ def tag_audit_main():
                         if tags:
                             notes_with_tags += 1
                             note_title = note_path.stem
-                            note_tags[str(note_path)] = {"title": note_title, "tags": tags}
+                            note_tags[str(note_path)] = {
+                                "title": note_title,
+                                "tags": tags,
+                            }
 
                             for tag in tags:
                                 tag_counts[tag] += 1
@@ -3547,26 +3863,35 @@ def tag_audit_main():
                         pass  # Skip notes with invalid frontmatter
 
         console.print(f"[bold]Step 1:[/bold] Scanned {total_notes} notes")
-        console.print(f"  Notes with tags: {notes_with_tags} ({notes_with_tags * 100 // total_notes if total_notes else 0}%)")
+        console.print(
+            f"  Notes with tags: {notes_with_tags} ({notes_with_tags * 100 // total_notes if total_notes else 0}%)"
+        )
         console.print(f"  Unique tags: {len(tag_counts)}")
         console.print()
 
         # Find orphan tags (used only once)
-        orphan_tags = [(tag, tag_notes[tag][0]) for tag, count in tag_counts.items() if count == 1]
+        orphan_tags = [
+            (tag, tag_notes[tag][0]) for tag, count in tag_counts.items() if count == 1
+        ]
         orphan_tags.sort(key=lambda x: x[0])
 
         # Find over-tagged notes (7+ tags)
-        over_tagged = [(info["title"], len(info["tags"]), info["tags"])
-                       for path, info in note_tags.items() if len(info["tags"]) >= 7]
+        over_tagged = [
+            (info["title"], len(info["tags"]), info["tags"])
+            for path, info in note_tags.items()
+            if len(info["tags"]) >= 7
+        ]
         over_tagged.sort(key=lambda x: x[1], reverse=True)
 
         # Sort tag frequency
         sorted_tags = sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)
 
         # Sort co-occurrence
-        sorted_cooccur = sorted(cooccurrence.items(), key=lambda x: x[1], reverse=True)[:50]
+        sorted_cooccur = sorted(cooccurrence.items(), key=lambda x: x[1], reverse=True)[
+            :50
+        ]
 
-        console.print(f"[bold]Step 2:[/bold] Analysis complete")
+        console.print("[bold]Step 2:[/bold] Analysis complete")
         console.print(f"  Orphan tags: {len(orphan_tags)}")
         console.print(f"  Over-tagged notes: {len(over_tagged)}")
         console.print()
@@ -3594,10 +3919,12 @@ def tag_audit_main():
             pct = count * 100 // notes_with_tags if notes_with_tags else 0
             report_lines.append(f"| `{tag}` | {count} | {pct}% |")
 
-        report_lines.extend([
-            "",
-            "## Orphan Tags (used only once)",
-        ])
+        report_lines.extend(
+            [
+                "",
+                "## Orphan Tags (used only once)",
+            ]
+        )
 
         if orphan_tags:
             for tag, note_title in orphan_tags:
@@ -3605,12 +3932,14 @@ def tag_audit_main():
         else:
             report_lines.append("*No orphan tags found*")
 
-        report_lines.extend([
-            "",
-            "## Over-Tagged Notes (7+ tags)",
-            "| Note | Tag Count | Tags |",
-            "|------|-----------|------|",
-        ])
+        report_lines.extend(
+            [
+                "",
+                "## Over-Tagged Notes (7+ tags)",
+                "| Note | Tag Count | Tags |",
+                "|------|-----------|------|",
+            ]
+        )
 
         if over_tagged:
             for title, count, tags in over_tagged:
@@ -3619,12 +3948,14 @@ def tag_audit_main():
         else:
             report_lines.append("| *None* | - | - |")
 
-        report_lines.extend([
-            "",
-            "## Co-occurrence Matrix (top pairs)",
-            "| Tag A | Tag B | Co-occurrences |",
-            "|-------|-------|----------------|",
-        ])
+        report_lines.extend(
+            [
+                "",
+                "## Co-occurrence Matrix (top pairs)",
+                "| Tag A | Tag B | Co-occurrences |",
+                "|-------|-------|----------------|",
+            ]
+        )
 
         if sorted_cooccur:
             for (tag1, tag2), count in sorted_cooccur:
@@ -3691,6 +4022,7 @@ def tag_audit_main():
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
         import traceback
+
         traceback.print_exc()
         return 1
 
