@@ -1,0 +1,3 @@
+# teaching-metrics-or-rules-o
+
+Learned from user correction: Teaching: - metrics or rules of thumb where...
