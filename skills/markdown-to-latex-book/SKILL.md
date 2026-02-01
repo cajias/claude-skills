@@ -1,15 +1,21 @@
 ---
 name: markdown-to-latex-book
-description: This skill should be used when the user asks to "convert markdown to LaTeX", "create a PDF book from markdown", "turn markdown files into a professional book", "generate LaTeX from markdown", or mentions creating professional PDF documentation from markdown sources.
+description: >-
+  This skill should be used when the user asks to "convert markdown to
+  LaTeX", "create a PDF book from markdown", "turn markdown files into a
+  professional book", "generate LaTeX from markdown", or mentions creating
+  professional PDF documentation from markdown sources.
 ---
 
 # Markdown to LaTeX Book Conversion
 
-Convert collections of markdown files into professionally typeset LaTeX books with proper typography, consistent styling, and publication-ready output.
+Convert collections of markdown files into professionally typeset LaTeX books with proper
+typography, consistent styling, and publication-ready output.
 
 ## Overview
 
-This skill transforms markdown documentation (such as Obsidian vaults, documentation folders, or playbooks) into professional LaTeX books. The process involves:
+This skill transforms markdown documentation (such as Obsidian vaults, documentation folders,
+or playbooks) into professional LaTeX books. The process involves:
 
 1. Analyzing markdown content structure
 2. Designing a logical book hierarchy
@@ -30,7 +36,7 @@ This skill transforms markdown documentation (such as Obsidian vaults, documenta
 
 Before writing any LaTeX, explore the markdown source:
 
-```
+```text
 Use the Explore agent to analyze:
 - All markdown files and their purposes
 - Logical structure/hierarchy of content
@@ -40,6 +46,7 @@ Use the Explore agent to analyze:
 ```
 
 Key questions to answer:
+
 - How many files? What are their sizes?
 - What's the natural grouping (parts/chapters)?
 - Are there Mermaid diagrams that need conversion?
@@ -49,7 +56,7 @@ Key questions to answer:
 
 Map markdown files to book structure:
 
-```
+```text
 Front Matter
 ├── Half-title page
 ├── Title page
@@ -74,7 +81,7 @@ Back Matter
 
 Create modular file structure:
 
-```
+```text
 project/
 ├── main.tex          # Master document
 └── chapters/
@@ -123,33 +130,33 @@ project/
 
 Apply these professional typography standards:
 
-| Element | Recommendation |
-|---------|----------------|
-| Body font | Palatino, Charter, or Source Serif Pro |
-| Heading font | Helvetica, Source Sans, or matching sans |
-| Code font | Inconsolata, Fira Code, or JetBrains Mono |
-| Float placement | `[htbp]` not `[h]` alone |
-| Page bottoms | `\raggedbottom` to prevent stretching |
-| Table rows | `\arraystretch{1.2}` minimum |
-| Margins | Account for binding gutter |
+| Element         | Recommendation                            |
+| --------------- | ----------------------------------------- |
+| Body font       | Palatino, Charter, or Source Serif Pro    |
+| Heading font    | Helvetica, Source Sans, or matching sans  |
+| Code font       | Inconsolata, Fira Code, or JetBrains Mono |
+| Float placement | `[htbp]` not `[h]` alone                  |
+| Page bottoms    | `\raggedbottom` to prevent stretching     |
+| Table rows      | `\arraystretch{1.2}` minimum              |
+| Margins         | Account for binding gutter                |
 
 ### Phase 5: Content Conversion
 
 #### Markdown Elements to LaTeX
 
-| Markdown | LaTeX |
-|----------|-------|
-| `# Heading` | `\chapter{}` or `\section{}` |
-| `**bold**` | `\textbf{}` |
-| `*italic*` | `\textit{}` |
-| `` `code` `` | `\texttt{}` |
-| `[link](url)` | `\href{url}{text}` |
-| `[[wiki-link]]` | `Chapter~\ref{ch:label}` |
-| `> quote` | `\begin{quote}...\end{quote}` |
-| `- list` | `\begin{itemize}...\end{itemize}` |
-| `1. list` | `\begin{enumerate}...\end{enumerate}` |
-| Tables | `tabularx` with `booktabs` |
-| Code blocks | `lstlisting` environment |
+| Markdown        | LaTeX                                 |
+| --------------- | ------------------------------------- |
+| `# Heading`     | `\chapter{}` or `\section{}`          |
+| `**bold**`      | `\textbf{}`                           |
+| `*italic*`      | `\textit{}`                           |
+| `` `code` ``    | `\texttt{}`                           |
+| `[link](url)`   | `\href{url}{text}`                    |
+| `[[wiki-link]]` | `Chapter~\ref{ch:label}`              |
+| `> quote`       | `\begin{quote}...\end{quote}`         |
+| `- list`        | `\begin{itemize}...\end{itemize}`     |
+| `1. list`       | `\begin{enumerate}...\end{enumerate}` |
+| Tables          | `tabularx` with `booktabs`            |
+| Code blocks     | `lstlisting` environment              |
 
 #### Mermaid Diagrams
 
@@ -201,6 +208,7 @@ tectonic main.tex
 ```
 
 Common issues and fixes:
+
 - `Underfull vbox`: Add `\raggedbottom`
 - `Not in outer par mode`: Don't put floats inside tcolorbox
 - `Undefined language`: Remove unsupported `language=yaml` from listings
@@ -209,6 +217,7 @@ Common issues and fixes:
 ### Phase 7: Polish
 
 Final improvements checklist:
+
 - [ ] Draft watermark if needed (`draftwatermark` package)
 - [ ] PDF metadata (title, author, keywords)
 - [ ] Consistent heading styles

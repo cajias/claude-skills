@@ -11,6 +11,7 @@ Execute High-Level Design documents through systematic, gated phases with TDD me
 ## Overview
 
 This skill transforms HLD documents into executable phase plans, ensuring:
+
 - Each phase follows RED-GREEN-REFACTOR
 - Phase gates prevent premature advancement
 - Cross-phase dependencies are tracked and respected
@@ -28,15 +29,15 @@ This skill transforms HLD documents into executable phase plans, ensuring:
 
 ## Dependencies
 
-| Dependency | Purpose |
-|------------|---------|
-| `tdd-skills:tdd-plan` | Generate TDD plans for each phase |
-| `ralph-loop:ralph-loop` | Execute iterative TDD loops |
-| `superpowers:verification-before-completion` | Pre-completion validation |
+| Dependency                                   | Purpose                           |
+| -------------------------------------------- | --------------------------------- |
+| `tdd-skills:tdd-plan`                        | Generate TDD plans for each phase |
+| `ralph-loop:ralph-loop`                      | Execute iterative TDD loops       |
+| `superpowers:verification-before-completion` | Pre-completion validation         |
 
 ## Phase Execution Model
 
-```
+```text
 HLD Document
      │
      ▼
@@ -103,31 +104,40 @@ The skill parses HLD documents with this structure:
 # HLD: <Project Name>
 
 ## Phase 1: <Phase Name>
+
 ### Description
+
 <What this phase accomplishes>
 
 ### Dependencies
+
 - Depends on: Phase 0 (or "none" for first phase)
 
 ### Deliverables
+
 - [ ] Deliverable 1
 - [ ] Deliverable 2
 
 ### Validation Criteria
+
 - All unit tests pass
 - CDK synth succeeds
 - Integration tests pass (if applicable)
 
 ### Deployment Command (optional)
+
 `npm run deploy:phase1`
 
 ---
 
 ## Phase 2: <Phase Name>
+
 ### Dependencies
+
 - Depends on: Phase 1
 
 ### Deliverables
+
 ...
 ```
 
@@ -136,6 +146,7 @@ The skill parses HLD documents with this structure:
 ### Step 1: Extract Phases
 
 Parse the HLD to identify:
+
 - Phase names and numbers
 - Phase descriptions
 - Deliverables (become TDD goals)
@@ -147,13 +158,14 @@ Parse the HLD to identify:
 
 Create a directed acyclic graph (DAG):
 
-```
+```text
 Phase 1 ──┬──► Phase 2 ──► Phase 4
           │
           └──► Phase 3 ──► Phase 4
 ```
 
 Validate:
+
 - No circular dependencies
 - All referenced phases exist
 - At least one phase has no dependencies (entry point)
@@ -166,21 +178,24 @@ Create `.agent/hld-execution-state.md`:
 # HLD Execution State: <Project Name>
 
 ## Dependency Graph
-| Phase | Depends On | Status | Validation |
-|-------|-----------|--------|------------|
-| Phase 1 | - | pending | - |
-| Phase 2 | Phase 1 | blocked | - |
-| Phase 3 | Phase 1 | blocked | - |
-| Phase 4 | Phase 2, Phase 3 | blocked | - |
+
+| Phase   | Depends On       | Status  | Validation |
+| ------- | ---------------- | ------- | ---------- |
+| Phase 1 | -                | pending | -          |
+| Phase 2 | Phase 1          | blocked | -          |
+| Phase 3 | Phase 1          | blocked | -          |
+| Phase 4 | Phase 2, Phase 3 | blocked | -          |
 
 ## Current Phase: None
 
 ## Completed Phases
+
 (none yet)
 
 ## Phase Execution Log
+
 | Phase | Started | Completed | Validation Result |
-|-------|---------|-----------|-------------------|
+| ----- | ------- | --------- | ----------------- |
 ```
 
 ## Phase Execution Process
@@ -191,7 +206,7 @@ Create `.agent/hld-execution-state.md`:
 
 Before starting any phase:
 
-```
+```text
 CHECK: Are all blockedBy phases complete?
   - If NO: Cannot start, remain blocked
   - If YES: Check validation gates
@@ -209,10 +224,12 @@ Transform phase deliverables into TDD plan:
 # Ralph Loop Plan: Phase N - <Phase Name>
 
 ## Master Goals (from HLD deliverables)
+
 - [ ] Goal 1: <deliverable 1>
 - [ ] Goal 2: <deliverable 2>
 
 ## Exit Criteria (from HLD validation criteria)
+
 - [ ] All phase goals complete
 - [ ] Unit tests pass
 - [ ] Build succeeds
@@ -222,18 +239,22 @@ Transform phase deliverables into TDD plan:
 ## Current Iteration Plan
 
 ### Phase 1: RED - Write Failing Tests
+
 - [ ] RED: Test for goal 1
 - [ ] RED: Test for goal 2
 
 ### Phase 2: GREEN - Implement
+
 - [ ] GREEN: Implement goal 1
 - [ ] GREEN: Implement goal 2
 
 ### Phase 3: REFACTOR
+
 - [ ] Clean up implementation
 - [ ] Apply code simplifier
 
 ### Phase 4: VALIDATE
+
 - [ ] Run all tests
 - [ ] Execute deployment: `<deploy-cmd>`
 - [ ] Run security review
@@ -245,11 +266,12 @@ Transform phase deliverables into TDD plan:
 
 Invoke ralph-loop with the generated plan:
 
-```
+```text
 Skill({ skill: "ralph-loop:ralph-loop", args: "--completion-promise 'Phase N exit criteria satisfied'" })
 ```
 
 Ralph iterates until:
+
 - All tests pass
 - Deployment succeeds
 - Validation criteria met
@@ -259,17 +281,20 @@ Ralph iterates until:
 After TDD completion, execute the phase gate:
 
 **Parallel validation:**
+
 - Unit tests: `npm test`
 - Build: `npm run build`
 - Lint: `npm run lint`
 - Security: `/security-review`
 
 **Sequential validation (if deployment command provided):**
+
 - Deploy: `<phase-deploy-cmd>`
 - Integration tests: `<integration-cmd>`
 
 **User checkpoint:**
-```
+
+```text
 @phase-N-validation-gate
 
 Phase N: <Phase Name> completed.
@@ -286,6 +311,7 @@ Approve to proceed to dependent phases?
 #### 5. Phase Completion
 
 On approval:
+
 1. Mark phase complete in state tracker
 2. Record validation results
 3. Update dependency graph
@@ -308,11 +334,13 @@ User approval required between phases. This prevents autonomous phase collapsing
 
 ### Mechanism 4: State Persistence
 
-`.agent/hld-execution-state.md` persists across context windows. Even after compaction, the agent can read state and resume correctly.
+`.agent/hld-execution-state.md` persists across context windows. Even after compaction, the
+agent can read state and resume correctly.
 
 ### Mechanism 5: Explicit Phase Boundaries
 
 Each phase has:
+
 - Clear start marker in logs
 - Explicit TDD cycle
 - Validation gate
@@ -327,10 +355,10 @@ Track resources created in earlier phases that later phases depend on:
 ```markdown
 ## Cross-Phase Resources
 
-| Resource | Created In | Used By | Type |
-|----------|-----------|---------|------|
-| UserTable | Phase 1 | Phase 2, 3 | DynamoDB |
-| AuthStack | Phase 2 | Phase 3, 4 | CDK Stack |
+| Resource  | Created In | Used By    | Type      |
+| --------- | ---------- | ---------- | --------- |
+| UserTable | Phase 1    | Phase 2, 3 | DynamoDB  |
+| AuthStack | Phase 2    | Phase 3, 4 | CDK Stack |
 ```
 
 ### Interface Contracts
@@ -345,6 +373,7 @@ When Phase N creates an interface that Phase N+1 consumes:
 ### Rollback Points
 
 After each phase gate:
+
 - Create git tag: `hld-phase-N-complete`
 - If later phase fails, can rollback to known-good state
 
@@ -390,57 +419,75 @@ general-purpose:"Mark phase complete, update state, identify next phase":phase_m
 ## Example: Infrastructure Migration HLD
 
 Input HLD:
+
 ```markdown
 # HLD: Database Migration
 
 ## Phase 1: Create New Tables
+
 ### Dependencies: none
+
 ### Deliverables
+
 - [ ] Create UserTableV2 with new schema
 - [ ] Create indexes for query patterns
 
 ### Validation
+
 - CDK synth succeeds
 - Tables deploy to dev environment
 
 ---
 
 ## Phase 2: Dual-Write Implementation
+
 ### Dependencies: Phase 1
+
 ### Deliverables
+
 - [ ] Write to both old and new tables
 - [ ] Read from old table
 
 ### Validation
+
 - Integration tests pass
 - No data loss in writes
 
 ---
 
 ## Phase 3: Migration Script
+
 ### Dependencies: Phase 1
+
 ### Deliverables
+
 - [ ] Backfill script for historical data
 - [ ] Validation script to compare tables
 
 ### Validation
+
 - Script completes successfully
 - Data integrity verified
 
 ---
 
 ## Phase 4: Switch Reads
+
 ### Dependencies: Phase 2, Phase 3
+
 ### Deliverables
+
 - [ ] Read from new table
 - [ ] Fallback to old on errors
 
 ### Validation
+
 - Integration tests pass
 - Performance benchmarks met
 ```
 
 Execution order:
+
 1. Phase 1 (no deps) - Create tables
 2. Phase 2 AND Phase 3 (parallel, both depend on Phase 1)
 3. Phase 4 (after both 2 and 3 complete)
@@ -493,10 +540,12 @@ If context is compacted or session restarts:
 ## Additional Resources
 
 ### Reference Files
+
 - **`references/hld-parsing-patterns.md`** - Common HLD formats and parsing strategies
 - **`references/validation-gate-patterns.md`** - Validation gate configurations
 
 ### Example Files
+
 - **`examples/infrastructure-migration.hld.md`** - Example infrastructure HLD
 - **`examples/feature-rollout.hld.md`** - Example feature rollout HLD
 

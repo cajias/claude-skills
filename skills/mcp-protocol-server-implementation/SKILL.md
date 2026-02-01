@@ -15,11 +15,13 @@ date: 2026-01-27
 # MCP Protocol Server Implementation
 
 ## Problem
+
 When implementing a custom MCP server, the official MCP SDK client
 (`@modelcontextprotocol/sdk`) with `StreamableHTTPClientTransport` fails to connect
 or times out, even when `tools/list` returns correct JSON-RPC responses.
 
 ## Context / Trigger Conditions
+
 - Building a custom MCP server (Lambda, Express, etc.) from scratch
 - Using `StreamableHTTPClientTransport` from `@modelcontextprotocol/sdk`
 - Client throws "Expected initialize response" error
@@ -34,18 +36,18 @@ or times out, even when `tools/list` returns correct JSON-RPC responses.
 The SDK client sends `initialize` as its first request. Your server MUST respond:
 
 ```typescript
-if (method === 'initialize') {
+if (method === "initialize") {
   return {
-    jsonrpc: '2.0',
+    jsonrpc: "2.0",
     id,
     result: {
-      protocolVersion: '2024-11-05',  // Current MCP protocol version
+      protocolVersion: "2024-11-05", // Current MCP protocol version
       serverInfo: {
-        name: 'your-server-name',
-        version: '1.0.0',
+        name: "your-server-name",
+        version: "1.0.0",
       },
       capabilities: {
-        tools: {},  // Indicates server supports tools
+        tools: {}, // Indicates server supports tools
       },
     },
   };
@@ -66,7 +68,7 @@ function isNotification(message: McpRequest): boolean {
 // In handler:
 if (isNotification(mcpRequest)) {
   // Return 202 Accepted with empty body
-  return { statusCode: 202, headers, body: '' };
+  return { statusCode: 202, headers, body: "" };
 }
 ```
 
@@ -80,11 +82,11 @@ function formatAsSSE(response: McpResponse): string {
 }
 
 function clientAcceptsSSE(acceptHeader: string | undefined): boolean {
-  return acceptHeader?.includes('text/event-stream') ?? false;
+  return acceptHeader?.includes("text/event-stream") ?? false;
 }
 
 // Set Content-Type accordingly
-const contentType = useSSE ? 'text/event-stream' : 'application/json';
+const contentType = useSSE ? "text/event-stream" : "application/json";
 ```
 
 ### 4. Session Management (RECOMMENDED)
@@ -92,29 +94,31 @@ const contentType = useSSE ? 'text/event-stream' : 'application/json';
 Track sessions via `mcp-session-id` header:
 
 ```typescript
-const incomingSessionId = headers['mcp-session-id'];
+const incomingSessionId = headers["mcp-session-id"];
 const sessionId = incomingSessionId ?? randomUUID();
 
 // Include in response headers
-responseHeaders['mcp-session-id'] = sessionId;
-responseHeaders['Access-Control-Expose-Headers'] = 'mcp-session-id';
+responseHeaders["mcp-session-id"] = sessionId;
+responseHeaders["Access-Control-Expose-Headers"] = "mcp-session-id";
 ```
 
 ### 5. CORS Headers (REQUIRED for browser clients)
 
 ```typescript
 const headers = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type,Authorization,mcp-session-id,mcp-protocol-version',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-  'Access-Control-Expose-Headers': 'mcp-session-id',
-  'Cache-Control': 'no-cache',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "Content-Type,Authorization,mcp-session-id,mcp-protocol-version",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Expose-Headers": "mcp-session-id",
+  "Cache-Control": "no-cache",
 };
 ```
 
 ## Verification
 
 1. Test with curl first:
+
 ```bash
 # Test initialize
 curl -X POST https://your-server/mcp \
@@ -129,13 +133,16 @@ curl -X POST https://your-server/mcp \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
 ```
 
-2. Then test with MCP SDK client:
-```typescript
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
+1. Then test with MCP SDK client:
 
-const client = new Client({ name: 'test', version: '1.0.0' });
-const transport = new StreamableHTTPClientTransport(new URL('https://your-server/mcp'));
+```typescript
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+const client = new Client({ name: "test", version: "1.0.0" });
+const transport = new StreamableHTTPClientTransport(
+  new URL("https://your-server/mcp"),
+);
 await client.connect(transport);
 const tools = await client.listTools();
 ```
@@ -146,48 +153,48 @@ Complete minimal MCP server handler:
 
 ```typescript
 export function handler(event: APIGatewayProxyEvent): APIGatewayProxyResult {
-  const headers = { 'Content-Type': 'application/json', /* CORS headers */ };
+  const headers = { "Content-Type": "application/json" /* CORS headers */ };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
   }
 
-  const request = JSON.parse(event.body ?? '{}');
+  const request = JSON.parse(event.body ?? "{}");
 
   // Handle notifications (no id = notification)
   if (request.id === undefined) {
-    return { statusCode: 202, headers, body: '' };
+    return { statusCode: 202, headers, body: "" };
   }
 
   // Handle methods
   switch (request.method) {
-    case 'initialize':
+    case "initialize":
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: request.id,
           result: {
-            protocolVersion: '2024-11-05',
-            serverInfo: { name: 'my-server', version: '1.0.0' },
+            protocolVersion: "2024-11-05",
+            serverInfo: { name: "my-server", version: "1.0.0" },
             capabilities: { tools: {} },
           },
         }),
       };
 
-    case 'tools/list':
+    case "tools/list":
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: request.id,
           result: { tools: MY_TOOLS },
         }),
       };
 
-    case 'tools/call':
+    case "tools/call":
       // Handle tool execution
       break;
 
@@ -196,9 +203,12 @@ export function handler(event: APIGatewayProxyEvent): APIGatewayProxyResult {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: request.id,
-          error: { code: -32601, message: `Method not found: ${request.method}` },
+          error: {
+            code: -32601,
+            message: `Method not found: ${request.method}`,
+          },
         }),
       };
   }

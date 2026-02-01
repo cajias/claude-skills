@@ -23,7 +23,8 @@ in Stack A until Stack B is updated to stop using it. But updating Stack B often
 Stack A's export to still exist. This circular dependency blocks in-place migrations.
 
 **Common error message:**
-```
+
+```text
 Cannot delete export FoundationStack:ExportsOutputFnGetAtt...
 as it is in use by AuthPortalStack, ComputeStack and MCPGatewayStack
 ```
@@ -54,6 +55,7 @@ new SomeConstruct(this, 'Auth', {
 ```
 
 This generates an export like:
+
 ```yaml
 Exports:
   FoundationStack:ExportsOutputFnGetAttUserPoolProviderURLD334AC9D:
@@ -62,7 +64,7 @@ Exports:
 
 ## Why In-Place Migration Fails
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ Stack A has Export X                                        │
 │ Stack B, C, D import X via Fn::ImportValue                  │
@@ -92,6 +94,7 @@ STACK_PREFIX="feature-" npm run deploy
 ```
 
 In CDK:
+
 ```typescript
 const stackPrefix = process.env.STACK_PREFIX || '';
 
@@ -104,6 +107,7 @@ const foundationStack = new FoundationStack(app, `${stackPrefix}FoundationStack`
 ```
 
 **Gotchas with prefixes:**
+
 - AppConfig application names must include prefix
 - SSM parameter paths must include prefix
 - KMS key aliases must include prefix
@@ -115,28 +119,35 @@ Avoid the problem by never using CloudFormation exports:
 
 ```typescript
 // In FoundationStack - write to SSM
-new ssm.StringParameter(this, 'OidcIssuerParam', {
-  parameterName: '/foundation/oidc-issuer-url',
+new ssm.StringParameter(this, "OidcIssuerParam", {
+  parameterName: "/foundation/oidc-issuer-url",
   stringValue: this.userPool.userPoolProviderUrl,
 });
 
 // In consuming stacks - read from SSM
 const oidcIssuer = ssm.StringParameter.valueForStringParameter(
-  this,  // Must be stack scope, NOT app scope!
-  '/foundation/oidc-issuer-url'
+  this, // Must be stack scope, NOT app scope!
+  "/foundation/oidc-issuer-url",
 );
 ```
 
 **Critical:** SSM lookups must happen inside stack constructors, not at app level:
+
 ```typescript
 // WRONG - will fail with "App at '' should be created in scope of a Stack"
-const oidcIssuer = ssm.StringParameter.valueForStringParameter(app, '/foundation/oidc-issuer-url');
+const oidcIssuer = ssm.StringParameter.valueForStringParameter(
+  app,
+  "/foundation/oidc-issuer-url",
+);
 
 // CORRECT - inside stack constructor
 class MyStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps) {
     super(scope, id, props);
-    const oidcIssuer = ssm.StringParameter.valueForStringParameter(this, '/foundation/oidc-issuer-url');
+    const oidcIssuer = ssm.StringParameter.valueForStringParameter(
+      this,
+      "/foundation/oidc-issuer-url",
+    );
   }
 }
 ```
@@ -144,6 +155,7 @@ class MyStack extends Stack {
 ### Solution 3: Manual Stack Deletion and Recreation
 
 When all else fails:
+
 1. Delete consuming stacks (B, C, D) from CloudFormation console
 2. Update producing stack (A)
 3. Redeploy consuming stacks

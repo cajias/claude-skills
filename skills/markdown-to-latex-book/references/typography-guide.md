@@ -3,39 +3,43 @@
 ## Font Selection
 
 ### Body Text (Serif)
+
 Professional options for body text:
 
-| Font | Package | Character |
-|------|---------|-----------|
-| Palatino | `\usepackage{palatino}` | Classic, highly readable |
-| Charter | `\usepackage{charter}` | Clean, modern feel |
-| Source Serif Pro | `\usepackage{sourceserifpro}` | Contemporary |
-| Libertinus | `\usepackage{libertinus}` | Open-source Palatino alternative |
-| EB Garamond | `\usepackage{ebgaramond}` | Traditional, elegant |
+| Font             | Package                       | Character                        |
+| ---------------- | ----------------------------- | -------------------------------- |
+| Palatino         | `\usepackage{palatino}`       | Classic, highly readable         |
+| Charter          | `\usepackage{charter}`        | Clean, modern feel               |
+| Source Serif Pro | `\usepackage{sourceserifpro}` | Contemporary                     |
+| Libertinus       | `\usepackage{libertinus}`     | Open-source Palatino alternative |
+| EB Garamond      | `\usepackage{ebgaramond}`     | Traditional, elegant             |
 
 ### Headings (Sans-serif)
+
 Pair with contrasting sans-serif:
 
-| Font | Package | Notes |
-|------|---------|-------|
-| Helvetica | `\usepackage[scaled=0.92]{helvet}` | Classic, widely available |
-| Source Sans Pro | `\usepackage{sourcesanspro}` | Pairs well with Source Serif |
-| Fira Sans | `\usepackage{FiraSans}` | Modern, Mozilla-developed |
-| Lato | `\usepackage{lato}` | Friendly, warm feel |
+| Font            | Package                            | Notes                        |
+| --------------- | ---------------------------------- | ---------------------------- |
+| Helvetica       | `\usepackage[scaled=0.92]{helvet}` | Classic, widely available    |
+| Source Sans Pro | `\usepackage{sourcesanspro}`       | Pairs well with Source Serif |
+| Fira Sans       | `\usepackage{FiraSans}`            | Modern, Mozilla-developed    |
+| Lato            | `\usepackage{lato}`                | Friendly, warm feel          |
 
 ### Code (Monospace)
+
 For code listings:
 
-| Font | Package | Features |
-|------|---------|----------|
-| Inconsolata | `\usepackage{inconsolata}` | Clean, popular |
-| Fira Code | Requires XeLaTeX | Ligatures for programming |
-| JetBrains Mono | Requires XeLaTeX | Purpose-built for code |
-| Source Code Pro | `\usepackage{sourcecodepro}` | Matches Source family |
+| Font            | Package                      | Features                  |
+| --------------- | ---------------------------- | ------------------------- |
+| Inconsolata     | `\usepackage{inconsolata}`   | Clean, popular            |
+| Fira Code       | Requires XeLaTeX             | Ligatures for programming |
+| JetBrains Mono  | Requires XeLaTeX             | Purpose-built for code    |
+| Source Code Pro | `\usepackage{sourcecodepro}` | Matches Source family     |
 
 ## Page Layout
 
 ### Margins for Binding
+
 ```latex
 % For perfect binding (glued spine)
 \setlrmarginsandblock{1in}{1.25in}{*}  % Inner, outer
@@ -48,6 +52,7 @@ For code listings:
 ```
 
 ### Vertical Spacing
+
 ```latex
 % Prevent stretched pages
 \raggedbottom
@@ -63,6 +68,7 @@ For code listings:
 ## Chapter Styles in Memoir
 
 Available built-in styles:
+
 - `default` - Simple, no decoration
 - `section` - Minimal
 - `madsen` - Rules above/below title
@@ -75,6 +81,7 @@ Available built-in styles:
 - `wilsondob` - Traditional
 
 Custom style example:
+
 ```latex
 \makechapterstyle{professional}{%
     \chapterstyle{default}
@@ -92,6 +99,7 @@ Custom style example:
 ## Color Palettes
 
 ### Professional Blue Theme
+
 ```latex
 \definecolor{chaptercolor}{RGB}{60, 100, 160}
 \definecolor{linkcolor}{RGB}{50, 90, 140}
@@ -99,6 +107,7 @@ Custom style example:
 ```
 
 ### Warm Earth Theme
+
 ```latex
 \definecolor{chaptercolor}{RGB}{120, 80, 50}
 \definecolor{linkcolor}{RGB}{100, 70, 40}
@@ -106,6 +115,7 @@ Custom style example:
 ```
 
 ### High Contrast (Accessibility)
+
 ```latex
 \definecolor{chaptercolor}{RGB}{0, 0, 0}
 \definecolor{linkcolor}{RGB}{0, 0, 150}
@@ -115,6 +125,7 @@ Custom style example:
 ## Code Listing Styles
 
 ### Minimal (No Line Numbers)
+
 ```latex
 \lstset{
     basicstyle=\ttfamily\footnotesize,
@@ -128,6 +139,7 @@ Custom style example:
 ```
 
 ### Full Featured
+
 ```latex
 \lstset{
     basicstyle=\ttfamily\footnotesize,
@@ -146,6 +158,7 @@ Custom style example:
 ## Table Styling
 
 ### Professional Tables
+
 ```latex
 \usepackage{booktabs}
 \renewcommand{\arraystretch}{1.2}
@@ -166,6 +179,7 @@ Content & More content \\
 ```
 
 ### Alternating Row Colors
+
 ```latex
 \usepackage[table]{xcolor}
 \rowcolors{2}{gray!10}{white}
@@ -181,6 +195,7 @@ Row 2 & Data \\
 ## Headers and Footers
 
 ### Simple with Rule
+
 ```latex
 \makepagestyle{book}
 \makeevenhead{book}{\thepage}{}{\small\scshape\leftmark}
@@ -190,6 +205,7 @@ Row 2 & Data \\
 ```
 
 ### Centered Page Numbers
+
 ```latex
 \makepagestyle{centered}
 \makeevenfoot{centered}{}{\thepage}{}

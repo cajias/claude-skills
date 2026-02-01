@@ -17,17 +17,18 @@ Convert a directory of markdown files to PDF with Mermaid diagram rendering.
 
 ## Usage
 
-```
+```text
 /md-to-pdf <directory-path>
 ```
 
 ### Example
 
-```
+```text
 /md-to-pdf ~/Documents/my-playbook
 ```
 
 This will:
+
 1. Find all `.md` files in the directory
 2. Ask where to save the PDF
 3. Combine files alphabetically
@@ -46,7 +47,7 @@ This will:
 
 Files are sorted alphabetically. To control order, use numeric prefixes:
 
-```
+```text
 00-introduction.md
 01-getting-started.md
 02-advanced-topics.md
@@ -56,6 +57,7 @@ Files are sorted alphabetically. To control order, use numeric prefixes:
 ## Excluded Files
 
 The following files are automatically excluded:
+
 - README.md
 - CHANGELOG.md
 - LICENSE.md

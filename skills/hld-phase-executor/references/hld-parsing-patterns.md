@@ -12,27 +12,34 @@ The most common format uses H2 headers for phases:
 # HLD: Project Name
 
 ## Phase 1: Foundation
+
 ### Description
+
 Set up foundational infrastructure.
 
 ### Dependencies
+
 - Depends on: none
 
 ### Deliverables
+
 - [ ] Create VPC
 - [ ] Create subnets
 - [ ] Configure NAT gateway
 
 ### Validation Criteria
+
 - CDK synth passes
 - VPC deployed successfully
 - Network connectivity verified
 
 ### Deployment Command
+
 `npm run deploy:foundation`
 ```
 
 **Parsing strategy:**
+
 1. Split on `## Phase` pattern
 2. Extract phase number from header
 3. Parse each section by `###` subheaders
@@ -58,6 +65,7 @@ Simpler format for linear dependencies:
 ```
 
 **Parsing strategy:**
+
 1. Match numbered list items with bold headers
 2. Extract deliverables from sub-bullets
 3. Parse parenthetical dependencies
@@ -70,15 +78,16 @@ Structured format with explicit columns:
 ```markdown
 # HLD: Feature Rollout
 
-| Phase | Name | Depends On | Deliverables | Validation |
-|-------|------|-----------|--------------|------------|
-| 1 | API Design | - | OpenAPI spec, types | Spec validates |
-| 2 | Backend | 1 | Endpoints, DB | Tests pass |
-| 3 | Frontend | 2 | UI components | E2E tests |
-| 4 | Launch | 2, 3 | Feature flags | Canary OK |
+| Phase | Name       | Depends On | Deliverables        | Validation     |
+| ----- | ---------- | ---------- | ------------------- | -------------- |
+| 1     | API Design | -          | OpenAPI spec, types | Spec validates |
+| 2     | Backend    | 1          | Endpoints, DB       | Tests pass     |
+| 3     | Frontend   | 2          | UI components       | E2E tests      |
+| 4     | Launch     | 2, 3       | Feature flags       | Canary OK      |
 ```
 
 **Parsing strategy:**
+
 1. Parse markdown table headers
 2. Map columns to phase attributes
 3. Split "Depends On" column on commas
@@ -112,6 +121,7 @@ Detailed description of phase 2...
 ```
 
 **Parsing strategy:**
+
 1. Extract YAML front matter
 2. Parse phase metadata from YAML
 3. Match phase content by name/id
@@ -122,6 +132,7 @@ Detailed description of phase 2...
 ### Explicit Dependencies
 
 Look for patterns:
+
 - `Depends on: Phase 1, Phase 2`
 - `depends on: 1, 2`
 - `(depends on: Phase 1)`
@@ -132,6 +143,7 @@ Look for patterns:
 ### Implicit Dependencies
 
 When dependencies not stated:
+
 - Assume linear dependency (Phase N depends on Phase N-1)
 - Look for resource references ("uses VPC from Phase 1")
 - Check for interface mentions ("implements API from Phase 2")
@@ -139,6 +151,7 @@ When dependencies not stated:
 ### Parallel Phases
 
 Identify phases that can run in parallel:
+
 - Same dependency set
 - No resource conflicts
 - Explicit "can run in parallel with" notation
@@ -146,6 +159,7 @@ Identify phases that can run in parallel:
 ## Deliverable Extraction
 
 ### Checkbox Format
+
 ```markdown
 - [ ] Create user table
 - [ ] Add indexes
@@ -153,18 +167,21 @@ Identify phases that can run in parallel:
 ```
 
 ### Bullet Format
+
 ```markdown
 - Create user table
 - Add indexes
 ```
 
 ### Numbered Format
+
 ```markdown
 1. Create user table
 2. Add indexes
 ```
 
 ### Prose Format
+
 ```markdown
 This phase creates the user table and adds indexes for query performance.
 ```
@@ -174,22 +191,27 @@ This phase creates the user table and adds indexes for query performance.
 ## Validation Criteria Extraction
 
 ### Explicit Criteria
+
 ```markdown
 ### Validation Criteria
+
 - All tests pass
 - Deployment succeeds
 - No errors in logs
 ```
 
 ### Command-Based
+
 ```markdown
 ### Validation
+
 Run: `npm test && npm run deploy:check`
 ```
 
 ### Implicit Criteria
 
 If no validation specified, apply defaults:
+
 1. Unit tests pass (`npm test`)
 2. Build succeeds (`npm run build`)
 3. Lint passes (`npm run lint`)
@@ -200,6 +222,7 @@ If no validation specified, apply defaults:
 ### Missing Phase Numbers
 
 If phases use names only:
+
 1. Assign sequential numbers
 2. Use names for dependency resolution
 3. Normalize to "Phase N: Name" format
@@ -207,7 +230,8 @@ If phases use names only:
 ### Circular Dependencies
 
 Detect during parsing:
-```
+
+```text
 Phase A -> Phase B -> Phase C -> Phase A  (INVALID)
 ```
 
@@ -216,7 +240,8 @@ Report to user with the cycle path.
 ### Self-Dependencies
 
 Invalid:
-```
+
+```text
 Phase 1 depends on: Phase 1
 ```
 
@@ -224,7 +249,7 @@ Remove self-references and warn user.
 
 ### Unknown Dependencies
 
-```
+```text
 Phase 2 depends on: Phase X (not defined)
 ```
 
@@ -242,15 +267,8 @@ Normalized phase structure:
       "name": "Foundation",
       "description": "Set up foundational infrastructure",
       "dependencies": [],
-      "deliverables": [
-        "Create VPC",
-        "Create subnets",
-        "Configure NAT gateway"
-      ],
-      "validationCriteria": [
-        "CDK synth passes",
-        "VPC deployed successfully"
-      ],
+      "deliverables": ["Create VPC", "Create subnets", "Configure NAT gateway"],
+      "validationCriteria": ["CDK synth passes", "VPC deployed successfully"],
       "deploymentCommand": "npm run deploy:foundation",
       "status": "pending"
     }
@@ -267,6 +285,7 @@ Normalized phase structure:
 ## Validation During Parsing
 
 Before accepting HLD:
+
 - [ ] At least one phase exists
 - [ ] At least one phase has no dependencies (entry point)
 - [ ] No circular dependencies

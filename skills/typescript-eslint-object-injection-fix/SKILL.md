@@ -15,6 +15,7 @@ date: 2026-01-27
 # TypeScript ESLint Object Injection Fix
 
 ## Problem
+
 When dynamically building objects from external data (headers, query parameters, form data),
 ESLint's `security/detect-object-injection` rule flags code like `obj[key] = value` as a
 potential security vulnerability, warning about "Generic Object Injection Sink" that could
@@ -23,22 +24,25 @@ lead to prototype pollution attacks.
 ## Context / Trigger Conditions
 
 **Exact error messages:**
-```
+
+```text
 Generic Object Injection Sink
 security/detect-object-injection
 ```
 
 **Common scenarios:**
+
 1. Iterating over HTTP headers and storing them in an object
 2. Processing query parameters or form data into a structured object
 3. Aggregating data from multiple sources into a single result object
 4. Any code using bracket notation with external/untrusted keys: `obj[key] = value`
 
 **Example problematic code:**
+
 ```typescript
 const headers: Record<string, string> = {};
 response.headers.forEach((value, key) => {
-  headers[key] = value;  // ⚠️ ESLint warning here
+  headers[key] = value; // ⚠️ ESLint warning here
 });
 ```
 
@@ -48,11 +52,12 @@ Use `Object.create(null)` to create objects without a prototype chain, combined 
 `Object.defineProperty` for safe property assignment:
 
 ### Pattern 1: Simple Key-Value Assignment
+
 ```typescript
 // Instead of:
 const headers: Record<string, string> = {};
 response.headers.forEach((value, key) => {
-  headers[key] = value;  // ❌ ESLint warning
+  headers[key] = value; // ❌ ESLint warning
 });
 
 // Use:
@@ -68,6 +73,7 @@ response.headers.forEach((value, key) => {
 ```
 
 ### Pattern 2: Conditional Property Creation
+
 ```typescript
 // For objects built conditionally:
 const aggregated: Record<string, string[]> = Object.create(null);
@@ -92,8 +98,11 @@ for (const [key, value] of Object.entries(data)) {
 ```
 
 ### Pattern 3: Returning the Safe Object
+
 ```typescript
-function filterHeaders(headers: Record<string, string>): Record<string, string> {
+function filterHeaders(
+  headers: Record<string, string>,
+): Record<string, string> {
   const filtered: Record<string, string> = Object.create(null);
 
   for (const [key, value] of Object.entries(headers)) {
@@ -107,24 +116,27 @@ function filterHeaders(headers: Record<string, string>): Record<string, string> 
     }
   }
 
-  return filtered;  // Safe to return - no prototype
+  return filtered; // Safe to return - no prototype
 }
 ```
 
 ## Why This Works
 
 ### The Security Issue
+
 Normal objects (`{}`) inherit from `Object.prototype`, which means keys like `__proto__`,
 `constructor`, or `prototype` can be manipulated to pollute the prototype chain:
 
 ```typescript
 const obj = {};
-obj['__proto__'].polluted = true;
+obj["__proto__"].polluted = true;
 // Now ALL objects have polluted === true
 ```
 
 ### The Solution
+
 `Object.create(null)` creates an object with NO prototype chain:
+
 - No inherited properties
 - No `__proto__` access point
 - Cannot pollute other objects
@@ -136,36 +148,42 @@ preventing accidental prototype access.
 ## Verification
 
 After applying the fix:
+
 1. ESLint warnings should disappear
 2. Run: `npm run lint` or `eslint .` - should pass
 3. Tests should still pass (no functional change)
 4. Verify in REPL that object has no prototype:
+
    ```javascript
    const obj = Object.create(null);
-   console.log(Object.getPrototypeOf(obj));  // null
+   console.log(Object.getPrototypeOf(obj)); // null
    ```
 
 ## Common Mistakes to Avoid
 
 ### ❌ Don't just disable the rule
+
 ```typescript
 // eslint-disable-next-line security/detect-object-injection
-headers[key] = value;  // Still vulnerable!
+headers[key] = value; // Still vulnerable!
 ```
 
 ### ❌ Don't forget Object.create(null)
+
 ```typescript
-const obj = {};  // Still has prototype!
+const obj = {}; // Still has prototype!
 Object.defineProperty(obj, key, { value });
 ```
 
 ### ❌ Don't use direct bracket notation on safe objects
+
 ```typescript
 const obj: Record<string, string> = Object.create(null);
-obj[key] = value;  // ⚠️ ESLint will still warn!
+obj[key] = value; // ⚠️ ESLint will still warn!
 ```
 
 ### ✅ Do use Object.defineProperty consistently
+
 ```typescript
 const obj: Record<string, string> = Object.create(null);
 Object.defineProperty(obj, key, {
@@ -181,8 +199,11 @@ Object.defineProperty(obj, key, {
 From the MCP Multiplexer header handling code:
 
 **Before (with warnings):**
+
 ```typescript
-export function aggregateResponseHeaders(headerSets: Record<string, string>[]): Record<string, string> {
+export function aggregateResponseHeaders(
+  headerSets: Record<string, string>[],
+): Record<string, string> {
   const aggregated: Record<string, string[]> = {};
 
   for (const headers of headerSets) {
@@ -199,7 +220,7 @@ export function aggregateResponseHeaders(headerSets: Record<string, string>[]): 
 
   const result: Record<string, string> = {};
   for (const [key, values] of Object.entries(aggregated)) {
-    result[key] = values.join(', ');
+    result[key] = values.join(", ");
   }
 
   return result;
@@ -207,8 +228,11 @@ export function aggregateResponseHeaders(headerSets: Record<string, string>[]): 
 ```
 
 **After (safe, no warnings):**
+
 ```typescript
-export function aggregateResponseHeaders(headerSets: Record<string, string>[]): Record<string, string> {
+export function aggregateResponseHeaders(
+  headerSets: Record<string, string>[],
+): Record<string, string> {
   const aggregated: Record<string, string[]> = Object.create(null);
 
   for (const headers of headerSets) {
@@ -233,7 +257,7 @@ export function aggregateResponseHeaders(headerSets: Record<string, string>[]): 
   const result: Record<string, string> = Object.create(null);
   for (const [key, values] of Object.entries(aggregated)) {
     Object.defineProperty(result, key, {
-      value: values.join(', '),
+      value: values.join(", "),
       enumerable: true,
       configurable: true,
       writable: true,
@@ -247,6 +271,7 @@ export function aggregateResponseHeaders(headerSets: Record<string, string>[]): 
 ## When to Use This Pattern
 
 **Always use when:**
+
 - Building objects from HTTP headers
 - Processing query parameters or form data
 - Aggregating data from multiple untrusted sources
@@ -254,6 +279,7 @@ export function aggregateResponseHeaders(headerSets: Record<string, string>[]): 
 - Any dynamic key assignment from user-controlled data
 
 **Can skip when:**
+
 - Keys are hardcoded string literals
 - Building objects from trusted internal data only
 - Using Maps instead of plain objects (Map is prototype-safe)
