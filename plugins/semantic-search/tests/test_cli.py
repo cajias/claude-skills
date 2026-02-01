@@ -3,11 +3,12 @@
 import json
 import os
 import subprocess
+from pathlib import Path
 
 import pytest
 
 
-PROJECT_DIR = "/Users/rc/Projects/workspace/claude-skills/plugins/semantic-search"
+PROJECT_DIR = str(Path(__file__).resolve().parent.parent)
 
 
 @pytest.fixture
