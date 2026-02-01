@@ -12,7 +12,7 @@ Re-index all Zettelkasten notes for semantic search.
 1. Run the indexer:
 
    ```bash
-   uv run --project /Users/rc/Projects/workspace/claude-skills/plugins/semantic-search ss-index
+   uv run --project ${CLAUDE_PLUGIN_ROOT} ss-index
    ```
 
 2. Report how many notes were indexed
