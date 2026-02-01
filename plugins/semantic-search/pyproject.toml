@@ -1,0 +1,63 @@
+[project]
+name = "semantic-search"
+version = "0.1.0"
+description = "Semantic search over Obsidian Zettelkasten notes using LanceDB"
+requires-python = ">=3.11"
+dependencies = [
+    "lancedb>=0.20",
+    "sentence-transformers>=3.0",
+]
+
+[project.scripts]
+ss-index = "semantic_search.cli:index_cmd"
+ss-search = "semantic_search.cli:search_cmd"
+ss-status = "semantic_search.cli:status_cmd"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/semantic_search"]
+
+[tool.ruff]
+extend = "/Users/rc/Projects/workspace/lint-configs/python/ruff.toml"
+src = ["src", "tests"]
+target-version = "py311"
+
+[tool.ruff.lint]
+# Extend ignores for this project
+ignore = [
+    "E203",    # Whitespace before ':' (conflicts with Black)
+    "E501",    # Line too long (handled by formatter)
+    "D100",    # Missing docstring in public module (small project)
+    "D104",    # Missing docstring in public package
+    "BLE001",  # Blind except (used in get_table for table-not-found)
+    "TRY003",  # Long exception messages
+    "EM101",   # Exception string literal
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["semantic_search"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",    # Allow assert statements in tests
+    "ANN001",  # Missing type annotation for function argument
+    "ANN201",  # Missing return type annotation
+    "ANN202",  # Missing return type for private function
+    "PLR2004", # Allow magic values in tests
+    "PLR0913", # Allow many arguments in test functions
+    "D103",    # Missing docstring in public function (tests)
+    "S603",    # subprocess call with non-constant args
+    "S607",    # partial executable path in subprocess
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]

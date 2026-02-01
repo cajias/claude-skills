@@ -1,0 +1,16 @@
+{
+  "name": "semantic-search",
+  "version": "0.1.0",
+  "description": "Semantic search over Obsidian Zettelkasten notes using LanceDB and sentence-transformers for local embeddings.",
+  "author": {
+    "name": "rc"
+  },
+  "license": "MIT",
+  "keywords": [
+    "semantic-search",
+    "zettelkasten",
+    "obsidian",
+    "lancedb",
+    "embeddings"
+  ]
+}
