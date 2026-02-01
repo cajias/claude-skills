@@ -10,13 +10,13 @@ When invoking the Ralph Loop skill, the prompt argument must be properly quoted.
 
 ## Correct Invocation
 
-```
+```text
 /ralph-loop "Your task description here" --max-iterations 5 --completion-promise "Task complete"
 ```
 
 Or using the Skill tool:
 
-```
+```text
 Skill: ralph-loop:ralph-loop
 Args: "Your task description" --max-iterations 5 --completion-promise "Done"
 ```
@@ -31,19 +31,24 @@ Args: "Your task description" --max-iterations 5 --completion-promise "Done"
 ## Common Mistakes
 
 ### Wrong - Unquoted prompt with special chars
-```
+
+```text
 /ralph-loop Audit links: 1) Check broken, 2) Fix dupes
 ```
+
 Error: Shell operators require approval
 
 ### Wrong - Complex characters
-```
+
+```text
 /ralph-loop "Check (parentheses) and [brackets]"
 ```
+
 May fail due to shell interpretation
 
 ### Correct - Simple quoted prompt
-```
+
+```text
 /ralph-loop "Audit links and fix issues" --max-iterations 5
 ```
 
@@ -62,7 +67,8 @@ head -10 .claude/ralph-loop.local.md
 ## Exiting the Loop
 
 Output the exact completion promise in XML tags:
-```
+
+```text
 <promise>Your completion promise text</promise>
 ```
 

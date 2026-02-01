@@ -94,12 +94,14 @@ After removing the incorrect lock file:
 ## Example
 
 **Scenario:** CI fails with this error after merging a PR:
-```
+
+```text
 ValidationError: Multiple package lock files found: pnpm-lock.yaml, package-lock.json.
 Please ensure that only one of these files is present.
 ```
 
 **Investigation:**
+
 ```bash
 $ grep packageManager package.json
 # No output - not defined
@@ -113,6 +115,7 @@ package-lock.json  pnpm-lock.yaml
 ```
 
 **Resolution:** Project uses npm (based on CI config). Remove pnpm-lock.yaml:
+
 ```bash
 git rm pnpm-lock.yaml
 git commit -m "fix: remove pnpm-lock.yaml from npm project"

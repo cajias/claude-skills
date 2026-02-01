@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 1.29
 ---
@@ -35,4 +35,3 @@ Teaching: issues with special characters | Correction: Unable to extract specifi
 - Classification: user
 - Confidence: 0.55
 - Corrections detected: 1
-

@@ -13,11 +13,13 @@ date: 2026-01-27
 # GitLab MR Discussion Thread Management
 
 ## Problem
+
 When responding to MR code review feedback, you need to reply to specific discussion
 threads (not add top-level comments). The `glab mr note` command only adds top-level
 comments, not threaded replies to existing discussions.
 
 ## Context / Trigger Conditions
+
 - Need to respond to code review comments on an MR
 - Want replies to appear in the correct discussion thread
 - Using `glab mr note` but comments appear at top level instead of threaded
@@ -26,6 +28,7 @@ comments, not threaded replies to existing discussions.
 ## Solution
 
 ### 1. List Discussion Threads
+
 Get all resolvable discussions with their IDs:
 
 ```bash
@@ -41,6 +44,7 @@ glab api "projects/ENCODED_PROJECT_PATH/merge_requests/MR_NUMBER/discussions?per
 **Note:** Project path must be URL-encoded (e.g., `org/group/repo` → `org%2Fgroup%2Frepo`)
 
 ### 2. Reply to a Discussion Thread
+
 Use the discussion ID to add a threaded reply:
 
 ```bash
@@ -50,6 +54,7 @@ glab api "projects/ENCODED_PROJECT_PATH/merge_requests/MR_NUMBER/discussions/DIS
 ```
 
 ### 3. Delete a Comment
+
 Delete a note by its ID:
 
 ```bash
@@ -57,6 +62,7 @@ glab api "projects/ENCODED_PROJECT_PATH/merge_requests/MR_NUMBER/notes/NOTE_ID" 
 ```
 
 ### 4. Batch Operations
+
 Delete multiple comments:
 
 ```bash
@@ -67,6 +73,7 @@ done
 ```
 
 ### 5. Pagination
+
 For MRs with many discussions (>100), paginate:
 
 ```bash
@@ -80,13 +87,16 @@ glab api "projects/PATH/merge_requests/MR/discussions?per_page=100&page=2"
 ## Why `glab mr note` Doesn't Work for Threads
 
 The `glab mr note` command only supports:
+
 - Adding top-level comments to MRs
 - No `--discussion-id` or `--reply-to` flag exists
 
 For threaded replies, `glab api` is the only option.
 
 ## Verification
+
 After posting a reply:
+
 1. Visit the MR in GitLab UI
 2. Navigate to the discussion thread
 3. Verify your reply appears nested under the original comment
@@ -115,19 +125,19 @@ To avoid repeated prompts, add to `~/.claude/settings.json`:
 ```json
 {
   "permissions": {
-    "allow": [
-      "Bash(glab api*)"
-    ]
+    "allow": ["Bash(glab api*)"]
   }
 }
 ```
 
 ## Notes
+
 - Discussion IDs are long hex strings (e.g., `bb8314529ff79b8fa2e037b107a89d2cca06e2dc`)
 - Note IDs are numeric (e.g., `878884`)
 - System-generated notes (commits, assignments) cannot be deleted (403 Forbidden)
 - Only your own comments can be deleted
 
 ## See Also
+
 - `gitlab-ci-debugging` - For CI/CD pipeline issues
 - `gitlab-group-exploration` - For exploring GitLab groups and projects

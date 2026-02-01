@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 2.23
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 2.23
 
 ## Problem / Use Case
 
-create a plan for putting together a guide for how to use genai to speed up the sdlc. You will use a ralph loop to iterate over the generated doc, evaluating it for ai writing, incompleteness, incorre
+create a plan for putting together a guide for how to use genai to speed up the sdlc. You will use a ralph loop to
+iterate over the generated doc, evaluating it for ai writing, incompleteness, incorre
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: Avoid: 'forget it'
 - Classification: user
 - Confidence: 0.7
 - Corrections detected: 2
-

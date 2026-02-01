@@ -5,11 +5,12 @@ description: Fix note ID prefixes to ensure permanent notes have 'perm-' and fle
 
 # /zfixids - Fix Note ID Prefixes
 
-Ensure all notes have correct ID prefixes based on their location. This is critical for proper categorization in semantic search and hub analysis.
+Ensure all notes have correct ID prefixes based on their location. This is critical for proper categorization in
+semantic search and hub analysis.
 
 ## Usage
 
-```
+```text
 /zfixids              # Fix all incorrect prefixes
 /zfixids --dry-run    # Preview changes without applying
 ```
@@ -37,10 +38,12 @@ zk-sync                # Re-sync to S3 Vectors
 ## Why This Matters
 
 The ID prefix determines how notes are categorized in S3 Vectors:
+
 - `perm-*` keys are treated as permanent (validated) knowledge
 - `flee-*` keys are treated as fleeting (pending) knowledge
 
 Hub analysis and cluster detection rely on these prefixes to:
+
 - Filter for permanent notes only in reports
 - Show correct markers (★ vs ○) in output
 - Calculate hub coverage statistics
@@ -55,6 +58,6 @@ Hub analysis and cluster detection rely on these prefixes to:
 ## Follow-up
 
 After fixing IDs, run:
+
 1. `zk-sync` - Update S3 Vectors with new IDs
 2. `zk-hub-review` - Get accurate hub analysis
-

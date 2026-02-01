@@ -15,11 +15,13 @@ date: 2025-01-27
 
 ## Problem
 
-Uploading markdown to Quip requires careful handling of diagrams, images, and formatting. Numbered lists frequently fail and need HTML conversion.
+Uploading markdown to Quip requires careful handling of diagrams, images, and formatting. Numbered lists frequently fail
+and need HTML conversion.
 
 ## Context/Trigger
 
 This skill activates when the user says:
+
 - "tell q to upload <file-path> to <quip-url>"
 - Similar variations requesting file upload to Quip
 
@@ -53,6 +55,7 @@ For each mermaid or PlantUML diagram found:
 1. **Extract diagram code** from the code block
 
 2. **Generate image for Mermaid**:
+
    ```bash
    # Create temp file with mermaid code
    echo '<mermaid-code>' > /tmp/diagram-<hash>.mmd
@@ -62,12 +65,14 @@ For each mermaid or PlantUML diagram found:
    ```
 
 3. **Generate image for PlantUML** (if plantuml available):
+
    ```bash
    # Use PlantUML to generate PNG
    plantuml -tpng /tmp/diagram-<hash>.puml
    ```
 
 4. **Replace diagram code block with placeholder**:
+
    ```markdown
    > TODO: add image /tmp/diagram-<hash>.png here
    ```
@@ -78,6 +83,7 @@ Transform the markdown content:
 
 1. **Replace existing image references**:
    - Convert `![alt](path)` to:
+
      ```markdown
      > TODO: add image <absolute-path> here
      ```
@@ -96,6 +102,7 @@ Transform the markdown content:
 Use the `QuipEditor` tool available in the default Q agent:
 
 1. **Use QuipEditor with contentFilePath**:
+
    ```bash
    # Upload entire markdown file at once
    QuipEditor(
@@ -107,6 +114,7 @@ Use the `QuipEditor` tool available in the default Q agent:
    ```
 
 2. **For section-by-section uploads**:
+
    ```bash
    # First analyze document structure
    QuipEditor(
@@ -125,6 +133,7 @@ Use the `QuipEditor` tool available in the default Q agent:
    ```
 
 3. **CRITICAL: Validate the uploaded content immediately**:
+
    ```bash
    # Read back using QuipEditor
    QuipEditor(
@@ -151,28 +160,33 @@ Use the `QuipEditor` tool available in the default Q agent:
    - Root cause: Quip's markdown parser poorly handles `1. Item` syntax
 
    **MANDATORY: Pre-convert numbered lists to HTML before upload:**
+
    ```markdown
    1. First item
    2. Second item
    ```
+
    MUST become:
+
    ```html
    <ol>
-   <li>First item</li>
-   <li>Second item</li>
+     <li>First item</li>
+     <li>Second item</li>
    </ol>
    ```
 
    **For nested numbered lists:**
+
    ```html
    <ol>
-   <li>First item
-   <ol>
-   <li>Nested first</li>
-   <li>Nested second</li>
-   </ol>
-   </li>
-   <li>Second item</li>
+     <li>
+       First item
+       <ol>
+         <li>Nested first</li>
+         <li>Nested second</li>
+       </ol>
+     </li>
+     <li>Second item</li>
    </ol>
    ```
 
@@ -185,10 +199,17 @@ Use the `QuipEditor` tool available in the default Q agent:
    - Problem: Tables created but cells are empty
    - Detection: Read back content, verify table cells have content
    - Fix: Re-upload using proper Quip table HTML format:
+
      ```html
      <table>
-       <tr><th>Header 1</th><th>Header 2</th></tr>
-       <tr><td>Cell 1</td><td>Cell 2</td></tr>
+       <tr>
+         <th>Header 1</th>
+         <th>Header 2</th>
+       </tr>
+       <tr>
+         <td>Cell 1</td>
+         <td>Cell 2</td>
+       </tr>
      </table>
      ```
 
@@ -227,62 +248,95 @@ After all sections are uploaded, provide:
 ## Markdown to Quip HTML Conversion Reference
 
 **Bullet Lists** (usually work with markdown, but HTML is safer):
+
 ```markdown
 - Item 1
 - Item 2
 ```
+
 becomes:
+
 ```html
-<ul><li>Item 1</li><li>Item 2</li></ul>
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+</ul>
 ```
 
 **Numbered Lists** (MUST use HTML - markdown often fails!):
+
 ```markdown
 1. First item
 2. Second item
 3. Third item
 ```
+
 becomes:
+
 ```html
-<ol><li>First item</li><li>Second item</li><li>Third item</li></ol>
+<ol>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item</li>
+</ol>
 ```
 
 **Tables**:
+
 ```markdown
 | Col1 | Col2 |
-|------|------|
+| ---- | ---- |
 | A    | B    |
 ```
+
 becomes:
+
 ```html
-<table><tr><th>Col1</th><th>Col2</th></tr><tr><td>A</td><td>B</td></tr></table>
+<table>
+  <tr>
+    <th>Col1</th>
+    <th>Col2</th>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>B</td>
+  </tr>
+</table>
 ```
 
 **Headers**:
+
 ```markdown
 # H1
+
 ## H2
 ```
+
 becomes:
+
 ```html
 <h1>H1</h1>
 <h2>H2</h2>
 ```
 
 **Code Blocks**:
+
 ````markdown
 ```python
 code here
 ```
 ````
+
 becomes:
+
 ```html
 <pre><code class="language-python">code here</code></pre>
 ```
 
 ## Agent Selection
 
-**IMPORTANT**: Always use the **default Q agent** (not amzn-docs) because it has the `QuipEditor` tool which can write to Quip documents.
+**IMPORTANT**: Always use the **default Q agent** (not amzn-docs) because it has the `QuipEditor` tool which can write
+to Quip documents.
 
 ## Command Construction
 

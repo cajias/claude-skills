@@ -19,12 +19,14 @@ tags: [tdd, context-compaction, ralph-loop, scratchpad, state-persistence]
 ## Problem
 
 When Claude Code compacts context during long TDD sessions, the agent loses:
+
 - Current TDD phase (RED/GREEN/REFACTOR)
 - Knowledge of what approaches were already tried
 - Understanding of which tests were written vs. which need to be written
 - Phase gate enforcement ("don't implement until tests fail")
 
 This causes the agent to:
+
 - Skip the RED phase and jump to implementation
 - Repeat failed investigations
 - Re-explore code it already analyzed
@@ -33,6 +35,7 @@ This causes the agent to:
 ## Context / Trigger Conditions
 
 **Symptoms indicating this problem:**
+
 - Agent says "Let me explore the codebase" when it already did
 - Same error message or exploration output appears multiple times in session
 - Agent starts writing implementation code without failing tests
@@ -40,6 +43,7 @@ This causes the agent to:
 - Agent proposes approaches it already tried and failed
 
 **Diagnostic checks:**
+
 ```bash
 # Count context compactions in a session
 grep -c "Conversation compacted" ~/.claude/projects/-Users-*/SESSION_ID.jsonl
@@ -51,17 +55,20 @@ grep -h '"role":"user"' SESSION_FILE.jsonl | grep -o '"text":"[^"]*"' | sort | u
 ## Root Cause
 
 The scratchpad.md file typically stores:
+
 - Task goals ✅
 - Exit criteria ✅
 - Task status (done/not done) ✅
 
 But it does NOT store:
+
 - Current TDD phase (RED/GREEN/REFACTOR) ❌
 - Phase validation checklist status ❌
 - Investigation tracker with failed attempts ❌
 - Test file locations created in RED phase ❌
 
-Context compaction summarizes prose instructions equally, so "MANDATORY: Write tests first" gets as much priority as "nice to have: add comments".
+Context compaction summarizes prose instructions equally, so "MANDATORY: Write tests first" gets as much priority as
+"nice to have: add comments".
 
 ## Solution
 
@@ -69,28 +76,33 @@ Context compaction summarizes prose instructions equally, so "MANDATORY: Write t
 
 Replace prose TDD notes with structured state:
 
-```markdown
+````markdown
 ## TDD Phase State (DO NOT SUMMARIZE - RESTORE VERBATIM)
+
 ```yaml
-current_phase: RED  # RED | GREEN | REFACTOR
+current_phase: RED # RED | GREEN | REFACTOR
 phase_start: 2026-01-25T10:00:00Z
 iteration: 1
 ```
+````
 
 ### RED Phase Metrics
-| Metric | Value |
-|--------|-------|
-| New Tests Written | 3 |
-| Tests Failing | 3 |
-| Test Files | `src/handler.test.ts:45-89`, `src/client.test.ts:12-34` |
+
+| Metric            | Value                                                   |
+| ----------------- | ------------------------------------------------------- |
+| New Tests Written | 3                                                       |
+| Tests Failing     | 3                                                       |
+| Test Files        | `src/handler.test.ts:45-89`, `src/client.test.ts:12-34` |
 
 ### Phase Validation Checklist
+
 - [x] Written NEW test files (not just run existing)
 - [x] All new tests FAIL with meaningful errors
 - [ ] Ready to proceed to GREEN
 
 ⚠️ PHASE GATE: Cannot start GREEN until all boxes checked above.
-```
+
+````text
 
 ### 2. Populate Investigation Tracker
 
@@ -103,7 +115,7 @@ Actually USE the investigation tracker defined in TDD plans:
 | 1 | Test timeout | Increased to 30s | Still fails | Check async handling |
 | 1 | Mock not called | Added jest.mock() | Works | None |
 | 2 | Type error | Cast to unknown | Fails | Try generic |
-```
+````
 
 **Auto-population rule**: After ANY failure (test, build, lint), add a row IMMEDIATELY.
 
@@ -113,7 +125,9 @@ Wrap critical instructions in markers that signal importance to summarization:
 
 ```markdown
 <!-- CRITICAL: Preserve verbatim during context compaction -->
+
 ⚠️ PHASE GATE: I am in RED phase. I CANNOT write implementation until:
+
 1. I have created NEW test files (listed above)
 2. Those tests FAIL with meaningful errors
 3. Phase validation checklist is complete
@@ -153,7 +167,9 @@ At the start of each session or iteration, add this prompt pattern:
 
 ```markdown
 ## Session Restoration Checklist
+
 Before starting work, I MUST:
+
 1. Read `.agent/scratchpad.md` for current phase state
 2. Read Investigation Tracker for failed approaches
 3. Identify: Current phase = [phase], Test files = [files], Last failure = [failure]
@@ -170,6 +186,7 @@ After implementing these patterns:
 4. **Phase gates enforced**: Agent refuses to implement without failing tests
 
 **Test by:**
+
 ```bash
 # Simulate long session
 # 1. Start TDD task
@@ -182,7 +199,8 @@ After implementing these patterns:
 ## Example
 
 **Before (state lost after compaction):**
-```
+
+```text
 Session 1: "I'll write failing tests for the handler"
   -> Writes 3 tests, all fail
   -> [COMPACTION]
@@ -192,7 +210,8 @@ Session 1 (continued): "Let me explore the codebase to understand the handler"
 ```
 
 **After (state preserved):**
-```
+
+```text
 Session 1: "I'll write failing tests for the handler"
   -> Writes 3 tests, all fail
   -> Updates scratchpad: current_phase: RED, tests: [list], failing: 3
@@ -222,6 +241,7 @@ Session 1 (continued): "Restoring from scratchpad... Phase: RED complete,
 Another common failure after context compaction: **agent forgets to delegate and does work itself**.
 
 ### Symptoms
+
 - Agent starts doing investigation/implementation directly instead of spawning sub-agents
 - Concurrent task opportunities missed (sequential execution when parallel is possible)
 - Task dependencies not tracked in TodoWrite
@@ -229,23 +249,27 @@ Another common failure after context compaction: **agent forgets to delegate and
 
 ### Solution: Add Orchestration State to Scratchpad
 
-```markdown
+````markdown
 ## Orchestration Rules (DO NOT SUMMARIZE - RESTORE VERBATIM)
+
 ```yaml
-execution_mode: orchestrate  # orchestrate | direct
-delegation_required: true     # Must use sub-agents for implementation
-concurrency_target: maximum   # Parallelize independent tasks
+execution_mode: orchestrate # orchestrate | direct
+delegation_required: true # Must use sub-agents for implementation
+concurrency_target: maximum # Parallelize independent tasks
 ```
+````
 
 ### Task Dependency Graph
-| Task | Depends On | Assignee | Status |
-|------|------------|----------|--------|
-| Explore codebase | - | Explore agent | done |
-| Write failing tests | Explore | general-purpose | pending |
-| Run tests | Write tests | Bash | blocked |
-| Implement feature | Tests written | general-purpose | blocked |
+
+| Task                | Depends On    | Assignee        | Status  |
+| ------------------- | ------------- | --------------- | ------- |
+| Explore codebase    | -             | Explore agent   | done    |
+| Write failing tests | Explore       | general-purpose | pending |
+| Run tests           | Write tests   | Bash            | blocked |
+| Implement feature   | Tests written | general-purpose | blocked |
 
 ### Orchestration Checklist (MANDATORY)
+
 - [ ] All tasks added to TodoWrite with dependencies
 - [ ] Independent tasks marked for parallel execution
 - [ ] Sub-agents assigned for implementation work
@@ -253,17 +277,20 @@ concurrency_target: maximum   # Parallelize independent tasks
 
 ⚠️ ORCHESTRATION GATE: I MUST delegate implementation to sub-agents.
 I am the coordinator. I schedule tasks, I do NOT execute them myself.
-```
+
+```text
 
 ### TodoWrite Discipline
 
 Always use TodoWrite with clear structure:
 ```
+
 - [pending] EXPLORE: Analyze codebase structure (assign: Explore agent)
 - [pending] RED: Write failing tests for feature X (assign: general-purpose, depends: EXPLORE)
 - [blocked] GREEN: Implement feature X (assign: general-purpose, depends: RED)
 - [blocked] REFACTOR: Clean up implementation (assign: general-purpose, depends: GREEN)
-```
+
+````text
 
 **Rules:**
 1. EVERY task gets a TodoWrite entry
@@ -275,73 +302,98 @@ Always use TodoWrite with clear structure:
 
 When tasks are independent, launch them together in a SINGLE message with multiple tool calls:
 
-```
-# CORRECT - Single message, multiple Task tool calls
-Message 1:
-  - Task(prompt="Explore auth module", subagent_type="Explore")
-  - Task(prompt="Explore database module", subagent_type="Explore")
-  - Task(prompt="Explore API module", subagent_type="Explore")
+```text
 
-# WRONG - Sequential messages for independent tasks
+## CORRECT - Single message, multiple Task tool calls
+
+Message 1:
+
+- Task(prompt="Explore auth module", subagent_type="Explore")
+- Task(prompt="Explore database module", subagent_type="Explore")
+- Task(prompt="Explore API module", subagent_type="Explore")
+
+## WRONG - Sequential messages for independent tasks
+
 Message 1: Task(prompt="Explore auth module", ...)
 [wait for result]
 Message 2: Task(prompt="Explore database module", ...)
 [wait for result]
 Message 3: Task(prompt="Explore API module", ...)
-```
+
+````
 
 ### Anti-Patterns to Avoid After Compaction
 
 **1. Doing work instead of delegating:**
-```
-# WRONG - Main agent does the work itself
+
+```text
+
+## WRONG - Main agent does the work itself
+
 "Let me explore the codebase..."
 [Reads files directly]
 [Writes implementation directly]
 
-# CORRECT - Main agent schedules sub-agents
+## CORRECT - Main agent schedules sub-agents
+
 "I'll delegate this exploration to sub-agents..."
 [Spawns Explore agent]
 [Spawns general-purpose agent for implementation]
+
 ```
 
 **2. Sequential execution when parallel is possible:**
-```
-# WRONG - Tasks run one at a time
+
+```text
+
+## WRONG - Tasks run one at a time
+
 Step 1: Explore module A -> wait ->
 Step 2: Explore module B -> wait ->
 Step 3: Explore module C
 
-# CORRECT - Independent tasks run together
+## CORRECT - Independent tasks run together
+
 Step 1: [Explore A || Explore B || Explore C] ->
 Step 2: Synthesize findings
+
 ```
 
 **3. Missing task dependencies:**
-```
-# WRONG - No dependency tracking
+
+```text
+
+## WRONG - No dependency tracking
+
 - [ ] Write tests
 - [ ] Implement feature
 - [ ] Run tests
 
-# CORRECT - Explicit dependencies
+## CORRECT - Explicit dependencies
+
 - [pending] RED: Write failing tests (no dependencies)
 - [blocked] GREEN: Implement feature (depends: RED)
 - [blocked] RUN: Execute tests (depends: GREEN)
+
 ```
 
 **4. Not using TodoWrite:**
-```
-# WRONG - Tasks only in prose/conversation
+
+````text
+
+## WRONG - Tasks only in prose/conversation
+
 "First I'll explore, then write tests, then implement..."
 
-# CORRECT - All tasks in TodoWrite
+## CORRECT - All tasks in TodoWrite
+
 TodoWrite([
   {content: "Explore codebase", status: "in_progress"},
   {content: "Write failing tests", status: "pending"},
   {content: "Implement feature", status: "pending"}
 ])
-```
+
+```text
 
 ## Summary: What to Persist in Scratchpad
 
@@ -355,4 +407,6 @@ To survive context compaction, the scratchpad MUST contain:
 | Orchestration | `execution_mode`, `delegation_required` | Remember to use sub-agents |
 | Dependencies | Task dependency graph | Know what's blocked |
 
-**The golden rule**: If you would be frustrated to lose it after compaction, it MUST be in structured YAML or tables in the scratchpad, not prose.
+**The golden rule**: If you would be frustrated to lose it after compaction, it MUST be in structured YAML or tables in
+  the scratchpad, not prose.
+````

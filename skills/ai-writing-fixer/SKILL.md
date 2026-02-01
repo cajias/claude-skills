@@ -39,6 +39,7 @@ humanize_text --categories "buzzwords,filler-phrases" input.md
 ### Critical Priority
 
 **Chatbot Artifacts** → Delete entirely
+
 - "I hope this helps" → (delete)
 - "As an AI language model" → (delete)
 - "Feel free to ask" → (delete)
@@ -46,34 +47,38 @@ humanize_text --categories "buzzwords,filler-phrases" input.md
 ### High Priority
 
 **Buzzwords** → Simplify
-| Original | Replacement |
-|----------|-------------|
-| leverage | use |
-| utilize | use |
-| facilitate | help, enable |
-| implement | build, create |
-| delve into | examine, explore |
-| cutting-edge | modern, current |
-| ecosystem | system, environment |
-| synergy | cooperation |
+
+| Original     | Replacement         |
+| ------------ | ------------------- |
+| leverage     | use                 |
+| utilize      | use                 |
+| facilitate   | help, enable        |
+| implement    | build, create       |
+| delve into   | examine, explore    |
+| cutting-edge | modern, current     |
+| ecosystem    | system, environment |
+| synergy      | cooperation         |
 
 **Inflated Symbolism** → Deflate
-| Original | Replacement |
-|----------|-------------|
-| stands as a testament | shows, demonstrates |
-| plays a vital role | is important for |
-| watershed moment | turning point |
-| cornerstone of | foundation of, basis for |
+
+| Original              | Replacement              |
+| --------------------- | ------------------------ |
+| stands as a testament | shows, demonstrates      |
+| plays a vital role    | is important for         |
+| watershed moment      | turning point            |
+| cornerstone of        | foundation of, basis for |
 
 **Promotional Language** → Neutralize
-| Original | Replacement |
-|----------|-------------|
+
+| Original      | Replacement          |
+| ------------- | -------------------- |
 | revolutionary | significant, notable |
-| breathtaking | impressive |
-| game-changing | important |
-| unparalleled | excellent, strong |
+| breathtaking  | impressive           |
+| game-changing | important            |
+| unparalleled  | excellent, strong    |
 
 **Editorializing** → Delete
+
 - "It's important to note that" → (delete)
 - "Worth mentioning is that" → (delete)
 - "Interestingly," → (delete)
@@ -81,14 +86,17 @@ humanize_text --categories "buzzwords,filler-phrases" input.md
 ### Medium Priority
 
 **Negative Parallelism** → Direct statement
+
 - "It's not just X, but Y" → "It is both X and Y" or just "Y"
 - "Not only X, but also Y" → "X and Y"
 
 **Participle Endings** → Trim or restructure
+
 - ", ensuring quality" → (delete or new sentence)
 - ", highlighting its importance" → (delete)
 
 **Filler Phrases** → Delete entirely
+
 - "In today's ever-evolving world" → (delete)
 - "In the realm of" → (delete)
 - "When it comes to" → (delete)
@@ -101,7 +109,7 @@ humanize_text --categories "buzzwords,filler-phrases" input.md
 
 ## Iterative Workflow
 
-```
+```text
 ┌─────────────────┐
 │ Analyze Text    │
 └────────┬────────┘
@@ -132,27 +140,30 @@ humanize_text --categories "buzzwords,filler-phrases" input.md
 ## Modes
 
 ### Interactive Mode
+
 - Present each issue for review
 - Options: [A]ccept, [E]dit, [S]kip, [Q]uit
 - Maximum control, slower
 
 ### Batch Mode
+
 - Auto-apply high-confidence fixes
 - Skip low-confidence changes
 - Present summary at end
 
 ### Report-Only Mode
+
 - Show what would change
 - No modifications made
 - Good for preview
 
 ## Confidence Levels
 
-| Confidence | Auto-apply? | Examples |
-|------------|-------------|----------|
-| High | Yes | Simple word swaps, deletions |
-| Medium | Review | Phrase restructuring |
-| Low | Skip | Complex rewrites |
+| Confidence | Auto-apply? | Examples                     |
+| ---------- | ----------- | ---------------------------- |
+| High       | Yes         | Simple word swaps, deletions |
+| Medium     | Review      | Phrase restructuring         |
+| Low        | Skip        | Complex rewrites             |
 
 ## Change Application Order
 
@@ -181,16 +192,18 @@ After all iterations:
 **Changes Made:** 15
 
 ### Summary
-| Category | Fixed |
-|----------|-------|
-| Chatbot Artifacts | 1 |
-| Buzzwords | 6 |
-| Inflated Symbolism | 3 |
-| Participle Endings | 2 |
-| Filler Phrases | 1 |
-| Editorializing | 2 |
+
+| Category           | Fixed |
+| ------------------ | ----- |
+| Chatbot Artifacts  | 1     |
+| Buzzwords          | 6     |
+| Inflated Symbolism | 3     |
+| Participle Endings | 2     |
+| Filler Phrases     | 1     |
+| Editorializing     | 2     |
 
 ### Before/After Excerpt
+
 **Before:** "In today's ever-evolving world, the platform stands as a testament to innovation, leveraging cutting-edge technology."
 
 **After:** "The platform demonstrates innovation using modern technology."

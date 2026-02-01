@@ -39,6 +39,7 @@ If no directory provided or no .md files found, inform the user.
 ### Step 2: Ask Output Location
 
 Use AskUserQuestion to ask where to save the PDF:
+
 - Same directory as source (default)
 - Custom path
 
@@ -61,6 +62,7 @@ python3 "$CLAUDE_PLUGIN_ROOT/scripts/md-to-pdf.py" "<source-directory>" "<output
 ```
 
 The script handles:
+
 - Combining markdown files alphabetically
 - Downloading Mermaid diagrams from mermaid.ink
 - Generating HTML with pandoc
@@ -80,11 +82,12 @@ open "<output-path>"
 
 ## Example Usage
 
-```
+```text
 /md-to-pdf /path/to/documentation
 ```
 
 This will:
+
 1. Find all .md files in /path/to/documentation
 2. Ask where to save the PDF
 3. Generate the PDF with rendered diagrams

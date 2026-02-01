@@ -32,6 +32,11 @@
       "bash -c 'cd plugins/ai-zettelkasten && uvx ruff format -- \"$@\"' --",
       "bash -c 'cd plugins/ai-zettelkasten && uvx ruff check --fix -- \"$@\"' --",
       "bash -c 'cd plugins/ai-zettelkasten && uvx ruff check -- \"$@\"' --"
+    ],
+    "plugins/semantic-search/**/*.py": [
+      "bash -c 'cd plugins/semantic-search && uv run ruff format -- \"$@\"' --",
+      "bash -c 'cd plugins/semantic-search && uv run ruff check --fix -- \"$@\"' --",
+      "bash -c 'cd plugins/semantic-search && uv run ruff check -- \"$@\"' --"
     ]
   },
   "keywords": [

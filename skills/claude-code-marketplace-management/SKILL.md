@@ -14,11 +14,13 @@ date: 2026-01-26
 # Claude Code Marketplace Management
 
 ## Problem
+
 Users may confuse marketplace discovery directories (like claudemarketplaces.com) with
 actual plugin marketplaces that can be added to Claude Code. The discovery site is for
 browsing; the marketplaces listed on it are what you actually add.
 
 ## Context / Trigger Conditions
+
 - User asks "how do I add this marketplace?" referring to claudemarketplaces.com
 - User wants to discover available Claude Code plugins
 - User is looking for plugin marketplaces to install
@@ -49,6 +51,7 @@ browsing; the marketplaces listed on it are what you actually add.
 ```
 
 Examples:
+
 - `/plugin marketplace add anthropics/claude-code` - Official Anthropic plugins
 - `/plugin marketplace add wshobson/agents` - Community agent marketplace
 - `/plugin marketplace add payloadcms/payload` - Payload CMS marketplace
@@ -56,6 +59,7 @@ Examples:
 ### Listing Available Marketplaces
 
 Browse claudemarketplaces.com to discover marketplaces by:
+
 - Category (Development, AI, Security, etc.)
 - GitHub stars (popularity)
 - Plugin count
@@ -72,8 +76,10 @@ Browse claudemarketplaces.com to discover marketplaces by:
 ```
 
 ## Verification
+
 After adding a marketplace, you should see:
-```
+
+```text
 Successfully added marketplace: <marketplace-name>
 ```
 
@@ -91,11 +97,13 @@ For example, to add the official Anthropic marketplace:
 `/plugin marketplace add anthropics/claude-code`"
 
 ## Notes
+
 - Marketplaces must have a valid `.claude-plugin/marketplace.json` file
 - Only marketplaces with 5+ GitHub stars appear on claudemarketplaces.com
 - The directory updates daily via automated GitHub search
 - Always review marketplace code before installing (security best practice)
 
 ## References
+
 - [Claude Code Marketplaces Directory](https://claudemarketplaces.com/)
 - [About Claude Code Marketplaces](https://claudemarketplaces.com/about)

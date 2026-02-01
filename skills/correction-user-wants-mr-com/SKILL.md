@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 0.99
 ---
@@ -16,12 +16,12 @@ breakthrough_score: 0.99
 
 Task
 
-  Create inline code review comments on GitLab merge requests that are positioned on specific lines in the
-   diff (appearing next to the code), not as general MR comments.
+Create inline code review comments on GitLab merge requests that are positioned on specific lines in the
+diff (appearing next to the code), not as general MR comments.
 
-  Problem
+Problem
 
-  When po
+When po
 
 ## When to Use This Skill
 
@@ -42,4 +42,3 @@ Correction: User wants 'mr comments' instead of 'as general' | User wants instea
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

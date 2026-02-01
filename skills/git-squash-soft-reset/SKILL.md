@@ -83,7 +83,8 @@ git diff origin/main --stat
 ## Example
 
 **Before:** 12 commits on feature branch
-```
+
+```text
 76c02678 fix(mcp-client): use proper types
 44c1fb0f fix: remove pnpm-lock.yaml
 edf814e2 chore: strengthen ESLint rules
@@ -93,6 +94,7 @@ edf814e2 chore: strengthen ESLint rules
 ```
 
 **Commands:**
+
 ```bash
 git reset --soft origin/main
 git commit -m "feat(mcp-multiplexer): complete MCP protocol implementation
@@ -107,25 +109,29 @@ git push --force-with-lease origin feat/issue-82-complete-mcp-v2
 ```
 
 **After:** Single clean commit
-```
+
+```text
 13499270 feat(mcp-multiplexer): complete MCP protocol implementation
 ```
 
 ## Notes
 
-- **--force-with-lease** is safer than **--force** - it fails if someone else pushed to the branch, preventing accidental overwrites
-- **--no-verify** bypasses pre-commit hooks - use when hooks fail for environmental reasons (network timeouts, missing tools) but the code is known to be valid
-- This technique preserves all file changes but loses individual commit messages - consider including a summary of key changes in the new commit message
+- **--force-with-lease** is safer than **--force** - it fails if someone else pushed to the
+  branch, preventing accidental overwrites
+- **--no-verify** bypasses pre-commit hooks - use when hooks fail for environmental reasons
+  (network timeouts, missing tools) but the code is known to be valid
+- This technique preserves all file changes but loses individual commit messages - consider
+  including a summary of key changes in the new commit message
 - Works with any target branch, not just main: `git reset --soft origin/develop`
 - To squash only the last N commits: `git reset --soft HEAD~N`
 
 ## Comparison with Alternatives
 
-| Method | Interactive | Preserves Messages | Speed |
-|--------|-------------|-------------------|-------|
-| `git reset --soft` | No | No | Fast |
-| `git rebase -i` | Yes | Configurable | Slow |
-| `git merge --squash` | No | No | Medium |
+| Method               | Interactive | Preserves Messages | Speed  |
+| -------------------- | ----------- | ------------------ | ------ |
+| `git reset --soft`   | No          | No                 | Fast   |
+| `git rebase -i`      | Yes         | Configurable       | Slow   |
+| `git merge --squash` | No          | No                 | Medium |
 
 ## Related
 

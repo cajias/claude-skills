@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 3.42
 ---
@@ -27,7 +27,9 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Teaching: disable lint rules for ai-generated code - flee-20260129-p2pma4 | Correction: User wants 'correctness' instead of 'just' | User wants instead: 'abstractly - flee-20260129-p2lre2' | Avoid: 'disable lint rules for ai-generated code - flee-20260129-p2pma4'
+Teaching: disable lint rules for ai-generated code - flee-20260129-p2pma4 | Correction: User wants 'correctness' instead
+of 'just' | User wants instead: 'abstractly - flee-20260129-p2lre2' | Avoid: 'disable lint rules for ai-generated code -
+flee-20260129-p2pma4'
 
 ## Verification
 
@@ -40,4 +42,3 @@ Teaching: disable lint rules for ai-generated code - flee-20260129-p2pma4 | Corr
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 2
-

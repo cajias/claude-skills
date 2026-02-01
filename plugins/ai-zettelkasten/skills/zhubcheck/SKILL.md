@@ -9,7 +9,7 @@ Compare semantic clusters with hub assignments to find notes that may be in the 
 
 ## Usage
 
-```
+```text
 /zhubcheck                    # Default 60% threshold
 /zhubcheck --threshold 70     # Stricter threshold
 ```
@@ -45,15 +45,14 @@ uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-hub
 
 ## Interpreting Results
 
-| Situation | Action |
-|-----------|--------|
-| Low similarity + better match | Consider moving note to suggested hub |
+| Situation                        | Action                                    |
+| -------------------------------- | ----------------------------------------- |
+| Low similarity + better match    | Consider moving note to suggested hub     |
 | Low similarity + no better match | Note may need a new hub or is too generic |
-| High similarity | Note is well-assigned |
+| High similarity                  | Note is well-assigned                     |
 
 ## Output Legend
 
 - Current: The hub the note is currently assigned to
 - Suggest: The hub with highest semantic similarity
 - Percentage: Cosine similarity score
-

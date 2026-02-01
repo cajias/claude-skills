@@ -1,0 +1,3 @@
+# correction-avoid-move-the-s
+
+Learned from user correction: Correction: Avoid: 'move the skills just document what is...

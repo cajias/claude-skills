@@ -29,29 +29,32 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claudeception-all-sessions.sh [options]
 
 ## Common Options
 
-| Option | Description |
-|--------|-------------|
-| `--dry-run` | Preview what would be processed |
-| `--since N` | Recent N days (positive) or oldest N days (negative) |
-| `--limit N` | Process at most N sessions |
-| `--filter PATTERN` | Only sessions matching pattern |
-| `--project PATH` | Only sessions from specific project |
-| `--max-messages N` | Skip sessions with more than N messages |
-| `--cleanup` | Remove result files |
+| Option             | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| `--dry-run`        | Preview what would be processed                      |
+| `--since N`        | Recent N days (positive) or oldest N days (negative) |
+| `--limit N`        | Process at most N sessions                           |
+| `--filter PATTERN` | Only sessions matching pattern                       |
+| `--project PATH`   | Only sessions from specific project                  |
+| `--max-messages N` | Skip sessions with more than N messages              |
+| `--cleanup`        | Remove result files                                  |
 
 ## Examples
 
 **Preview oldest sessions:**
+
 ```bash
 ${CLAUDE_PLUGIN_ROOT}/scripts/claudeception-all-sessions.sh --since -1 --dry-run
 ```
 
 **Process last 7 days, limit to 10:**
+
 ```bash
 ${CLAUDE_PLUGIN_ROOT}/scripts/claudeception-all-sessions.sh --since 7 --limit 10
 ```
 
 **Filter by topic:**
+
 ```bash
 ${CLAUDE_PLUGIN_ROOT}/scripts/claudeception-all-sessions.sh --filter "obsidian" --limit 5
 ```
@@ -59,6 +62,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/claudeception-all-sessions.sh --filter "obsidian" 
 ## Output
 
 Results are saved to `~/.claude/claudeception-results/`:
+
 - `{session-id}.md` - Extracted knowledge
 - `{session-id}.log` - Processing log
 

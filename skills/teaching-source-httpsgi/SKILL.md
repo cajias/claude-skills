@@ -5,12 +5,12 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 71.03
 ---
 
-# Teaching: - source: https://github | Correction: Expected be
+# Teaching: - source: <https://github> | Correction: Expected be
 
 ## Problem / Use Case
 
@@ -26,7 +26,7 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Teaching: - source: https://github | Correction: Expected behavior: 'be created'
+Teaching: - source: <https://github> | Correction: Expected behavior: 'be created'
 
 ## Verification
 
@@ -39,4 +39,3 @@ Teaching: - source: https://github | Correction: Expected behavior: 'be created'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 3
-

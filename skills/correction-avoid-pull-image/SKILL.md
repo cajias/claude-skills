@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 15.38
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 15.38
 
 ## Problem / Use Case
 
-create a ticket for copying the images we use from higress to ecs so we dont pull images from china anymore. Do youunderstand the ask and what to do ? we need a better sounding description
+create a ticket for copying the images we use from higress to ecs so we dont pull images from china anymore. Do
+youunderstand the ask and what to do ? we need a better sounding description
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: Avoid: 'pull images from china anymore'
 - Classification: user
 - Confidence: 0.55
 - Corrections detected: 1
-

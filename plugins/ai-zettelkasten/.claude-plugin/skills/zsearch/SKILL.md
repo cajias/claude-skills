@@ -13,7 +13,7 @@ Search your knowledge base using natural language. Finds relevant facts, decisio
 
 ## Usage
 
-```
+```text
 /zsearch <query>
 /zsearch <query> --type fact|decision|pattern|correction
 /zsearch <query> --since 7d
@@ -32,6 +32,7 @@ When this skill is invoked:
 1. **Parse the query and filters** from the arguments
 
 2. **Search S3 Vectors** using AWS CLI:
+
 ```bash
 # Generate embedding for query
 EMBEDDING=$(aws bedrock-runtime invoke-model \
@@ -50,20 +51,22 @@ aws s3vectors query-vectors \
   --return-distance
 ```
 
-3. **Format and display results** ranked by relevance:
-```
+1. **Format and display results** ranked by relevance:
+
+```text
 📚 Search Results for: "How does S3 Vectors work?"
 
 1. [0.24] S3 Vectors Configuration (fact)
    S3 Vectors uses 1536 dimensions with Bedrock Titan...
    Tags: aws, s3-vectors, embeddings
 
-2. [0.39] Chose S3 Vectors over Aurora (decision)
+1. [0.39] Chose S3 Vectors over Aurora (decision)
    Decided on S3 Vectors for simplicity and cost...
    Tags: architecture, aws
 ```
 
-4. **If S3 Vectors not configured**, fall back to Obsidian search:
+1. **If S3 Vectors not configured**, fall back to Obsidian search:
+
 ```bash
 # Search Obsidian extractions
 mcp__obsidian__search_notes --query "$QUERY" --limit 10
@@ -72,6 +75,7 @@ mcp__obsidian__search_notes --query "$QUERY" --limit 10
 ## Configuration
 
 Requires environment variables:
+
 - `ZETTELKASTEN_BUCKET`: S3 Vectors bucket name
 - `ZETTELKASTEN_INDEX`: Index name (default: knowledge-index)
 

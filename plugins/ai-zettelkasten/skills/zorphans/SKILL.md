@@ -9,7 +9,7 @@ Discover notes that are semantically isolated and don't have strong connections 
 
 ## Usage
 
-```
+```text
 /zorphans                    # Default 50% max similarity threshold
 /zorphans --threshold 40     # Find more isolated notes
 /zorphans --threshold 60     # Only find truly disconnected notes
@@ -43,12 +43,12 @@ uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-orp
 
 ## Interpreting Results
 
-| Similarity | Meaning |
-|------------|---------|
-| < 30% | Completely isolated - unique topic or needs deletion |
-| 30-40% | Very weak connections - consider expanding or linking |
-| 40-50% | Loosely connected - may need more related notes |
-| > 50% | Well connected - probably not an orphan |
+| Similarity | Meaning                                               |
+| ---------- | ----------------------------------------------------- |
+| < 30%      | Completely isolated - unique topic or needs deletion  |
+| 30-40%     | Very weak connections - consider expanding or linking |
+| 40-50%     | Loosely connected - may need more related notes       |
+| > 50%      | Well connected - probably not an orphan               |
 
 ## Output Legend
 
@@ -56,4 +56,3 @@ uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-orp
 - ○ = fleeting note (pending review)
 - Max similarity: Highest similarity to any other note
 - Avg similarity: Average similarity to nearest neighbors
-

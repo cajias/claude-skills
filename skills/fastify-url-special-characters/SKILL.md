@@ -28,11 +28,12 @@ Fastify never matched your route.
 - Characters like `#`, `?`, or URL-encoded values in test URLs
 
 Example test that fails unexpectedly:
+
 ```typescript
 // This test FAILS - gets 404 instead of 400
 const response = await server.inject({
-  method: 'POST',
-  url: '/gateways/invalid@gateway#id!/mcp',
+  method: "POST",
+  url: "/gateways/invalid@gateway#id!/mcp",
   payload: validPayload,
 });
 expect(response.statusCode).toBe(400); // FAILS: gets 404
@@ -57,12 +58,14 @@ Fastify (and most HTTP frameworks) parse URLs according to RFC 3986:
 ### Step 1: Identify Which Characters Fastify Passes Through
 
 Characters that reach your handler (can be validated):
+
 - Letters, numbers, hyphens, underscores: `a-z`, `A-Z`, `0-9`, `-`, `_`
 - Dots: `.` (passed through)
 - Spaces (URL-encoded as `%20`): decoded and passed through
 - `@` symbol: passed through
 
 Characters that DON'T reach your handler:
+
 - `#` - Treated as fragment start, URL truncated
 - `?` - Treated as query string start
 - `/` - Path separator (even when encoded)
@@ -71,31 +74,31 @@ Characters that DON'T reach your handler:
 
 ```typescript
 // BAD: These characters are stripped by Fastify router
-url: '/gateways/invalid@gateway#id!/mcp'  // Gets 404, # truncates URL
+url: "/gateways/invalid@gateway#id!/mcp"; // Gets 404, # truncates URL
 
 // GOOD: Use characters that pass through but fail your validation
-url: '/gateways/invalid.gateway.id/mcp'   // Gets 400, dots aren't alphanumeric
-url: '/gateways/invalid gateway/mcp'       // Gets 400, spaces encoded as %20
+url: "/gateways/invalid.gateway.id/mcp"; // Gets 400, dots aren't alphanumeric
+url: "/gateways/invalid gateway/mcp"; // Gets 400, spaces encoded as %20
 ```
 
 ### Step 3: Test Each Validation Rule Separately
 
 ```typescript
 // Test for invalid characters (using dots)
-it('should return 400 for invalid gateway ID format (with dot)', async () => {
+it("should return 400 for invalid gateway ID format (with dot)", async () => {
   const response = await server.inject({
-    method: 'POST',
-    url: '/gateways/invalid.gateway.id/mcp',
+    method: "POST",
+    url: "/gateways/invalid.gateway.id/mcp",
     payload: validPayload,
   });
   expect(response.statusCode).toBe(400);
 });
 
 // Test for too-long IDs (using valid chars but exceeding length)
-it('should return 400 for gateway ID exceeding max length', async () => {
-  const longId = 'a'.repeat(200); // Assuming max is 128
+it("should return 400 for gateway ID exceeding max length", async () => {
+  const longId = "a".repeat(200); // Assuming max is 128
   const response = await server.inject({
-    method: 'POST',
+    method: "POST",
     url: `/gateways/${longId}/mcp`,
     payload: validPayload,
   });
@@ -113,13 +116,13 @@ Test that your validation pattern correctly rejects the characters you care abou
 const GATEWAY_ID_PATTERN = /^[a-zA-Z0-9_-]{1,128}$/;
 
 // These should FAIL validation (return false)
-console.log(GATEWAY_ID_PATTERN.test('invalid.gateway'));  // false - has dot
-console.log(GATEWAY_ID_PATTERN.test('invalid gateway'));  // false - has space
-console.log(GATEWAY_ID_PATTERN.test(''));                 // false - empty
+console.log(GATEWAY_ID_PATTERN.test("invalid.gateway")); // false - has dot
+console.log(GATEWAY_ID_PATTERN.test("invalid gateway")); // false - has space
+console.log(GATEWAY_ID_PATTERN.test("")); // false - empty
 
 // These should PASS validation (return true)
-console.log(GATEWAY_ID_PATTERN.test('valid-gateway'));    // true
-console.log(GATEWAY_ID_PATTERN.test('valid_gateway_123')); // true
+console.log(GATEWAY_ID_PATTERN.test("valid-gateway")); // true
+console.log(GATEWAY_ID_PATTERN.test("valid_gateway_123")); // true
 ```
 
 ## Example
@@ -128,23 +131,23 @@ Real-world fix from MCP Proxy service:
 
 ```typescript
 // Before: Test failed with 404 because # was stripped
-it('should return 400 for invalid gateway ID format', async () => {
+it("should return 400 for invalid gateway ID format", async () => {
   const response = await server.inject({
-    method: 'POST',
-    url: '/gateways/invalid@gateway#id!/mcp',  // # causes 404
+    method: "POST",
+    url: "/gateways/invalid@gateway#id!/mcp", // # causes 404
     payload: validJsonRpcRequest,
   });
-  expect(response.statusCode).toBe(400);  // FAILS: gets 404
+  expect(response.statusCode).toBe(400); // FAILS: gets 404
 });
 
 // After: Use dots instead, which Fastify passes through
-it('should return 400 for invalid gateway ID format (with dot)', async () => {
+it("should return 400 for invalid gateway ID format (with dot)", async () => {
   const response = await server.inject({
-    method: 'POST',
-    url: '/gateways/invalid.gateway.id/mcp',  // dots pass through
+    method: "POST",
+    url: "/gateways/invalid.gateway.id/mcp", // dots pass through
     payload: validJsonRpcRequest,
   });
-  expect(response.statusCode).toBe(400);  // PASSES
+  expect(response.statusCode).toBe(400); // PASSES
 });
 ```
 

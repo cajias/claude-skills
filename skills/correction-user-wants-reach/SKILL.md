@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 1.57
 ---
@@ -35,4 +35,3 @@ Correction: User wants 'reach s3' instead of 'able to'
 - Classification: user
 - Confidence: 0.7
 - Corrections detected: 1
-

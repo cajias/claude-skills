@@ -13,7 +13,7 @@ Review and curate recently extracted knowledge. Approve, edit, or discard items 
 
 ## Usage
 
-```
+```text
 /zreview              # Review unreviewed items
 /zreview --today      # Review today's extractions
 /zreview --all        # Review all pending items
@@ -24,6 +24,7 @@ Review and curate recently extracted knowledge. Approve, edit, or discard items 
 When this skill is invoked:
 
 1. **Fetch unreviewed items** from Obsidian:
+
 ```bash
 # Find extraction files
 mcp__obsidian__search_notes \
@@ -32,8 +33,9 @@ mcp__obsidian__search_notes \
   --limit 20
 ```
 
-2. **Display items for review**:
-```
+1. **Display items for review**:
+
+```text
 📋 Knowledge Review Queue (5 items)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -46,20 +48,21 @@ mcp__obsidian__search_notes \
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-3. **For each item**, allow user to:
+1. **For each item**, allow user to:
    - **Approve**: Mark as reviewed, optionally promote to permanent note
    - **Edit**: Modify content, tags, or type before approving
    - **Discard**: Delete the extraction
    - **Skip**: Leave for later review
 
-4. **Update Obsidian** with review status:
+1. **Update Obsidian** with review status:
+
 ```bash
 mcp__obsidian__update_frontmatter \
   --path "knowledge-base/extractions/..." \
   --frontmatter '{"reviewed": true, "reviewed_date": "2026-01-27"}'
 ```
 
-5. **Optionally sync to S3 Vectors** for approved items:
+1. **Optionally sync to S3 Vectors** for approved items:
    - Generate embedding
    - Store in S3 Vectors with metadata
    - Update local record with vector ID

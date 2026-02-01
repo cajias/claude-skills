@@ -5,11 +5,12 @@ description: Suggest meaningful Zettelkasten links between notes based on semant
 
 # /zsuggestlinks - Zettelkasten Link Suggestions
 
-Analyze notes and suggest meaningful links following core Zettelkasten principles. Unlike simple similarity matching, this command classifies the *relationship type* between notes.
+Analyze notes and suggest meaningful links following core Zettelkasten principles. Unlike simple similarity matching,
+this command classifies the _relationship type_ between notes.
 
 ## Usage
 
-```
+```text
 /zsuggestlinks path/to/note.md     # Analyze single note
 /zsuggestlinks --all               # Analyze all permanent notes
 /zsuggestlinks --threshold 70      # Higher similarity requirement
@@ -19,22 +20,23 @@ Analyze notes and suggest meaningful links following core Zettelkasten principle
 
 ### 1. Links Connect Ideas, Not Documents
 
-Links should create meaningful conceptual connections, not just group similar topics. A link should answer: "Why does knowing A help me understand B?"
+Links should create meaningful conceptual connections, not just group similar topics. A link should answer: "Why does
+knowing A help me understand B?"
 
 ### 2. Relationship Types Matter
 
 Every link has a semantic relationship:
 
-| Type | Meaning | Example |
-|------|---------|---------|
-| **SOLVES** | A addresses problem in B | Pattern → Anti-pattern |
-| **ENABLES** | A is prerequisite for B | Setup → Feature |
-| **ELABORATES** | B expands on A | Overview → Deep-dive |
-| **CONTRADICTS** | B challenges A | Alternative approaches |
-| **SUPPORTS** | B provides evidence for A | Fact → Pattern |
-| **APPLIES** | B applies principle from A | Abstract → Concrete |
-| **ABSTRACTS** | B generalizes from A | Specific → General |
-| **SEQUENCE** | B logically follows A | Step 1 → Step 2 |
+| Type            | Meaning                    | Example                |
+| --------------- | -------------------------- | ---------------------- |
+| **SOLVES**      | A addresses problem in B   | Pattern → Anti-pattern |
+| **ENABLES**     | A is prerequisite for B    | Setup → Feature        |
+| **ELABORATES**  | B expands on A             | Overview → Deep-dive   |
+| **CONTRADICTS** | B challenges A             | Alternative approaches |
+| **SUPPORTS**    | B provides evidence for A  | Fact → Pattern         |
+| **APPLIES**     | B applies principle from A | Abstract → Concrete    |
+| **ABSTRACTS**   | B generalizes from A       | Specific → General     |
+| **SEQUENCE**    | B logically follows A      | Step 1 → Step 2        |
 
 ### 3. Bidirectional Awareness
 
@@ -85,7 +87,7 @@ The command uses these heuristics to determine relationship type:
 
 ## Output Format
 
-```
+```text
 Aggressive Context Clearing Between Tasks
   → SOLVES [[context-window-performance-degradation]] (78%)
     This note addresses problem in 'context-window-performance-degradation'
@@ -96,7 +98,7 @@ Aggressive Context Clearing Between Tasks
 ## Follow-up
 
 After reviewing suggestions:
+
 1. Add accepted links to note's `## Related` section
 2. Add backlinks to target notes
 3. Use relationship type as the link category
-

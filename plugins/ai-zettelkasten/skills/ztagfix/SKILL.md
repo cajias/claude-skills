@@ -9,7 +9,7 @@ Interactive workflow to fix tag issues identified by `/ztagaudit`.
 
 ## Usage
 
-```
+```text
 /ztagfix                      # Full remediation workflow
 /ztagfix safety               # Just safety tag consolidation
 /ztagfix orphans              # Just orphan tag consolidation
@@ -44,16 +44,16 @@ zk-tag-consolidate --from guardrails,ai-risks --to safety
 
 Consolidate orphan tags to broader categories based on the tag taxonomy:
 
-| Orphan Tags | Target | Command |
-|-------------|--------|---------|
-| `discipline`, `exit-criteria`, `planning`, `goals`, `tracking` | `methodology` | `zk-tag-consolidate -f discipline,exit-criteria,planning,goals,tracking -t methodology` |
-| `cloudformation`, `cdk`, `deployment`, `devops` | `infrastructure` | `zk-tag-consolidate -f cloudformation,cdk,deployment,devops -t infrastructure` |
-| `team-coordination`, `communication` | `workflows` | `zk-tag-consolidate -f team-coordination,communication -t workflows` |
-| `adr` | `documentation` | `zk-tag-consolidate -f adr -t documentation` |
-| `validation` | `testing` | `zk-tag-consolidate -f validation -t testing` |
-| `secrets` | `security` | `zk-tag-consolidate -f secrets -t security` |
-| `cost-management` | `monitoring` | `zk-tag-consolidate -f cost-management -t monitoring` |
-| `debugging` | `code-quality` | `zk-tag-consolidate -f debugging -t code-quality` |
+| Orphan Tags                                                    | Target           | Command                                                                                 |
+| -------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------- |
+| `discipline`, `exit-criteria`, `planning`, `goals`, `tracking` | `methodology`    | `zk-tag-consolidate -f discipline,exit-criteria,planning,goals,tracking -t methodology` |
+| `cloudformation`, `cdk`, `deployment`, `devops`                | `infrastructure` | `zk-tag-consolidate -f cloudformation,cdk,deployment,devops -t infrastructure`          |
+| `team-coordination`, `communication`                           | `workflows`      | `zk-tag-consolidate -f team-coordination,communication -t workflows`                    |
+| `adr`                                                          | `documentation`  | `zk-tag-consolidate -f adr -t documentation`                                            |
+| `validation`                                                   | `testing`        | `zk-tag-consolidate -f validation -t testing`                                           |
+| `secrets`                                                      | `security`       | `zk-tag-consolidate -f secrets -t security`                                             |
+| `cost-management`                                              | `monitoring`     | `zk-tag-consolidate -f cost-management -t monitoring`                                   |
+| `debugging`                                                    | `code-quality`   | `zk-tag-consolidate -f debugging -t code-quality`                                       |
 
 Run each with `--dry-run` first, then apply.
 
@@ -69,6 +69,7 @@ For notes with 7+ tags:
 3. Manually edit each note to reduce to 4-6 tags
 
 **Pruning principles:**
+
 - Keep tags that enable cross-hub discovery
 - Remove tags redundant with hub assignment
 - Keep technology tags (e.g., `typescript`, `git`)
@@ -85,6 +86,7 @@ Run `/zsync` to update S3 Vectors with tag changes.
 ## Tag Taxonomy Reference
 
 See `[[hubs/tag-taxonomy|Tag Taxonomy]]` for:
+
 - Approved tag categories
 - Deprecated tags and their replacements
 - Tagging guidelines
@@ -100,12 +102,12 @@ See `[[hubs/tag-taxonomy|Tag Taxonomy]]` for:
 
 ## Success Criteria
 
-| Metric | Before | Target |
-|--------|--------|--------|
-| Orphan tags | ~37 | <10 |
-| Unique tags | ~57 | 25-35 |
-| Over-tagged notes | ~3 | 0 |
-| Safety cluster tags | 3 | 1 |
+| Metric              | Before | Target |
+| ------------------- | ------ | ------ |
+| Orphan tags         | ~37    | <10    |
+| Unique tags         | ~57    | 25-35  |
+| Over-tagged notes   | ~3     | 0      |
+| Safety cluster tags | 3      | 1      |
 
 ## Related
 

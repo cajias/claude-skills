@@ -6,12 +6,14 @@ The core `knowledge_detector.py` module is fully implemented and tested.
 Remaining goals (G5-G7) are deferred for future integration work.
 
 ## Feature Specification (Clarified)
+
 - **Source**: Analyze both user prompts AND Claude responses for knowledge
 - **Integration**: Create unified `knowledge_detector.py` merging corrections + teaching
 - **Taxonomy**: Ask user at extraction time to classify (user vs project level)
 - **Weight**: Teaching signals get 3.0x weight (same as corrections)
 
 ## Master Goals (Immutable)
+
 - [x] G1: Create `knowledge_detector.py` that unifies correction + teaching detection
 - [x] G2: Detect teaching patterns ("remember that...", "always do X", "I prefer...")
 - [x] G3: Detect knowledge synthesis in Claude responses ("the pattern is...", "key insight:")
@@ -21,6 +23,7 @@ Remaining goals (G5-G7) are deferred for future integration work.
 - [x] G7: Update plugin.json to use new handler (v4.1.0)
 
 ## Exit Criteria - COMPLETE ✓
+
 - [x] knowledge_detector.py implemented with all functions
 - [x] 24/24 validation tests pass
 - [x] All modules importable without error
@@ -29,11 +32,13 @@ Remaining goals (G5-G7) are deferred for future integration work.
 - [x] Full plugin integration complete
 
 ## Coverage Thresholds
+
 - Line coverage: 80%
 - Branch coverage: 75%
 - Critical path coverage: 100% (detection patterns)
 
 ## Anti-Patterns (AVOID)
+
 - Writing implementation before tests
 - Writing tests that already pass
 - Skipping the refactor phase
@@ -41,8 +46,9 @@ Remaining goals (G5-G7) are deferred for future integration work.
 - Starting implementation without writing failing tests first
 
 ## Investigation Tracker
-| Iteration | Issue | Attempted Fix | Result | Next Action |
-|-----------|-------|---------------|--------|-------------|
+
+| Iteration                    | Issue | Attempted Fix | Result | Next Action |
+| ---------------------------- | ----- | ------------- | ------ | ----------- |
 | (populated during execution) |
 
 ---
@@ -80,6 +86,7 @@ Remaining goals (G5-G7) are deferred for future integration work.
     - `test_user_project_default_heuristics`
 
 **RED Phase Validation:**
+
 - [ ] All NEW tests fail with meaningful error messages
 - [ ] Failures are due to missing implementation
 - [ ] Test file locations documented
@@ -112,6 +119,7 @@ Remaining goals (G5-G7) are deferred for future integration work.
   - Add teaching weight (3.0x) to session_state.py
 
 **GREEN Phase Validation:**
+
 - [ ] All tests pass
 - [ ] No extra code beyond requirements
 - [ ] Coverage meets thresholds
@@ -128,6 +136,7 @@ Remaining goals (G5-G7) are deferred for future integration work.
 **Refactoring Triggers:** complexity > 10, method > 20 lines, duplicates > 3 lines
 
 **REFACTOR Validation:**
+
 - [ ] Tests still pass
 - [ ] Duplication reduced
 - [ ] Code simplified
@@ -135,12 +144,14 @@ Remaining goals (G5-G7) are deferred for future integration work.
 ### Phase 4: VALIDATE
 
 **Parallel validation (use concurrent subagents):**
+
 - [ ] Run pytest on new test file
 - [ ] Run pytest on existing test_correction_detector.py (no regressions)
 - [ ] Import test all modules
 - [ ] `/pr-review-toolkit:review-pr`
 
 **Sequential validation:**
+
 - [ ] Manual test: Send teaching phrase, verify detection
 - [ ] Manual test: End session, verify classification prompt
 
@@ -161,6 +172,7 @@ Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ### Phase 6: EVALUATE
 
 Check exit criteria:
+
 - If all met → DONE
 - If issues → Add to Investigation Tracker, generate next iteration
 

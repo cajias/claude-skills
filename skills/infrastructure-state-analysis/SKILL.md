@@ -1,12 +1,17 @@
 ---
 name: infrastructure-state-analysis
-description: "Phase 0.5: Infrastructure State Analysis for CDK/CloudFormation work. MANDATORY before TDD RED phase when working with infrastructure code. Prevents architectural errors by analyzing deployed state, cross-stack dependencies, and synth behavior."
+description: >-
+  Phase 0.5: Infrastructure State Analysis for CDK/CloudFormation work.
+  MANDATORY before TDD RED phase when working with infrastructure code.
+  Prevents architectural errors by analyzing deployed state, cross-stack
+  dependencies, and synth behavior.
 argument-hint: "[--stack STACK_NAME] [--region REGION] [--account ACCOUNT_ID]"
 ---
 
 # Phase 0.5: Infrastructure State Analysis
 
-**MANDATORY CHECKPOINT** for all CDK/CloudFormation infrastructure work. This phase must complete with ALL exit criteria met BEFORE proceeding to the TDD RED phase.
+**MANDATORY CHECKPOINT** for all CDK/CloudFormation infrastructure work. This phase must
+complete with ALL exit criteria met BEFORE proceeding to the TDD RED phase.
 
 ## Why This Phase Exists
 
@@ -17,11 +22,13 @@ This skill was created based on postmortem analysis of a critical infrastructure
 3. CDK synth wasn't run to validate the approach
 4. The error wasn't discovered until after significant implementation effort
 
-**Root Cause:** Jumping into TDD without understanding current infrastructure state leads to architectural errors that are expensive to fix.
+**Root Cause:** Jumping into TDD without understanding current infrastructure state leads to
+architectural errors that are expensive to fix.
 
 ## When This Phase Is Required
 
 **MANDATORY** when the task involves ANY of:
+
 - Creating or modifying CDK stacks
 - Changing CloudFormation exports/imports
 - Adding or modifying SSM parameter lookups
@@ -31,6 +38,7 @@ This skill was created based on postmortem analysis of a critical infrastructure
 - Adding or removing stack dependencies
 
 **SKIP** when the task is:
+
 - Pure application code (no infrastructure changes)
 - Documentation only
 - Test-only changes to existing infrastructure tests
@@ -42,30 +50,30 @@ This skill was created based on postmortem analysis of a critical infrastructure
 
 Before ANY infrastructure work, you MUST answer these questions:
 
-| Question | How to Answer | Why It Matters |
-|----------|---------------|----------------|
-| What stacks currently exist in the target account? | `aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE` | Avoid creating duplicate stacks or breaking existing deployments |
-| What are the current CloudFormation exports? | `aws cloudformation list-exports` | Identify dependencies before modifying them |
-| Which stacks import from the stack I'm modifying? | `aws cloudformation list-imports --export-name <name>` | Breaking exports breaks dependent stacks |
-| What SSM parameters already exist in the target path? | `aws ssm get-parameters-by-path --path /foundation/` | Avoid duplicate parameters or incorrect lookups |
-| Is there a deployed FoundationStack? | `aws cloudformation describe-stacks --stack-name FoundationStack` | Many stacks depend on foundation resources |
+| Question                                              | How to Answer                                                                          | Why It Matters                                                   |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| What stacks currently exist in the target account?    | `aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE` | Avoid creating duplicate stacks or breaking existing deployments |
+| What are the current CloudFormation exports?          | `aws cloudformation list-exports`                                                      | Identify dependencies before modifying them                      |
+| Which stacks import from the stack I'm modifying?     | `aws cloudformation list-imports --export-name <name>`                                 | Breaking exports breaks dependent stacks                         |
+| What SSM parameters already exist in the target path? | `aws ssm get-parameters-by-path --path /foundation/`                                   | Avoid duplicate parameters or incorrect lookups                  |
+| Is there a deployed FoundationStack?                  | `aws cloudformation describe-stacks --stack-name FoundationStack`                      | Many stacks depend on foundation resources                       |
 
 ### Category 2: Architecture Understanding
 
-| Question | How to Verify | Failure Mode if Skipped |
-|----------|---------------|-------------------------|
-| Where should SSM lookups occur? | Read design docs, check CDK best practices | App-level lookups fail at synth time |
-| What scope is needed for `valueFromLookup`? | Must be Stack scope, never App scope | "App at '' should be created in the scope of a Stack" error |
-| Are there circular dependencies between stacks? | Trace imports/exports in both directions | Deployment fails with circular dependency error |
-| Does the design doc match the implementation? | Compare design doc Section 6 with actual code | Architectural drift causes subtle failures |
+| Question                                        | How to Verify                                 | Failure Mode if Skipped                                     |
+| ----------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------- |
+| Where should SSM lookups occur?                 | Read design docs, check CDK best practices    | App-level lookups fail at synth time                        |
+| What scope is needed for `valueFromLookup`?     | Must be Stack scope, never App scope          | "App at '' should be created in the scope of a Stack" error |
+| Are there circular dependencies between stacks? | Trace imports/exports in both directions      | Deployment fails with circular dependency error             |
+| Does the design doc match the implementation?   | Compare design doc Section 6 with actual code | Architectural drift causes subtle failures                  |
 
 ### Category 3: CDK Context Understanding
 
-| Question | How to Verify | Impact |
-|----------|---------------|--------|
-| What context values are cached? | Check `cdk.context.json` | Stale context causes incorrect synth output |
-| Are there hardcoded account/region values? | Grep for account IDs, region strings | Environment-specific failures |
-| What happens if SSM parameters don't exist? | Test with missing parameters | Synth fails or produces invalid templates |
+| Question                                    | How to Verify                        | Impact                                      |
+| ------------------------------------------- | ------------------------------------ | ------------------------------------------- |
+| What context values are cached?             | Check `cdk.context.json`             | Stale context causes incorrect synth output |
+| Are there hardcoded account/region values?  | Grep for account IDs, region strings | Environment-specific failures               |
+| What happens if SSM parameters don't exist? | Test with missing parameters         | Synth fails or produces invalid templates   |
 
 ## Commands to Run
 
@@ -185,15 +193,15 @@ Add the following entries to the Investigation Tracker table:
 ```markdown
 ## Investigation Tracker
 
-| Iteration | Issue | Attempted Fix | Result | Next Action |
-|-----------|-------|---------------|--------|-------------|
-| 0.5 | Infrastructure state analysis | Ran CFN list-stacks | Found 12 stacks deployed | Document dependencies |
-| 0.5 | CloudFormation exports | Ran list-exports | 8 exports, 3 have importers | Create migration plan for exports |
-| 0.5 | SSM parameters | Checked /foundation/ path | 15 parameters exist | Verify lookup scope in code |
-| 0.5 | CDK synth test | Ran cdk synth --all | FAILED: App scope error | Move lookups to Stack level |
-| 0.5 | SSM lookup scope | Audited valueFromLookup calls | Found 3 at App level | Task #12: Fix architecture |
-| 0.5 | Cross-stack deps | Grep for Fn::ImportValue | 5 templates have imports | Document which exports they use |
-| 0.5 | CDK context | Checked cdk.context.json | Context has stale VPC ID | Clear and re-synth |
+| Iteration | Issue                         | Attempted Fix                 | Result                      | Next Action                       |
+| --------- | ----------------------------- | ----------------------------- | --------------------------- | --------------------------------- |
+| 0.5       | Infrastructure state analysis | Ran CFN list-stacks           | Found 12 stacks deployed    | Document dependencies             |
+| 0.5       | CloudFormation exports        | Ran list-exports              | 8 exports, 3 have importers | Create migration plan for exports |
+| 0.5       | SSM parameters                | Checked /foundation/ path     | 15 parameters exist         | Verify lookup scope in code       |
+| 0.5       | CDK synth test                | Ran cdk synth --all           | FAILED: App scope error     | Move lookups to Stack level       |
+| 0.5       | SSM lookup scope              | Audited valueFromLookup calls | Found 3 at App level        | Task #12: Fix architecture        |
+| 0.5       | Cross-stack deps              | Grep for Fn::ImportValue      | 5 templates have imports    | Document which exports they use   |
+| 0.5       | CDK context                   | Checked cdk.context.json      | Context has stale VPC ID    | Clear and re-synth                |
 ```
 
 ### Minimum Required Entries
@@ -209,7 +217,7 @@ Every infrastructure task MUST log at least:
 
 ### Updated Iteration Workflow
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │  PHASE 0: REQUIREMENTS CLARIFICATION                        │
 │  - Parse request, identify ambiguities                      │
@@ -263,26 +271,28 @@ grep -r "valueFromLookup" packages/infra/bin/ packages/infra/lib/
 
 ### Red Flags to Watch For
 
-| Pattern in Output | What It Means | Action |
-|-------------------|---------------|--------|
-| "should be created in the scope of a Stack" | SSM lookup at App level | Move to Stack constructor |
-| "Export with name X not found" | Missing CloudFormation export | Check stack deployment order |
-| "Circular dependency" | Stacks reference each other | Redesign with SSM parameters |
-| "Parameter not found" | SSM parameter doesn't exist | Deploy FoundationStack first |
-| "dummy value" in synth output | CDK using placeholder | Run synth after deployment |
+| Pattern in Output                           | What It Means                 | Action                       |
+| ------------------------------------------- | ----------------------------- | ---------------------------- |
+| "should be created in the scope of a Stack" | SSM lookup at App level       | Move to Stack constructor    |
+| "Export with name X not found"              | Missing CloudFormation export | Check stack deployment order |
+| "Circular dependency"                       | Stacks reference each other   | Redesign with SSM parameters |
+| "Parameter not found"                       | SSM parameter doesn't exist   | Deploy FoundationStack first |
+| "dummy value" in synth output               | CDK using placeholder         | Run synth after deployment   |
 
 ### Common Fix Patterns
 
 **App-level lookup (WRONG):**
+
 ```typescript
 // infra.ts (App level)
-const value = ssm.StringParameter.valueFromLookup(app, '/path');
+const value = ssm.StringParameter.valueFromLookup(app, "/path");
 ```
 
 **Stack-level lookup (CORRECT):**
+
 ```typescript
 // Inside Stack constructor
-const value = ssm.StringParameter.valueFromLookup(this, '/path');
+const value = ssm.StringParameter.valueFromLookup(this, "/path");
 ```
 
 ## Related Skills

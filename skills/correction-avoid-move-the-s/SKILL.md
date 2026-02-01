@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'command']
+tags: ["correction", "learned", "command"]
 level: user
 breakthrough_score: 1.71
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 1.71
 
 ## Problem / Use Case
 
-dont move the skills Just document what is requrired in generate to maintain skills/powers in the same repo such that they can be isntalled by claude and kiro.
+dont move the skills Just document what is requrired in generate to maintain skills/powers in the same repo such that
+they can be isntalled by claude and kiro.
 
 Create the doc in research in obsidian
 
@@ -24,7 +25,8 @@ When making similar mistakes to: command
 
 ## Solution / Approach
 
-Correction: Avoid: 'move the skills just document what is requrired in generate to maintain skills/powers in the same repo such that they can be isntalled by claude and kiro'
+Correction: Avoid: 'move the skills just document what is requrired in generate to maintain skills/powers in the same
+repo such that they can be isntalled by claude and kiro'
 
 ## Verification
 
@@ -37,4 +39,3 @@ Correction: Avoid: 'move the skills just document what is requrired in generate 
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

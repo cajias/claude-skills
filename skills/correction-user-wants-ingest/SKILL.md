@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 1.24
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 1.24
 
 ## Problem / Use Case
 
-look at the docs in our obsidian not oyet ingested. For each one, ingest into one or more high quality fleeting notes. once the doc is ingested, change the zk_status
+look at the docs in our obsidian not oyet ingested. For each one, ingest into one or more high quality fleeting notes.
+once the doc is ingested, change the zk_status
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: User wants 'ingested' instead of 'oyet'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 2
-

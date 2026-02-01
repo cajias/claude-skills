@@ -7,16 +7,19 @@ description: Use when GitLab MR comments have position null, appear as Discussio
 
 ## Overview
 
-GitLab's API requires **nested JSON objects** for positioned comments. The `glab api` CLI tool's `-f "position[key]=value"` syntax sends **flat keys** instead of nested objects, causing GitLab to silently create `DiscussionNote` (general comment) instead of `DiffNote` (inline comment).
+GitLab's API requires **nested JSON objects** for positioned comments. The `glab api` CLI
+tool's `-f "position[key]=value"` syntax sends **flat keys** instead of nested objects,
+causing GitLab to silently create `DiscussionNote` (general comment) instead of `DiffNote`
+(inline comment).
 
 ## Quick Reference
 
-| Symptom | Cause |
-|---------|-------|
-| `type: DiscussionNote` instead of `DiffNote` | Position data sent as flat keys |
-| `position: null` in response | GitLab rejected position silently |
-| Comment appears in MR thread, not on code line | Same as above |
-| 201 Created but wrong note type | API accepts request, ignores invalid position |
+| Symptom                                        | Cause                                         |
+| ---------------------------------------------- | --------------------------------------------- |
+| `type: DiscussionNote` instead of `DiffNote`   | Position data sent as flat keys               |
+| `position: null` in response                   | GitLab rejected position silently             |
+| Comment appears in MR thread, not on code line | Same as above                                 |
+| 201 Created but wrong note type                | API accepts request, ignores invalid position |
 
 ## The Fix
 
@@ -48,11 +51,11 @@ glab api "/projects/:id/merge_requests/:iid/discussions" \
 
 ## Position Field Rules
 
-| Line Type | Required Fields |
-|-----------|-----------------|
-| Added line (`+`) | `new_line` only |
-| Removed line (`-`) | `old_line` only |
-| Context line (` `) | Both `old_line` AND `new_line` |
+| Line Type          | Required Fields                |
+| ------------------ | ------------------------------ |
+| Added line (`+`)   | `new_line` only                |
+| Removed line (`-`) | `old_line` only                |
+| Context line (``)  | Both `old_line` AND `new_line` |
 
 ## Getting SHA Values
 
@@ -76,5 +79,6 @@ glab api "..." -f "position[base_sha]=abc"
 ## Verification
 
 Success response has:
+
 - `type: "DiffNote"` (not `DiscussionNote` or `null`)
 - `position` object with your SHA values (not `null`)

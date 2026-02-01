@@ -17,15 +17,18 @@ tags: [aws, cdk, cloudformation, infrastructure, gap-analysis, tdd]
 
 ## Overview
 
-This template extends the standard gap analysis categories to include validation dimensions that catch architectural and runtime issues **before deployment**.
+This template extends the standard gap analysis categories to include validation dimensions
+that catch architectural and runtime issues **before deployment**.
 
 ### Original Categories (A-D)
+
 - **Category A**: Critical Gaps (Blocking Deployment)
 - **Category B**: Implementation Gaps (Functionality Missing)
 - **Category C**: Quality/Security Gaps
 - **Category D**: Test Coverage Gaps
 
 ### Extended Categories (E-H)
+
 - **Category E**: Deployment Validation
 - **Category F**: Runtime Behavior
 - **Category G**: Cross-Component Integration
@@ -92,36 +95,36 @@ npx cdk diff --all 2>&1 | tee /tmp/cdk-diff.log
 
 ### What "Complete" Means
 
-| Criterion | Pass Condition |
-|-----------|----------------|
-| Synthesis | `cdk synth --all` exits with code 0 |
-| Templates | All expected `.template.json` files generated in `cdk.out/` |
-| Validation | All CloudFormation templates pass `validate-template` |
-| Context | All context parameters have defaults or documented requirements |
-| Lookups | All synthesis-time lookups are in Stack scope (not App scope) |
-| Dependencies | No circular dependencies; clear deployment order |
-| Diff | Changes match expected modifications (no unexpected drift) |
+| Criterion    | Pass Condition                                                  |
+| ------------ | --------------------------------------------------------------- |
+| Synthesis    | `cdk synth --all` exits with code 0                             |
+| Templates    | All expected `.template.json` files generated in `cdk.out/`     |
+| Validation   | All CloudFormation templates pass `validate-template`           |
+| Context      | All context parameters have defaults or documented requirements |
+| Lookups      | All synthesis-time lookups are in Stack scope (not App scope)   |
+| Dependencies | No circular dependencies; clear deployment order                |
+| Diff         | Changes match expected modifications (no unexpected drift)      |
 
 ### Warning Signs
 
-| Warning Sign | What It Indicates |
-|--------------|-------------------|
+| Warning Sign                                          | What It Indicates                                                |
+| ----------------------------------------------------- | ---------------------------------------------------------------- |
 | `App at '' should be created in the scope of a Stack` | Synthesis-time lookup called at App level instead of Stack level |
-| `Cannot read property 'X' of undefined` | Missing required prop or uninitialized dependency |
-| `Circular dependency between stacks` | Stack A depends on B, and B depends on A |
-| `Export X cannot be deleted` | CloudFormation export is still in use by another stack |
-| `SSM parameter not found` | Parameter doesn't exist or lookup is at wrong scope |
-| `No template generated for X` | Stack was skipped due to condition or error |
-| `Context key required but not provided` | Missing `-c` flag or `cdk.context.json` entry |
+| `Cannot read property 'X' of undefined`               | Missing required prop or uninitialized dependency                |
+| `Circular dependency between stacks`                  | Stack A depends on B, and B depends on A                         |
+| `Export X cannot be deleted`                          | CloudFormation export is still in use by another stack           |
+| `SSM parameter not found`                             | Parameter doesn't exist or lookup is at wrong scope              |
+| `No template generated for X`                         | Stack was skipped due to condition or error                      |
+| `Context key required but not provided`               | Missing `-c` flag or `cdk.context.json` entry                    |
 
 ### Gap Documentation Template
 
 ```markdown
-| ID | Gap | Current State | Expected State | Severity |
-|----|-----|---------------|----------------|----------|
-| E-1 | Synthesis fails with scope error | SSM lookups in App scope | SSM lookups in Stack constructors | **CRITICAL** |
-| E-2 | Missing context parameters | No default for dataPlane | Default to 'eks' or require explicit | HIGH |
-| E-3 | Template validation fails | Invalid intrinsic function | Valid CloudFormation | HIGH |
+| ID  | Gap                              | Current State              | Expected State                       | Severity     |
+| --- | -------------------------------- | -------------------------- | ------------------------------------ | ------------ |
+| E-1 | Synthesis fails with scope error | SSM lookups in App scope   | SSM lookups in Stack constructors    | **CRITICAL** |
+| E-2 | Missing context parameters       | No default for dataPlane   | Default to 'eks' or require explicit | HIGH         |
+| E-3 | Template validation fails        | Invalid intrinsic function | Valid CloudFormation                 | HIGH         |
 ```
 
 ---
@@ -186,35 +189,35 @@ cat cdk.out/*.template.json | \
 
 ### What "Complete" Means
 
-| Criterion | Pass Condition |
-|-----------|----------------|
-| Environment Variables | All required env vars present with valid values (not placeholders) |
-| Security Groups | Required ports open; no overly permissive rules (0.0.0.0/0 ingress) |
-| IAM Policies | No `*` in Resource unless justified; least privilege verified |
-| Health Checks | Path matches actual endpoint; interval/timeout appropriate |
-| Timeouts | Lambda timeouts < API Gateway timeout; reasonable for workload |
-| Container Images | Real ECR images, not placeholder (amazonlinux) |
+| Criterion             | Pass Condition                                                      |
+| --------------------- | ------------------------------------------------------------------- |
+| Environment Variables | All required env vars present with valid values (not placeholders)  |
+| Security Groups       | Required ports open; no overly permissive rules (0.0.0.0/0 ingress) |
+| IAM Policies          | No `*` in Resource unless justified; least privilege verified       |
+| Health Checks         | Path matches actual endpoint; interval/timeout appropriate          |
+| Timeouts              | Lambda timeouts < API Gateway timeout; reasonable for workload      |
+| Container Images      | Real ECR images, not placeholder (amazonlinux)                      |
 
 ### Warning Signs
 
-| Warning Sign | What It Indicates |
-|--------------|-------------------|
-| `public.ecr.aws/amazonlinux` in task definition | Placeholder image, not actual application |
-| `resources: ['*']` in IAM policy | Overly permissive IAM |
-| `healthCheckPath: '/'` without verification | May not match actual health endpoint |
-| Security group with `0.0.0.0/0` ingress | Publicly accessible without explicit intent |
-| Lambda timeout > 15 minutes | Possible misunderstanding of Lambda limits |
-| Missing environment variable | Runtime failures due to undefined config |
-| `undefined` or `null` in template values | Props not properly resolved at synth time |
+| Warning Sign                                    | What It Indicates                           |
+| ----------------------------------------------- | ------------------------------------------- |
+| `public.ecr.aws/amazonlinux` in task definition | Placeholder image, not actual application   |
+| `resources: ['*']` in IAM policy                | Overly permissive IAM                       |
+| `healthCheckPath: '/'` without verification     | May not match actual health endpoint        |
+| Security group with `0.0.0.0/0` ingress         | Publicly accessible without explicit intent |
+| Lambda timeout > 15 minutes                     | Possible misunderstanding of Lambda limits  |
+| Missing environment variable                    | Runtime failures due to undefined config    |
+| `undefined` or `null` in template values        | Props not properly resolved at synth time   |
 
 ### Gap Documentation Template
 
 ```markdown
-| ID | Gap | Current State | Expected State | Severity |
-|----|-----|---------------|----------------|----------|
-| F-1 | Placeholder container images | amazonlinux:2023 | service-mcp-proxy ECR image | **HIGH** |
-| F-2 | Overly broad IAM permissions | execute-api:* | Scoped to specific API Gateway | MEDIUM |
-| F-3 | Health check mismatch | ALB checks /health, app serves /healthz | Both use same path | HIGH |
+| ID  | Gap                          | Current State                           | Expected State                 | Severity |
+| --- | ---------------------------- | --------------------------------------- | ------------------------------ | -------- |
+| F-1 | Placeholder container images | amazonlinux:2023                        | service-mcp-proxy ECR image    | **HIGH** |
+| F-2 | Overly broad IAM permissions | execute-api:\*                          | Scoped to specific API Gateway | MEDIUM   |
+| F-3 | Health check mismatch        | ALB checks /health, app serves /healthz | Both use same path             | HIGH     |
 ```
 
 ---
@@ -281,34 +284,34 @@ done
 
 ### What "Complete" Means
 
-| Criterion | Pass Condition |
-|-----------|----------------|
-| Cross-Stack Refs | `Fn::ImportValue` count < 5 per stack (prefer SSM) |
-| SSM Parameters | All written parameters have matching consumers |
-| Interface Contracts | TypeScript interfaces match runtime usage |
-| Event Routing | EventBridge rules have valid targets |
-| Stack Independence | Each stack can be synthesized independently |
-| Data Flow | Write paths match read paths exactly |
+| Criterion           | Pass Condition                                     |
+| ------------------- | -------------------------------------------------- |
+| Cross-Stack Refs    | `Fn::ImportValue` count < 5 per stack (prefer SSM) |
+| SSM Parameters      | All written parameters have matching consumers     |
+| Interface Contracts | TypeScript interfaces match runtime usage          |
+| Event Routing       | EventBridge rules have valid targets               |
+| Stack Independence  | Each stack can be synthesized independently        |
+| Data Flow           | Write paths match read paths exactly               |
 
 ### Warning Signs
 
-| Warning Sign | What It Indicates |
-|--------------|-------------------|
-| `Export X is already used by Y` | Tight coupling; can't update without cascade |
-| Mismatched SSM paths (`/foundation/vpc-id` vs `/foundation/network/vpc-id`) | Consumer won't find producer's value |
-| Missing `grantRead()` calls | Consumer lacks permission to access producer's data |
-| Circular stack dependencies | Architecture needs redesign |
-| Interface field missing | Runtime will fail on undefined property access |
-| EventBridge target returns `null` | Lambda ARN not resolved correctly |
+| Warning Sign                                                                | What It Indicates                                   |
+| --------------------------------------------------------------------------- | --------------------------------------------------- |
+| `Export X is already used by Y`                                             | Tight coupling; can't update without cascade        |
+| Mismatched SSM paths (`/foundation/vpc-id` vs `/foundation/network/vpc-id`) | Consumer won't find producer's value                |
+| Missing `grantRead()` calls                                                 | Consumer lacks permission to access producer's data |
+| Circular stack dependencies                                                 | Architecture needs redesign                         |
+| Interface field missing                                                     | Runtime will fail on undefined property access      |
+| EventBridge target returns `null`                                           | Lambda ARN not resolved correctly                   |
 
 ### Gap Documentation Template
 
 ```markdown
-| ID | Gap | Current State | Producer | Consumer | Severity |
-|----|-----|---------------|----------|----------|----------|
-| G-1 | SSM path mismatch | Writer uses /foundation/vpc-id | FoundationStack | ComputeStack reads /network/vpc-id | **CRITICAL** |
-| G-2 | Cross-stack export creates coupling | Uses Fn::ImportValue | DataStack | ComputeStack | MEDIUM |
-| G-3 | Missing interface field | IDataPlane missing targetGroup | FargateDataPlane | DataPlaneRouter | HIGH |
+| ID  | Gap                                 | Current State                  | Producer         | Consumer                           | Severity     |
+| --- | ----------------------------------- | ------------------------------ | ---------------- | ---------------------------------- | ------------ |
+| G-1 | SSM path mismatch                   | Writer uses /foundation/vpc-id | FoundationStack  | ComputeStack reads /network/vpc-id | **CRITICAL** |
+| G-2 | Cross-stack export creates coupling | Uses Fn::ImportValue           | DataStack        | ComputeStack                       | MEDIUM       |
+| G-3 | Missing interface field             | IDataPlane missing targetGroup | FargateDataPlane | DataPlaneRouter                    | HIGH         |
 ```
 
 ---
@@ -384,37 +387,37 @@ cat cdk.out/*.template.json | jq '[.Resources | keys | length] | add'
 
 ### What "Complete" Means
 
-| Criterion | Pass Condition |
-|-----------|----------------|
-| Resource Types | All expected AWS resource types present in templates |
-| Encryption | All data-at-rest resources have encryption enabled |
-| Logging | Log groups exist for all compute resources |
-| Retention | Log retention and backup policies configured |
-| Tags | Required tags (Environment, Project, Owner) present |
-| CDK Nag | No ERROR level findings (warnings acceptable with justification) |
-| Removal Policy | Stateful resources have RETAIN or SNAPSHOT policy |
+| Criterion      | Pass Condition                                                   |
+| -------------- | ---------------------------------------------------------------- |
+| Resource Types | All expected AWS resource types present in templates             |
+| Encryption     | All data-at-rest resources have encryption enabled               |
+| Logging        | Log groups exist for all compute resources                       |
+| Retention      | Log retention and backup policies configured                     |
+| Tags           | Required tags (Environment, Project, Owner) present              |
+| CDK Nag        | No ERROR level findings (warnings acceptable with justification) |
+| Removal Policy | Stateful resources have RETAIN or SNAPSHOT policy                |
 
 ### Warning Signs
 
-| Warning Sign | What It Indicates |
-|--------------|-------------------|
-| `SSESpecification: null` on DynamoDB | Table data not encrypted |
-| `RetentionInDays: undefined` on LogGroup | Logs retained indefinitely (cost) |
-| No CloudWatch alarms in template | No automated alerting |
-| `RemovalPolicy.DESTROY` on production database | Data loss risk on stack deletion |
-| Missing required tags | Cost allocation and compliance issues |
-| CDK Nag `Error` suppressed without justification | Security risk ignored |
-| Lambda without X-Ray tracing | Observability gap |
+| Warning Sign                                     | What It Indicates                     |
+| ------------------------------------------------ | ------------------------------------- |
+| `SSESpecification: null` on DynamoDB             | Table data not encrypted              |
+| `RetentionInDays: undefined` on LogGroup         | Logs retained indefinitely (cost)     |
+| No CloudWatch alarms in template                 | No automated alerting                 |
+| `RemovalPolicy.DESTROY` on production database   | Data loss risk on stack deletion      |
+| Missing required tags                            | Cost allocation and compliance issues |
+| CDK Nag `Error` suppressed without justification | Security risk ignored                 |
+| Lambda without X-Ray tracing                     | Observability gap                     |
 
 ### Gap Documentation Template
 
 ```markdown
-| ID | Gap | Resource | Current State | Expected State | Severity |
-|----|-----|----------|---------------|----------------|----------|
+| ID  | Gap                    | Resource         | Current State          | Expected State         | Severity |
+| --- | ---------------------- | ---------------- | ---------------------- | ---------------------- | -------- |
 | H-1 | DynamoDB not encrypted | AuthContextTable | SSESpecification: null | KMS encryption enabled | **HIGH** |
-| H-2 | Log retention not set | MCPProxyLogGroup | Indefinite | 30 days | MEDIUM |
-| H-3 | Missing alarms | FargateService | No alarms | CPU/Memory alarms | MEDIUM |
-| H-4 | No WAF on ALB | DataPlaneALB | No WebACL | WAF with rate limiting | HIGH |
+| H-2 | Log retention not set  | MCPProxyLogGroup | Indefinite             | 30 days                | MEDIUM   |
+| H-3 | Missing alarms         | FargateService   | No alarms              | CPU/Memory alarms      | MEDIUM   |
+| H-4 | No WAF on ALB          | DataPlaneALB     | No WebACL              | WAF with rate limiting | HIGH     |
 ```
 
 ---
@@ -485,41 +488,50 @@ When creating `gap-analysis-iteration-N.md`:
 # Gap Analysis: HLD vs Implementation - Iteration N
 
 ## Executive Summary
+
 ...
 
 ## Gap Categories
 
 ### CATEGORY A: Critical Gaps
+
 ...
 
 ### CATEGORY B: Implementation Gaps
+
 ...
 
 ### CATEGORY C: Quality/Security Gaps
+
 ...
 
 ### CATEGORY D: Test Coverage Gaps
+
 ...
 
 ### CATEGORY E: Deployment Validation Gaps
-| ID | Gap | Current State | Impact | Priority |
-|----|-----|---------------|--------|----------|
-| E-1 | ... | ... | ... | ... |
+
+| ID  | Gap | Current State | Impact | Priority |
+| --- | --- | ------------- | ------ | -------- |
+| E-1 | ... | ...           | ...    | ...      |
 
 ### CATEGORY F: Runtime Behavior Gaps
-| ID | Gap | Current State | Impact | Priority |
-|----|-----|---------------|--------|----------|
-| F-1 | ... | ... | ... | ... |
+
+| ID  | Gap | Current State | Impact | Priority |
+| --- | --- | ------------- | ------ | -------- |
+| F-1 | ... | ...           | ...    | ...      |
 
 ### CATEGORY G: Cross-Component Integration Gaps
-| ID | Gap | Current State | Impact | Priority |
-|----|-----|---------------|--------|----------|
-| G-1 | ... | ... | ... | ... |
+
+| ID  | Gap | Current State | Impact | Priority |
+| --- | --- | ------------- | ------ | -------- |
+| G-1 | ... | ...           | ...    | ...      |
 
 ### CATEGORY H: Infrastructure Validation Gaps
-| ID | Gap | Current State | Impact | Priority |
-|----|-----|---------------|--------|----------|
-| H-1 | ... | ... | ... | ... |
+
+| ID  | Gap | Current State | Impact | Priority |
+| --- | --- | ------------- | ------ | -------- |
+| H-1 | ... | ...           | ...    | ...      |
 ```
 
 ---
@@ -529,24 +541,26 @@ When creating `gap-analysis-iteration-N.md`:
 ### Case Study: SSM Parameter Scope Error (TASK-6)
 
 **What Happened:**
+
 - SSM parameter lookups were placed in `bin/infra.ts` (App scope)
 - CDK requires lookups in Stack constructors (Stack scope)
 - `cdk synth` failed with "App at '' should be created in the scope of a Stack"
 
 **Which Category Would Have Caught It:**
 
-| Category | Would Have Caught? | How |
-|----------|-------------------|-----|
-| A (Critical) | No | Focused on functionality, not synthesis |
-| B (Implementation) | Maybe | If explicitly checking CDK patterns |
-| C (Quality) | No | Focused on security/code quality |
-| D (Test Coverage) | No | Tests mock synthesis |
-| **E (Deployment)** | **YES** | Running `cdk synth --all` immediately exposes this |
-| F (Runtime) | No | Synthesis must succeed first |
-| G (Integration) | Partial | SSM path matching, but not scope |
-| H (Infrastructure) | No | Template validation, not synthesis |
+| Category           | Would Have Caught? | How                                                |
+| ------------------ | ------------------ | -------------------------------------------------- |
+| A (Critical)       | No                 | Focused on functionality, not synthesis            |
+| B (Implementation) | Maybe              | If explicitly checking CDK patterns                |
+| C (Quality)        | No                 | Focused on security/code quality                   |
+| D (Test Coverage)  | No                 | Tests mock synthesis                               |
+| **E (Deployment)** | **YES**            | Running `cdk synth --all` immediately exposes this |
+| F (Runtime)        | No                 | Synthesis must succeed first                       |
+| G (Integration)    | Partial            | SSM path matching, but not scope                   |
+| H (Infrastructure) | No                 | Template validation, not synthesis                 |
 
-**Conclusion:** Adding Category E (Deployment Validation) as a mandatory checkpoint would have caught this issue immediately after implementation, saving significant debugging time.
+**Conclusion:** Adding Category E (Deployment Validation) as a mandatory checkpoint would have
+caught this issue immediately after implementation, saving significant debugging time.
 
 ---
 
@@ -554,11 +568,12 @@ When creating `gap-analysis-iteration-N.md`:
 
 The extended gap analysis categories ensure comprehensive validation across:
 
-| Category | Focus | Primary Question |
-|----------|-------|------------------|
-| E | Deployment | Can we synthesize and deploy? |
-| F | Runtime | Will it work when deployed? |
-| G | Integration | Do components communicate correctly? |
-| H | Infrastructure | Does it meet design and compliance requirements? |
+| Category | Focus          | Primary Question                                 |
+| -------- | -------------- | ------------------------------------------------ |
+| E        | Deployment     | Can we synthesize and deploy?                    |
+| F        | Runtime        | Will it work when deployed?                      |
+| G        | Integration    | Do components communicate correctly?             |
+| H        | Infrastructure | Does it meet design and compliance requirements? |
 
-**Key Principle:** Run Category E validation (`cdk synth --all`) after EVERY infrastructure change, before any other validation. If synthesis fails, nothing else matters.
+**Key Principle:** Run Category E validation (`cdk synth --all`) after EVERY infrastructure
+change, before any other validation. If synthesis fails, nothing else matters.

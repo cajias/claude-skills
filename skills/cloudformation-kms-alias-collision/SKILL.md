@@ -28,7 +28,8 @@ exists in the account from another stack or previous deployment.
 - Stack was working but fails after another stack with similar resources was deployed
 
 Example error:
-```
+
+```text
 ❌ Deployment failed: Error: The stack named DataStack failed creation,
 it may need to be manually deleted from the AWS console: ROLLBACK_COMPLETE:
 Resource with ID [CorrelationTokenKmsKey] failed with reason:
@@ -46,6 +47,7 @@ aws kms list-aliases --query 'Aliases[?contains(AliasName, `your-alias-pattern`)
 ```
 
 Example:
+
 ```bash
 aws kms list-aliases --query 'Aliases[?contains(AliasName, `mat-correlation-token`)]'
 ```
@@ -53,6 +55,7 @@ aws kms list-aliases --query 'Aliases[?contains(AliasName, `mat-correlation-toke
 ### Step 2: Determine the Source
 
 Check which stack created the existing alias:
+
 - Look at the `TargetKeyId` from the alias listing
 - Find the key in CloudFormation stacks using:
 
@@ -70,10 +73,10 @@ Change the alias name to be unique per stack:
 
 ```typescript
 // Before: Conflicting alias
-key.addAlias('mat-correlation-token');
+key.addAlias("mat-correlation-token");
 
 // After: Stack-specific alias
-key.addAlias('mat-dataplane-correlation-token');
+key.addAlias("mat-dataplane-correlation-token");
 ```
 
 **Option B: Share the Existing Key** (For truly shared resources)
@@ -81,11 +84,14 @@ key.addAlias('mat-dataplane-correlation-token');
 If the key should be shared, import it instead of creating:
 
 ```typescript
-const existingKey = kms.Key.fromKeyArn(this, 'SharedKey',
-  'arn:aws:kms:us-east-1:123456789:key/abc-123');
+const existingKey = kms.Key.fromKeyArn(
+  this,
+  "SharedKey",
+  "arn:aws:kms:us-east-1:123456789:key/abc-123",
+);
 ```
 
-**Option C: Remove Alias from Conflicting Stack**
+### Option C: Remove Alias from Conflicting Stack
 
 If the original stack shouldn't have the alias, remove it there first.
 

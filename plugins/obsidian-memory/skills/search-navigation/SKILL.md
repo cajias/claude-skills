@@ -11,36 +11,39 @@ Efficient strategies for finding and accessing information in the Obsidian vault
 
 ### Quick Reference
 
-| Need | Tool | Why |
-|------|------|-----|
-| Read one file | `read_note` | Direct access |
-| Read multiple files | `read_multiple_notes` | Batch (max 10) |
-| Check file exists/metadata | `get_notes_info` | No content load |
-| Get just frontmatter | `get_frontmatter` | See summary without content |
-| Search by content | `search_notes` with `searchContent: true` | Full-text search |
-| Search by metadata | `search_notes` with `searchFrontmatter: true` | Find by type/status/tags |
-| Browse structure | `list_directory` | See folder contents |
-| Find all tags | `manage_tags` with `operation: list` | See note's tags |
-| Vault overview | `get_vault_stats` | Size, recent files |
+| Need                       | Tool                                          | Why                         |
+| -------------------------- | --------------------------------------------- | --------------------------- |
+| Read one file              | `read_note`                                   | Direct access               |
+| Read multiple files        | `read_multiple_notes`                         | Batch (max 10)              |
+| Check file exists/metadata | `get_notes_info`                              | No content load             |
+| Get just frontmatter       | `get_frontmatter`                             | See summary without content |
+| Search by content          | `search_notes` with `searchContent: true`     | Full-text search            |
+| Search by metadata         | `search_notes` with `searchFrontmatter: true` | Find by type/status/tags    |
+| Browse structure           | `list_directory`                              | See folder contents         |
+| Find all tags              | `manage_tags` with `operation: list`          | See note's tags             |
+| Vault overview             | `get_vault_stats`                             | Size, recent files          |
 
 ### Tool Details
 
 #### `get_frontmatter` - Fast Metadata Check
-```
+
+```text
 Use when: You need to understand what a file is about without reading content
 Returns: Just the YAML frontmatter (type, status, summary, tags)
 Perfect for: Triaging multiple files quickly
 ```
 
 #### `get_notes_info` - Batch Metadata
-```
+
+```text
 Use when: Checking multiple files at once (up to array of paths)
 Returns: Path, size, modified date, hasFrontmatter flag
 Perfect for: Quick scan of a folder's contents
 ```
 
 #### `search_notes` - Find Content
-```
+
+```text
 Parameters:
 - query: Search text
 - searchContent: true (default) - search in note body
@@ -55,7 +58,8 @@ Use searchFrontmatter for:
 ```
 
 #### `read_multiple_notes` - Batch Read
-```
+
+```text
 Parameters:
 - paths: Array of note paths (max 10)
 - includeContent: true (default)
@@ -71,17 +75,20 @@ Use when: You know which files you need and want to read them efficiently
 When looking for notes on a topic:
 
 1. **Search frontmatter** for summary keywords
-   ```
+
+   ```text
    search_notes(query: "authentication", searchFrontmatter: true, searchContent: false)
    ```
 
 2. **Get info** on promising results
-   ```
+
+   ```text
    get_notes_info(paths: [results])
    ```
 
 3. **Read** only the relevant ones
-   ```
+
+   ```text
    read_note(path: "the-one-I-need.md")
    ```
 
@@ -90,12 +97,14 @@ When looking for notes on a topic:
 When you know the category:
 
 1. **List directory** to see options
-   ```
+
+   ```text
    list_directory(path: "knowledge-base/aws-services")
    ```
 
 2. **Get frontmatter** for files of interest
-   ```
+
+   ```text
    get_frontmatter(path: "knowledge-base/aws-services/lambda-patterns.md")
    ```
 
@@ -106,12 +115,14 @@ When you know the category:
 When looking for cross-cutting concerns:
 
 1. **Search frontmatter** for tag
-   ```
+
+   ```text
    search_notes(query: "#blocker", searchFrontmatter: true)
    ```
 
 2. **Or search content** for inline tags
-   ```
+
+   ```text
    search_notes(query: "#decision", searchContent: true)
    ```
 
@@ -120,7 +131,8 @@ When looking for cross-cutting concerns:
 When looking for recent work:
 
 1. **Get vault stats** with recent files
-   ```
+
+   ```text
    get_vault_stats(recentCount: 10)
    ```
 
@@ -131,7 +143,8 @@ When looking for recent work:
 ### Pattern: Quick Context Load
 
 Before starting work on a client/project:
-```
+
+```text
 1. list_directory("engagements/active/[client]")
 2. read_note("engagements/active/[client]/context.md")
 3. If decisions folder exists: list_directory + get_frontmatter on ADRs
@@ -140,7 +153,8 @@ Before starting work on a client/project:
 ### Pattern: Find Related Decisions
 
 When making a technical choice:
-```
+
+```text
 1. search_notes(query: "[technology]", searchFrontmatter: true)
 2. Filter results for type: decision
 3. read_multiple_notes on relevant ADRs
@@ -149,7 +163,8 @@ When making a technical choice:
 ### Pattern: People Lookup
 
 When someone is mentioned:
-```
+
+```text
 1. list_directory("people")
 2. Look for matching filename
 3. read_note("people/[name].md")
@@ -158,7 +173,8 @@ When someone is mentioned:
 ### Pattern: Session Context Recovery
 
 When resuming previous work:
-```
+
+```text
 1. list_directory("agent-workspaces")
 2. Find relevant session folder by date/context
 3. read_note("agent-workspaces/[session]/context.md")
@@ -174,27 +190,27 @@ When resuming previous work:
 
 ## Folder Quick Reference
 
-| Path | Contains |
-|------|----------|
-| `engagements/active/` | Current client work |
-| `engagements/completed/` | Archived engagements |
-| `knowledge-base/` | Reference material by technology |
-| `playbooks/` | Reusable methodologies |
-| `people/` | Information about individuals |
-| `career/` | Brag doc, promotion materials |
-| `agentic-platform-program/` | Tech lead domain work |
-| `agent-workspaces/` | Session workspaces |
-| `agent-workspaces/shared/` | Cross-session persistent notes |
+| Path                        | Contains                         |
+| --------------------------- | -------------------------------- |
+| `engagements/active/`       | Current client work              |
+| `engagements/completed/`    | Archived engagements             |
+| `knowledge-base/`           | Reference material by technology |
+| `playbooks/`                | Reusable methodologies           |
+| `people/`                   | Information about individuals    |
+| `career/`                   | Brag doc, promotion materials    |
+| `agentic-platform-program/` | Tech lead domain work            |
+| `agent-workspaces/`         | Session workspaces               |
+| `agent-workspaces/shared/`  | Cross-session persistent notes   |
 
 ## Common Searches
 
-| Looking for... | Search approach |
-|----------------|-----------------|
-| Active blockers | `search_notes("#blocker", searchFrontmatter: true)` |
-| Decisions on X | `search_notes("type: decision", searchFrontmatter: true)` + filter |
-| Lessons learned | `list_directory("knowledge-base/lessons-learned")` |
-| Person info | `list_directory("people")` + `read_note` |
-| Recent session | `get_vault_stats(recentCount: 5)` |
+| Looking for...  | Search approach                                                    |
+| --------------- | ------------------------------------------------------------------ |
+| Active blockers | `search_notes("#blocker", searchFrontmatter: true)`                |
+| Decisions on X  | `search_notes("type: decision", searchFrontmatter: true)` + filter |
+| Lessons learned | `list_directory("knowledge-base/lessons-learned")`                 |
+| Person info     | `list_directory("people")` + `read_note`                           |
+| Recent session  | `get_vault_stats(recentCount: 5)`                                  |
 
 ## Related
 

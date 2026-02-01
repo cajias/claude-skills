@@ -37,7 +37,7 @@ notes = list(fleeting_path.glob("*.md"))
 notes = [n for n in notes if ".archive" not in str(n)]
 ```
 
-2. **Categorize notes by quality tier**:
+1. **Categorize notes by quality tier**:
 
 ```text
 Quality Tiers:
@@ -46,7 +46,7 @@ Quality Tiers:
 - Tier 3 (Atomic): <10 lines, single paragraph - NEEDS ENRICHMENT
 ```
 
-3. **Identify note patterns**:
+1. **Identify note patterns**:
 
 ```python
 categories = {
@@ -65,7 +65,7 @@ for note in notes:
         categories["named_patterns"].append(note)
 ```
 
-4. **Display triage summary**:
+1. **Display triage summary**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -94,7 +94,7 @@ Actions:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-5. **For duplicate detection**, use TF-IDF similarity:
+1. **For duplicate detection**, use TF-IDF similarity:
 
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -118,6 +118,7 @@ for i, j in combinations(range(len(notes)), 2):
 ## Output
 
 Produces a categorized summary enabling informed decisions about next actions:
+
 - Run `/zenrich` for atomic notes needing structure
 - Run `/zreview` for full notes ready for promotion
 - Run `/zdupes` for duplicate resolution

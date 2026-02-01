@@ -9,7 +9,7 @@ Automatically assign unassigned permanent notes to their best-matching hubs base
 
 ## Usage
 
-```
+```text
 /zhubassign                     # Default 50% threshold, interactive
 /zhubassign --threshold 60      # Stricter threshold
 /zhubassign --dry-run           # Preview without changes
@@ -43,12 +43,12 @@ zk-hub-assign --threshold 50
 
 ## Command Options
 
-| Option | Description |
-|--------|-------------|
-| `--threshold N` | Minimum similarity (0-100) to assign a note. Default: 50 |
-| `--dry-run` | Show preview without making changes |
-| `--yes` | Skip confirmation prompt |
-| `--update-vectors` | Also update S3 Vectors metadata with hub assignments |
+| Option             | Description                                              |
+| ------------------ | -------------------------------------------------------- |
+| `--threshold N`    | Minimum similarity (0-100) to assign a note. Default: 50 |
+| `--dry-run`        | Show preview without making changes                      |
+| `--yes`            | Skip confirmation prompt                                 |
+| `--update-vectors` | Also update S3 Vectors metadata with hub assignments     |
 
 ## Output Format
 
@@ -56,7 +56,7 @@ zk-hub-assign --threshold 50
 
 Notes are grouped by target hub, sorted by similarity:
 
-```
+```text
 Claude Code Patterns Hub (12 notes)
   hub-claude-code-patterns
     [78%] orchestrator-pattern-benefits
@@ -82,7 +82,7 @@ After assignment, shows count of successfully assigned notes per hub.
 
 ## Workflow Example
 
-```
+```text
 1. /zhubreview              # Analyze gaps and unassigned notes
 2. /zadd hub ...            # Create new hubs for gap clusters
 3. /zhubassign --dry-run    # Preview assignments
@@ -105,12 +105,12 @@ If the `## Hub` section doesn't exist, it's created at the end of the note.
 
 ## Similarity Threshold Guide
 
-| Threshold | Use Case |
-|-----------|----------|
-| 40% | Aggressive assignment - may include weak matches |
-| 50% | Balanced (default) - good for general use |
-| 60% | Conservative - only strong matches |
-| 70%+ | Very strict - only very clear matches |
+| Threshold | Use Case                                         |
+| --------- | ------------------------------------------------ |
+| 40%       | Aggressive assignment - may include weak matches |
+| 50%       | Balanced (default) - good for general use        |
+| 60%       | Conservative - only strong matches               |
+| 70%+      | Very strict - only very clear matches            |
 
 ## See Also
 

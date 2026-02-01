@@ -16,11 +16,13 @@ date: 2026-01-27
 
 ## Problem
 
-When documenting projects, ideas, or brainstorms in Obsidian, notes often grow too long and become hard to navigate. A 200+ line note covering overview, architecture, implementation details, and references creates cognitive overload.
+When documenting projects, ideas, or brainstorms in Obsidian, notes often grow too long and become hard to navigate. A
+200+ line note covering overview, architecture, implementation details, and references creates cognitive overload.
 
 ## Context / Trigger Conditions
 
 Apply this pattern when:
+
 - A note exceeds ~100 lines or covers 3+ distinct aspects
 - Content naturally separates into "what/why" vs "how"
 - Documentation will be referenced repeatedly
@@ -31,7 +33,7 @@ Apply this pattern when:
 
 ### Structure
 
-```
+```text
 project-idea/
 ├── project-overview.md      # Index: scannable, links to details
 ├── project-architecture.md  # Detail: technical deep-dive
@@ -47,26 +49,30 @@ project-idea/
 > One-line description of what this is
 
 ## The Problem
+
 [2-3 sentences]
 
 ## The Solution
+
 [2-3 sentences + simple diagram]
 
 ## Key Decisions
 
-| Decision | Choice | Why |
-|----------|--------|-----|
-| Database | S3 Vectors | Cheapest, serverless |
-| Framework | Next.js | Team familiarity |
+| Decision  | Choice     | Why                  |
+| --------- | ---------- | -------------------- |
+| Database  | S3 Vectors | Cheapest, serverless |
+| Framework | Next.js    | Team familiarity     |
 
 → See [[project-architecture]] for details
 
 ## Status
+
 - [x] Research complete
 - [ ] Prototype
 - [ ] Production
 
 ## Related
+
 - [[project-architecture]] - Technical details
 - [[project-decisions]] - Decision records
 ```
@@ -79,19 +85,23 @@ project-idea/
 > Part of [[project-overview]]
 
 ## TL;DR
+
 [One paragraph summary for skimmers]
 
 ---
 
 ## [Detailed Section 1]
+
 [Full technical content]
 
 ## [Detailed Section 2]
+
 [Full technical content]
 
 ---
 
 ## Related
+
 - [[project-overview]] - Main overview
 - [[other-related-topic]]
 ```
@@ -100,14 +110,14 @@ project-idea/
 
 ```yaml
 ---
-type: overview  # or: architecture, decision, reference
+type: overview # or: architecture, decision, reference
 topic: project-name
 status: draft
 created: 2026-01-27
 related:
   - "[[project-architecture]]"
   - "[[project-decisions]]"
-parent: "[[project-overview]]"  # for detail files
+parent: "[[project-overview]]" # for detail files
 ---
 ```
 
@@ -123,6 +133,7 @@ flowchart LR
 ## Verification
 
 After restructuring:
+
 1. Index file is <80 lines and scannable in 30 seconds
 2. Each detail file has a clear single purpose
 3. All files link bidirectionally (index → detail, detail → index)
@@ -132,7 +143,8 @@ After restructuring:
 ## Example
 
 **Before** (single 200-line file):
-```
+
+```text
 ai-zettelkasten-brainstorm.md (200+ lines)
 ├── Context
 ├── Problem
@@ -146,7 +158,8 @@ ai-zettelkasten-brainstorm.md (200+ lines)
 ```
 
 **After** (linked files):
-```
+
+```text
 ai-zettelkasten-plugin-brainstorm.md (60 lines)
 ├── Problem (3 lines)
 ├── Solution (5 lines)

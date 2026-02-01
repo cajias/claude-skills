@@ -5,12 +5,12 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 4.12
 ---
 
-# Correction: Avoid: 'map clearly to any specific sdlc phase: 
+# Correction: Avoid: 'map clearly to any specific sdlc phase
 
 ## Problem / Use Case
 
@@ -26,7 +26,8 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Correction: Avoid: 'map clearly to any specific sdlc phase: - `normalize-structure-after-exploration' | Expected behavior: 'be tagged with which sdlc phases based on my review of all 73 files (notes 293-365)'
+Correction: Avoid: 'map clearly to any specific sdlc phase: - `normalize-structure-after-exploration' | Expected
+behavior: 'be tagged with which sdlc phases based on my review of all 73 files (notes 293-365)'
 
 ## Verification
 
@@ -39,4 +40,3 @@ Correction: Avoid: 'map clearly to any specific sdlc phase: - `normalize-structu
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

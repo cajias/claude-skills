@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'wrong_assessment']
+tags: ["correction", "learned", "wrong_assessment"]
 level: user
 breakthrough_score: 7.10
 ---
@@ -39,4 +39,3 @@ Correction: User wants 'fleeting notes' instead of 'create the' | Expected behav
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

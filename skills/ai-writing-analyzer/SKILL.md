@@ -23,23 +23,23 @@ Access to the pattern database in `../ai-writing-humanizer/patterns/patterns.jso
 
 ## Pattern Categories (15 Total)
 
-| Priority | Category | Examples |
-|----------|----------|----------|
-| Critical | Chatbot Artifacts | "I hope this helps", "As an AI..." |
-| High | Buzzwords | "leverage", "utilize", "delve into" |
-| High | Inflated Symbolism | "stands as a testament", "watershed moment" |
-| High | Promotional Language | "breathtaking", "revolutionary" |
-| High | Editorializing | "It's important to note", "Worth mentioning" |
-| Medium | Negative Parallelism | "It's not just X, but Y" |
-| Medium | Participle Endings | ", ensuring...", ", highlighting..." |
-| Medium | Filler Phrases | "In today's ever-evolving world" |
-| Medium | Weasel Words | "Some experts say", "It is believed" |
-| Medium | Transition Overuse | "Furthermore", "Moreover" (frequency-based) |
-| Low | Em Dash Overuse | More than 2 per 500 words |
-| Low | Hedge Words | "somewhat", "relatively", "arguably" |
-| Low | Rule of Three | Repeated triadic structures |
-| Low | Formatting Patterns | Excessive bullet lists, headers |
-| Low | Sentence Starters | Repetitive patterns |
+| Priority | Category             | Examples                                     |
+| -------- | -------------------- | -------------------------------------------- |
+| Critical | Chatbot Artifacts    | "I hope this helps", "As an AI..."           |
+| High     | Buzzwords            | "leverage", "utilize", "delve into"          |
+| High     | Inflated Symbolism   | "stands as a testament", "watershed moment"  |
+| High     | Promotional Language | "breathtaking", "revolutionary"              |
+| High     | Editorializing       | "It's important to note", "Worth mentioning" |
+| Medium   | Negative Parallelism | "It's not just X, but Y"                     |
+| Medium   | Participle Endings   | ", ensuring...", ", highlighting..."         |
+| Medium   | Filler Phrases       | "In today's ever-evolving world"             |
+| Medium   | Weasel Words         | "Some experts say", "It is believed"         |
+| Medium   | Transition Overuse   | "Furthermore", "Moreover" (frequency-based)  |
+| Low      | Em Dash Overuse      | More than 2 per 500 words                    |
+| Low      | Hedge Words          | "somewhat", "relatively", "arguably"         |
+| Low      | Rule of Three        | Repeated triadic structures                  |
+| Low      | Formatting Patterns  | Excessive bullet lists, headers              |
+| Low      | Sentence Starters    | Repetitive patterns                          |
 
 ## Quick Analysis
 
@@ -65,18 +65,22 @@ patterns = json.load(open('patterns/patterns.json'))
 For each category, apply appropriate detection method:
 
 **Simple Matching** (buzzwords, filler phrases):
+
 - Case-insensitive exact match
 - Record location and context
 
 **Regex Matching** (negative parallelism, participle endings):
+
 - Apply regex patterns
 - Validate in context
 
 **Frequency Detection** (transitions, em dashes):
+
 - Count occurrences per 500 words
 - Flag if exceeds threshold
 
 **Structural Analysis** (rule of three, formatting):
+
 - Detect repeated patterns
 - Count structural elements
 
@@ -117,39 +121,42 @@ Output format:
 **AI Likelihood:** High (15 patterns detected)
 
 ### Critical (1)
+
 - **Chatbot Artifact** [para 1]: "I hope this helps"
 
 ### High Priority (9)
+
 - **Buzzword** [para 2]: "leverage" → consider "use"
 - **Inflated Symbolism** [para 3]: "stands as a testament"
-...
+  ...
 
 ### Summary
+
 | Category | Count |
-|----------|-------|
-| Critical | 1 |
-| High | 9 |
-| Medium | 3 |
-| Low | 2 |
+| -------- | ----- |
+| Critical | 1     |
+| High     | 9     |
+| Medium   | 3     |
+| Low      | 2     |
 ```
 
 ## Thresholds
 
-| Pattern | Threshold | Flagged When |
-|---------|-----------|--------------|
-| Em dashes | 2 per 500 words | Exceeds |
-| Transitions | 3 per 500 words | Exceeds |
-| Hedge words | 4 per 500 words | Exceeds |
-| Rule of three | 2 instances | Exceeds |
+| Pattern       | Threshold       | Flagged When |
+| ------------- | --------------- | ------------ |
+| Em dashes     | 2 per 500 words | Exceeds      |
+| Transitions   | 3 per 500 words | Exceeds      |
+| Hedge words   | 4 per 500 words | Exceeds      |
+| Rule of three | 2 instances     | Exceeds      |
 
 ## AI Likelihood Scoring
 
-| Score | Likelihood | Criteria |
-|-------|------------|----------|
-| 0-2 issues | Low | Likely human-written |
-| 3-7 issues | Medium | Some AI markers |
-| 8-15 issues | High | Likely AI-assisted |
-| 16+ issues | Very High | Almost certainly AI |
+| Score       | Likelihood | Criteria             |
+| ----------- | ---------- | -------------------- |
+| 0-2 issues  | Low        | Likely human-written |
+| 3-7 issues  | Medium     | Some AI markers      |
+| 8-15 issues | High       | Likely AI-assisted   |
+| 16+ issues  | Very High  | Almost certainly AI  |
 
 ## See Also
 

@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 64.09
 ---
@@ -26,7 +26,8 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Teaching: premature abstraction with ai - `flee-20260129-z6a7b8 | Correction: Unable to extract specific insight - manual review recommended
+Teaching: premature abstraction with ai - `flee-20260129-z6a7b8 | Correction: Unable to extract specific insight -
+manual review recommended
 
 ## Verification
 
@@ -39,4 +40,3 @@ Teaching: premature abstraction with ai - `flee-20260129-z6a7b8 | Correction: Un
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

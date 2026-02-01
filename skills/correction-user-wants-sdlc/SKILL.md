@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 17.69
 ---
@@ -26,7 +26,9 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Correction: User wants 'sdlc' instead of 'clearly' | User wants instead: 'showing which notes should receive which sdlc tags: ## sdlc tagging analysis report (notes 366-437) based on my review of all 72 notes' | Expected behavior: 'receive which sdlc tags: ## sdlc tagging analysis report (notes 366-437) based on my review of all 72 notes'
+Correction: User wants 'sdlc' instead of 'clearly' | User wants instead: 'showing which notes should receive which sdlc
+tags: ## sdlc tagging analysis report (notes 366-437) based on my review of all 72 notes' | Expected behavior: 'receive
+which sdlc tags: ## sdlc tagging analysis report (notes 366-437) based on my review of all 72 notes'
 
 ## Verification
 
@@ -39,4 +41,3 @@ Correction: User wants 'sdlc' instead of 'clearly' | User wants instead: 'showin
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-
