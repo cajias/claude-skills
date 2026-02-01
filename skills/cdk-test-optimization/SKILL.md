@@ -30,12 +30,14 @@ This multiplies test time by the number of tests.
 ## Context / Trigger Conditions
 
 Symptoms:
+
 - Single test file takes 30+ minutes
 - Jest shows tests running but progress stalls for minutes between tests
 - Disk usage spikes during tests (see: cdk-temp-folder-disk-bloat skill)
 - `ps aux` shows multiple esbuild/docker processes per test
 
 Pattern to look for in test files:
+
 ```typescript
 beforeEach(() => {
   app = new cdk.App();  // BAD: Creates new app for EACH test
@@ -125,6 +127,7 @@ For maximum speed, consider:
 3. **Verify via integration tests**: Real deployments catch real issues
 
 This is appropriate when:
+
 - Integration tests exist and cover the constructs
 - CDK synth tests are mostly "does it create an ECS cluster" type assertions
 - Test speed is critical (TDD workflows, CI pipelines)
@@ -132,6 +135,7 @@ This is appropriate when:
 ## Verification
 
 After refactoring:
+
 - Test file should complete in 2-5 minutes instead of 30+
 - Only one set of Docker/esbuild bundling messages per describe block
 - Disk usage during tests should be much lower
@@ -140,10 +144,10 @@ After refactoring:
 
 Real-world result from refactoring `fargate-data-plane.test.ts`:
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Time | 30+ minutes | 4 minutes |
-| CDK synths | 36 | 2 |
+| Metric     | Before      | After      |
+| ---------- | ----------- | ---------- |
+| Time       | 30+ minutes | 4 minutes  |
+| CDK synths | 36          | 2          |
 | Disk usage | 20+ GB temp | ~2 GB temp |
 
 The test file had 36 tests, each doing `beforeEach(() => new cdk.App())`.
@@ -163,9 +167,9 @@ Refactored to 2 `beforeAll` blocks (default config + custom certificate config).
 ## See Also
 
 - **cdk-temp-folder-disk-bloat**: Companion skill for when CDK tests fill up disk
-- AWS CDK Testing: https://docs.aws.amazon.com/cdk/v2/guide/testing.html
+- AWS CDK Testing: <https://docs.aws.amazon.com/cdk/v2/guide/testing.html>
 
 ## References
 
-- Jest beforeAll vs beforeEach: https://jestjs.io/docs/setup-teardown
-- CDK assertions library: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.assertions-readme.html
+- Jest beforeAll vs beforeEach: <https://jestjs.io/docs/setup-teardown>
+- CDK assertions library: <https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.assertions-readme.html>

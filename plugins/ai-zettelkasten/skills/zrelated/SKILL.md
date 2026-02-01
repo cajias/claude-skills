@@ -9,7 +9,7 @@ Discover semantically related notes to help build connections in your knowledge 
 
 ## Usage
 
-```
+```text
 /zrelated context management        # Search by query
 /zrelated perm-fact-my-note-id      # Search by note ID
 /zrelated "TDD patterns" --top 15   # Custom number of results
@@ -41,7 +41,7 @@ uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-rel
 
 When writing or reviewing a note, find related content to link:
 
-```
+```text
 /zrelated "AWS Lambda optimization"
 # Returns notes about Lambda, serverless, performance
 ```
@@ -50,7 +50,7 @@ When writing or reviewing a note, find related content to link:
 
 Find notes that should reference a specific note:
 
-```
+```text
 /zrelated perm-fact-context-management
 # Returns notes that should link to this one
 ```
@@ -59,7 +59,7 @@ Find notes that should reference a specific note:
 
 Explore what you know about a subject:
 
-```
+```text
 /zrelated "authentication patterns"
 # Discovers all related knowledge across hubs
 ```
@@ -74,8 +74,7 @@ Explore what you know about a subject:
 
 ## Tips
 
-- Use note IDs (perm-*, fleet-*) for precise searches from a known note
+- Use note IDs (perm-_, fleet-_) for precise searches from a known note
 - Use natural language queries for exploratory searches
 - Higher --top values useful for broadly applicable topics
 - Results can inform `## Related` section in notes
-

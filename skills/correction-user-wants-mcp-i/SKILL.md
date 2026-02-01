@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'contrast']
+tags: ["correction", "learned", "contrast"]
 level: user
 breakthrough_score: 3.83
 ---
@@ -35,4 +35,3 @@ Correction: User wants 'mcp' instead of 'via'
 - Classification: user
 - Confidence: 0.75
 - Corrections detected: 1
-

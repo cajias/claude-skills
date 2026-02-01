@@ -11,31 +11,32 @@ version: 2.0.0
 # Obsidian Memory System
 
 **Obsidian is my primary workspace**, not just long-term storage. Use it for:
+
 - Working memory during sessions (scratchpads, analysis, task tracking)
 - Permanent knowledge (decisions, lessons, patterns)
 - Everything in between
 
 ## Why Obsidian Over Local Disk
 
-| Aspect | Local Disk | Obsidian |
-|--------|------------|----------|
-| Folder creation | Need `mkdir` first | **Auto-created** |
-| Searchability | Grep/Glob | `search_notes` with frontmatter |
-| User visibility | Hidden in filesystem | **Visible in Obsidian app** |
-| Cross-session | Lost or scattered | **Organized, persistent** |
-| Linking | None | `[[wiki-links]]` work |
+| Aspect          | Local Disk           | Obsidian                        |
+| --------------- | -------------------- | ------------------------------- |
+| Folder creation | Need `mkdir` first   | **Auto-created**                |
+| Searchability   | Grep/Glob            | `search_notes` with frontmatter |
+| User visibility | Hidden in filesystem | **Visible in Obsidian app**     |
+| Cross-session   | Lost or scattered    | **Organized, persistent**       |
+| Linking         | None                 | `[[wiki-links]]` work           |
 
 **Default choice: Obsidian.** Only use local disk for generated code or build artifacts.
 
 ## MCP Tools for Workspace
 
-| Need | Tool | Example |
-|------|------|---------|
-| Create/overwrite | `write_note` | Session context, scratchpad |
-| Surgical edit | `patch_note` | Update status, add findings |
-| Read | `read_note` | Load previous context |
-| Search | `search_notes` | Find related work |
-| List | `list_directory` | Browse folder contents |
+| Need             | Tool             | Example                     |
+| ---------------- | ---------------- | --------------------------- |
+| Create/overwrite | `write_note`     | Session context, scratchpad |
+| Surgical edit    | `patch_note`     | Update status, add findings |
+| Read             | `read_note`      | Load previous context       |
+| Search           | `search_notes`   | Find related work           |
+| List             | `list_directory` | Browse folder contents      |
 
 ## Session Workspace Protocol
 
@@ -45,7 +46,7 @@ For ANY working memory during a session:
 
 Just write your first file - folder is created automatically:
 
-```
+```text
 agent-workspaces/claude-[YYYYMMDD]-[HHMMSS]-[context]/context.md
 ```
 
@@ -53,12 +54,12 @@ Context examples: `vault-setup`, `feature-auth`, `debug-api`, `pr-review-123`
 
 ### 2. Standard Session Files
 
-| File | Purpose |
-|------|---------|
-| `context.md` | Session state, current task, status |
+| File            | Purpose                                |
+| --------------- | -------------------------------------- |
+| `context.md`    | Session state, current task, status    |
 | `scratchpad.md` | Working notes, analysis, draft content |
-| `findings.md` | Discoveries, results, outputs |
-| `tasks.md` | Task tracking if complex |
+| `findings.md`   | Discoveries, results, outputs          |
+| `tasks.md`      | Task tracking if complex               |
 
 ### 3. Update Status When Done
 
@@ -72,16 +73,16 @@ status: completed
 
 ### Always (Proactive)
 
-| Trigger | What to Capture | Where |
-|---------|-----------------|-------|
-| Starting any task | Session context | `agent-workspaces/claude-[timestamp]-[context]/` |
-| "Let's do X instead of Y" | Decision + rationale | `decisions/` folder as ADR |
-| "I prefer..." | User preference | `agent-workspaces/shared/persistent.md` |
-| "That worked/didn't work" | Lesson learned | `knowledge-base/lessons-learned/` |
-| Person mentioned | Facts about them | `people/[name].md` |
-| Recurring pattern | Pattern documentation | `knowledge-base/` with `#pattern` |
-| Important constraint | Project context | `engagements/active/[project]/` |
-| Quick note, unsure where | Inbox for triage | `agent-workspaces/shared/inbox.md` |
+| Trigger                   | What to Capture       | Where                                            |
+| ------------------------- | --------------------- | ------------------------------------------------ |
+| Starting any task         | Session context       | `agent-workspaces/claude-[timestamp]-[context]/` |
+| "Let's do X instead of Y" | Decision + rationale  | `decisions/` folder as ADR                       |
+| "I prefer..."             | User preference       | `agent-workspaces/shared/persistent.md`          |
+| "That worked/didn't work" | Lesson learned        | `knowledge-base/lessons-learned/`                |
+| Person mentioned          | Facts about them      | `people/[name].md`                               |
+| Recurring pattern         | Pattern documentation | `knowledge-base/` with `#pattern`                |
+| Important constraint      | Project context       | `engagements/active/[project]/`                  |
+| Quick note, unsure where  | Inbox for triage      | `agent-workspaces/shared/inbox.md`               |
 
 ### During Complex Tasks
 
@@ -107,7 +108,7 @@ status: completed
 
 ## Write Location Decision Tree
 
-```
+```text
 ANY working memory (scratchpad, analysis, tasks)?
   └─ YES → agent-workspaces/claude-[timestamp]-[context]/
 
@@ -160,12 +161,12 @@ The `summary` field is critical for efficient navigation.
 
 ## Tag Taxonomy
 
-| Category | Tags |
-|----------|------|
-| Status | `#draft` `#active` `#completed` `#archived` |
-| Type | `#decision` `#pattern` `#lesson` `#meeting` `#blocker` |
-| Priority | `#urgent` `#backlog` |
-| Sharing | `#shareable` `#internal` `#sensitive` |
+| Category | Tags                                                   |
+| -------- | ------------------------------------------------------ |
+| Status   | `#draft` `#active` `#completed` `#archived`            |
+| Type     | `#decision` `#pattern` `#lesson` `#meeting` `#blocker` |
+| Priority | `#urgent` `#backlog`                                   |
+| Sharing  | `#shareable` `#internal` `#sensitive`                  |
 
 ## What NOT to Store in Obsidian
 

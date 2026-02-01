@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'contrast']
+tags: ["correction", "learned", "contrast"]
 level: user
 breakthrough_score: 1.34
 ---
@@ -35,4 +35,3 @@ Correction: User wants instead: 'claude code directly in the hub name'
 - Classification: user
 - Confidence: 0.7
 - Corrections detected: 1
-

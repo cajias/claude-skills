@@ -5,12 +5,12 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 5.60
 ---
 
-# Correction: User wants 'a dupe' instead of 'is not' | Avoid:
+# Correction: User wants 'a dupe' instead of 'is not' | Avoid
 
 ## Problem / Use Case
 
@@ -37,4 +37,3 @@ Correction: User wants 'a dupe' instead of 'is not' | Avoid: 'use the mcp server
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

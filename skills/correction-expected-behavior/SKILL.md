@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 3.48
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 3.48
 
 ## Problem / Use Case
 
-review the permanent notes in zk, and add a tag them with the name of the sdlc phase the are relevant to if they are relevant to any phase of the sdlc. The tag should be sdlc-<phase name>
+review the permanent notes in zk, and add a tag them with the name of the sdlc phase the are relevant to if they are
+relevant to any phase of the sdlc. The tag should be sdlc-<phase name>
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: Expected behavior: 'be sdlc-<phase name>'
 - Classification: user
 - Confidence: 0.7
 - Corrections detected: 1
-

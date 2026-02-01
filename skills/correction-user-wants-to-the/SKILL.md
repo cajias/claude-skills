@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 29.67
 ---
@@ -26,7 +26,8 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Correction: User wants 'to the' instead of 'make edits' | Expected behavior: 'be tagged with which sdlc phase tags: ## sdlc tagging analysis report (notes 74-146) ### notes that should be tagged: **sdlc-development** (coding'
+Correction: User wants 'to the' instead of 'make edits' | Expected behavior: 'be tagged with which sdlc phase tags: ##
+sdlc tagging analysis report (notes 74-146) ### notes that should be tagged: **sdlc-development** (coding'
 
 ## Verification
 
@@ -39,4 +40,3 @@ Correction: User wants 'to the' instead of 'make edits' | Expected behavior: 'be
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

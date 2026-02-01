@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 10.66
 ---
@@ -39,4 +39,3 @@ Correction: User wants 'code' instead of 'correct'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

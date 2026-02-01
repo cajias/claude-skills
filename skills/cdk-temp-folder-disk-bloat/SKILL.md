@@ -23,6 +23,7 @@ automatically cleaned up. On macOS, these accumulate in /private/var/folders/XX/
 (the per-user temp directory) and can consume tens or hundreds of gigabytes of disk space.
 
 This is especially severe when:
+
 - Running CDK tests repeatedly (TDD workflows, CI loops)
 - Using cdk watch or similar continuous deployment tools
 - Multiple CDK projects are active
@@ -31,14 +32,16 @@ This is especially severe when:
 ## Context / Trigger Conditions
 
 Symptoms:
+
 - Disk suddenly full or nearly full (100% usage)
 - Standard cleanup commands (npm cache clean, go clean, brew cleanup) don't help
 - df -h shows high usage but home directory seems normal
 - CDK synth/deploy/tests become slow or fail with disk errors
 
 Detection commands:
-1. Count CDK temp folders: ls /private/var/folders/*/*/T/cdk.out* 2>/dev/null | wc -l
-2. Check total size: du -sh /private/var/folders/*/*/T/cdk.out* 2>/dev/null | head -20
+
+1. Count CDK temp folders: ls /private/var/folders/_/_/T/cdk.out\* 2>/dev/null | wc -l
+2. Check total size: du -sh /private/var/folders/_/_/T/cdk.out\* 2>/dev/null | head -20
 
 If you see hundreds or thousands of cdk.out folders, this is your problem.
 
@@ -49,26 +52,26 @@ If you see hundreds or thousands of cdk.out folders, this is your problem.
 First, stop whatever is creating new folders:
 
 Find CDK-related processes:
-  ps aux | grep -E "jest|cdk|esbuild" | grep -v grep
+ps aux | grep -E "jest|cdk|esbuild" | grep -v grep
 
 Kill jest/test processes that run CDK:
-  pkill -9 -f "jest-worker"
-  pkill -9 -f "npm test"
+pkill -9 -f "jest-worker"
+pkill -9 -f "npm test"
 
 If using Claude Code with TDD/ralph-loop, send Ctrl+C to the running session.
 
 Important: If processes keep respawning, find and kill the parent orchestrator:
-  pgrep -f "jest.*passWithNoTests" | xargs ps -o pid,ppid,command -p
+pgrep -f "jest.\*passWithNoTests" | xargs ps -o pid,ppid,command -p
 Then kill the parent PID.
 
 ### Step 2: Clean Up Existing Folders
 
 Find your temp folder path:
-  echo $TMPDIR
+echo $TMPDIR
 Usually: /var/folders/XX/XXXXXXXXX/T/
 
 Remove all CDK temp folders:
-  rm -rf /private/var/folders/*/*/T/cdk.out*
+rm -rf /private/var/folders/_/_/T/cdk.out\*
 
 This may take several minutes if there are thousands of folders.
 
@@ -84,7 +87,8 @@ Should show significantly more free space.
 When using Claude Code with parallel subagents (Task tool), NEVER run CDK operations in parallel:
 
 **FORBIDDEN (will exhaust disk in minutes):**
-```
+
+```text
 # BAD - each subagent creates separate cdk.out folders
 [
   Task(general-purpose: "Run npm test") ||
@@ -95,7 +99,8 @@ When using Claude Code with parallel subagents (Task tool), NEVER run CDK operat
 ```
 
 **REQUIRED (sequential execution):**
-```
+
+```text
 # GOOD - one CDK operation at a time
 1. npm run build
 2. npm run lint
@@ -104,8 +109,10 @@ When using Claude Code with parallel subagents (Task tool), NEVER run CDK operat
 ```
 
 **In TDD plans and scratchpads, add this warning:**
+
 ```markdown
 ## CRITICAL: CDK Disk Bloat Prevention
+
 ⚠️ DO NOT run CDK operations in parallel!
 Run validation commands SEQUENTIALLY, not in parallel.
 ```
@@ -114,25 +121,26 @@ Run validation commands SEQUENTIALLY, not in parallel.
 
 In your CDK app, set a consistent output directory that gets cleaned:
 
-  const app = new cdk.App({
-    outdir: 'cdk.out',  // Use project-relative path, not temp
-  });
+const app = new cdk.App({
+outdir: 'cdk.out', // Use project-relative path, not temp
+});
 
 ### Option 2: Add Clean Script to package.json
 
-  "scripts": {
-    "clean": "rm -rf cdk.out node_modules/.cache",
-    "pretest": "rm -rf cdk.out"
-  }
+"scripts": {
+"clean": "rm -rf cdk.out node_modules/.cache",
+"pretest": "rm -rf cdk.out"
+}
 
 ### Option 3: Periodic Cleanup Cron
 
 Add to crontab (crontab -e) - clean CDK temp folders daily at 3am:
-  0 3 * * * rm -rf /private/var/folders/*/*/T/cdk.out* 2>/dev/null
+0 3 \*\* _rm -rf /private/var/folders/_/_/T/cdk.out_ 2>/dev/null
 
 ## Verification
 
 After cleanup:
+
 1. Run df -h / - should show recovered space
 2. Count remaining folders - should be 0 or very low
 3. Run a CDK test/synth and verify behavior
@@ -145,8 +153,9 @@ Investigation showed standard caches only 20GB, but temp folders had 1000+ cdk.o
 folders at 3.1GB each consuming 60+ GB.
 
 Resolution:
+
 1. Stopped the TDD loop creating folders (pkill jest-worker)
-2. Cleaned up (rm -rf /private/var/folders/*/*/T/cdk.out*)
+2. Cleaned up (rm -rf /private/var/folders/_/_/T/cdk.out\*)
 3. Result: 84GB recovered
 
 ## Notes
@@ -170,5 +179,5 @@ Resolution:
 
 ## References
 
-- AWS CDK CLI docs: https://docs.aws.amazon.com/cdk/v2/guide/cli.html
+- AWS CDK CLI docs: <https://docs.aws.amazon.com/cdk/v2/guide/cli.html>
 - macOS temp folders: /private/var/folders is real path, /var/folders is symlink

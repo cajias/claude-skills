@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'command']
+tags: ["correction", "learned", "command"]
 level: user
 breakthrough_score: 3.21
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 3.21
 
 ## Problem / Use Case
 
-dont do the loop manually. use the ralph loop skill. do option B. Iterate on each file before moving to the next, orchestrate subagents an just coordinate
+dont do the loop manually. use the ralph loop skill. do option B. Iterate on each file before moving to the next,
+orchestrate subagents an just coordinate
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: Avoid: 'do the loop manually'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 2
-

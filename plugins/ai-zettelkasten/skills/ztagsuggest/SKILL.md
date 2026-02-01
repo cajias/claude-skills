@@ -9,7 +9,7 @@ Suggest tags for untagged or under-tagged notes by analyzing semantically simila
 
 ## Usage
 
-```
+```text
 /ztagsuggest                  # Interactive suggestion workflow
 /ztagsuggest <note-id>        # Suggest tags for specific note
 ```
@@ -34,6 +34,7 @@ find /Users/cajias/Documents/obsidian-vault-work/knowledge-base/permanent -name 
 ```
 
 Or notes with minimal tags:
+
 ```bash
 grep -l "tags:" /Users/cajias/Documents/obsidian-vault-work/knowledge-base/permanent/*.md | while read f; do
   count=$(grep "tags:" "$f" | grep -oE '\[.*\]' | tr ',' '\n' | wc -l)
@@ -58,17 +59,17 @@ zk-related "<note title or content excerpt>" --top 5
 
 From the related notes output, collect tags and count frequencies:
 
-| Tag | Occurrences | Confidence |
-|-----|-------------|------------|
-| `context-management` | 4/5 | 80% |
-| `ai-agents` | 3/5 | 60% |
-| `workflows` | 2/5 | 40% |
+| Tag                  | Occurrences | Confidence |
+| -------------------- | ----------- | ---------- |
+| `context-management` | 4/5         | 80%        |
+| `ai-agents`          | 3/5         | 60%        |
+| `workflows`          | 2/5         | 40%        |
 
 ### Step 4: Review and Apply
 
 Present suggestions to user:
 
-```
+```text
 Note: subagent-delegation-for-context-management.md
 Current tags: []
 Hub: AI Engineering
@@ -97,12 +98,12 @@ Then run `/zsync` to update the vector store.
 
 Tag confidence = (# similar notes with tag) / (# similar notes checked) × 100
 
-| Confidence | Recommendation |
-|------------|----------------|
-| ≥80% | Strong suggestion - apply unless contradicted |
-| 60-79% | Good suggestion - likely appropriate |
-| 40-59% | Moderate suggestion - review carefully |
-| <40% | Weak suggestion - only if clearly relevant |
+| Confidence | Recommendation                                |
+| ---------- | --------------------------------------------- |
+| ≥80%       | Strong suggestion - apply unless contradicted |
+| 60-79%     | Good suggestion - likely appropriate          |
+| 40-59%     | Moderate suggestion - review carefully        |
+| <40%       | Weak suggestion - only if clearly relevant    |
 
 ## Batch Processing
 
@@ -127,10 +128,10 @@ For bulk suggestions:
 
 ## Success Metrics
 
-| Metric | Before | Target |
-|--------|--------|--------|
-| Tagged notes | 96 (20%) | 190+ (40%) |
-| Avg tags per tagged note | varies | 3-5 |
+| Metric                   | Before   | Target     |
+| ------------------------ | -------- | ---------- |
+| Tagged notes             | 96 (20%) | 190+ (40%) |
+| Avg tags per tagged note | varies   | 3-5        |
 
 ## Tag Taxonomy Compliance
 

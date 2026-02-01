@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 12.18
 ---
@@ -18,7 +18,7 @@ breakthrough_score: 12.18
 <task-id>a3ac1ad</task-id>
 <status>completed</status>
 <summary>Agent "Index existing knowledge for dedup" completed</summary>
-<result>Perfect. Now let me compile the comprehensive 
+<result>Perfect. Now let me compile the comprehensive
 
 ## When to Use This Skill
 
@@ -39,4 +39,3 @@ Correction: User wants 'archive' instead of 'in'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

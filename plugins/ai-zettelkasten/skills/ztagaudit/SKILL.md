@@ -9,7 +9,7 @@ Generate a comprehensive tag health report for the knowledge base, identifying i
 
 ## Usage
 
-```
+```text
 /ztagaudit                    # Generate audit report
 ```
 
@@ -37,6 +37,7 @@ zk-tag-audit
 ## Output Sections
 
 ### Summary
+
 - Total notes scanned
 - Notes with tags (count and percentage)
 - Unique tag count
@@ -44,25 +45,29 @@ zk-tag-audit
 - Over-tagged note count (7+ tags)
 
 ### Tag Frequency Distribution
+
 Table showing each tag, its count, and percentage of tagged notes.
 
 ### Orphan Tags
+
 List of tags used only once, with the note that uses them.
 
 ### Over-Tagged Notes
+
 Table of notes with 7+ tags (target is 4-6).
 
 ### Co-occurrence Matrix
+
 Top tag pairs that frequently appear together.
 
 ## Interpretation Guide
 
-| Metric | Healthy | Warning | Critical |
-|--------|---------|---------|----------|
-| Tagged notes | >40% | 20-40% | <20% |
-| Orphan tags | <10% of vocab | 10-30% | >30% |
-| Over-tagged | 0 notes | 1-3 notes | >3 notes |
-| Unique tags | 25-35 | 35-50 | >50 |
+| Metric       | Healthy       | Warning   | Critical |
+| ------------ | ------------- | --------- | -------- |
+| Tagged notes | >40%          | 20-40%    | <20%     |
+| Orphan tags  | <10% of vocab | 10-30%    | >30%     |
+| Over-tagged  | 0 notes       | 1-3 notes | >3 notes |
+| Unique tags  | 25-35         | 35-50     | >50      |
 
 ## When to Use
 

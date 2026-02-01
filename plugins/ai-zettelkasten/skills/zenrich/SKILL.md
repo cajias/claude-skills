@@ -28,19 +28,24 @@ Every enriched note should have:
 # [Original Title]
 
 ## Problem Solved
+
 What issue or challenge does this pattern/concept address?
 
 ## The Pattern
+
 Expanded content with:
+
 - Implementation details
 - Code examples (if applicable)
 - Guidelines and best practices
 - Tables or diagrams where helpful
 
 ## Why This Works
+
 The underlying principle that makes this effective.
 
 ## Related
+
 - [[existing-note-1]]
 - [[existing-note-2]]
 - [[existing-note-3]]
@@ -61,7 +66,7 @@ def is_atomic(note_path):
     return not has_sections and line_count < 15
 ```
 
-2. **For batch processing**, group notes and use parallel subagents:
+1. **For batch processing**, group notes and use parallel subagents:
 
 ```python
 # Group into batches of ~25
@@ -76,16 +81,16 @@ for batch in batches:
     )
 ```
 
-3. **Enrichment prompt for subagent**:
+1. **Enrichment prompt for subagent**:
 
 ```markdown
 Enrich each atomic note with proper ZK structure:
 
 1. Keep original title (# heading)
-2. Add ## Problem Solved - what issue does this address?
-3. Add ## The Pattern - expand with implementation details, examples, guidelines
-4. Add ## Why This Works - explain the underlying principle
-5. Add ## Related - suggest 2-3 related concepts as [[wiki-links]]
+1. Add ## Problem Solved - what issue does this address?
+1. Add ## The Pattern - expand with implementation details, examples, guidelines
+1. Add ## Why This Works - explain the underlying principle
+1. Add ## Related - suggest 2-3 related concepts as [[wiki-links]]
 
 IMPORTANT: Related links must reference EXISTING notes in the knowledge base.
 Use semantic similarity to find relevant existing notes.
@@ -93,7 +98,7 @@ Use semantic similarity to find relevant existing notes.
 Keep frontmatter unchanged. Edit existing files, don't create new ones.
 ```
 
-4. **Validate enrichment** after completion:
+1. **Validate enrichment** after completion:
 
 ```python
 def validate_enriched(note_path):
@@ -109,7 +114,7 @@ def validate_enriched(note_path):
     return all(section in content for section in required_sections)
 ```
 
-5. **Display progress**:
+1. **Display progress**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

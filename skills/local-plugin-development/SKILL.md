@@ -61,7 +61,8 @@ mkdir -p ~/.claude/plugins/local-marketplace/my-plugin/skills/my-skill
 ```
 
 **Directory structure:**
-```
+
+```text
 ~/.claude/plugins/local-marketplace/
 ├── .claude-plugin/
 │   └── marketplace.json      # Marketplace manifest
@@ -172,6 +173,7 @@ claude plugin install obsidian-memory@local
 ```
 
 Key points:
+
 - `owner` is an object with `name` (not a string)
 - `plugins` is an array (not an object)
 - `source` uses relative paths from marketplace root
@@ -197,6 +199,7 @@ claude plugin uninstall my-plugin@local
 ### Why Not Symlinks?
 
 Manual symlinks to `~/.claude/plugins/installed/` may work but:
+
 - Not officially supported
 - May break with updates
 - `claude plugin list` won't show them correctly
@@ -205,6 +208,7 @@ Manual symlinks to `~/.claude/plugins/installed/` may work but:
 ### Updating Plugins
 
 After editing plugin files:
+
 1. Update version in `plugin.json`
 2. Run: `claude plugin update my-plugin@local`
 3. Restart Claude Code

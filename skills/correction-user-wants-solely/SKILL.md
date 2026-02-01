@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 0.83
 ---
@@ -14,7 +14,8 @@ breakthrough_score: 0.83
 
 ## Problem / Use Case
 
-remember not to focus solely on claude, kiro is equaly important. In this part it will important to reference the actual plugins, skills, mcp servers and other tools that help the development
+remember not to focus solely on claude, kiro is equaly important. In this part it will important to reference the actual
+plugins, skills, mcp servers and other tools that help the development
 
 ## When to Use This Skill
 
@@ -35,4 +36,3 @@ Correction: User wants 'solely on' instead of 'to focus'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

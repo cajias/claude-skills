@@ -17,7 +17,9 @@ verified: 2026-01-27
 
 ## Problem
 
-When building AI applications requiring semantic search (RAG, knowledge bases, memory systems), developers often default to:
+When building AI applications requiring semantic search (RAG, knowledge bases, memory systems), developers often default
+to:
+
 - **Aurora + pgvector**: Works but ~$10-20/month minimum, cold start issues
 - **OpenSearch Serverless**: Powerful but ~$175/month minimum
 - **Pinecone/external**: External dependency, ongoing costs
@@ -27,6 +29,7 @@ S3 Vectors (GA December 2025) is often the better choice but less known.
 ## Context / Trigger Conditions
 
 Use S3 Vectors when:
+
 - Building semantic search for personal/small-scale use
 - Need vector storage for <2 billion vectors
 - Want serverless with no infrastructure management
@@ -38,15 +41,15 @@ Use S3 Vectors when:
 
 ### Key Facts
 
-| Feature | Value |
-|---------|-------|
-| GA Date | December 2025 |
-| Max vectors/index | 2 billion |
-| Max vectors/bucket | 20 trillion |
-| Metadata keys | 50 per vector |
-| Latency (frequent) | ~100ms |
-| Latency (cold) | <1 second |
-| Cost reduction | ~90% vs specialized vector DBs |
+| Feature            | Value                          |
+| ------------------ | ------------------------------ |
+| GA Date            | December 2025                  |
+| Max vectors/index  | 2 billion                      |
+| Max vectors/bucket | 20 trillion                    |
+| Metadata keys      | 50 per vector                  |
+| Latency (frequent) | ~100ms                         |
+| Latency (cold)     | <1 second                      |
+| Cost reduction     | ~90% vs specialized vector DBs |
 
 ### Architecture Pattern
 
@@ -93,18 +96,19 @@ flowchart LR
 
 ### Cost Estimate (Personal Use)
 
-| Component | Usage | Monthly |
-|-----------|-------|---------|
-| PUT (upload) | 10MB | $0.05 |
-| Storage | 100MB | $0.02 |
-| Queries | 3,000 | $1.50 |
-| S3 (content) | 1GB | $0.02 |
-| Bedrock embeddings | 1,000 | $0.10 |
-| **Total** | | **$2-5** |
+| Component          | Usage | Monthly  |
+| ------------------ | ----- | -------- |
+| PUT (upload)       | 10MB  | $0.05    |
+| Storage            | 100MB | $0.02    |
+| Queries            | 3,000 | $1.50    |
+| S3 (content)       | 1GB   | $0.02    |
+| Bedrock embeddings | 1,000 | $0.10    |
+| **Total**          |       | **$2-5** |
 
 ### When to Add Aurora Instead
 
 S3 Vectors lacks relational queries. Add Aurora if you need:
+
 - Complex SQL JOINs across relationships
 - Multi-hop graph traversal (A → B → C)
 - Aggregations across metadata
@@ -198,7 +202,8 @@ for vec in response['vectors']:
 
 ## References
 
-- [S3 Vectors GA Announcement](https://aws.amazon.com/blogs/aws/amazon-s3-vectors-now-generally-available-with-increased-scale-and-performance/)
+- [S3 Vectors GA
+  Announcement](https://aws.amazon.com/blogs/aws/amazon-s3-vectors-now-generally-available-with-increased-scale-and-performance/)
 - [S3 Vectors Feature Page](https://aws.amazon.com/s3/features/vectors/)
 - [S3 Vectors Documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-vectors.html)
 - [InfoQ: S3 Vectors Storage-First Architecture](https://www.infoq.com/news/2026/01/aws-s3-vectors-ga/)

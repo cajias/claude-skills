@@ -37,7 +37,7 @@ existing_notes = {
 print(f"Found {len(existing_notes)} existing notes")
 ```
 
-2. **Extract all wiki-links from notes**:
+1. **Extract all wiki-links from notes**:
 
 ```python
 import re
@@ -53,7 +53,7 @@ for note in permanent_path.glob("*.md"):
     all_links.update(extract_links(content))
 ```
 
-3. **Identify broken links**:
+1. **Identify broken links**:
 
 ```python
 broken_links = []
@@ -69,7 +69,7 @@ for link in all_links:
 print(f"Found {len(broken_links)} broken links")
 ```
 
-4. **Display audit results**:
+1. **Display audit results**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -88,7 +88,7 @@ Broken Link Categories:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-5. **For semantic replacement**, match broken links to existing notes:
+1. **For semantic replacement**, match broken links to existing notes:
 
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -118,7 +118,7 @@ def find_semantic_match(broken_link, existing_notes):
     return None
 ```
 
-6. **Fix broken links in files**:
+1. **Fix broken links in files**:
 
 ```python
 def fix_links_in_file(note_path, replacements):
@@ -135,7 +135,7 @@ def fix_links_in_file(note_path, replacements):
     note_path.write_text(content)
 ```
 
-7. **Options for unfixable links**:
+1. **Options for unfixable links**:
 
 ```text
 Options:

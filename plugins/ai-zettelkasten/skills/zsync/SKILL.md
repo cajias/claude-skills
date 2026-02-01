@@ -5,11 +5,12 @@ description: Sync unindexed Obsidian notes to S3 Vectors for semantic search
 
 # /zsync - Sync Knowledge Base to S3 Vectors
 
-Manually sync notes from Obsidian to S3 Vectors. Use when auto-indexing wasn't available (e.g., missing AWS credentials) or to ensure all notes are searchable.
+Manually sync notes from Obsidian to S3 Vectors. Use when auto-indexing wasn't available (e.g., missing AWS credentials)
+or to ensure all notes are searchable.
 
 ## Usage
 
-```
+```text
 /zsync
 ```
 

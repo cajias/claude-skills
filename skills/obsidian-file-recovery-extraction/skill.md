@@ -6,11 +6,13 @@ tags: [obsidian, data-recovery, leveldb, electron, forensics]
 
 # Obsidian File Recovery Data Extraction
 
-When Obsidian vault files are corrupted or lost, the File Recovery core plugin maintains historical snapshots in Chrome/Electron IndexedDB format.
+When Obsidian vault files are corrupted or lost, the File Recovery core plugin maintains historical snapshots in
+Chrome/Electron IndexedDB format.
 
 ## The Problem
 
 Standard tools cannot read Obsidian's backup data:
+
 - Data stored in IndexedDB at `~/Library/Application Support/obsidian/IndexedDB/app_obsidian.md_0.indexeddb.leveldb/`
 - Chrome/Electron uses V8/Blink serialization, NOT standard LevelDB
 - Node.js `level`, `classic-level`, Python `plyvel` all fail
@@ -62,7 +64,8 @@ for record in backups_store.iterate_records():
 
 ## CRITICAL: Keep Best Version, Not Latest
 
-File Recovery keeps multiple snapshots. If a file was emptied/corrupted later, the **latest** backup has empty data. Always keep the **longest content version**:
+File Recovery keeps multiple snapshots. If a file was emptied/corrupted later, the **latest** backup has empty data.
+Always keep the **longest content version**:
 
 ```python
 best_backups = {}  # path -> {data, len}
@@ -79,23 +82,25 @@ for record in backups_store.iterate_records():
 
 ## Key Locations (macOS)
 
-| Component | Path |
-|-----------|------|
-| LevelDB | `~/Library/Application Support/obsidian/IndexedDB/app_obsidian.md_0.indexeddb.leveldb/` |
-| Blob storage | `~/Library/Application Support/obsidian/IndexedDB/app_obsidian.md_0.indexeddb.blob` |
-| Database name | Contains "backup" (e.g., `d4fd49d66ec66ec4-backup`) |
-| Object store | `backups` |
-| Record fields | `path`, `ts`, `data` |
+| Component     | Path                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------- |
+| LevelDB       | `~/Library/Application Support/obsidian/IndexedDB/app_obsidian.md_0.indexeddb.leveldb/` |
+| Blob storage  | `~/Library/Application Support/obsidian/IndexedDB/app_obsidian.md_0.indexeddb.blob`     |
+| Database name | Contains "backup" (e.g., `d4fd49d66ec66ec4-backup`)                                     |
+| Object store  | `backups`                                                                               |
+| Record fields | `path`, `ts`, `data`                                                                    |
 
 ## Why Standard Tools Fail
 
 Chrome IndexedDB uses V8's internal serialization:
+
 - Type markers for objects, arrays, strings
 - Variable-length integer encoding
 - Blob references for large data
 - Custom Blink object serialization
 
 The `strings` command extracts readable portions but mangles:
+
 - Non-ASCII characters
 - Markdown formatting
 - YAML frontmatter
@@ -128,5 +133,5 @@ for rel_path, info in best_backups.items():
 
 ## References
 
-- CCL Chromium Reader: https://github.com/cclgroupltd/ccl_chromium_reader
+- CCL Chromium Reader: <https://github.com/cclgroupltd/ccl_chromium_reader>
 - Chrome IndexedDB format in Chromium source

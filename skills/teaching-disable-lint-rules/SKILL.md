@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 10.88
 ---
@@ -26,7 +26,8 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Teaching: disable lint rules" - updated to lint-rule-evolution-process, linters-as-negotiation-layer, review-for-comprehension 31 | Correction: Avoid: 'disable lint rules" - updated to lint-rule-evolution-process'
+Teaching: disable lint rules" - updated to lint-rule-evolution-process, linters-as-negotiation-layer,
+review-for-comprehension 31 | Correction: Avoid: 'disable lint rules" - updated to lint-rule-evolution-process'
 
 ## Verification
 
@@ -39,4 +40,3 @@ Teaching: disable lint rules" - updated to lint-rule-evolution-process, linters-
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 1
-

@@ -9,7 +9,7 @@ Analyze the entire knowledge base to evaluate hub organization, discover cluster
 
 ## Usage
 
-```
+```text
 /zhubreview                    # Default 10 clusters
 /zhubreview --clusters 15      # More fine-grained analysis
 ```
@@ -42,6 +42,7 @@ zk-hub-review --clusters 10
 ### Cluster Analysis
 
 Each discovered cluster shows:
+
 - **Status**: ✓ (matched), ~ WEAK (partial match), ⚠ GAP (needs new hub)
 - **Keywords**: Auto-extracted from note titles
 - **Best hub**: Most similar existing hub
@@ -49,13 +50,13 @@ Each discovered cluster shows:
 
 ### Summary Table
 
-| Metric | Description |
-|--------|-------------|
-| Permanent notes | Total permanent notes analyzed |
-| Notes with hub | Notes that have hub assignments |
-| Notes without hub | Notes missing hub assignments |
-| Existing hubs | Current hub count |
-| Gap clusters | Clusters without matching hubs |
+| Metric            | Description                     |
+| ----------------- | ------------------------------- |
+| Permanent notes   | Total permanent notes analyzed  |
+| Notes with hub    | Notes that have hub assignments |
+| Notes without hub | Notes missing hub assignments   |
+| Existing hubs     | Current hub count               |
+| Gap clusters      | Clusters without matching hubs  |
 
 ### Recommendations
 
@@ -72,11 +73,11 @@ Each discovered cluster shows:
 
 ## Interpretation Guide
 
-| Hub Similarity | Meaning |
-|----------------|---------|
-| > 55% | Good match - cluster covered by existing hub |
-| 40-55% | Weak match - hub exists but may need refinement |
-| < 40% | Gap - cluster needs a new dedicated hub |
+| Hub Similarity | Meaning                                         |
+| -------------- | ----------------------------------------------- |
+| > 55%          | Good match - cluster covered by existing hub    |
+| 40-55%         | Weak match - hub exists but may need refinement |
+| < 40%          | Gap - cluster needs a new dedicated hub         |
 
 ## Follow-up Actions
 
@@ -86,4 +87,3 @@ After running hub review:
 2. **Bulk-assign notes** to appropriate hubs
 3. **Run `/zhubcheck`** to validate assignments
 4. **Run `/zsync`** to update S3 Vectors with changes
-

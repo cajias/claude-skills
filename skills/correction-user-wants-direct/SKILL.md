@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'negation_reference']
+tags: ["correction", "learned", "negation_reference"]
 level: user
 breakthrough_score: 7.43
 ---
@@ -26,7 +26,8 @@ When making similar mistakes to: negation_reference
 
 ## Solution / Approach
 
-Correction: User wants 'directly' instead of 'write files' | Avoid: 'have permission to write or execute files in the current session'
+Correction: User wants 'directly' instead of 'write files' | Avoid: 'have permission to write or execute files in the
+current session'
 
 ## Verification
 
@@ -39,4 +40,3 @@ Correction: User wants 'directly' instead of 'write files' | Avoid: 'have permis
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 7
-

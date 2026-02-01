@@ -15,11 +15,13 @@ date: 2025-01-27
 
 ## Problem
 
-Users need to delegate tasks to specific Amazon Q CLI agents running in the background, with intelligent agent selection based on the task type.
+Users need to delegate tasks to specific Amazon Q CLI agents running in the background, with intelligent agent selection
+based on the task type.
 
 ## Context/Trigger
 
 This skill activates when the user says:
+
 - "tell q to ..."
 - "tell q <agent-name> to ..."
 
@@ -48,6 +50,7 @@ When the user triggers this skill:
    - **Default**: Use `omega` if uncertain
 
 3. **Build the Q command**:
+
    ```bash
    q chat --agent <agent-name> --no-interactive --trust-all-tools "<task-prompt>"
    ```
@@ -58,7 +61,8 @@ When the user triggers this skill:
    - Provide the bash_id so they can check progress with BashOutput tool
 
 5. **Response format**:
-   ```
+
+   ```text
    Starting Q agent '<agent-name>' in background to: <brief-task-summary>
 
    Command: q chat --agent <agent-name> --no-interactive --trust-all-tools "<task>"
@@ -85,7 +89,7 @@ From `~/.aws/amazonq/cli-agents/`:
 
 ## Examples
 
-**User**: "tell q to upload docs/architecture.md to https://company.quip.com/ABC123"
+**User**: "tell q to upload docs/architecture.md to <https://company.quip.com/ABC123>"
 **Action**: Use `default` agent (has QuipEditor tool) + `quip-upload` skill workflow
 
 **User**: "tell q to create an architecture diagram for our EventBridge setup"
@@ -121,7 +125,8 @@ When the command matches "upload <file> to <quip-url>":
 4. Request a detailed summary report at the end
 
 **Prompt template for Quip uploads**:
-```
+
+```text
 Upload the markdown file '<absolute-file-path>' to Quip document '<quip-url>' using the QuipEditor tool.
 
 Follow the quip-upload skill workflow SECTION BY SECTION:

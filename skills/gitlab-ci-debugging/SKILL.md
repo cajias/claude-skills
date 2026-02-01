@@ -18,11 +18,13 @@ tags: [gitlab, ci-cd, debugging, pipelines]
 
 ## Problem
 
-GitLab CI pipelines fail with various error patterns that aren't always obvious to diagnose. This skill covers common failure modes and their solutions.
+GitLab CI pipelines fail with various error patterns that aren't always obvious to diagnose. This skill covers common
+failure modes and their solutions.
 
 ## Context / Trigger Conditions
 
 Use this skill when:
+
 - Pipeline jobs fail with unclear errors
 - AWS credential errors (`target_role_access_denied`)
 - Jobs work locally but fail in CI
@@ -37,14 +39,15 @@ Use this skill when:
 
 **Causes & Fixes**:
 
-| Cause | Fix |
-|-------|-----|
-| Missing CI variable | Set `$BEDROCK_ROLE_ARN` or required role ARN in CI/CD settings |
-| Wrong IAM trust policy | Update trust policy to allow GitLab OIDC provider |
-| Protected variable on unprotected branch | Make variable available to all branches or protect the branch |
-| Different image missing AWS CLI | Use image with AWS CLI pre-installed |
+| Cause                                    | Fix                                                            |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| Missing CI variable                      | Set `$BEDROCK_ROLE_ARN` or required role ARN in CI/CD settings |
+| Wrong IAM trust policy                   | Update trust policy to allow GitLab OIDC provider              |
+| Protected variable on unprotected branch | Make variable available to all branches or protect the branch  |
+| Different image missing AWS CLI          | Use image with AWS CLI pre-installed                           |
 
 **Diagnostic**:
+
 ```bash
 glab ci view --job JOB_NAME  # View job logs
 ```
@@ -69,6 +72,7 @@ job:
 ```
 
 **Node version check**:
+
 ```yaml
 before_script:
   - node --version
@@ -80,6 +84,7 @@ before_script:
 **Symptom**: format_check or lint jobs fail
 
 **Debugging steps**:
+
 ```bash
 # Run locally first
 npm run lint
@@ -94,12 +99,13 @@ git add -A && git commit -m "fix: format"
 ```
 
 **Common `.gitlab-ci.yml` pattern**:
+
 ```yaml
 format_check:
   script:
     - npm ci
     - npm run format:check
-  allow_failure: true  # Won't block pipeline
+  allow_failure: true # Won't block pipeline
 ```
 
 ### 4. MR vs Branch Pipeline Differences
@@ -107,11 +113,13 @@ format_check:
 **Symptom**: Pipeline works on branch but fails on MR
 
 **Causes**:
+
 - MR pipelines use `CI_MERGE_REQUEST_*` variables
 - Different rules apply to MR pipelines
 - Protected variables may not be available
 
 **Debug**:
+
 ```yaml
 debug_job:
   script:
@@ -125,6 +133,7 @@ debug_job:
 **Symptom**: Pipeline fails to start with YAML error
 
 **Diagnostic**:
+
 ```bash
 # Validate locally
 glab ci lint
@@ -136,6 +145,7 @@ glab ci lint
 ```
 
 **Fix duplicate keys** (common with `rules:`):
+
 ```yaml
 # Wrong - duplicate rules key
 job:
@@ -173,6 +183,7 @@ glab variable list
 ## Verification
 
 Pipeline debugging is working when you can:
+
 1. Identify the failing job and error message
 2. Reproduce the issue (locally or understand why it's CI-specific)
 3. Apply a fix and verify the pipeline passes
@@ -180,6 +191,7 @@ Pipeline debugging is working when you can:
 ## Example
 
 **Failed Pipeline Investigation**:
+
 ```bash
 # 1. Check which job failed
 glab ci status
@@ -202,6 +214,7 @@ git add -A && git commit -m "fix: format" && git push
 - Protected CI variables only available on protected branches
 - MR pipelines have different variable scope than branch pipelines
 - Cache npm dependencies to speed up pipelines:
+
   ```yaml
   cache:
     key: ${CI_COMMIT_REF_SLUG}

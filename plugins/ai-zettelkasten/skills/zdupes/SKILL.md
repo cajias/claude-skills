@@ -9,7 +9,7 @@ Scan S3 Vectors for semantically similar notes that might be duplicates or candi
 
 ## Usage
 
-```
+```text
 /zdupes                    # Default 85% threshold
 /zdupes --threshold 90     # Custom threshold
 ```
@@ -42,9 +42,9 @@ uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-dup
 
 ## Interpreting Results
 
-| Similarity | Meaning |
-|------------|---------|
-| 99%+ | Near-exact duplicates - consolidate or delete one |
-| 95-99% | Very similar - review for redundancy |
-| 90-95% | Related topics - consider linking |
-| 85-90% | Thematically connected - may belong in same hub |
+| Similarity | Meaning                                           |
+| ---------- | ------------------------------------------------- |
+| 99%+       | Near-exact duplicates - consolidate or delete one |
+| 95-99%     | Very similar - review for redundancy              |
+| 90-95%     | Related topics - consider linking                 |
+| 85-90%     | Thematically connected - may belong in same hub   |

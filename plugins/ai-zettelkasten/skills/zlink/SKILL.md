@@ -9,7 +9,8 @@ version: 1.0.0
 
 # /zlink - Automatic Zettelkasten Linking
 
-Find and create meaningful links between notes following Zettelkasten principles. Unlike simple similarity matching, this command validates connections with an LLM and classifies relationship types.
+Find and create meaningful links between notes following Zettelkasten principles. Unlike simple similarity matching,
+this command validates connections with an LLM and classifies relationship types.
 
 ## Usage
 
@@ -59,11 +60,11 @@ if result.should_link:
 
 Links are created in both directions with inverse relationships:
 
-| Forward | Inverse |
-|---------|---------|
-| ENABLES | SEQUENCE |
-| ELABORATES | ABSTRACTS |
-| SUPPORTS | APPLIES |
+| Forward     | Inverse     |
+| ----------- | ----------- |
+| ENABLES     | SEQUENCE    |
+| ELABORATES  | ABSTRACTS   |
+| SUPPORTS    | APPLIES     |
 | CONTRADICTS | CONTRADICTS |
 
 ### 4. Link Application
@@ -92,32 +93,32 @@ zk-suggest-links path/to/note.md --apply --bidirectional --yes
 
 ## Flags Reference
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--threshold` | 65 | Minimum similarity % for candidates |
-| `--top` | 5 | Max suggestions per note |
-| `--apply` | false | Actually write links to files |
-| `--bidirectional` | true | Create backlinks in target notes |
-| `--no-validate` | false | Skip LLM validation (faster, less accurate) |
-| `--min-confidence` | 70 | Minimum LLM confidence to accept link |
-| `--fix` | false | Repair broken links mode |
-| `--audit` | false | Link health report mode |
-| `--yes` | false | Skip confirmation prompts |
+| Flag               | Default | Description                                 |
+| ------------------ | ------- | ------------------------------------------- |
+| `--threshold`      | 65      | Minimum similarity % for candidates         |
+| `--top`            | 5       | Max suggestions per note                    |
+| `--apply`          | false   | Actually write links to files               |
+| `--bidirectional`  | true    | Create backlinks in target notes            |
+| `--no-validate`    | false   | Skip LLM validation (faster, less accurate) |
+| `--min-confidence` | 70      | Minimum LLM confidence to accept link       |
+| `--fix`            | false   | Repair broken links mode                    |
+| `--audit`          | false   | Link health report mode                     |
+| `--yes`            | false   | Skip confirmation prompts                   |
 
 ## Relationship Types
 
 Every link includes its relationship type for context:
 
-| Type | Meaning | Example |
-|------|---------|---------|
-| **SOLVES** | A addresses problem in B | Pattern → Anti-pattern |
-| **ENABLES** | A is prerequisite for B | Setup → Feature |
-| **ELABORATES** | A expands on B | Overview → Deep-dive |
-| **CONTRADICTS** | A challenges B | Alternative approaches |
-| **SUPPORTS** | A provides evidence for B | Fact → Pattern |
-| **APPLIES** | A applies principle from B | Abstract → Concrete |
-| **ABSTRACTS** | A generalizes from B | Specific → General |
-| **SEQUENCE** | A logically follows B | Step 1 → Step 2 |
+| Type            | Meaning                    | Example                |
+| --------------- | -------------------------- | ---------------------- |
+| **SOLVES**      | A addresses problem in B   | Pattern → Anti-pattern |
+| **ENABLES**     | A is prerequisite for B    | Setup → Feature        |
+| **ELABORATES**  | A expands on B             | Overview → Deep-dive   |
+| **CONTRADICTS** | A challenges B             | Alternative approaches |
+| **SUPPORTS**    | A provides evidence for B  | Fact → Pattern         |
+| **APPLIES**     | A applies principle from B | Abstract → Concrete    |
+| **ABSTRACTS**   | A generalizes from B       | Specific → General     |
+| **SEQUENCE**    | A logically follows B      | Step 1 → Step 2        |
 
 ## When to Use
 

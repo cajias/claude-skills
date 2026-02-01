@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-30
-tags: ['correction', 'learned', 'wrong_assessment']
+tags: ["correction", "learned", "wrong_assessment"]
 level: user
 breakthrough_score: 1.66
 ---
@@ -35,4 +35,3 @@ Correction: Issue: 'debug the loop invocation and learn what you are doing wrong
 - Classification: user
 - Confidence: 0.8
 - Corrections detected: 2
-

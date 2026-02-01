@@ -16,6 +16,7 @@ date: 2025-01-27
 ## Problem
 
 Quip's editor has limitations when importing markdown in bulk:
+
 - **Tables**: Cell values may be lost or misaligned
 - **Lists**: Bullet points and numbered lists often render as plain paragraphs with literal `*` or `-` characters
 - **Images**: Cannot be programmatically uploaded - require manual insertion
@@ -24,6 +25,7 @@ Quip's editor has limitations when importing markdown in bulk:
 ## Context/Trigger
 
 This skill activates when the user says:
+
 - "write to Quip"
 - "update Quip with markdown"
 - "sync markdown to Quip"
@@ -33,7 +35,7 @@ This skill activates when the user says:
 
 Instead of writing the entire markdown file at once, this skill instructs Q Chat to:
 
-1. **Parse the markdown into sections** (split by `## ` headers)
+1. **Parse the markdown into sections** (split by `##` headers)
 2. **Write each section individually** to Quip
 3. **Verify each section** before moving to the next
 4. **Handle special content** (images, diagrams, tables, lists) with care
@@ -42,7 +44,8 @@ Instead of writing the entire markdown file at once, this skill instructs Q Chat
 
 When the user wants to write a markdown document to Quip, invoke Q Chat with this prompt:
 
-**IMPORTANT: Always run q chat as a background process** to avoid timeouts. The "Thinking..." messages are normal and indicate the command is processing - not that it's stuck. Large files (15KB+) may take several minutes to process.
+**IMPORTANT: Always run q chat as a background process** to avoid timeouts. The "Thinking..." messages are normal and
+indicate the command is processing - not that it's stuck. Large files (15KB+) may take several minutes to process.
 
 ```bash
 # Run as background process with extended timeout
@@ -53,7 +56,7 @@ Use `run_in_background: true` in the Bash tool and monitor with `BashOutput` to 
 
 ### The Prompt Template
 
-```
+```text
 You are transferring a markdown document to Quip. Follow these rules STRICTLY:
 
 SOURCE FILE: <MARKDOWN_FILE_PATH>
@@ -71,22 +74,26 @@ TARGET QUIP: <QUIP_URL>
 ### Images (![alt](path) or HTML <img>)
 - DO NOT attempt to upload images
 - Replace with placeholder:
-  ```
-  [TODO: INSERT IMAGE]
-  Name: <filename>
-  Alt text: <alt text>
-  Original path: <full path>
-  ```
+```
+
+[TODO: INSERT IMAGE]
+Name: <filename>
+Alt text: <alt text>
+Original path: <full path>
+
+````text
 
 ### Mermaid Diagrams (```mermaid blocks)
 - DO NOT include raw mermaid code
 - Replace with placeholder:
-  ```
-  [TODO: INSERT DIAGRAM]
-  Type: Mermaid
-  Description: <brief description of what the diagram shows>
-  Source file: <path to .mmd file if referenced>
-  ```
+````
+
+[TODO: INSERT DIAGRAM]
+Type: Mermaid
+Description: <brief description of what the diagram shows>
+Source file: <path to .mmd file if referenced>
+
+````text
 
 ### Tables
 - Write tables ONE ROW AT A TIME if needed
@@ -116,68 +123,81 @@ Before uploading any section with numbered lists, convert markdown to HTML:
 1. First item
 2. Second item
 3. Third item
-```
+````
+
 MUST become:
+
 ```html
 <ol>
-<li>First item</li>
-<li>Second item</li>
-<li>Third item</li>
+  <li>First item</li>
+  <li>Second item</li>
+  <li>Third item</li>
 </ol>
 ```
 
 **Nested numbered lists:**
+
 ```markdown
 1. First item
    1. Nested first
    2. Nested second
 2. Second item
 ```
+
 MUST become:
+
 ```html
 <ol>
-<li>First item
-<ol>
-<li>Nested first</li>
-<li>Nested second</li>
-</ol>
-</li>
-<li>Second item</li>
+  <li>
+    First item
+    <ol>
+      <li>Nested first</li>
+      <li>Nested second</li>
+    </ol>
+  </li>
+  <li>Second item</li>
 </ol>
 ```
 
 **Mixed lists (bullet inside numbered):**
+
 ```markdown
 1. First item
    - Sub bullet A
    - Sub bullet B
 2. Second item
 ```
+
 MUST become:
+
 ```html
 <ol>
-<li>First item
-<ul>
-<li>Sub bullet A</li>
-<li>Sub bullet B</li>
-</ul>
-</li>
-<li>Second item</li>
+  <li>
+    First item
+    <ul>
+      <li>Sub bullet A</li>
+      <li>Sub bullet B</li>
+    </ul>
+  </li>
+  <li>Second item</li>
 </ol>
 ```
 
 **Verification checklist for numbered lists:**
+
 - [ ] Numbers appear as actual list numbers (1, 2, 3...), not literal text
 - [ ] Items are indented as list items, not as paragraphs
 - [ ] Nested lists maintain proper hierarchy
 - [ ] List continues with correct sequential numbering
 
 **If numbered list verification fails:**
+
 1. Delete the malformed content
 2. Re-upload using explicit HTML `<ol><li>...</li></ol>` format
 3. Use QuipEditor with `format="html"` instead of `format="markdown"`
 
 ### Code Blocks
+
 - Verify code blocks render with monospace font
 - Verify syntax highlighting is applied if language is specified
 - Long code blocks may need to be split
@@ -185,6 +205,7 @@ MUST become:
 ## VERIFICATION CHECKLIST
 
 After writing each section, verify:
+
 - [ ] Headers are correct level (H1, H2, H3)
 - [ ] **Bullet lists** render with bullet points (not literal `-` or `*`)
 - [ ] **Numbered lists** render with sequential numbers (not literal `1.`, `2.` text)
@@ -194,11 +215,13 @@ After writing each section, verify:
 - [ ] Links are clickable
 - [ ] Image/diagram placeholders are clearly marked
 
-**IMPORTANT: Numbered list verification is critical!** If you see lines starting with `1.` as plain text, the list failed and must be re-uploaded as HTML.
+**IMPORTANT: Numbered list verification is critical!** If you see lines starting with `1.` as plain text,
+the list failed and must be re-uploaded as HTML.
 
 ## ERROR RECOVERY
 
 If a section fails to render correctly:
+
 1. Delete the malformed content
 2. Try writing it in smaller chunks
 3. If markdown syntax fails, use Quip's native formatting
@@ -207,12 +230,14 @@ If a section fails to render correctly:
 ## FINAL REPORT
 
 After completing the transfer, provide:
+
 - List of sections transferred successfully
 - List of image placeholders (with paths for manual upload)
 - List of diagram placeholders
 - Any sections that had rendering issues
 - Any tables that needed manual correction
-```
+
+````text
 
 ## Example Invocation
 
@@ -263,7 +288,7 @@ After each section:
 - Sections transferred
 - Image placeholders created
 - Any rendering issues found"
-```
+````
 
 ## When to Use This Skill
 

@@ -16,6 +16,7 @@ date: 2026-01-27
 # Docker Desktop Stuck State Recovery
 
 ## Problem
+
 Docker Desktop on macOS can enter a stuck state where the backend process is running but
 the Docker engine/VM hasn't started. Normal restart methods (quit app, `docker desktop stop`,
 AppleScript) all hang or timeout, leaving Docker unusable.
@@ -25,7 +26,8 @@ AppleScript) all hang or timeout, leaving Docker unusable.
 Any of these symptoms indicate this stuck state:
 
 1. **Socket missing**: `docker ps` or `docker info` fails with:
-   ```
+
+   ```text
    failed to connect to the docker API at unix:///Users/<user>/.docker/run/docker.sock
    dial unix /Users/<user>/.docker/run/docker.sock: connect: no such file or directory
    ```
@@ -54,12 +56,14 @@ killall -9 com.docker.backend && sleep 3 && open -a Docker
 ### Step-by-Step
 
 1. **Identify the stuck backend process**:
+
    ```bash
    ps aux | grep -i docker | grep -v grep
    # Look for: com.docker.backend
    ```
 
 2. **Force kill the backend**:
+
    ```bash
    killall -9 com.docker.backend
    # OR if you have the PID:
@@ -67,16 +71,19 @@ killall -9 com.docker.backend && sleep 3 && open -a Docker
    ```
 
 3. **Wait for cleanup**:
+
    ```bash
    sleep 3
    ```
 
 4. **Relaunch Docker Desktop**:
+
    ```bash
    open -a Docker
    ```
 
 5. **Wait for engine startup** (~10 seconds):
+
    ```bash
    sleep 10 && docker ps
    ```

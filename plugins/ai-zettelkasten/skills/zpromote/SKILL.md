@@ -23,9 +23,10 @@ Move curated fleeting notes to permanent status with proper metadata updates.
 ## Prerequisites
 
 Notes should be promoted only after:
+
 1. Enriched with proper structure (`/zenrich`)
-2. Broken links fixed (`/zfix-links`)
-3. Optionally reviewed (`/zreview`)
+1. Broken links fixed (`/zfix-links`)
+1. Optionally reviewed (`/zreview`)
 
 ## Implementation
 
@@ -46,7 +47,7 @@ def is_ready_for_promotion(note_path):
     return all(checks.values()), checks
 ```
 
-2. **Update frontmatter metadata**:
+1. **Update frontmatter metadata**:
 
 ```python
 import re
@@ -71,7 +72,7 @@ def update_frontmatter(content):
     return content
 ```
 
-3. **Move file to permanent directory**:
+1. **Move file to permanent directory**:
 
 ```python
 import shutil
@@ -94,7 +95,7 @@ def promote_note(fleeting_path, vault_path):
     return target_path
 ```
 
-4. **Batch promotion with progress**:
+1. **Batch promotion with progress**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -113,7 +114,7 @@ Progress: ████████████████████ 162/162
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-5. **Handle validation failures**:
+1. **Handle validation failures**:
 
 ```python
 def promote_with_validation(notes, vault_path):
@@ -132,7 +133,7 @@ def promote_with_validation(notes, vault_path):
     return promoted, failed
 ```
 
-6. **Display summary**:
+1. **Display summary**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -203,6 +204,6 @@ zk-suggest-links path/to/promoted-note.md --apply --bidirectional --yes
 ## Notes
 
 - Promotion is idempotent - already-promoted notes are skipped
-- Original file IDs (flee-*) are preserved for traceability
+- Original file IDs (flee-\*) are preserved for traceability
 - S3 Vectors index is automatically updated via PostToolUse hook
 - Backlinks in other notes automatically resolve to new location

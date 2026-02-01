@@ -5,11 +5,12 @@ description: Find semantic clusters in the knowledge base to validate hub organi
 
 # /zcluster - Find Semantic Clusters
 
-Analyze S3 Vectors to discover natural semantic clusters in your knowledge base. Useful for validating hub organization or discovering new hub candidates.
+Analyze S3 Vectors to discover natural semantic clusters in your knowledge base. Useful for validating hub organization
+or discovering new hub candidates.
 
 ## Usage
 
-```
+```text
 /zcluster                              # Use default seed patterns
 /zcluster --seeds "api,auth,cache"     # Custom seed patterns
 ```

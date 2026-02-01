@@ -18,7 +18,8 @@ tags: [gitlab, yamllint, ci-cd, yaml]
 ## Problem
 
 yamllint rejects GitLab CI files containing `!reference` tags with errors like:
-```
+
+```text
 .gitlab-ci.yml:42:5: error: unknown tag '!reference'
 ```
 
@@ -27,6 +28,7 @@ GitLab's `!reference` tag is valid GitLab CI syntax for reusing configuration, b
 ## Context / Trigger Conditions
 
 Use this skill when:
+
 - yamllint fails on `.gitlab-ci.yml` with "unknown tag" errors
 - Pre-commit hooks reject valid GitLab CI YAML
 - CI lint jobs fail but GitLab's own validator accepts the file
@@ -46,13 +48,13 @@ rules:
   line-length:
     max: 120
   truthy:
-    allowed-values: ['true', 'false', 'yes', 'no']
+    allowed-values: ["true", "false", "yes", "no"]
 
 # Allow GitLab CI custom tags
 yaml-files:
-  - '*.yaml'
-  - '*.yml'
-  - '.yamllint'
+  - "*.yaml"
+  - "*.yml"
+  - ".yamllint"
 
 ignore: |
   node_modules/
@@ -60,8 +62,8 @@ ignore: |
 
 # Custom tags configuration
 custom-tags:
-  - '!reference'
-  - '!reference sequence'
+  - "!reference"
+  - "!reference sequence"
 ```
 
 ### 2. Alternative: Inline Comment Disable
@@ -86,12 +88,13 @@ repos:
     rev: v1.35.1
     hooks:
       - id: yamllint
-        args: ['-c', '.yamllint.yaml']
+        args: ["-c", ".yamllint.yaml"]
 ```
 
 ## Verification
 
 After applying the fix:
+
 ```bash
 yamllint -c .yamllint.yaml .gitlab-ci.yml
 ```
@@ -101,6 +104,7 @@ Should pass without "unknown tag" errors.
 ## Example
 
 **Before** (fails):
+
 ```yaml
 # .gitlab-ci.yml
 .common:
@@ -109,7 +113,7 @@ Should pass without "unknown tag" errors.
 
 job:
   script:
-    - !reference [.common, script]  # yamllint error here
+    - !reference [.common, script] # yamllint error here
 ```
 
 **After** (with `.yamllint.yaml` config): Same file passes.

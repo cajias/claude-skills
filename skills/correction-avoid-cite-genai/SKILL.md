@@ -5,7 +5,7 @@ description: |
 author: Claude Code (extracted by Claudeception v4.0)
 version: 1.0.0
 date: 2026-01-29
-tags: ['correction', 'learned', 'command']
+tags: ["correction", "learned", "command"]
 level: user
 breakthrough_score: 7.43
 ---
@@ -35,4 +35,3 @@ Correction: Avoid: 'cite genai-powered sdlc guide as a source'
 - Classification: user
 - Confidence: 0.85
 - Corrections detected: 7
-

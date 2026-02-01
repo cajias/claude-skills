@@ -16,9 +16,12 @@ date: 2026-01-26
 # GitLab Group Exploration via glab CLI
 
 ## Problem
-When working with private/internal GitLab instances (like `code.aws.dev`), web fetching often fails due to authentication requirements. You need a way to programmatically explore groups, list projects, and get details.
+
+When working with private/internal GitLab instances (like `code.aws.dev`), web fetching often fails due to
+authentication requirements. You need a way to programmatically explore groups, list projects, and get details.
 
 ## Context / Trigger Conditions
+
 - User asks to explore a GitLab group URL like `https://code.aws.dev/group/subgroup/path`
 - WebFetch is blocked or returns authentication errors
 - Need to list all projects in a GitLab namespace
@@ -28,28 +31,33 @@ When working with private/internal GitLab instances (like `code.aws.dev`), web f
 ## Solution
 
 ### 1. List Projects in a Group
+
 ```bash
 # URL-encode the group path (replace / with %2F)
 glab api groups/GROUP%2FPATH%2FHERE/projects --hostname code.aws.dev
 ```
 
 ### 2. Get Detailed Project Info
+
 ```bash
 glab api groups/proserve%2Fproduct-and-solutions%2Ftools/projects --hostname code.aws.dev | \
   jq -r '.[] | "## \(.name)\n- Path: \(.path_with_namespace)\n- URL: \(.web_url)\n- Description: \(.description // "None")\n- Last Activity: \(.last_activity_at)"'
 ```
 
 ### 3. Check for Subgroups
+
 ```bash
 glab api groups/GROUP%2FPATH/subgroups --hostname code.aws.dev | jq '.'
 ```
 
 ### 4. Get Group Details
+
 ```bash
 glab api groups/GROUP%2FPATH --hostname code.aws.dev | jq '{name, description, full_path, web_url, visibility}'
 ```
 
 ### 5. Get Group ID (for API operations)
+
 ```bash
 glab api groups/GROUP%2FPATH --hostname code.aws.dev | jq -r '.id'
 ```
@@ -62,6 +70,7 @@ glab api groups/GROUP%2FPATH --hostname code.aws.dev | jq -r '.id'
 - **jq Filtering**: Pipe to jq for readable output
 
 ## Common Fields Available
+
 - `name`, `path`, `path_with_namespace`
 - `description`, `web_url`
 - `visibility` (public, internal, private)
@@ -70,6 +79,7 @@ glab api groups/GROUP%2FPATH --hostname code.aws.dev | jq -r '.id'
 - `default_branch`
 
 ## Verification
+
 Run `glab api groups/YOUR%2FGROUP/projects --hostname your.gitlab.host` and verify JSON output with project details.
 
 ## Example
@@ -89,11 +99,13 @@ glab api groups/proserve%2Fproduct-and-solutions%2Ftools/projects \
 ```
 
 ## Notes
+
 - If glab isn't authenticated, run: `glab auth login --hostname code.aws.dev`
 - For large groups, the API may paginate results (check for `x-next-page` header)
 - Group IDs are needed for some operations like updating group settings
 
 ## References
+
 - [glab CLI Documentation](https://gitlab.com/gitlab-org/cli/-/tree/main/docs)
 - [GitLab Groups API](https://docs.gitlab.com/ee/api/groups.html)
 - [GitLab Projects API](https://docs.gitlab.com/ee/api/projects.html)

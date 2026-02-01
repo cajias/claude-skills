@@ -9,7 +9,8 @@ Migrate Quip folders and documents to Obsidian with full image/diagram support.
 
 ## Overview
 
-Quip documents exported to markdown retain image references as `/blob/THREAD_ID/BLOB_ID` URLs, but the actual images require authenticated API access to download. This skill provides the complete workflow to:
+Quip documents exported to markdown retain image references as `/blob/THREAD_ID/BLOB_ID` URLs, but the actual images
+require authenticated API access to download. This skill provides the complete workflow to:
 
 1. Download all blob images from Quip using the API
 2. Update markdown references to use local paths
@@ -23,6 +24,7 @@ Quip documents exported to markdown retain image references as `/blob/THREAD_ID/
 Obtain a Quip API token from: `https://quip-amazon.com/dev/token`
 
 Configure the token in one of these locations:
+
 ```bash
 # Option 1: Environment variable
 export QUIP_API_TOKEN="your-token-here"
@@ -49,6 +51,7 @@ grep -rhoE '/blob/[A-Za-z0-9]+/[A-Za-z0-9_-]+' /path/to/obsidian/folder | sort -
 ```
 
 Filter out non-Quip patterns (documentation references):
+
 ```bash
 grep -v "main/articles\|pattern/" /tmp/quip-blobs.txt > /tmp/quip-blobs-filtered.txt
 ```
@@ -68,6 +71,7 @@ bash ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/download-quip-bl
 ```
 
 The script:
+
 - Downloads each blob via the Quip API
 - Detects file type (PNG, JPG, GIF, SVG)
 - Names files as `{thread_id}_{blob_id}.{ext}`
@@ -93,12 +97,14 @@ python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-obsidian-
 ```
 
 This converts reference-style links:
+
 ```markdown
 ![alt text][1]
 [1]: attachments/image.png
 ```
 
 To inline format:
+
 ```markdown
 ![alt text](attachments/image.png)
 ```
@@ -148,17 +154,19 @@ find "/path/to/obsidian/folder" -name "*.md" -exec sed -i '' 's/\\(/(/g; s/\\)/)
 ```
 
 This converts malformed tables:
+
 ```markdown
-||Header1|Header2|
-|---|---|---|
-|1|Cell1|Cell2|
+|     | Header1 | Header2 |
+| --- | ------- | ------- |
+| 1   | Cell1   | Cell2   |
 ```
 
 To proper markdown:
+
 ```markdown
-|Header1|Header2|
-|---|---|
-|Cell1|Cell2|
+| Header1 | Header2 |
+| ------- | ------- |
+| Cell1   | Cell2   |
 ```
 
 ## Quick Migration Command
@@ -218,13 +226,16 @@ Some blob references may be to non-existent or deleted images. Check the downloa
 
 ### Tables Not Rendering
 
-Quip exports tables with extra leading columns (`||`) and row numbers (`|1|`, `|2|`). Run `fix-quip-tables.py` to correct the format.
+Quip exports tables with extra leading columns (`||`) and row numbers (`|1|`, `|2|`). Run `fix-quip-tables.py` to
+correct the format.
 
-Also check for zero-width space characters (U+200B) before tables - these invisible characters can prevent table recognition. Run `fix-zero-width-spaces.py` to remove them.
+Also check for zero-width space characters (U+200B) before tables - these invisible characters can prevent table
+recognition. Run `fix-zero-width-spaces.py` to remove them.
 
 ## Blob URL Format Reference
 
 Quip blob URLs follow this pattern:
+
 - **Markdown reference**: `/blob/THREAD_ID/BLOB_ID`
 - **Full API URL**: `https://platform.quip-amazon.com/1/blob/THREAD_ID/BLOB_ID`
 - **Local path**: `attachments/THREAD_ID_BLOB_ID.png`
@@ -233,15 +244,15 @@ Thread IDs and Blob IDs are base64-like strings (alphanumeric with `-` and `_`).
 
 ## Scripts Reference
 
-| Script | Purpose |
-|--------|---------|
-| `scripts/download-quip-blobs.sh` | Download all blobs from a list file |
-| `scripts/fix-obsidian-images.py` | Convert reference-style to inline images |
-| `scripts/fix-code-block-spacing.py` | Remove extra blank lines from code blocks |
-| `scripts/fix-code-block-langs.py` | Auto-detect and add language hints to code blocks |
-| `scripts/fix-zero-width-spaces.py` | Remove invisible Unicode characters that break rendering |
-| `scripts/fix-quip-tables.py` | Fix Quip table formatting (empty columns, row numbers, escapes) |
-| `scripts/fix-table-separators.py` | Ensure table separators match column count |
+| Script                              | Purpose                                                         |
+| ----------------------------------- | --------------------------------------------------------------- |
+| `scripts/download-quip-blobs.sh`    | Download all blobs from a list file                             |
+| `scripts/fix-obsidian-images.py`    | Convert reference-style to inline images                        |
+| `scripts/fix-code-block-spacing.py` | Remove extra blank lines from code blocks                       |
+| `scripts/fix-code-block-langs.py`   | Auto-detect and add language hints to code blocks               |
+| `scripts/fix-zero-width-spaces.py`  | Remove invisible Unicode characters that break rendering        |
+| `scripts/fix-quip-tables.py`        | Fix Quip table formatting (empty columns, row numbers, escapes) |
+| `scripts/fix-table-separators.py`   | Ensure table separators match column count                      |
 
 ## Additional Resources
 

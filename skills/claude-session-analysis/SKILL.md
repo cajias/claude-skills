@@ -26,6 +26,7 @@ not just metrics.
 ## Context / Trigger Conditions
 
 Use this skill when:
+
 - Want to improve Claude Code configuration based on past sessions
 - Looking for tools that should be pre-granted (asked for repeatedly)
 - Finding skills to create (same investigation done multiple times)
@@ -47,6 +48,7 @@ SESSION_ID/tool-results/*.txt       # Large tool outputs
 ```
 
 **Finding sessions for a project:**
+
 ```bash
 # List all session directories for a project
 ls -la ~/.claude/projects/-Users-cajias-Projects-PROJECT_NAME/
@@ -58,6 +60,7 @@ ls -lt ~/.claude/projects/-Users-*-PROJECT/ | head -20
 ### 2. Session File Format
 
 Each line is a JSON object with these key fields:
+
 ```json
 {
   "type": "user" | "assistant" | "file-history-snapshot" | "queue-operation",
@@ -73,22 +76,26 @@ Each line is a JSON object with these key fields:
 ### 3. Diagnostic Commands
 
 **Count context compactions:**
+
 ```bash
 grep -c "Conversation compacted" SESSION_FILE.jsonl
 ```
 
 **Find all sessions with compactions in a project:**
+
 ```bash
 grep -l "Conversation compacted" ~/.claude/projects/-Users-*-PROJECT/*.jsonl
 ```
 
 **Total compactions across all sessions:**
+
 ```bash
 grep -c "Conversation compacted" ~/.claude/projects/-Users-*-PROJECT/*.jsonl 2>/dev/null | \
   awk -F: '{s+=$2} END {print "Total compactions:", s}'
 ```
 
 **Extract user messages:**
+
 ```bash
 grep -h '"role":"user"' SESSION_FILE.jsonl | \
   grep -o '"text":"[^"]*"' | \
@@ -96,6 +103,7 @@ grep -h '"role":"user"' SESSION_FILE.jsonl | \
 ```
 
 **Find user corrections/frustrations:**
+
 ```bash
 grep -h '"role":"user"' SESSION_FILE.jsonl | \
   grep -o '"text":"[^"]*"' | \
@@ -103,12 +111,14 @@ grep -h '"role":"user"' SESSION_FILE.jsonl | \
 ```
 
 **Find repeated messages (indicates loops):**
+
 ```bash
 grep -h '"text":"[^"]*"' SESSION_FILE.jsonl | \
   sort | uniq -c | sort -rn | head -10
 ```
 
 **Find TDD-related patterns:**
+
 ```bash
 grep -o '"text":"[^"]*"' SESSION_FILE.jsonl | \
   grep -iE "RED|GREEN|REFACTOR|test first|write test|failing test"
@@ -117,17 +127,20 @@ grep -o '"text":"[^"]*"' SESSION_FILE.jsonl | \
 ### 4. Analyzing Context Compaction Impact
 
 **Find what was summarized:**
+
 ```bash
 # Look for summary type messages
 grep '"type":"summary"' SESSION_FILE.jsonl | jq '.summary' 2>/dev/null
 ```
 
 **Find session continuation points:**
+
 ```bash
 grep -i "continued from a previous conversation" SESSION_FILE.jsonl
 ```
 
 **Identify compaction timing:**
+
 ```bash
 grep "Conversation compacted" SESSION_FILE.jsonl | \
   grep -o '"timestamp":"[^"]*"'
@@ -136,11 +149,13 @@ grep "Conversation compacted" SESSION_FILE.jsonl | \
 ### 5. Subagent Analysis
 
 **List all subagents in a session:**
+
 ```bash
 ls ~/.claude/projects/-Users-*-PROJECT/SESSION_ID/subagents/
 ```
 
 **Find subagent that failed:**
+
 ```bash
 grep -l "error\|failed\|exception" SESSION_ID/subagents/*.jsonl
 ```
@@ -150,12 +165,14 @@ grep -l "error\|failed\|exception" SESSION_ID/subagents/*.jsonl
 When grep patterns fail on large sessions, use the Python scripts in `scripts/` for reliable JSONL parsing.
 
 **Full session analysis (recommended):**
+
 ```bash
 SCRIPTS=~/.claude/skills/claude-session-analysis/scripts
 python3 $SCRIPTS/session-stats.py SESSION.jsonl
 ```
 
 **Individual scripts:**
+
 ```bash
 # Extract tool usage counts
 cat SESSION.jsonl | python3 $SCRIPTS/tool-usage.py
@@ -168,6 +185,7 @@ cat SESSION.jsonl | python3 $SCRIPTS/summaries.py
 ```
 
 **Scripts included:**
+
 - `session-optimizer.py` - **Main script** - extracts configuration recommendations
 - `session-stats.py` - Comprehensive metrics with health assessment
 - `tool-usage.py` - Tool usage frequency
@@ -177,33 +195,36 @@ cat SESSION.jsonl | python3 $SCRIPTS/summaries.py
 ### 7. Configuration Optimization (Primary Goal)
 
 **Run the optimizer script:**
+
 ```bash
 SCRIPTS=~/.claude/skills/claude-session-analysis/scripts
 python3 $SCRIPTS/session-optimizer.py SESSION.jsonl
 ```
 
 This extracts actionable recommendations:
+
 - **Tools to pre-grant** - Commands requested 10+ times
 - **Skills to create** - Investigation patterns that repeated
 - **CLAUDE.md rules** - User corrections indicate missing guidance
 
 **What each finding means:**
 
-| Finding | Action |
-|---------|--------|
-| `Bash(glab *) requested 50x` | Add to allowed tools in settings |
+| Finding                        | Action                             |
+| ------------------------------ | ---------------------------------- |
+| `Bash(glab *) requested 50x`   | Add to allowed tools in settings   |
 | `"!reference" investigated 3x` | Create a skill documenting the fix |
-| `User said "no, use X" 5x` | Add rule to CLAUDE.md |
+| `User said "no, use X" 5x`     | Add rule to CLAUDE.md              |
 
 ### 8. Session Health Benchmarks
 
-| Metric | Healthy | Warning | Critical |
-|--------|---------|---------|----------|
-| Compactions | 0-5 | 6-15 | 16+ |
-| Interruptions | 0-3 | 4-8 | 9+ |
-| Duration | <1 day | 1-7 days | >1 week |
+| Metric        | Healthy | Warning  | Critical |
+| ------------- | ------- | -------- | -------- |
+| Compactions   | 0-5     | 6-15     | 16+      |
+| Interruptions | 0-3     | 4-8      | 9+       |
+| Duration      | <1 day  | 1-7 days | >1 week  |
 
 **Interpretation:**
+
 - **44 compactions** = extreme context debt, session should have been split
 - **16+ interruptions** = agent frequently going wrong direction
 - **Multi-week sessions** = accumulated context loss makes later work unreliable
@@ -211,12 +232,14 @@ This extracts actionable recommendations:
 ### 9. Pattern Recognition
 
 **Signs of lost context:**
+
 - Same exploration text repeated 3+ times
 - User messages containing "again" or "already"
 - Multiple identical tool calls in sequence
 - Sudden shift from GREEN phase back to exploration
 
 **Signs of TDD violations:**
+
 - Implementation file edits without prior test file creation
 - "Let me implement" without "tests are failing" context
 - No RED/GREEN/REFACTOR pattern in todo items
@@ -244,6 +267,7 @@ grep -o '"text":"[^"]*"' "$SESSION" | grep -iE "RED|GREEN|REFACTOR" | head -5
 ## Verification
 
 Analysis is successful when you can answer:
+
 1. **Tools to pre-grant**: What commands were requested 10+ times?
 2. **Skills to create**: What topics were investigated repeatedly?
 3. **CLAUDE.md rules**: What did the user keep correcting?
