@@ -1,0 +1,87 @@
+# HLD Phase Executor Workflow
+# Orchestration template for systematic HLD execution with TDD and phase gates
+
+# ===== PHASE 0: HLD PARSING & SETUP =====
+
+# Parse the HLD document and extract phases
+general-purpose:"Parse the HLD document provided by the user. Extract all phases with their names, descriptions, deliverables, dependencies, validation criteria, and deployment commands. Build a dependency graph (DAG) and verify no circular dependencies exist. Create the initial state tracker at .agent/hld-execution-state.md":hld_parsed ->
+
+# User approval of parsed structure
+@approve-hld-structure ->
+
+# ===== PHASE EXECUTION LOOP =====
+# Note: This is a template - actual execution iterates through phases
+
+# Identify next executable phase
+general-purpose:"Read .agent/hld-execution-state.md. Identify the next phase that: (1) has status 'pending', (2) has all dependencies marked 'complete', (3) has all dependency validation gates passed. If no phase is executable, report blocked status.":next_phase_identified ->
+
+# Check if work remains
+(if next_phase_identified.has_pending_phases)~>
+
+# ===== PER-PHASE TDD CYCLE =====
+
+# Generate mini TDD plan for the phase
+general-purpose:"For the identified phase, transform its deliverables into a TDD plan with: (1) Master goals from deliverables, (2) Exit criteria from validation criteria, (3) RED-GREEN-REFACTOR phases. Write plan to .agent/phase-N-tdd-plan.md and update scratchpad.":phase_tdd_plan_generated ->
+
+# Execute RED phase - write failing tests
+general-purpose:"Execute RED phase: Write failing tests for each deliverable. Each test must: (1) clearly test one deliverable, (2) fail with meaningful error, (3) fail due to missing implementation not test errors. Verify all tests fail before proceeding.":red_phase_complete ->
+
+# Verify RED phase
+general-purpose:"Run test suite and confirm all new tests fail as expected. Document which tests were written and their failure reasons in the execution log.":red_verified ->
+
+# Execute GREEN phase - minimal implementation
+general-purpose:"Execute GREEN phase: Write minimal code to make all tests pass. Do not add features beyond what tests require. Do not refactor yet. Focus on making tests green.":green_phase_complete ->
+
+# Verify GREEN phase
+general-purpose:"Run test suite and confirm all tests pass. Ensure no regressions in existing tests. Document implementation summary in execution log.":green_verified ->
+
+# Execute REFACTOR phase
+[
+  general-purpose:"Execute REFACTOR phase: Clean up implementation. Remove duplication, improve naming, extract helpers. Keep all tests passing throughout.":refactoring_complete ||
+
+  general-purpose:"Apply code simplifier and review tools. Check for complexity issues and address them while maintaining test coverage.":code_review_complete
+] ->
+
+# Verify REFACTOR phase
+general-purpose:"Run full test suite after refactoring. Verify all tests still pass and coverage has not decreased.":refactor_verified ->
+
+# ===== PHASE VALIDATION GATE =====
+
+# Run parallel validation checks
+[
+  general-purpose:"Run unit tests: npm test. Capture results and any failures.":unit_tests_result ||
+
+  general-purpose:"Run build and lint: npm run build && npm run lint. Capture results.":build_lint_result ||
+
+  general-purpose:"Run security review using /security-review and /security-scanning:security-sast. Capture findings.":security_result
+] ->
+
+# Run deployment validation (if deployment command specified)
+general-purpose:"If phase has deployment command, execute it. Capture deployment output and verify success. If no deployment command, skip this step.":deployment_result ->
+
+# Run integration tests (if specified)
+general-purpose:"If phase has integration test command, execute it. Capture results. If no integration tests, skip this step.":integration_result ->
+
+# Compile validation results
+general-purpose:"Compile all validation results into a summary. Determine if phase validation passed (all checks green) or failed (any check red). Prepare summary for user review.":validation_summary ->
+
+# User checkpoint for phase approval
+@phase-validation-gate ->
+
+# ===== PHASE COMPLETION =====
+
+# Mark phase complete
+general-purpose:"Update .agent/hld-execution-state.md: (1) Mark current phase as 'complete', (2) Record validation results, (3) Update dependency graph to unblock dependent phases, (4) Create git tag 'hld-phase-N-complete', (5) Commit phase changes.":phase_marked_complete ->
+
+# Check for more phases
+general-purpose:"Check if all phases are complete. If yes, proceed to final summary. If no, loop back to identify next phase.":completion_check ->
+
+# Conditional: more phases to execute
+(if completion_check.phases_remaining)~> next_phase_identified ||
+
+# ===== FINAL SUMMARY =====
+
+# Generate completion report
+general-purpose:"Generate final HLD execution report: (1) List all completed phases with timestamps, (2) Summarize validation results, (3) List any skipped phases or known issues, (4) Provide cleanup recommendations.":final_report ->
+
+@hld-execution-complete

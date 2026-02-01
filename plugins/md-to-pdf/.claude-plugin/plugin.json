@@ -1,0 +1,9 @@
+{
+  "name": "md-to-pdf",
+  "version": "1.0.0",
+  "description": "Convert markdown directories to PDF with Mermaid diagram rendering",
+  "author": {
+    "name": "cajias"
+  },
+  "keywords": ["pdf", "markdown", "mermaid", "documentation"]
+}

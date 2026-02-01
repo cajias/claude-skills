@@ -1,0 +1,363 @@
+% Professional Book Template
+% Compile with: tectonic main.tex
+
+\documentclass[11pt,letterpaper,openany,oldfontcommands]{memoir}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+
+% Encoding and fonts
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+
+% Professional fonts
+\usepackage{palatino}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{inconsolata}
+
+% Language
+\usepackage[english]{babel}
+
+% Graphics and colors
+\usepackage{graphicx}
+\usepackage[dvipsnames,svgnames,table]{xcolor}
+
+% Tables
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\renewcommand{\arraystretch}{1.2}
+
+% Code listings
+\usepackage{listings}
+
+% Hyperlinks with PDF metadata
+\usepackage[
+    colorlinks=true,
+    linkcolor=RoyalBlue!80!black,
+    urlcolor=RoyalBlue!70!black,
+    citecolor=ForestGreen!80!black,
+    bookmarks=true,
+    bookmarksnumbered=true,
+    pdfstartview=FitH,
+    pdftitle={BOOK TITLE HERE},
+    pdfauthor={AUTHOR NAME HERE},
+    pdfsubject={SUBJECT HERE},
+    pdfkeywords={keyword1, keyword2, keyword3}
+]{hyperref}
+
+% TikZ for diagrams
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc}
+
+% Better enumeration
+\usepackage{enumitem}
+\setlist{nosep, leftmargin=1.5em}
+
+% Math symbols
+\usepackage{amssymb}
+
+% Quotes
+\usepackage{csquotes}
+
+% Drop caps (optional)
+\usepackage{lettrine}
+
+% Draft watermark (comment out for final)
+% \usepackage{draftwatermark}
+% \SetWatermarkText{DRAFT}
+% \SetWatermarkScale{0.8}
+% \SetWatermarkColor[gray]{0.9}
+% \SetWatermarkAngle{45}
+
+% ============================================================================
+% DOCUMENT SETTINGS
+% ============================================================================
+
+% Page layout (with binding gutter)
+\setlrmarginsandblock{1in}{1.25in}{*}
+\setulmarginsandblock{1.1in}{1.3in}{*}
+\checkandfixthelayout
+
+% Flexible page bottoms (prevents underfull vbox)
+\raggedbottom
+
+% Paragraph spacing
+\setlength{\parskip}{0.4\baselineskip}
+\setlength{\parindent}{1.5em}
+
+% Chapter style
+\chapterstyle{madsen}
+\renewcommand*{\chapnamefont}{\normalfont\Large\sffamily\scshape\color{RoyalBlue!70!black}}
+\renewcommand*{\chapnumfont}{\normalfont\huge\sffamily\bfseries\color{RoyalBlue!70!black}}
+\renewcommand*{\chaptitlefont}{\normalfont\HUGE\sffamily\bfseries\color{black}}
+\setlength{\beforechapskip}{40pt}
+\setlength{\afterchapskip}{30pt}
+
+% Part style
+\renewcommand{\partnamefont}{\normalfont\huge\sffamily\scshape\color{RoyalBlue!60!black}}
+\renewcommand{\partnumfont}{\normalfont\huge\sffamily\bfseries\color{RoyalBlue!60!black}}
+\renewcommand{\parttitlefont}{\normalfont\Huge\sffamily\bfseries}
+\renewcommand{\printparttitle}[1]{\parttitlefont #1\par\vskip 10pt\hrule height 1.5pt}
+
+% Section styles (sans-serif headings)
+\setsecheadstyle{\Large\sffamily\bfseries\color{black}}
+\setsubsecheadstyle{\large\sffamily\bfseries\color{black}}
+\setsubsubsecheadstyle{\normalsize\sffamily\bfseries\color{black}}
+
+% Headers and footers with rules
+\makepagestyle{bookstyle}
+\makeevenhead{bookstyle}{\thepage}{}{\small\sffamily\scshape\leftmark}
+\makeoddhead{bookstyle}{\small\sffamily\scshape\rightmark}{}{\thepage}
+\makeevenfoot{bookstyle}{}{}{}
+\makeoddfoot{bookstyle}{}{}{}
+\makeheadrule{bookstyle}{\textwidth}{0.4pt}
+\pagestyle{bookstyle}
+
+% Section numbering depth
+\setsecnumdepth{subsection}
+\settocdepth{subsection}
+
+% TOC styling
+\renewcommand{\cftchapterdotsep}{\cftnodots}
+\renewcommand{\cftchapterfont}{\sffamily\bfseries}
+\renewcommand{\cftsectionfont}{\sffamily}
+\renewcommand{\cftsubsectionfont}{\sffamily\small}
+
+% ============================================================================
+% CODE LISTING STYLES
+% ============================================================================
+
+\definecolor{codebg}{RGB}{245, 245, 245}
+\definecolor{codeframe}{RGB}{180, 180, 180}
+\definecolor{codecomment}{RGB}{80, 120, 70}
+\definecolor{codekeyword}{RGB}{50, 100, 170}
+\definecolor{codestring}{RGB}{170, 100, 80}
+
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    backgroundcolor=\color{codebg},
+    frame=l,
+    framesep=8pt,
+    framerule=2pt,
+    rulecolor=\color{RoyalBlue!50!black},
+    breaklines=true,
+    breakatwhitespace=true,
+    breakindent=2em,
+    tabsize=2,
+    showstringspaces=false,
+    numbers=none,
+    commentstyle=\color{codecomment}\itshape,
+    keywordstyle=\color{codekeyword}\bfseries,
+    stringstyle=\color{codestring},
+    xleftmargin=12pt,
+    xrightmargin=4pt,
+    aboveskip=\baselineskip,
+    belowskip=0.8\baselineskip,
+}
+
+\lstdefinelanguage{typescript}{
+    keywords={const, let, var, function, return, if, else, for, while, class, extends, implements, interface, type, export, import, from, as, async, await, new, this, true, false, null, undefined, typeof, instanceof, describe, it, expect},
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]',
+    morestring=[b]",
+    morestring=[b]`,
+    sensitive=true,
+}
+
+\lstdefinelanguage{bash}{
+    keywords={git, npm, pnpm, cd, mkdir, rm, ls, cat, echo, export, source, pip, docker, brew},
+    morecomment=[l]{\#},
+    morestring=[b]',
+    morestring=[b]",
+    sensitive=true,
+}
+
+% ============================================================================
+% CUSTOM ENVIRONMENTS (tcolorbox)
+% ============================================================================
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\definecolor{problemcolor}{RGB}{180, 130, 50}
+\definecolor{patterncolor}{RGB}{60, 100, 160}
+\definecolor{tipcolor}{RGB}{70, 130, 90}
+\definecolor{warningcolor}{RGB}{190, 100, 50}
+
+\newtcolorbox{problembox}{
+    enhanced,
+    colback=problemcolor!8!white,
+    colframe=problemcolor!80!black,
+    coltitle=white,
+    title={\sffamily\bfseries Problem},
+    fontupper=\small,
+    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    boxrule=0.5pt,
+    leftrule=3pt,
+    arc=2pt,
+    breakable,
+    before skip=\baselineskip,
+    after skip=0.8\baselineskip,
+}
+
+\newtcolorbox{solutionbox}{
+    enhanced,
+    colback=patterncolor!6!white,
+    colframe=patterncolor!70!black,
+    coltitle=white,
+    title={\sffamily\bfseries Pattern},
+    fontupper=\small,
+    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    boxrule=0.5pt,
+    leftrule=3pt,
+    arc=2pt,
+    breakable,
+    before skip=0.5\baselineskip,
+    after skip=\baselineskip,
+}
+
+\newtcolorbox{tipbox}[1][Tip]{
+    enhanced,
+    colback=tipcolor!6!white,
+    colframe=tipcolor!60!black,
+    coltitle=white,
+    title={\sffamily\bfseries #1},
+    fontupper=\small,
+    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    boxrule=0.5pt,
+    leftrule=3pt,
+    arc=2pt,
+    breakable,
+    before skip=0.8\baselineskip,
+    after skip=0.8\baselineskip,
+}
+
+\newtcolorbox{warningbox}[1][Warning]{
+    enhanced,
+    colback=warningcolor!8!white,
+    colframe=warningcolor!80!black,
+    coltitle=white,
+    title={\sffamily\bfseries #1},
+    fontupper=\small,
+    left=8pt, right=8pt, top=4pt, bottom=4pt,
+    boxrule=0.5pt,
+    leftrule=3pt,
+    arc=2pt,
+    breakable,
+    before skip=0.8\baselineskip,
+    after skip=0.8\baselineskip,
+}
+
+% ============================================================================
+% DOCUMENT BEGIN
+% ============================================================================
+
+\begin{document}
+
+\frontmatter
+
+% Half-title page
+\begin{titlingpage}
+\thispagestyle{empty}
+\vspace*{0.3\textheight}
+\begin{center}
+{\Large\sffamily\scshape Book Title Here}
+\end{center}
+\vfill
+\end{titlingpage}
+
+% Title page
+\begin{titlingpage}
+\thispagestyle{empty}
+\centering
+\vspace*{1.5cm}
+
+{\color{RoyalBlue!60!black}\hrule height 2pt}
+\vspace{0.5cm}
+{\color{RoyalBlue!40!black}\hrule height 0.5pt}
+
+\vspace{2cm}
+
+{\fontsize{32}{38}\selectfont\sffamily\bfseries Book Title\\[0.3em] Here\par}
+
+\vspace{1.2cm}
+
+{\Large\sffamily\color{gray!70!black} Subtitle Goes Here\par}
+
+\vspace{3cm}
+
+{\large\sffamily Author Name\par}
+{\normalsize\sffamily\color{gray!60!black} Title/Role\par}
+
+\vfill
+
+{\color{RoyalBlue!40!black}\hrule height 0.5pt}
+\vspace{0.5cm}
+{\color{RoyalBlue!60!black}\hrule height 2pt}
+
+\vspace{1cm}
+
+{\large\sffamily\scshape Organization Name\par}
+\vspace{0.3cm}
+{\normalsize\sffamily Month Year\par}
+
+\end{titlingpage}
+
+% Copyright page
+\clearpage
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+{\small\sffamily\textcopyright\ Year Copyright Holder}
+\vspace{2em}
+
+\begin{minipage}{0.7\textwidth}
+\centering\small
+Brief description of the document and its purpose.
+\end{minipage}
+
+\vspace{3em}
+{\footnotesize\color{gray} Version Information}
+\end{center}
+\vspace*{\fill}
+
+% Table of Contents
+\clearpage
+\tableofcontents*
+
+% Introduction (optional, in frontmatter)
+\clearpage
+\chapter{Introduction}
+\label{ch:intro}
+
+Introduction content here.
+
+% ============================================================================
+% MAIN MATTER
+% ============================================================================
+
+\mainmatter
+
+\part{Part Title}
+\label{part:one}
+
+\include{chapters/ch01-name}
+\include{chapters/ch02-name}
+
+% ============================================================================
+% BACK MATTER
+% ============================================================================
+
+\backmatter
+
+\appendix
+\part{Appendices}
+
+\include{chapters/appendix-a}
+
+\end{document}
