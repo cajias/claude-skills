@@ -16,7 +16,7 @@ Search your knowledge base using semantic similarity.
 1. Run the search:
 
    ```bash
-   uv run --project /Users/rc/Projects/workspace/claude-skills/plugins/semantic-search ss-search "$QUERY" --limit 5
+   uv run --project ${CLAUDE_PLUGIN_ROOT} ss-search "$QUERY" --limit 5
    ```
 
 2. Parse the JSON output

@@ -18,6 +18,11 @@
       "name": "isengardcli-aws-auth",
       "source": "./plugins/isengardcli-aws-auth",
       "description": "Enforces AWS authentication via isengardcli. Blocks direct aws/cdk/deploy commands. Uses environment variables (DEV, GAMMA, PROD) with color-coded warnings."
+    },
+    {
+      "name": "semantic-search",
+      "source": "./plugins/semantic-search",
+      "description": "Semantic search over Obsidian Zettelkasten notes using LanceDB and sentence-transformers for local embeddings."
     }
   ]
 }

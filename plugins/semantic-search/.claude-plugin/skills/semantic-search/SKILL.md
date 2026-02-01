@@ -32,7 +32,7 @@ in LanceDB (embedded, serverless, stored in vault `.lancedb/`).
 When this skill is invoked:
 
 1. Run the search command with appropriate env vars:
-   `uvx --from /Users/rc/Projects/workspace/claude-skills/plugins/semantic-search ss-search "<query>"`
+   `uv run --project ${CLAUDE_PLUGIN_ROOT} ss-search "<query>"`
 2. Parse JSON results
 3. Read top 2-3 matching notes using Obsidian MCP tools
 4. Summarize findings for the user
