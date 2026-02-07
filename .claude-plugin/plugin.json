@@ -1,7 +1,7 @@
 {
   "name": "claude-skills",
   "description": "Custom skills marketplace - reusable workflow patterns for TDD, code review, and development automation",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "cajias"
   },
