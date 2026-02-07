@@ -2,7 +2,7 @@
 # Generate pane sessions table from pane data
 # Usage: generate-pane-table.sh < pane_data.txt
 # Input format: one line per pane: "pane_id|cwd"
-# Example: w1t1p1|/Users/cajias/Projects
+# Example: w1t1p1|/home/user/Projects
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 

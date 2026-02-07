@@ -248,7 +248,7 @@ After completing the transfer, provide:
 # Use Bash tool with run_in_background: true and timeout: 600000
 q chat --trust-all-tools "You are transferring a markdown document to Quip. Follow these rules STRICTLY:
 
-SOURCE FILE: /Users/cajias/Projects/omega-worktree/adr-009/docs/adr/adr-010-agentcore-gateway-migration.md
+SOURCE FILE: /path/to/project/docs/adr/adr-010-agentcore-gateway-migration.md
 TARGET QUIP: https://quip-amazon.com/3XRMA6802u9T/ADR10
 
 ## TRANSFER STRATEGY

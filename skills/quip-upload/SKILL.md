@@ -27,7 +27,7 @@ This skill activates when the user says:
 
 ## Prerequisites
 
-- Mermaid CLI installed: `mmdc` command available at `/Users/cajias/.nvm/versions/node/v22.12.0/bin/mmdc`
+- Mermaid CLI installed: `mmdc` command available on PATH (install via `npm install -g @mermaid-js/mermaid-cli`)
 - Quip API token available in environment or from `~/.aws/amazonq/cli-agents/amzn-docs.json`
 - Agent: Use `amzn-docs` (has Quip context and tools)
 

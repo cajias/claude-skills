@@ -21,7 +21,7 @@ Run the tag audit command with proper AWS credentials:
 isengardcli run --account 806230523044 -- bash -c '
 export ZETTELKASTEN_BUCKET=zettelkasten-cajias
 export ZETTELKASTEN_INDEX=knowledge-index
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
 zk-tag-audit
 '
 ```

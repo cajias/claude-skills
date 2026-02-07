@@ -18,9 +18,9 @@ Use the `mcp__iterm2__iterm2_list_panes` tool to get all panes with their workin
 Parse the pane list and pipe to the table generator script. Format each pane as `pane_id|cwd`:
 
 ```bash
-echo "w1t1p1|/Users/cajias/Projects
-w2t1p1|/Users/cajias/Projects/foo
-w2t2p1|/Users/cajias/Projects/bar" | ${CLAUDE_PLUGIN_ROOT}/scripts/generate-pane-table.sh
+echo "w1t1p1|$HOME/Projects
+w2t1p1|$HOME/Projects/foo
+w2t2p1|$HOME/Projects/bar" | ${CLAUDE_PLUGIN_ROOT}/scripts/generate-pane-table.sh
 ```
 
 ### Step 3: Output

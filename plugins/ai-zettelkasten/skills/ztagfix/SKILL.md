@@ -29,13 +29,13 @@ Consolidate redundant safety-related tags:
 ```bash
 # Preview changes
 isengardcli run --account 806230523044 -- bash -c '
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
 zk-tag-consolidate --from guardrails,ai-risks --to safety --dry-run
 '
 
 # Apply after review
 isengardcli run --account 806230523044 -- bash -c '
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
 zk-tag-consolidate --from guardrails,ai-risks --to safety
 '
 ```

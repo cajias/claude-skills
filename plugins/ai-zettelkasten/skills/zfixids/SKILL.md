@@ -21,7 +21,7 @@ Run the fix command:
 
 ```bash
 isengardcli run --account 806230523044 -- bash -c '
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
 zk-fix-ids --dry-run   # Preview first
 zk-fix-ids             # Apply fixes
 zk-sync                # Re-sync to S3 Vectors

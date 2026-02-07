@@ -30,13 +30,15 @@ List permanent notes without tags or with <2 tags:
 
 ```bash
 # Scan for untagged notes
-find /Users/cajias/Documents/obsidian-vault-work/knowledge-base/permanent -name "*.md" -exec grep -l "tags: \[\]" {} \; 2>/dev/null | head -20
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
+find "$OBSIDIAN_VAULT/knowledge-base/permanent" -name "*.md" -exec grep -l "tags: \[\]" {} \; 2>/dev/null | head -20
 ```
 
 Or notes with minimal tags:
 
 ```bash
-grep -l "tags:" /Users/cajias/Documents/obsidian-vault-work/knowledge-base/permanent/*.md | while read f; do
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
+grep -l "tags:" "$OBSIDIAN_VAULT/knowledge-base/permanent"/*.md | while read f; do
   count=$(grep "tags:" "$f" | grep -oE '\[.*\]' | tr ',' '\n' | wc -l)
   if [ "$count" -lt 2 ]; then echo "$f: $count tags"; fi
 done
@@ -50,7 +52,7 @@ For each untagged note, find similar notes using semantic search:
 isengardcli run --account 806230523044 -- bash -c '
 export ZETTELKASTEN_BUCKET=zettelkasten-cajias
 export ZETTELKASTEN_INDEX=knowledge-index
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
 zk-related "<note title or content excerpt>" --top 5
 '
 ```

@@ -22,7 +22,7 @@ Run the duplicate detection command with proper AWS credentials:
 isengardcli run --account 806230523044 -- bash -c '
 export ZETTELKASTEN_BUCKET=zettelkasten-cajias
 export ZETTELKASTEN_INDEX=knowledge-index
-uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-dupes --threshold 85
+uvx --from ${CLAUDE_PLUGIN_ROOT} zk-dupes --threshold 85
 '
 ```
 

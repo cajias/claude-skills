@@ -381,7 +381,7 @@ def main() -> None:
             },
             {
                 "name": "omega-api-authentication",
-                "description": "How to authenticate with the Omega API using /Users/cajias/Projects/omega/config.json",
+                "description": "How to authenticate with the Omega API using /path/to/project/config.json",
                 "problem": "Need AWS account 123456789012 credentials",
                 "tags": ["omega", "api", "auth"],
                 "expected": "project",

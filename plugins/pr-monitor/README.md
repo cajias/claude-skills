@@ -130,7 +130,7 @@ Line 3: LAST_COMMIT_SHA
 Example:
 
 ```text
-/Users/cajias/Projects/claude-skills
+/home/user/Projects/claude-skills
 2
 a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
 ```

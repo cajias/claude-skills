@@ -253,7 +253,7 @@ When Claude Code would normally stop:
 
 ```bash
 # 1. User asks to monitor PR #2 in claude-skills repo
-cd /Users/cajias/Projects/claude-skills
+cd /path/to/claude-skills
 
 # 2. Get current state
 gh pr view 2 --json headRefOid,title,commits

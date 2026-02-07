@@ -23,8 +23,8 @@ isengardcli run --account 806230523044 -- bash -c '
 export ZETTELKASTEN_BUCKET=zettelkasten-cajias
 export ZETTELKASTEN_INDEX=knowledge-index
 export ZETTELKASTEN_ROLE_ARN=arn:aws:iam::806230523044:role/ZettelkastenPluginRole
-export OBSIDIAN_VAULT=/Users/cajias/Documents/obsidian-vault-work
-uvx --from /Users/cajias/.claude/my-claude-skills/plugins/ai-zettelkasten zk-hub-check
+export OBSIDIAN_VAULT="${OBSIDIAN_VAULT:-$HOME/Documents/Obsidian Vault}"
+uvx --from ${CLAUDE_PLUGIN_ROOT} zk-hub-check
 '
 ```
 

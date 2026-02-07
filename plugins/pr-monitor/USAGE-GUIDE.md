@@ -183,7 +183,7 @@ Line 3: LAST_COMMIT_SHA
 **Example:**
 
 ```text
-/Users/cajias/Projects/claude-skills
+/home/user/Projects/claude-skills
 2
 a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
 ```
@@ -571,7 +571,7 @@ cd ~/Projects/claude-skills
 "Monitor PR #2 in this repository for new commits"
 
 # Claude executes:
-REPO_PATH=$(pwd)  # /Users/cajias/Projects/claude-skills
+REPO_PATH=$(pwd)  # /home/user/Projects/claude-skills
 PR_NUMBER=2
 CURRENT_SHA=$(gh pr view 2 --json headRefOid --jq '.headRefOid')
 
@@ -584,7 +584,7 @@ EOF
 # Verification:
 cat /tmp/claude_monitor_pr_claude-skills_2
 # Output:
-# /Users/cajias/Projects/claude-skills
+# /home/user/Projects/claude-skills
 # 2
 # a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
 ```

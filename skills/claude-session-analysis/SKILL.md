@@ -248,7 +248,7 @@ This extracts actionable recommendations:
 
 ```bash
 # Full diagnostic for a problematic session
-SESSION="/Users/cajias/.claude/projects/-Users-cajias-Projects-myproject/abc123.jsonl"
+SESSION="$HOME/.claude/projects/-Users-USERNAME-Projects-myproject/abc123.jsonl"
 
 echo "=== Compaction Count ==="
 grep -c "Conversation compacted" "$SESSION"
