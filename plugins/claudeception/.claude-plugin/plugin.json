@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/signal_accumulator.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/signal_accumulator.py"
           }
         ]
       }
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/knowledge_handler.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/knowledge_handler.py"
           }
         ]
       }
@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/cajias/.claude/my-claude-skills/plugins/claudeception/hooks/extraction_engine.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/extraction_engine.py"
           }
         ]
       }

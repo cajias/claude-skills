@@ -1,11 +1,15 @@
 ---
 name: zettelkasten
 description: >-
-  AI-powered Zettelkasten knowledge management with ChromaDB. Use when user
-  wants to add notes, search knowledge, manage tasks, bookmark URLs, or
-  explore connections. Triggers on zettel, zadd, zsearch, zboard, zbookmark,
-  zconnect, zorphans, zreview, zmap, zclusters.
+  [DEPRECATED - Use ai-zettelkasten instead] AI-powered Zettelkasten knowledge
+  management with ChromaDB. Use when user wants to add notes, search knowledge,
+  manage tasks, bookmark URLs, or explore connections. Triggers on zettel, zadd,
+  zsearch, zboard, zbookmark, zconnect, zorphans, zreview, zmap, zclusters.
 ---
+
+> **DEPRECATED:** This plugin has been superseded by **ai-zettelkasten**.
+> Please migrate to `ai-zettelkasten` for continued updates.
+> This plugin is no longer maintained.
 
 # Zettel Database Manager
 

@@ -1,11 +1,15 @@
 ---
 name: notion-ingest
 description: >-
-  Ingest Notion documents into Zettelkasten as atomic notes. Writes to BOTH
-  ChromaDB (vector search) AND Obsidian (markdown files with wikilinks).
-  Analyzes structure, proposes atomization, creates interlinked notes with
-  proper Luhmann-style IDs.
+  [DEPRECATED - Use ai-zettelkasten instead] Ingest Notion documents into
+  Zettelkasten as atomic notes. Writes to BOTH ChromaDB (vector search) AND
+  Obsidian (markdown files with wikilinks). Analyzes structure, proposes
+  atomization, creates interlinked notes with proper Luhmann-style IDs.
 ---
+
+> **DEPRECATED:** This plugin has been superseded by **ai-zettelkasten**.
+> Please migrate to `ai-zettelkasten` for continued updates.
+> This plugin is no longer maintained.
 
 # Notion Document Ingestion
 

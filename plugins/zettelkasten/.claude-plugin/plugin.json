@@ -1,7 +1,8 @@
 {
   "name": "zettelkasten",
-  "version": "1.0.0",
-  "description": "AI-powered Zettelkasten knowledge management with local ChromaDB vector search. Supports notes, tasks, bookmarks with Luhmann-style IDs and automatic connection discovery.",
+  "version": "0.0.1",
+  "deprecated": true,
+  "description": "[DEPRECATED - Use ai-zettelkasten instead] AI-powered Zettelkasten knowledge management with local ChromaDB vector search. Supports notes, tasks, bookmarks with Luhmann-style IDs and automatic connection discovery.",
   "author": {
     "name": "logicalicy (adapted for ChromaDB)",
     "url": "https://github.com/logicalicy/ai-zettelkasten-lite"
