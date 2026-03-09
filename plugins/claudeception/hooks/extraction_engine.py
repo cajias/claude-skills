@@ -31,11 +31,23 @@ script_dir = Path(__file__).parent
 sys.path.insert(0, str(script_dir))
 
 try:
-    from session_state import calculate_breakthrough_score, clear_session, get_signal_summary
+    from session_state import (
+        calculate_breakthrough_score,
+        clear_session,
+        get_signal_summary,
+        get_transcript_start_line,
+        record_compaction,
+    )
 
     HAS_SESSION_STATE = True
 except ImportError:
     HAS_SESSION_STATE = False
+
+    def get_transcript_start_line():
+        return 0
+
+    def record_compaction(line_count):
+        pass
 
 try:
     from duplicate_detector import should_reject_duplicate
@@ -253,7 +265,7 @@ def extract_skills_from_session(session_data: dict, signal_summary: dict) -> int
 
     # Corrections are high-value signals (lowered threshold v4.2.1)
     for correction in corrections:
-        if correction.get("confidence", 0) >= 0.5:
+        if correction.get("confidence", 0) >= 0.3:
             insight = correction.get("extracted_knowledge", "") or correction.get("extracted_insight", "")
             if insight:
                 skills_to_create.append(
@@ -318,46 +330,318 @@ def extract_skills_from_session(session_data: dict, signal_summary: dict) -> int
     return skills_created
 
 
-def read_transcript(transcript_path: str) -> list[dict]:
-    """Read session transcript."""
+def read_transcript(transcript_path: str, start_line: int = 0) -> tuple[list[dict], int]:
+    """Read session transcript from a specific line.
+
+    Args:
+        transcript_path: Path to the transcript JSONL file
+        start_line: Line number to start reading from (0-indexed)
+
+    Returns:
+        Tuple of (messages list, total line count)
+    """
     messages = []
+    total_lines = 0
+
     try:
         with open(transcript_path) as f:
-            for line in f:
+            for i, line in enumerate(f):
+                total_lines = i + 1
+                if i < start_line:
+                    continue  # Skip lines before start_line
+
+                line = line.strip()
+                if not line:
+                    continue
+
                 try:
-                    msg = json.loads(line.strip())
+                    msg = json.loads(line)
                     messages.append(msg)
                 except json.JSONDecodeError:
-                    continue
+                    # Not JSON, might be plain text - store as raw
+                    messages.append({"type": "raw", "content": line})
+
+        log(f"Read {len(messages)} messages from transcript (lines {start_line}-{total_lines})")
+    except FileNotFoundError:
+        log(f"Transcript file not found: {transcript_path}")
     except Exception as e:
         log(f"Error reading transcript: {e}")
-    return messages
+
+    return messages, total_lines
+
+
+def extract_conversation_text(messages: list[dict], max_chars: int = 50000) -> str:
+    """Extract readable conversation text from transcript messages.
+
+    Args:
+        messages: List of transcript message dicts
+        max_chars: Maximum characters to return
+
+    Returns:
+        Formatted conversation text
+    """
+    conversation_parts = []
+    total_chars = 0
+
+    for msg in messages:
+        if total_chars >= max_chars:
+            break
+
+        # Handle different message formats
+        role = msg.get("role", msg.get("type", "unknown"))
+        content = ""
+
+        if "content" in msg:
+            content = msg["content"]
+            if isinstance(content, list):
+                # Handle content blocks (Claude API format)
+                text_parts = []
+                for block in content:
+                    if isinstance(block, dict):
+                        if block.get("type") == "text":
+                            text_parts.append(block.get("text", ""))
+                        elif block.get("type") == "tool_use":
+                            text_parts.append(f"[Tool: {block.get('name', 'unknown')}]")
+                        elif block.get("type") == "tool_result":
+                            result = str(block.get("content", ""))[:500]
+                            text_parts.append(f"[Tool Result: {result}]")
+                    elif isinstance(block, str):
+                        text_parts.append(block)
+                content = "\n".join(text_parts)
+            elif not isinstance(content, str):
+                content = str(content)
+
+        elif "message" in msg:
+            content = str(msg["message"])
+
+        if content:
+            # Format based on role
+            if role in ("user", "human"):
+                formatted = f"\n[USER]: {content}\n"
+            elif role in ("assistant", "ai"):
+                formatted = f"\n[ASSISTANT]: {content}\n"
+            else:
+                formatted = f"\n[{role.upper()}]: {content}\n"
+
+            remaining = max_chars - total_chars
+            if len(formatted) > remaining:
+                formatted = formatted[:remaining] + "..."
+
+            conversation_parts.append(formatted)
+            total_chars += len(formatted)
+
+    return "".join(conversation_parts)
+
+
+def analyze_transcript_for_knowledge(conversation_text: str) -> dict:
+    """Analyze conversation text for extractable knowledge patterns.
+
+    Returns analysis metadata to guide LLM extraction prompt.
+    """
+    analysis = {
+        "has_debugging": False,
+        "has_error_resolution": False,
+        "has_workaround": False,
+        "has_discovery": False,
+        "has_pattern_learning": False,
+        "key_topics": [],
+        "error_patterns": [],
+        "tools_used": set(),
+    }
+
+    text_lower = conversation_text.lower()
+
+    # Detect debugging sessions
+    debug_indicators = ["debug", "error", "exception", "traceback", "stack trace", "failed", "not working"]
+    analysis["has_debugging"] = any(ind in text_lower for ind in debug_indicators)
+
+    # Detect error resolution
+    resolution_indicators = ["fixed", "solved", "resolved", "working now", "that worked", "solution"]
+    if analysis["has_debugging"] and any(ind in text_lower for ind in resolution_indicators):
+        analysis["has_error_resolution"] = True
+
+    # Detect workarounds
+    workaround_indicators = ["workaround", "instead", "alternative", "hack", "trick", "bypass"]
+    analysis["has_workaround"] = any(ind in text_lower for ind in workaround_indicators)
+
+    # Detect discoveries
+    discovery_indicators = ["found", "discovered", "realized", "turns out", "actually", "the issue was"]
+    analysis["has_discovery"] = any(ind in text_lower for ind in discovery_indicators)
+
+    # Detect pattern learning
+    pattern_indicators = ["pattern", "best practice", "should always", "remember to", "learned", "gotcha"]
+    analysis["has_pattern_learning"] = any(ind in text_lower for ind in pattern_indicators)
+
+    # Extract error patterns (look for common error formats)
+    error_patterns = re.findall(r'(?:error|exception|failed)[\s:]+([^\n]{10,100})', text_lower)
+    analysis["error_patterns"] = list(set(error_patterns[:5]))  # Dedupe and limit
+
+    # Extract tools used
+    tool_matches = re.findall(r'\[Tool:\s*([^\]]+)\]', conversation_text)
+    analysis["tools_used"] = list(set(tool_matches))
+
+    # Extract key topics (capitalized multi-word terms)
+    topic_matches = re.findall(r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', conversation_text)
+    analysis["key_topics"] = list(set(topic_matches[:10]))
+
+    return analysis
+
+
+def build_extraction_prompt(
+    conversation_text: str,
+    analysis: dict,
+    signal_summary: dict,
+    hook_event: str
+) -> str:
+    """Build a comprehensive extraction prompt for the LLM.
+
+    Args:
+        conversation_text: The conversation content to analyze
+        analysis: Pre-analysis metadata
+        signal_summary: Accumulated signals from session
+        hook_event: Which hook triggered this (SessionEnd or PreCompact)
+
+    Returns:
+        Formatted prompt for Claude to analyze and extract skills
+    """
+    # Build context summary
+    context_parts = []
+
+    if analysis["has_error_resolution"]:
+        context_parts.append("✓ Error was debugged and resolved")
+    if analysis["has_workaround"]:
+        context_parts.append("✓ Workaround or alternative approach found")
+    if analysis["has_discovery"]:
+        context_parts.append("✓ Non-obvious discovery made")
+    if analysis["has_pattern_learning"]:
+        context_parts.append("✓ Pattern or best practice identified")
+
+    if analysis["error_patterns"]:
+        context_parts.append(f"Error patterns seen: {', '.join(analysis['error_patterns'][:3])}")
+
+    if analysis["tools_used"]:
+        context_parts.append(f"Tools used: {', '.join(analysis['tools_used'][:5])}")
+
+    context_summary = "\n".join(context_parts) if context_parts else "No specific patterns detected"
+
+    # Signal summary
+    signal_text = f"""
+Signals accumulated:
+- Errors: {signal_summary.get('error_count', 0)}
+- Retries: {signal_summary.get('retry_count', 0)}
+- Web searches: {signal_summary.get('web_search_count', 0)}
+- User corrections: {signal_summary.get('correction_count', 0)}
+- User teaching: {signal_summary.get('teaching_count', 0)}
+- Breakthrough score: {signal_summary.get('breakthrough_score', 0):.2f}
+"""
+
+    # Truncate conversation if needed
+    max_conv_len = 30000
+    if len(conversation_text) > max_conv_len:
+        # Keep beginning and end for context
+        half = max_conv_len // 2
+        conversation_text = (
+            conversation_text[:half]
+            + f"\n\n[... {len(conversation_text) - max_conv_len} characters truncated ...]\n\n"
+            + conversation_text[-half:]
+        )
+
+    prompt = f"""
+================================================================================
+CLAUDECEPTION - SESSION KNOWLEDGE EXTRACTION
+================================================================================
+Trigger: {hook_event}
+
+**Pre-Analysis:**
+{context_summary}
+
+{signal_text}
+
+**Session Conversation:**
+--------------------------------------------------------------------------------
+{conversation_text}
+--------------------------------------------------------------------------------
+
+**Your Task:**
+Analyze this conversation for skill-worthy knowledge. Look for:
+
+| Category | What to Extract | Skip If |
+|----------|-----------------|---------|
+| Debugging Insight | Root cause of non-obvious error | Just a typo or syntax error |
+| Workaround | Solution to tool/framework limitation | Standard documented approach |
+| Pattern | Reusable technique discovered | Project-specific config |
+| Integration | How to connect systems | Already well-documented |
+| Gotcha | Surprising behavior that caught us | Common knowledge |
+
+**Extraction Criteria:**
+- Must be REUSABLE (not one-off project-specific)
+- Must be NON-OBVIOUS (required investigation)
+- Must be VERIFIED (actually worked in this session)
+- Should benefit FUTURE sessions
+
+**Output Format:**
+If skill-worthy knowledge found, respond with JSON:
+```json
+{{
+  "skills": [
+    {{
+      "name": "kebab-case-name",
+      "title": "Brief Descriptive Title",
+      "description": "One-line summary for semantic matching - include error messages, tool names",
+      "problem": "What problem this solves",
+      "triggers": "When to use: specific symptoms, error messages, scenarios",
+      "solution": "Step-by-step approach or key insight",
+      "verification": "How to confirm it worked",
+      "tags": ["category", "tool-name", "error-type"],
+      "confidence": 0.8
+    }}
+  ]
+}}
+```
+
+If nothing notable, respond: "No skill-worthy knowledge to extract."
+
+================================================================================
+"""
+    return prompt
 
 
 def main() -> int:
-    """Main entry point for Stop hook."""
+    """Main entry point for SessionEnd/PreCompact hooks."""
     log("=" * 70)
-    log("Extraction engine started (Stop hook)")
+    log("Extraction engine started")
 
     # Read session data from stdin
     session_data = {}
+    hook_event = "unknown"
     if not sys.stdin.isatty():
         try:
             input_str = sys.stdin.read()
             if input_str:
                 session_data = json.loads(input_str)
+                hook_event = session_data.get("hook_event_name", "unknown")
+                log(f"Triggered by: {hook_event}")
                 log(f"Received session data: {list(session_data.keys())}")
         except json.JSONDecodeError:
             log("Could not parse stdin as JSON")
         except Exception as e:
             log(f"Error reading stdin: {e}")
 
+    # Get transcript path
+    transcript_path = session_data.get("transcript_path", "")
+    if not transcript_path:
+        log("No transcript_path in session data - cannot analyze content")
+        # Fall back to signal-only extraction
+        return _fallback_signal_extraction(session_data, hook_event)
+
     # Get session state with accumulated signals
     signal_summary = {}
+    start_line = 0
     if HAS_SESSION_STATE:
         try:
             signal_summary = get_signal_summary() or {}
-            log("Retrieved signal summary")
+            start_line = signal_summary.get("last_compaction_line", 0)
+            log(f"Retrieved signal summary, reading from line {start_line}")
         except Exception as e:
             log(f"Error getting signal summary: {e}")
 
@@ -368,33 +652,115 @@ def main() -> int:
         except Exception:
             signal_summary["breakthrough_score"] = 0
 
-    # Extract skills
+    # Read transcript from last compaction point
+    messages, total_lines = read_transcript(transcript_path, start_line)
+
+    if not messages:
+        log("No messages to analyze in transcript segment - falling back to signal extraction")
+        return _fallback_signal_extraction(session_data, hook_event)
+
+    # Extract conversation text
+    conversation_text = extract_conversation_text(messages)
+    log(f"Extracted {len(conversation_text)} chars of conversation text")
+
+    if len(conversation_text) < 200:
+        log("Conversation too short for meaningful analysis")
+        return _finalize_extraction(session_data, signal_summary, hook_event, total_lines, 0)
+
+    # Analyze transcript for knowledge patterns
+    analysis = analyze_transcript_for_knowledge(conversation_text)
+    log(f"Analysis: debugging={analysis['has_debugging']}, resolution={analysis['has_error_resolution']}, "
+        f"discovery={analysis['has_discovery']}, workaround={analysis['has_workaround']}")
+
+    # Check if there's anything worth extracting
+    has_potential = (
+        analysis["has_error_resolution"]
+        or analysis["has_workaround"]
+        or analysis["has_discovery"]
+        or analysis["has_pattern_learning"]
+        or signal_summary.get("correction_count", 0) > 0
+        or signal_summary.get("teaching_count", 0) > 0
+        or signal_summary.get("breakthrough_score", 0) >= BREAKTHROUGH_THRESHOLD
+    )
+
+    if not has_potential:
+        log("No indicators of extractable knowledge found")
+        return _finalize_extraction(session_data, signal_summary, hook_event, total_lines, 0)
+
+    # Extract skills directly from accumulated signals
+    skills_created = extract_skills_from_session(session_data, signal_summary)
+    log(f"Direct extraction created {skills_created} skills")
+
+    return _finalize_extraction(session_data, signal_summary, hook_event, total_lines, skills_created)
+
+
+def _fallback_signal_extraction(session_data: dict, hook_event: str) -> int:
+    """Fallback to signal-only extraction when transcript unavailable."""
+    log("Falling back to signal-only extraction")
+
+    signal_summary = {}
+    if HAS_SESSION_STATE:
+        try:
+            signal_summary = get_signal_summary() or {}
+        except Exception as e:
+            log(f"Error getting signal summary: {e}")
+
+    if "breakthrough_score" not in signal_summary and HAS_SESSION_STATE:
+        try:
+            signal_summary["breakthrough_score"] = calculate_breakthrough_score()
+        except Exception:
+            signal_summary["breakthrough_score"] = 0
+
     skills_created = 0
     if session_data or signal_summary:
         skills_created = extract_skills_from_session(session_data, signal_summary)
 
+    return _finalize_extraction(session_data, signal_summary, hook_event, 0, skills_created)
+
+
+def _finalize_extraction(
+    session_data: dict,
+    signal_summary: dict,
+    hook_event: str,
+    total_lines: int,
+    skills_created: int
+) -> int:
+    """Finalize extraction: emit events and handle state based on hook type."""
+
     # Emit summary event
     emit_event(
         {
-            "event_type": "session_extraction_complete",
+            "event_type": "extraction_complete",
             "timestamp": datetime.now().isoformat(),
             "session_id": session_data.get("session_id", "unknown"),
+            "hook_event": hook_event,
             "breakthrough_score": signal_summary.get("breakthrough_score", 0),
             "skills_created": skills_created,
-            "corrections_count": len(signal_summary.get("corrections", [])),
-            "errors_count": len(signal_summary.get("errors", [])),
+            "corrections_count": signal_summary.get("correction_count", 0),
+            "teaching_count": signal_summary.get("teaching_count", 0),
+            "transcript_lines_analyzed": total_lines - signal_summary.get("last_compaction_line", 0),
         }
     )
 
-    # Clear session state
+    # Handle state based on hook type
     if HAS_SESSION_STATE:
         try:
-            clear_session()
-            log("Cleared session state")
+            if hook_event == "PreCompact":
+                # Record compaction point but keep session alive
+                record_compaction(total_lines)
+                log(f"Recorded compaction at line {total_lines}")
+            elif hook_event == "SessionEnd":
+                # Clear session completely
+                clear_session()
+                log("Cleared session state (session ended)")
+            else:
+                # Unknown hook, just clear to be safe
+                clear_session()
+                log(f"Cleared session state (unknown hook: {hook_event})")
         except Exception as e:
-            log(f"Error clearing session: {e}")
+            log(f"Error finalizing session state: {e}")
 
-    log(f"Extraction complete: {skills_created} skills created")
+    log(f"Extraction complete: hook={hook_event}, skills_created={skills_created}")
     log("=" * 70)
 
     return 0

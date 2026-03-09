@@ -171,6 +171,8 @@ class SessionState:
         exchanges: List of exchange summaries
         last_updated: ISO timestamp of last state update
         metadata: Additional session metadata
+        last_compaction_line: Line number in transcript where last compaction occurred (0 = start)
+        compaction_count: Number of compactions that have occurred
     """
 
     session_id: str
@@ -183,6 +185,8 @@ class SessionState:
     exchanges: list[dict[str, Any]] = field(default_factory=list)
     last_updated: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
+    last_compaction_line: int = 0  # v4.3: Track transcript position for incremental analysis
+    compaction_count: int = 0  # v4.3: Track number of compactions
 
     @property
     def correction_count(self) -> int:
@@ -210,6 +214,8 @@ class SessionState:
             "exchanges": self.exchanges,
             "last_updated": self.last_updated,
             "metadata": self.metadata,
+            "last_compaction_line": self.last_compaction_line,
+            "compaction_count": self.compaction_count,
         }
 
     @classmethod
@@ -225,6 +231,8 @@ class SessionState:
             exchanges=data.get("exchanges", []),
             last_updated=data.get("last_updated", ""),
             metadata=data.get("metadata", {}),
+            last_compaction_line=data.get("last_compaction_line", 0),
+            compaction_count=data.get("compaction_count", 0),
         )
 
 
@@ -530,7 +538,72 @@ def get_signal_summary() -> dict[str, Any]:
         "exchange_count": len(state.exchanges),
         "breakthrough_score": score,
         "last_updated": state.last_updated,
+        "last_compaction_line": state.last_compaction_line,  # v4.3: For transcript reading
+        "compaction_count": state.compaction_count,
     }
+
+
+def record_compaction(transcript_line_count: int) -> SessionState:
+    """Record a compaction event and update the transcript position marker.
+
+    Called by PreCompact hook after extraction to mark where we left off.
+    The next extraction will read from this line forward.
+
+    Args:
+        transcript_line_count: Current number of lines in the transcript
+
+    Returns:
+        Updated SessionState object
+
+    Raises:
+        SessionNotInitializedError: If no active session
+    """
+    with file_lock():
+        state_dict = _read_state_file()
+
+        if not state_dict:
+            msg = "No active session. Call init_session() first."
+            raise SessionNotInitializedError(msg)
+
+        state = SessionState.from_dict(state_dict)
+
+        # Update compaction tracking
+        state.last_compaction_line = transcript_line_count
+        state.compaction_count += 1
+        state.last_updated = datetime.now().isoformat()
+
+        # Reset signal counters for next segment (signals were already processed)
+        state.error_count = 0
+        state.retry_count = 0
+        state.web_search_count = 0
+        state.corrections = []
+        state.teachings = []
+        state.exchanges = []
+
+        _write_state_file(state.to_dict())
+
+        log(
+            f"Recorded compaction #{state.compaction_count} at line {transcript_line_count}. "
+            "Signal counters reset for next segment."
+        )
+
+        return state
+
+
+def get_transcript_start_line() -> int:
+    """Get the line number to start reading transcript from.
+
+    Returns the line after the last compaction, or 0 if no compaction has occurred.
+
+    Returns:
+        Line number to start reading from (0-indexed)
+    """
+    state = get_session_state()
+
+    if not state:
+        return 0
+
+    return state.last_compaction_line
 
 
 # CLI interface for testing

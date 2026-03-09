@@ -17,33 +17,48 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/signal_accumulator.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/signal_accumulator.py",
+            "timeout": 5
           }
         ]
       }
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/knowledge_handler.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/knowledge_handler.py",
+            "timeout": 5
           }
         ]
       }
     ],
-    "Stop": [
+    "SessionEnd": [
       {
-        "matcher": "",
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/extraction_engine.py"
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/extraction_engine.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/extraction_engine.py",
+            "timeout": 30
           }
         ]
       }
