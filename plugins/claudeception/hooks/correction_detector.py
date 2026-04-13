@@ -211,11 +211,11 @@ def detect_negation_with_reference(text: str, previous_response: str = "") -> tu
     """
     text_lower = text.lower()
 
-    # Check for reference words
-    has_reference = any(ref in text_lower for ref in REFERENCE_WORDS)
+    # Use word boundaries to avoid false positives like "it" matching inside "with"
+    has_reference = any(re.search(r"\b" + re.escape(ref) + r"\b", text_lower) for ref in REFERENCE_WORDS)
 
-    # Check for negative sentiment
-    negative_count = sum(1 for neg in NEGATIVE_WORDS if neg in text_lower)
+    # Check for negative sentiment (word boundaries to avoid partial matches)
+    negative_count = sum(1 for neg in NEGATIVE_WORDS if re.search(r"\b" + re.escape(neg) + r"\b", text_lower))
 
     # If both reference and negative words present, likely a correction
     if has_reference and negative_count >= 1:

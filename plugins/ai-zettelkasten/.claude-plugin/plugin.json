@@ -18,23 +18,15 @@
     "Stop": [
       {
         "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uvx --from ai-zettelkasten zk-extract"
-          }
-        ]
+        "type": "command",
+        "command": "uvx --from ai-zettelkasten zk-extract"
       }
     ],
-    "PreToolCall": [
+    "PreToolUse": [
       {
         "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uvx --from ai-zettelkasten zk-suggest"
-          }
-        ]
+        "type": "command",
+        "command": "uvx --from ai-zettelkasten zk-suggest"
       }
     ]
   }

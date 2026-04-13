@@ -23,6 +23,46 @@
       "name": "semantic-search",
       "source": "./plugins/semantic-search",
       "description": "Semantic search over Obsidian Zettelkasten notes using LanceDB and sentence-transformers for local embeddings."
+    },
+    {
+      "name": "dev",
+      "source": "./plugins/dev",
+      "description": "Development workflow tools - README generation, code review, and more"
+    },
+    {
+      "name": "iterm-job-controller",
+      "source": "./plugins/iterm-job-controller",
+      "description": "iTerm2 terminal job dispatcher and session controller - manages terminal sessions, dispatches jobs, and monitors their progress"
+    },
+    {
+      "name": "iterm-utils",
+      "source": "./plugins/iterm-utils",
+      "description": "iTerm2 utilities for Claude Code - pane and session management"
+    },
+    {
+      "name": "md-to-pdf",
+      "source": "./plugins/md-to-pdf",
+      "description": "Convert markdown directories to PDF with Mermaid diagram rendering"
+    },
+    {
+      "name": "obsidian-memory",
+      "source": "./plugins/obsidian-memory",
+      "description": "Persistent memory system using Obsidian vault. Teaches Claude when/how to use Obsidian for storing decisions, learnings, workflow facts, and retrieving context."
+    },
+    {
+      "name": "pr-monitor",
+      "source": "./plugins/pr-monitor",
+      "description": "Automated PR monitoring with Stop hook that auto-resumes Claude Code when new commits are detected"
+    },
+    {
+      "name": "session-mining",
+      "source": "./plugins/session-mining",
+      "description": "Mine Claude Code sessions for knowledge extraction. Process session history to identify learnings, patterns, and improvement opportunities."
+    },
+    {
+      "name": "zettelkasten",
+      "source": "./plugins/zettelkasten",
+      "description": "AI-powered Zettelkasten knowledge management with local ChromaDB vector search. Supports notes, tasks, bookmarks with Luhmann-style IDs and automatic connection discovery."
     }
   ]
 }

@@ -10,6 +10,7 @@
     "lint:md:fix": "npx markdownlint '**/*.md' --ignore node_modules --fix",
     "format": "npx prettier --write '**/*.{md,json,yml,yaml}' --ignore-path .gitignore",
     "format:check": "npx prettier --check '**/*.{md,json,yml,yaml}' --ignore-path .gitignore",
+    "validate": "bash scripts/validate.sh",
     "prepare": "husky"
   },
   "devDependencies": {
