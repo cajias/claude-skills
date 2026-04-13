@@ -1,0 +1,3 @@
+# teaching-compare-llm-signal-p
+
+Learned from user correction: Teaching: compare llm signal performance against simple baselines (random, momentum, mean-reversion) to detect overfitting | --- ### 3 | Correction: User wants 'seen' instead of 'have' | Avoid: 'happened - incorrect causal reasoning about market movements - hallucinated case citations (already documented in legal contexts -- sec chair gensler explicitly cited this risk in his feb 2024 yale law school speech) sec chair gensler stated directly: \*"if an ai model can hallucinate a bad case citation' | Expected behavior: 'be calibrated against actual accuracy (track hit rate) - reasoning field enables human review and audit trail ### 2'

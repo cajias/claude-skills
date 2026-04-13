@@ -1,0 +1,3 @@
+# teaching-the-conflict-entirel
+
+Learned from user correction: Teaching: the conflict entirely\n\nwhat's your preference?" } ], "stop_reason": "end_turn", "stop_sequence": null, "usage": { "input_tokens": 3, "cache_creation_input_tokens": 499, "cache_read_input_tokens": 138500, "output_tokens": 73, "server_tool_use": { "web_search_requests": 0, "web_fetch_requests": 0 }, "service_tier": "standard", "cache_creation": { "ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 499 }, "inference_geo": "", "iterations": [], "speed": "standard" } }, "type": "assistant", "uuid": "5c35ea50-4720-4e23-aa28-12483d2c80db", "timestamp": "2026-04-01t12:12:51 | Correction: User wants 'stop' instead of 'yet performed' | User need: 'to' | Expected behavior: 'i also'

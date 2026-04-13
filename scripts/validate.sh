@@ -178,6 +178,11 @@ for dir in "$REPO_ROOT"/skills/*/; do
     continue
   fi
 
+  # Check for README.md (required by CI)
+  if [[ ! -f "$dir/README.md" ]]; then
+    error "skills/$name — missing README.md (required by CI)"
+  fi
+
   # Check file is not empty
   if [[ ! -s "$skill_file" ]]; then
     error "skills/$name — SKILL.md is empty"

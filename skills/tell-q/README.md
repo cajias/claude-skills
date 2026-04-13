@@ -1,3 +1,3 @@
 # tell-q
 
-.
+Use when:

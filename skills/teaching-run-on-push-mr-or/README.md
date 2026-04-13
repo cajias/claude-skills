@@ -1,0 +1,3 @@
+# teaching-run-on-push-mr-or
+
+Learned from user correction: Teaching: run on push, mr, or scheduled pipelines | Correction: User wants 'the template' instead of 'visible in' | User wants instead: 'gitlab api for assigned issues - `trigger_source` -- must equal `agent-mr-webhook` for the omega workflow to accept the trigger</result> <usage><total_tokens>44936</total_tokens><tool_uses>13</tool_uses><duration_ms>283827</duration_ms></usage> </task-notification> full transcript available at: /private/tmp/claude-504/-users-cajias-projects-omega-worktree-agent-mr-670/29396e38-0825-4ee3-956a-45c83e734659/tasks/a75388856a7629a33' | Avoid: 'run on push'
