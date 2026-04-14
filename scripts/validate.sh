@@ -89,8 +89,8 @@ fi
 
 section "Hook Definitions"
 
-for hooks_file in $(find "$REPO_ROOT/plugins" -name "hooks.json" -not -path "*/node_modules/*"); do
-  rel="${hooks_file#$REPO_ROOT/}"
+while IFS= read -r -d '' hooks_file; do
+  rel="${hooks_file#"$REPO_ROOT"/}"
 
   if ! jq empty "$hooks_file" 2>/dev/null; then
     error "$rel — invalid JSON"
@@ -108,18 +108,18 @@ for hooks_file in $(find "$REPO_ROOT/plugins" -name "hooks.json" -not -path "*/n
   else
     pass "$rel"
   fi
-done
+done < <(find "$REPO_ROOT/plugins" -name "hooks.json" -not -path "*/node_modules/*" -print0)
 
 # Also check for hooks defined inline in plugin.json
-for manifest in $(find "$REPO_ROOT/plugins" -path "*/.claude-plugin/plugin.json"); do
-  rel="${manifest#$REPO_ROOT/}"
+while IFS= read -r -d '' manifest; do
+  rel="${manifest#"$REPO_ROOT"/}"
   has_hooks=$(jq 'has("hooks")' "$manifest" 2>/dev/null)
   if [[ "$has_hooks" == "true" ]]; then
     # Validate each hook entry has required fields
     hook_count=$(jq '.hooks | length' "$manifest")
     pass "$rel — $hook_count inline hook(s)"
   fi
-done
+done < <(find "$REPO_ROOT/plugins" -path "*/.claude-plugin/plugin.json" -print0)
 
 # ─── 4. Agent Frontmatter ─────────────────────────────────────────
 
