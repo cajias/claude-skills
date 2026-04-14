@@ -1,3 +1,3 @@
 # ai-writing-analyzer
 
-Detect AI writing patterns in text.
+Detect AI writing patterns in text. Use when:

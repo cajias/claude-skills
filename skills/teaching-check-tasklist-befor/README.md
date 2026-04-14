@@ -1,0 +1,3 @@
+# teaching-check-tasklist-befor
+
+Learned from user correction: Teaching: check tasklist before assigning to see current state\n- when requesting new agents from team-lead, specify: the task ids to assign, the agent type needed, and a suggested name\n- keep the team-lead informed of major status changes", "teammate_id": "coordinator@srm-review", "agent_id": "coordinator@srm-review", "model": "us | Correction: User wants 'stop' instead of 'yet performed' | User need: 'to' | Avoid: 'assign fix/implementation tasks to it\n- always check tasklist before assigning to see current state\n- when requesting new agents from team-lead' | Expected behavior: 'i also'

@@ -1,0 +1,3 @@
+# correction-user-wants-steal
+
+Learned from user correction: Correction: User wants 'steal their' instead of 'adopting wholesale' | User wants instead: 'pm-live from scratch** - **current hld:** building pm-live to wrap polymarket's three apis (gamma' | Avoid: 'reimplement. either: - use caiovicentino's server directly and build only pm-engine and pm-forecast on top - use it as reference documentation for what tools practitioners actually need - use it for pm-live but build pm-data independently (historical data access is different from live apis) #### nice-to-have (lower priority) **d' | Expected behavior: 'do (quality & sota alignment) 4'

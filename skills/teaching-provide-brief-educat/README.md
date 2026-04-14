@@ -1,0 +1,3 @@
+# teaching-provide-brief-educat
+
+Learned from user correction: Teaching: provide brief educational explanations about implementation choices using (with backticks):\n\"`★ insight ─────────────────────────────────────`\n[2-3 key educational points]\n`─────────────────────────────────────────────────`\"\n\nthese insights should be included in the conversation, not in the codebase | Correction: User wants 'for commands' instead of 'use bash' | User need: 'more context first\" | skill check comes before clarifying questions' | User wants instead: 'everything yourself' | Avoid: 'use bash for commands producing >20 lines of output' | Expected behavior: 'provide educational insights about the codebase as you help with the user's task'
