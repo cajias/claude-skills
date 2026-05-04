@@ -1,0 +1,46 @@
+name: claude-skills
+version: 0.1.0
+description: APM marketplace for Claude Code plugins and OpenProse programs
+author: Raul Cajias
+
+marketplace:
+  owner:
+    name: cajias
+    url: https://cajias.io
+  metadata:
+    homepage: https://github.com/cajias/claude-skills
+    pluginRoot: ./plugins
+  build:
+    tagPattern: "{name}-v{version}"
+  packages:
+    - name: ai-zettelkasten
+      source: ./plugins/ai-zettelkasten
+      version: 0.1.0
+      description: >-
+        Automatic knowledge extraction from Claude sessions using
+        Stop hooks. Captures facts, decisions, patterns to Obsidian
+        and S3 Vectors.
+      tags: [knowledge-management, hooks]
+    - name: claudeception
+      source: ./plugins/claudeception
+      version: 0.1.0
+      description: >-
+        Extracts reusable skills from Claude Code sessions at session
+        end. Analyzes for non-obvious discoveries and creates SKILL.md
+        files.
+      tags: [skills, learning]
+    - name: isengardcli-aws-auth
+      source: ./plugins/isengardcli-aws-auth
+      version: 0.1.0
+      description: >-
+        Enforces AWS authentication via isengardcli. Blocks direct
+        aws/cdk/deploy commands. Uses environment variables (DEV,
+        GAMMA, PROD) with color-coded warnings.
+      tags: [aws, authentication, hooks]
+    - name: semantic-search
+      source: ./plugins/semantic-search
+      version: 0.1.0
+      description: >-
+        Semantic search over Obsidian Zettelkasten notes using
+        LanceDB and sentence-transformers for local embeddings.
+      tags: [search, embeddings, obsidian]
