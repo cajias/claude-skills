@@ -17,7 +17,7 @@
         "knowledge-management",
         "hooks"
       ],
-      "source": "./plugins/ai-zettelkasten"
+      "source": "./ai-zettelkasten"
     },
     {
       "name": "claudeception",
@@ -27,7 +27,7 @@
         "skills",
         "learning"
       ],
-      "source": "./plugins/claudeception"
+      "source": "./claudeception"
     },
     {
       "name": "dev",
@@ -37,7 +37,7 @@
         "dev-tools",
         "workflow"
       ],
-      "source": "./plugins/dev"
+      "source": "./dev"
     },
     {
       "name": "isengardcli-aws-auth",
@@ -48,7 +48,7 @@
         "authentication",
         "hooks"
       ],
-      "source": "./plugins/isengardcli-aws-auth"
+      "source": "./isengardcli-aws-auth"
     },
     {
       "name": "iterm-job-controller",
@@ -59,7 +59,7 @@
         "terminal",
         "jobs"
       ],
-      "source": "./plugins/iterm-job-controller"
+      "source": "./iterm-job-controller"
     },
     {
       "name": "iterm-utils",
@@ -69,7 +69,7 @@
         "iterm",
         "terminal"
       ],
-      "source": "./plugins/iterm-utils"
+      "source": "./iterm-utils"
     },
     {
       "name": "md-to-pdf",
@@ -80,7 +80,7 @@
         "pdf",
         "markdown"
       ],
-      "source": "./plugins/md-to-pdf"
+      "source": "./md-to-pdf"
     },
     {
       "name": "obsidian-memory",
@@ -91,7 +91,7 @@
         "memory",
         "knowledge-management"
       ],
-      "source": "./plugins/obsidian-memory"
+      "source": "./obsidian-memory"
     },
     {
       "name": "pr-monitor",
@@ -102,7 +102,7 @@
         "hooks",
         "monitoring"
       ],
-      "source": "./plugins/pr-monitor"
+      "source": "./pr-monitor"
     },
     {
       "name": "semantic-search",
@@ -113,7 +113,7 @@
         "embeddings",
         "obsidian"
       ],
-      "source": "./plugins/semantic-search"
+      "source": "./semantic-search"
     },
     {
       "name": "session-mining",
@@ -123,7 +123,7 @@
         "sessions",
         "knowledge-management"
       ],
-      "source": "./plugins/session-mining"
+      "source": "./session-mining"
     },
     {
       "name": "zettelkasten",
@@ -134,7 +134,7 @@
         "knowledge-management",
         "search"
       ],
-      "source": "./plugins/zettelkasten"
+      "source": "./zettelkasten"
     }
   ]
 }
