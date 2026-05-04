@@ -158,7 +158,7 @@ marketplace:
     pluginRoot: ./plugins
   build:
     tagPattern: "{name}-v{version}"
-  plugins:
+  packages:
     - name: ai-zettelkasten
       source: ./plugins/ai-zettelkasten
       version: 0.1.0
@@ -218,6 +218,108 @@ git commit -m "chore: add apm.yml marketplace manifest"
 ```
 
 No `marketplace.json` change yet — that comes in Task 3.
+
+---
+
+## Task 2.5: Update `scripts/validate.sh` for hidden plugins
+
+**Discovered during implementation:** the repo's pre-commit validator
+(run via `npm run validate` → `scripts/validate.sh`, invoked by
+`.husky/pre-commit`) errors when a plugin directory exists on disk
+but is not listed in `marketplace.json`. The spec's hidden-plugin
+model means 9 plugin directories will exist on disk without a
+marketplace entry, so this check must be relaxed before Task 3 can
+commit `marketplace.json` cleanly.
+
+**Files:**
+
+- Modify: `scripts/validate.sh`
+
+- [ ] **Step 1: Remove the strict "missing from marketplace" error**
+
+In `scripts/validate.sh`, remove the block that errors when a plugin
+directory has no marketplace entry. Keep the orphan check (a plugin
+listed in marketplace.json but absent from disk).
+
+Find this block (around lines 67-73):
+
+```bash
+  # Find plugins in directory but not in marketplace
+  missing_from_marketplace=$(comm -23 <(echo "$actual_names") <(echo "$marketplace_names"))
+  if [[ -n "$missing_from_marketplace" ]]; then
+    while IFS= read -r name; do
+      error "plugins/$name — exists on disk but missing from marketplace.json"
+    done <<< "$missing_from_marketplace"
+  fi
+```
+
+Replace with:
+
+```bash
+  # Plugins on disk that are NOT in marketplace.json are intentional
+  # (hidden / WIP / private). The marketplace publishes a curated
+  # subset of plugins/ — see apm.yml for the source of truth.
+  hidden_count=$(comm -23 <(echo "$actual_names") <(echo "$marketplace_names") | grep -c . || true)
+```
+
+Keep the orphan-in-marketplace check intact (the block right below
+the one you just replaced — it warns when `marketplace.json` lists a
+plugin that has no directory).
+
+Update the success message (around line 84) to mention hidden count:
+
+Find:
+
+```bash
+  if [[ -z "$missing_from_marketplace" && -z "$orphaned_in_marketplace" ]]; then
+    pass "marketplace.json in sync with plugins/ ($(echo "$actual_names" | wc -l | tr -d ' ') plugins)"
+  fi
+```
+
+Replace with:
+
+```bash
+  if [[ -z "$orphaned_in_marketplace" ]]; then
+    actual_count=$(echo "$actual_names" | wc -l | tr -d ' ')
+    published_count=$(echo "$marketplace_names" | wc -l | tr -d ' ')
+    pass "marketplace.json: $published_count published, $hidden_count hidden, $actual_count total on disk"
+  fi
+```
+
+- [ ] **Step 2: Run `npm run validate`**
+
+```bash
+cd /Users/rc/Projects/workspace/claude-skills
+npm run validate
+```
+
+Expected: the previous `ERROR: plugins/<name> — exists on disk but
+missing from marketplace.json` lines are gone. The script may still
+exit nonzero for the OTHER pre-existing issues (e.g. skills missing
+YAML frontmatter, agents missing `model` fields) — those are not in
+scope for this plan. If exit code is nonzero strictly because of
+those pre-existing warnings, capture them in the summary but proceed.
+If new errors appear, stop and investigate.
+
+If the only remaining errors are pre-existing issues, that's fine:
+this plan does not commit to fixing every pre-existing repo issue
+discovered. We only commit to not making them worse.
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add scripts/validate.sh
+git commit -m "chore: validate.sh allows plugins on disk to be hidden from marketplace
+
+The marketplace.json published by apm pack is a curated subset of
+plugins/. Plugin directories not listed in marketplace.json are
+intentional (hidden / WIP / private). The script now reports them
+as 'hidden' rather than erroring."
+```
+
+If pre-commit hooks block the commit on a pre-existing issue
+(non-validate.sh related), that is a real issue this plan cannot
+fix in-scope; report DONE_WITH_CONCERNS.
 
 ---
 
@@ -282,16 +384,19 @@ diff /tmp/marketplace-baseline.json .claude-plugin/marketplace.json
 If the diff is unexpected, stop, capture the diff in a comment, and
 flag in the PR. Do not commit until resolved.
 
-- [ ] **Step 4: Run the full check (online)**
+- [ ] **Step 4: Run the full check**
 
 Run:
 
 ```bash
-apm marketplace check
+apm marketplace check --offline
 ```
 
 Expected exit code: 0. This validates schema + ensures local paths
-resolve.
+resolve. We use `--offline` because all entries are local-path; APM
+0.11.0 attempts `git ls-remote` on every entry by default and fails
+with exit 128 on local paths. `--offline` is the correct flag for a
+local-path-only marketplace.
 
 - [ ] **Step 5: Commit the regenerated file**
 
@@ -320,7 +425,7 @@ pack: ## regenerate .claude-plugin/marketplace.json from apm.yml
  apm pack
 
 check: ## validate apm.yml schema and plugin reachability
- apm marketplace check
+ apm marketplace check --offline
 
 outdated: ## report drift between resolved versions and upstream tags
  apm marketplace outdated
@@ -395,7 +500,7 @@ apm-marketplace:
       run: apm --version
 
     - name: Run apm marketplace check
-      run: apm marketplace check
+      run: apm marketplace check --offline
 
     - name: Verify marketplace.json is up-to-date
       run: |
@@ -657,7 +762,7 @@ jq -r '.plugins[] | "\(.name): \(.description)"' .claude-plugin/marketplace.json
 # expect: 4 lines, descriptions matching the pre-migration file
 
 # 3. apm marketplace check exits 0
-apm marketplace check && echo "OK"
+apm marketplace check --offline && echo "OK"
 # expect: OK
 
 # 4. CI workflow exists
