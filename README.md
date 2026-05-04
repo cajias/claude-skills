@@ -14,26 +14,30 @@ efficiently. Each skill contains:
 
 ## Installation
 
-### Via Homebrew (macOS/Linux)
+### Via APM (recommended)
+
+[APM](https://github.com/microsoft/apm) is the dependency manager for AI
+agents. Add this marketplace once, then install plugins by name:
 
 ```bash
-brew tap cajias/tools
-brew install claude-skills
+# one-time, per consumer repo
+apm marketplace add cajias/claude-skills
+
+# install a plugin
+apm install cajias/claude-skills/<plugin-name>
 ```
 
-After installation, skills and plugins will be available at:
-
-```bash
-$(brew --prefix)/share/claude-skills/skills/   # Skills
-$(brew --prefix)/share/claude-skills/plugins/  # Plugins
-```
+Available plugins are listed under [Available Plugins](#available-plugins)
+below.
 
 ### Manual Installation
 
-Clone this repository to access skills and plugins directly:
+Clone this repository to access plugins directly:
 
 ```bash
 git clone https://github.com/cajias/claude-skills.git
+claude plugin install \
+  https://github.com/cajias/claude-skills/tree/main/plugins/<plugin-name>
 ```
 
 ## Available Skills
