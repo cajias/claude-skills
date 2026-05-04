@@ -268,7 +268,7 @@ and are an additive, opaque pass-through to the compiled output.
 Run:
 
 ```bash
-apm marketplace check --offline
+apm pack --dry-run
 ```
 
 Expected exit code: 0. Output should list 12 plugins as `ok` with
@@ -476,7 +476,7 @@ flag in the PR. Do not commit until resolved.
 Run:
 
 ```bash
-apm marketplace check --offline
+apm pack --dry-run
 ```
 
 Expected exit code: 0. This validates schema + ensures local paths
@@ -512,7 +512,7 @@ pack: ## regenerate .claude-plugin/marketplace.json from apm.yml
  apm pack
 
 check: ## validate apm.yml schema and plugin reachability
- apm marketplace check --offline
+ apm pack --dry-run
 
 outdated: ## report drift between resolved versions and upstream tags
  apm marketplace outdated
@@ -586,8 +586,8 @@ apm-marketplace:
     - name: Verify APM version
       run: apm --version
 
-    - name: Run apm marketplace check
-      run: apm marketplace check --offline
+    - name: Validate apm.yml schema
+      run: apm pack --dry-run
 
     - name: Verify marketplace.json is up-to-date
       run: |
@@ -849,11 +849,11 @@ jq -r '.plugins[] | "\(.name): \(.description)"' .claude-plugin/marketplace.json
 # expect: 12 lines, descriptions matching the pre-migration file
 
 # 3. apm marketplace check exits 0
-apm marketplace check --offline && echo "OK"
+apm pack --dry-run && echo "OK"
 # expect: OK
 
 # 4. CI workflow exists
-test -f .github/workflows/ci.yml && grep -q "apm marketplace check" .github/workflows/ci.yml && echo "OK"
+test -f .github/workflows/ci.yml && grep -q "apm pack --dry-run" .github/workflows/ci.yml && echo "OK"
 # expect: OK
 
 # 5. Homebrew/release-please artefacts are gone

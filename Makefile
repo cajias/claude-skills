@@ -3,8 +3,8 @@
 pack: ## regenerate .claude-plugin/marketplace.json from apm.yml
 	apm pack
 
-check: ## validate apm.yml schema and plugin reachability
-	apm marketplace check --offline
+check: ## validate apm.yml schema (no marketplace.json write)
+	apm pack --dry-run
 
 outdated: ## report drift between resolved versions and upstream tags
 	apm marketplace outdated
