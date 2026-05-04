@@ -29,6 +29,13 @@ marketplace:
         end. Analyzes for non-obvious discoveries and creates SKILL.md
         files.
       tags: [skills, learning]
+    - name: dev
+      source: ./plugins/dev
+      version: 0.1.0
+      description: >-
+        Development workflow tools — README generation, code review,
+        and more.
+      tags: [dev-tools, workflow]
     - name: isengardcli-aws-auth
       source: ./plugins/isengardcli-aws-auth
       version: 0.1.0
@@ -37,6 +44,43 @@ marketplace:
         aws/cdk/deploy commands. Uses environment variables (DEV,
         GAMMA, PROD) with color-coded warnings.
       tags: [aws, authentication, hooks]
+    - name: iterm-job-controller
+      source: ./plugins/iterm-job-controller
+      version: 0.1.0
+      description: >-
+        iTerm2 terminal job dispatcher and session controller —
+        manages terminal sessions, dispatches jobs, and monitors
+        their progress.
+      tags: [iterm, terminal, jobs]
+    - name: iterm-utils
+      source: ./plugins/iterm-utils
+      version: 0.1.0
+      description: >-
+        iTerm2 utilities for Claude Code — pane and session
+        management.
+      tags: [iterm, terminal]
+    - name: md-to-pdf
+      source: ./plugins/md-to-pdf
+      version: 0.1.0
+      description: >-
+        Convert markdown directories to PDF with Mermaid diagram
+        rendering.
+      tags: [documents, pdf, markdown]
+    - name: obsidian-memory
+      source: ./plugins/obsidian-memory
+      version: 0.1.0
+      description: >-
+        Persistent memory system using Obsidian vault. Teaches Claude
+        when/how to use Obsidian for storing decisions, learnings,
+        workflow facts, and retrieving context.
+      tags: [obsidian, memory, knowledge-management]
+    - name: pr-monitor
+      source: ./plugins/pr-monitor
+      version: 0.1.0
+      description: >-
+        Automated PR monitoring with Stop hook that auto-resumes
+        Claude Code when new commits are detected.
+      tags: [github, hooks, monitoring]
     - name: semantic-search
       source: ./plugins/semantic-search
       version: 0.1.0
@@ -44,3 +88,19 @@ marketplace:
         Semantic search over Obsidian Zettelkasten notes using
         LanceDB and sentence-transformers for local embeddings.
       tags: [search, embeddings, obsidian]
+    - name: session-mining
+      source: ./plugins/session-mining
+      version: 0.1.0
+      description: >-
+        Mine Claude Code sessions for knowledge extraction. Process
+        session history to identify learnings, patterns, and
+        improvement opportunities.
+      tags: [sessions, knowledge-management]
+    - name: zettelkasten
+      source: ./plugins/zettelkasten
+      version: 0.1.0
+      description: >-
+        AI-powered Zettelkasten knowledge management with local
+        ChromaDB vector search. Supports notes, tasks, bookmarks
+        with Luhmann-style IDs and automatic connection discovery.
+      tags: [zettelkasten, knowledge-management, search]
