@@ -32,9 +32,11 @@ Re-read it before starting if you have not.
 **Repo state at planning time:**
 
 - `.claude-plugin/marketplace.json` exists, hand-authored, declares
-  marketplace `name: "personal-skills"` and 4 plugins:
-  `ai-zettelkasten`, `claudeception`, `isengardcli-aws-auth`,
-  `semantic-search`.
+  marketplace `name: "personal-skills"` and 12 plugins:
+  `ai-zettelkasten`, `claudeception`, `dev`, `isengardcli-aws-auth`,
+  `iterm-job-controller`, `iterm-utils`, `md-to-pdf`,
+  `obsidian-memory`, `pr-monitor`, `semantic-search`,
+  `session-mining`, `zettelkasten`.
 - `plugins/` contains 13 plugin directories (4 exposed, 9 hidden).
 - `.github/workflows/ci.yml` has a `lint` job (markdownlint).
 - `.github/workflows/release-please.yml` exists and is being retired.
@@ -141,7 +143,10 @@ No commit at the end of Task 1.
 
 - [ ] **Step 1: Write the marketplace manifest**
 
-Create `apm.yml` at the repo root with exactly this content:
+Create `apm.yml` at the repo root with exactly this content. It declares
+all 12 plugins currently published in the pre-migration
+`marketplace.json`. Migration goal is format change (hand-authored →
+APM-managed); no plugin is removed from publication.
 
 ```yaml
 name: claude-skills
@@ -175,6 +180,13 @@ marketplace:
         end. Analyzes for non-obvious discoveries and creates SKILL.md
         files.
       tags: [skills, learning]
+    - name: dev
+      source: ./plugins/dev
+      version: 0.1.0
+      description: >-
+        Development workflow tools — README generation, code review,
+        and more.
+      tags: [dev-tools, workflow]
     - name: isengardcli-aws-auth
       source: ./plugins/isengardcli-aws-auth
       version: 0.1.0
@@ -183,6 +195,43 @@ marketplace:
         aws/cdk/deploy commands. Uses environment variables (DEV,
         GAMMA, PROD) with color-coded warnings.
       tags: [aws, authentication, hooks]
+    - name: iterm-job-controller
+      source: ./plugins/iterm-job-controller
+      version: 0.1.0
+      description: >-
+        iTerm2 terminal job dispatcher and session controller —
+        manages terminal sessions, dispatches jobs, and monitors
+        their progress.
+      tags: [iterm, terminal, jobs]
+    - name: iterm-utils
+      source: ./plugins/iterm-utils
+      version: 0.1.0
+      description: >-
+        iTerm2 utilities for Claude Code — pane and session
+        management.
+      tags: [iterm, terminal]
+    - name: md-to-pdf
+      source: ./plugins/md-to-pdf
+      version: 0.1.0
+      description: >-
+        Convert markdown directories to PDF with Mermaid diagram
+        rendering.
+      tags: [documents, pdf, markdown]
+    - name: obsidian-memory
+      source: ./plugins/obsidian-memory
+      version: 0.1.0
+      description: >-
+        Persistent memory system using Obsidian vault. Teaches Claude
+        when/how to use Obsidian for storing decisions, learnings,
+        workflow facts, and retrieving context.
+      tags: [obsidian, memory, knowledge-management]
+    - name: pr-monitor
+      source: ./plugins/pr-monitor
+      version: 0.1.0
+      description: >-
+        Automated PR monitoring with Stop hook that auto-resumes
+        Claude Code when new commits are detected.
+      tags: [github, hooks, monitoring]
     - name: semantic-search
       source: ./plugins/semantic-search
       version: 0.1.0
@@ -190,12 +239,29 @@ marketplace:
         Semantic search over Obsidian Zettelkasten notes using
         LanceDB and sentence-transformers for local embeddings.
       tags: [search, embeddings, obsidian]
+    - name: session-mining
+      source: ./plugins/session-mining
+      version: 0.1.0
+      description: >-
+        Mine Claude Code sessions for knowledge extraction. Process
+        session history to identify learnings, patterns, and
+        improvement opportunities.
+      tags: [sessions, knowledge-management]
+    - name: zettelkasten
+      source: ./plugins/zettelkasten
+      version: 0.1.0
+      description: >-
+        AI-powered Zettelkasten knowledge management with local
+        ChromaDB vector search. Supports notes, tasks, bookmarks
+        with Luhmann-style IDs and automatic connection discovery.
+      tags: [zettelkasten, knowledge-management, search]
 ```
 
-Plugin descriptions are taken verbatim from the existing
+Plugin descriptions are taken verbatim from the pre-migration
 `marketplace.json` (line-wrapped via `>-` block scalars to keep them
 valid YAML; YAML collapses the wrapped lines back to single
-descriptions).
+descriptions). Tags are new — not present in the pre-migration file —
+and are an additive, opaque pass-through to the compiled output.
 
 - [ ] **Step 2: Validate the manifest schema**
 
@@ -205,7 +271,7 @@ Run:
 apm marketplace check --offline
 ```
 
-Expected exit code: 0. Output should list 4 plugins as `ok` with
+Expected exit code: 0. Output should list 12 plugins as `ok` with
 `local-path` markers. If any entry fails schema validation, fix the
 YAML and re-run. `--offline` skips network reachability for
 local-path entries (which is all of them in this phase).
@@ -327,7 +393,28 @@ fix in-scope; report DONE_WITH_CONCERNS.
 
 **Files:**
 
-- Modify: `.claude-plugin/marketplace.json` (regenerated)
+- Modify (if needed): `apm.yml` (extend `packages:` to all 12 if Task 2
+  was committed with a smaller subset).
+- Modify: `.claude-plugin/marketplace.json` (regenerated).
+
+**Step 0: Reconcile `apm.yml` with the publication scope**
+
+If `apm.yml`'s `marketplace.packages` list does NOT contain all 12
+plugin entries shown in Task 2 Step 1's manifest, extend it now to
+match. (Background: an earlier iteration of this plan listed only 4
+plugins under the assumption that the rest were "hidden"; the actual
+pre-migration `marketplace.json` on `main` publishes all 12. The
+migration is a format change, not a curation change.)
+
+If you have to extend `apm.yml`, commit it as a separate first commit:
+
+```bash
+git add apm.yml
+git commit -m "chore: expand apm.yml packages to all currently-published plugins"
+```
+
+Then proceed to Step 1. If `apm.yml` already has all 12 entries, skip
+this step.
 
 - [ ] **Step 1: Dry-run the build to preview**
 
@@ -337,7 +424,7 @@ Run:
 apm pack --dry-run
 ```
 
-Expected output: a resolution table listing the 4 plugins as
+Expected output: a resolution table listing 12 plugins as
 `local-path` with their resolved `source` paths. No file is written
 on dry-run. If the table is empty or shows errors, stop and read the
 output.
@@ -350,7 +437,7 @@ Run:
 apm pack
 ```
 
-Expected output ends with: `[+] Built marketplace.json (4 plugins)
+Expected output ends with: `[+] Built marketplace.json (12 plugins)
 -> .claude-plugin/marketplace.json`. The file at
 `.claude-plugin/marketplace.json` is rewritten.
 
@@ -741,7 +828,7 @@ npm run lint:md
 Expected:
 
 - `make check`: exit 0.
-- `make pack`: prints `[+] Built marketplace.json (4 plugins) ...`.
+- `make pack`: prints `[+] Built marketplace.json (12 plugins) ...`.
 - The `git diff --quiet` echoes `clean` (the file is unchanged
   because step 2 of Task 3 already committed the regenerated form).
 - `npm run lint:md`: exit 0.
@@ -753,13 +840,13 @@ If any of these fail, fix the underlying issue before opening the PR.
 Confirm each spec acceptance criterion. Print the result of each:
 
 ```bash
-# 1. apm pack generates marketplace.json with the 4 plugins
+# 1. apm pack generates marketplace.json with all 12 plugins
 apm pack && jq '.plugins | length' .claude-plugin/marketplace.json
-# expect: 4
+# expect: 12
 
 # 2. plugin entries match pre-migration descriptions
 jq -r '.plugins[] | "\(.name): \(.description)"' .claude-plugin/marketplace.json
-# expect: 4 lines, descriptions matching the pre-migration file
+# expect: 12 lines, descriptions matching the pre-migration file
 
 # 3. apm marketplace check exits 0
 apm marketplace check --offline && echo "OK"
