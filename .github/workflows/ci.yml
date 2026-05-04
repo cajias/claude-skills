@@ -52,6 +52,33 @@ jobs:
         run: npm run format:check
         continue-on-error: false
 
+  apm-marketplace:
+    name: APM marketplace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install APM CLI
+        run: |
+          curl -sSL https://aka.ms/apm-unix | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Verify APM version
+        run: apm --version
+
+      - name: Validate apm.yml schema
+        run: apm pack --dry-run
+
+      - name: Verify marketplace.json is up-to-date
+        run: |
+          apm pack
+          if ! git diff --quiet .claude-plugin/marketplace.json; then
+            echo "::error::marketplace.json is stale. Run 'apm pack' locally and commit the result."
+            git --no-pager diff .claude-plugin/marketplace.json
+            exit 1
+          fi
+
   test-semantic-search:
     name: Test semantic-search plugin
     runs-on: ubuntu-latest
