@@ -209,6 +209,25 @@ Three new prose-program plugins are added: `pr-review`, `tdd-cycle`,
 declares `openprose/prose` as a dep so `apm install` brings the VM
 along.
 
+#### Composition strategy
+
+Phase 2 builds on top of existing community skills, agents, and tools
+rather than authoring every service from scratch. Each prose service
+is a thin **adapter** that activates an upstream skill (from
+`obra/superpowers`) or agent (from `wshobson/agents`) and applies the
+OpenProse `Requires` / `Ensures` contract. Where the contract is
+unique to this repo (e.g. `type-review`, `comment-review`), services
+are authored locally from the existing `pr-review-toolkit` plugin.
+Tooling like the `code-review-graph` MCP server, Semgrep, and
+reviewdog attach as upstream context/findings sources for the
+LLM-based services.
+
+Full mapping (service ↔ upstream, license attribution, and tooling
+deps): see `~/.claude/plans/do-the-composable-prose-eager-pebble.md`.
+The Phase 2 implementation plan (written after Phase 1 lands) will
+materialize that mapping into the actual `apm.yml` deps and adapter
+service files.
+
 #### Composability principle
 
 Programs are built from small reusable **services**. A service is the
@@ -330,11 +349,23 @@ implementation):
 - Each specialist `Ensures`: a list of findings, each with
   `{severity, location, summary, suggestion}`.
 
-**Source skills** (Phase 2 lift):
-`plugins/pr-review-toolkit/skills/*/SKILL.md` if present, otherwise
-the existing `code-reviewer` / `silent-failure-hunter` /
-`pr-test-analyzer` / `type-design-analyzer` / `comment-analyzer` agent
-definitions. Each becomes a service in `programs/pr-review/`.
+**Source upstreams** (wrapped per the Composition strategy — see
+`~/.claude/plans/do-the-composable-prose-eager-pebble.md` for the
+full table):
+
+- `coordinator` — wraps `obra/superpowers` `requesting-code-review`.
+- `code-review` — wraps `wshobson/agents` `code-reviewer`.
+- `security-review` — wraps `wshobson/agents` `security-auditor` +
+  Semgrep CLI as upstream finding source.
+- `test-analysis` — wraps `wshobson/agents` `test-automator`.
+- `type-review` — local from this repo's
+  `plugins/pr-review-toolkit/skills/type-design-analyzer` (no good
+  external upstream).
+- `comment-review` — local from this repo's
+  `plugins/pr-review-toolkit/skills/comment-analyzer`.
+
+Optional MCP dep: `tirth8205/code-review-graph` for diff-aware graph
+context provisioning.
 
 **Reuse**: `code-review.md` and `test-analysis.md` are designed
 contract-first so that future programs (e.g. `tdd-cycle/refactor`,
@@ -385,8 +416,20 @@ swap-compatible when the cross-plugin mechanism lands.
 `### Invariants` in `index.md` — phase identity (RED/GREEN/REFACTOR)
 is recoverable from the workspace state, not session memory.
 
-**Source skills**: `skills/tdd-plan/`,
-`skills/tdd-context-compaction-resilience/`.
+**Source upstreams** (wrapped per the Composition strategy):
+
+- `index` (orchestrator) — wraps `wshobson/agents` `tdd-orchestrator`.
+- `planner` — wraps `obra/superpowers` `writing-plans`.
+- `red` / `green` / `refactor` — wrap `obra/superpowers`
+  `test-driven-development` (per phase). `red` falls back to
+  `obra/superpowers` `systematic-debugging` if the test isn't
+  failing as expected.
+- `code-review` (refactor gate) — local copy of
+  `pr-review/programs/pr-review/code-review.md` keeping contracts
+  byte-identical for future cross-plugin reuse.
+
+Resilience invariants (phase identity recoverable from workspace
+state) are encoded in `index.md` per the original spec.
 
 #### Program 3 — `feature-execution`
 
@@ -424,7 +467,18 @@ plugins/feature-execution/
 `pr-review/coordinator`. v0.1 ships both as local files; cross-plugin
 invocation is the future-evolution target.
 
-**Source skills**: `skills/hld-phase-executor/`.
+**Source upstreams** (wrapped per the Composition strategy):
+
+- `index` — wraps `obra/superpowers` `executing-plans`.
+- `architect` — wraps `wshobson/agents` `backend-architect` +
+  `obra/superpowers` `writing-plans`.
+- `implementer` — wraps `obra/superpowers`
+  `subagent-driven-development` (with adapted spec/code-quality
+  reviewer prompts).
+- `tester` — local copy of `pr-review/coordinator.md` aggregation
+  contract.
+- `verification` — wraps `obra/superpowers`
+  `verification-before-completion` (cross-cutting gate).
 
 #### Phase 2 acceptance
 
