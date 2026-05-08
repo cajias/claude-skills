@@ -1,68 +1,152 @@
 {
-  "name": "personal-skills",
+  "name": "claude-skills",
   "owner": {
-    "name": "cajias"
+    "name": "cajias",
+    "url": "https://cajias.io"
+  },
+  "metadata": {
+    "homepage": "https://github.com/cajias/claude-skills",
+    "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "ai-zettelkasten",
-      "source": "./plugins/ai-zettelkasten",
-      "description": "Automatic knowledge extraction from Claude sessions using Stop hooks. Captures facts, decisions, patterns to Obsidian and S3 Vectors."
+      "description": "Automatic knowledge extraction from Claude sessions using Stop hooks. Captures facts, decisions, patterns to Obsidian and S3 Vectors.",
+      "version": "0.1.0",
+      "tags": [
+        "knowledge-management",
+        "hooks"
+      ],
+      "source": "./ai-zettelkasten"
+    },
+    {
+      "name": "cc-plugin-authoring",
+      "description": "Hard-won gotchas from authoring Claude Code plugins and APM marketplaces. Bundles two reference skills: APM marketplace authoring gotchas (apm pack vs compile, pluginRoot rewrites, prettier conflicts) and the YAML parse trap on slash-command argument-hint values.",
+      "version": "0.1.0",
+      "tags": [
+        "claude-code",
+        "plugin-authoring",
+        "apm",
+        "gotchas"
+      ],
+      "source": "./cc-plugin-authoring"
     },
     {
       "name": "claudeception",
-      "source": "./plugins/claudeception",
-      "description": "Extracts reusable skills from Claude Code sessions at session end. Analyzes for non-obvious discoveries and creates SKILL.md files."
-    },
-    {
-      "name": "isengardcli-aws-auth",
-      "source": "./plugins/isengardcli-aws-auth",
-      "description": "Enforces AWS authentication via isengardcli. Blocks direct aws/cdk/deploy commands. Uses environment variables (DEV, GAMMA, PROD) with color-coded warnings."
-    },
-    {
-      "name": "semantic-search",
-      "source": "./plugins/semantic-search",
-      "description": "Semantic search over Obsidian Zettelkasten notes using LanceDB and sentence-transformers for local embeddings."
+      "description": "Extracts reusable skills from Claude Code sessions at session end. Analyzes for non-obvious discoveries and creates SKILL.md files.",
+      "version": "0.1.0",
+      "tags": [
+        "skills",
+        "learning"
+      ],
+      "source": "./claudeception"
     },
     {
       "name": "dev",
-      "source": "./plugins/dev",
-      "description": "Development workflow tools - README generation, code review, and more"
+      "description": "Development workflow tools — README generation, code review, and more.",
+      "version": "0.1.0",
+      "tags": [
+        "dev-tools",
+        "workflow"
+      ],
+      "source": "./dev"
+    },
+    {
+      "name": "isengardcli-aws-auth",
+      "description": "Enforces AWS authentication via isengardcli. Blocks direct aws/cdk/deploy commands. Uses environment variables (DEV, GAMMA, PROD) with color-coded warnings.",
+      "version": "0.1.0",
+      "tags": [
+        "aws",
+        "authentication",
+        "hooks"
+      ],
+      "source": "./isengardcli-aws-auth"
     },
     {
       "name": "iterm-job-controller",
-      "source": "./plugins/iterm-job-controller",
-      "description": "iTerm2 terminal job dispatcher and session controller - manages terminal sessions, dispatches jobs, and monitors their progress"
+      "description": "iTerm2 terminal job dispatcher and session controller — manages terminal sessions, dispatches jobs, and monitors their progress.",
+      "version": "0.1.0",
+      "tags": [
+        "iterm",
+        "terminal",
+        "jobs"
+      ],
+      "source": "./iterm-job-controller"
     },
     {
       "name": "iterm-utils",
-      "source": "./plugins/iterm-utils",
-      "description": "iTerm2 utilities for Claude Code - pane and session management"
+      "description": "iTerm2 utilities for Claude Code — pane and session management.",
+      "version": "0.1.0",
+      "tags": [
+        "iterm",
+        "terminal"
+      ],
+      "source": "./iterm-utils"
     },
     {
       "name": "md-to-pdf",
-      "source": "./plugins/md-to-pdf",
-      "description": "Convert markdown directories to PDF with Mermaid diagram rendering"
+      "description": "Convert markdown directories to PDF with Mermaid diagram rendering.",
+      "version": "0.1.0",
+      "tags": [
+        "documents",
+        "pdf",
+        "markdown"
+      ],
+      "source": "./md-to-pdf"
     },
     {
       "name": "obsidian-memory",
-      "source": "./plugins/obsidian-memory",
-      "description": "Persistent memory system using Obsidian vault. Teaches Claude when/how to use Obsidian for storing decisions, learnings, workflow facts, and retrieving context."
+      "description": "Persistent memory system using Obsidian vault. Teaches Claude when/how to use Obsidian for storing decisions, learnings, workflow facts, and retrieving context.",
+      "version": "0.1.0",
+      "tags": [
+        "obsidian",
+        "memory",
+        "knowledge-management"
+      ],
+      "source": "./obsidian-memory"
     },
     {
       "name": "pr-monitor",
-      "source": "./plugins/pr-monitor",
-      "description": "Automated PR monitoring with Stop hook that auto-resumes Claude Code when new commits are detected"
+      "description": "Automated PR monitoring with Stop hook that auto-resumes Claude Code when new commits are detected.",
+      "version": "0.1.0",
+      "tags": [
+        "github",
+        "hooks",
+        "monitoring"
+      ],
+      "source": "./pr-monitor"
+    },
+    {
+      "name": "semantic-search",
+      "description": "Semantic search over Obsidian Zettelkasten notes using LanceDB and sentence-transformers for local embeddings.",
+      "version": "0.1.0",
+      "tags": [
+        "search",
+        "embeddings",
+        "obsidian"
+      ],
+      "source": "./semantic-search"
     },
     {
       "name": "session-mining",
-      "source": "./plugins/session-mining",
-      "description": "Mine Claude Code sessions for knowledge extraction. Process session history to identify learnings, patterns, and improvement opportunities."
+      "description": "Mine Claude Code sessions for knowledge extraction. Process session history to identify learnings, patterns, and improvement opportunities.",
+      "version": "0.1.0",
+      "tags": [
+        "sessions",
+        "knowledge-management"
+      ],
+      "source": "./session-mining"
     },
     {
       "name": "zettelkasten",
-      "source": "./plugins/zettelkasten",
-      "description": "AI-powered Zettelkasten knowledge management with local ChromaDB vector search. Supports notes, tasks, bookmarks with Luhmann-style IDs and automatic connection discovery."
+      "description": "AI-powered Zettelkasten knowledge management with local ChromaDB vector search. Supports notes, tasks, bookmarks with Luhmann-style IDs and automatic connection discovery.",
+      "version": "0.1.0",
+      "tags": [
+        "zettelkasten",
+        "knowledge-management",
+        "search"
+      ],
+      "source": "./zettelkasten"
     }
   ]
 }

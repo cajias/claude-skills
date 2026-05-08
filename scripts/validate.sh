@@ -64,13 +64,10 @@ else
   done
   actual_names=$(echo "$actual_names" | sort | sed '/^$/d')
 
-  # Find plugins in directory but not in marketplace
-  missing_from_marketplace=$(comm -23 <(echo "$actual_names") <(echo "$marketplace_names"))
-  if [[ -n "$missing_from_marketplace" ]]; then
-    while IFS= read -r name; do
-      error "plugins/$name — exists on disk but missing from marketplace.json"
-    done <<< "$missing_from_marketplace"
-  fi
+  # Plugins on disk that are NOT in marketplace.json are intentional
+  # (hidden / WIP / private). The marketplace publishes a curated
+  # subset of plugins/ — see apm.yml for the source of truth.
+  hidden_count=$(comm -23 <(echo "$actual_names") <(echo "$marketplace_names") | grep -c . || true)
 
   # Find plugins in marketplace but not on disk
   orphaned_in_marketplace=$(comm -13 <(echo "$actual_names") <(echo "$marketplace_names"))
@@ -80,8 +77,10 @@ else
     done <<< "$orphaned_in_marketplace"
   fi
 
-  if [[ -z "$missing_from_marketplace" && -z "$orphaned_in_marketplace" ]]; then
-    pass "marketplace.json in sync with plugins/ ($(echo "$actual_names" | wc -l | tr -d ' ') plugins)"
+  if [[ -z "$orphaned_in_marketplace" ]]; then
+    actual_count=$(echo "$actual_names" | wc -l | tr -d ' ')
+    published_count=$(echo "$marketplace_names" | wc -l | tr -d ' ')
+    pass "marketplace.json: $published_count published, $hidden_count hidden, $actual_count total on disk"
   fi
 fi
 
