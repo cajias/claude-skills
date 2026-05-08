@@ -1,7 +1,7 @@
 ---
 name: apm-marketplace-authoring-gotchas
 description: |
-  Seven APM-marketplace-authoring gotchas discovered during real
+  Eight APM-marketplace-authoring gotchas discovered during real
   migrations from hand-authored .claude-plugin/marketplace.json to
   APM-managed and from CC-native plugin authoring.
   Use when: (1) running `apm pack`, `apm marketplace check`, or `apm pack
@@ -13,18 +13,20 @@ description: |
   vs `plugins:` in marketplace.json; (7) commitlint rejects a commit
   with `footer-leading-blank` despite no apparent footer; (8) `apm
   compile -t claude` exits 0 with zero output and no compiled plugin
-  appears. The gotchas form a chain — fixing one usually surfaces
-  the next.
+  appears; (9) husky+lint-staged pre-commit blocks the FIRST marketplace
+  commit with markdownlint `MD040/fenced-code-language` errors on a
+  SKILL.md file copied verbatim from `~/.claude/skills/`. The gotchas
+  form a chain — fixing one usually surfaces the next.
 author: Claude Code
-version: 1.1.0
-date: 2026-05-07
+version: 1.2.0
+date: 2026-05-08
 ---
 
 # APM Marketplace Authoring Gotchas
 
 A real migration from a hand-authored `.claude-plugin/marketplace.json`
 to an APM-managed marketplace took 18 commits and ~6 CI iterations
-because of five compounding behaviors. Each one looks like a
+because of eight compounding behaviors. Each one looks like a
 configuration mistake; each one is actually a tool quirk. Knowing
 them up front collapses the discovery cycle.
 
@@ -279,6 +281,64 @@ Concrete origin: building the `cajias/nautilus-competition`
 marketplace plugin (May 2026), which bundles existing
 hand-authored skills lifted from `~/.claude/skills/` rather than
 translating from APM primitives.
+
+### 8. husky+markdownlint blocks the FIRST commit of a SKILL.md copied from `~/.claude/skills/`
+
+When you author a skill at `~/.claude/skills/<name>/SKILL.md`, then
+copy it verbatim into an APM marketplace tree at
+`plugins/<plugin>/skills/<name>/SKILL.md` and try to commit, the
+marketplace repo's husky + lint-staged pre-commit (running
+`markdownlint --fix`) often rejects the file. The user's
+`~/.claude/skills/` directory has no such gate — the trap is silent
+until the FIRST marketplace commit.
+
+Symptom signature:
+
+````text
+✖ npx markdownlint --fix:
+plugins/<name>/skills/<name>/SKILL.md:NN MD040/fenced-code-language Fenced code blocks should have a language specified [Context: "```"]
+husky - pre-commit script failed (code 1)
+````
+
+The block in the SKILL.md looks like a perfectly normal example —
+example output, log dump, raw shell session, or commit-message
+snippet — but the bare ` ``` ` (no language tag) trips MD040.
+The `apm pack` step ran fine; the staleness check would have passed;
+the plugin tests pass. The only thing blocking the commit is
+markdownlint on the SKILL.md itself.
+
+**Fix:** in any SKILL.md destined for an APM marketplace, never use
+bare ` ``` ` — always tag the language. For example output, log
+dumps, raw shell sessions, or commit-message snippets that aren't a
+real language: use ` ```text `. For real languages, tag
+accurately (`yaml`, `json`, `python`, `bash`, `make`, etc.).
+
+**Workflow implication:** if you're using `claudeception` to extract a
+skill that you intend to vend through an APM marketplace, run a
+markdownlint pass against the new SKILL.md _before_ dropping it into
+`plugins/<plugin>/skills/<name>/`. That saves a pre-commit round-trip:
+
+```bash
+npx --yes markdownlint-cli ~/.claude/skills/<name>/SKILL.md
+```
+
+If MD040 fires, fix the bare fences before copying. After fixing,
+either re-extract via claudeception or just propagate the language
+tags into the source-of-truth at `~/.claude/skills/` so future copies
+inherit the fix.
+
+Note: husky also runs prettier on the same files, so the diff coming
+out of a failed-then-fixed pre-commit cycle will mix legitimate
+markdownlint fixes with prettier cosmetic noise (e.g. `*foo*` →
+`_foo_`). The marketplace copy will drift slightly from the
+`~/.claude/skills/` source even after a clean pre-commit — that's
+expected and not worth back-porting.
+
+Concrete origin: committing the `cc-plugin-authoring` plugin to
+`cajias/claude-skills` (May 2026). Three unlanguaged fences across two
+SKILL.md files (one in `apm-marketplace-authoring-gotchas`, one in
+`cc-slash-command-argument-hint-yaml`) blocked the first commit;
+tagging them as ` ```text ` passed.
 
 ## Verification
 
