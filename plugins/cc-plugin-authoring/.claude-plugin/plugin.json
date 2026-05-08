@@ -1,0 +1,16 @@
+{
+  "name": "cc-plugin-authoring",
+  "description": "Hard-won gotchas from authoring Claude Code plugins and APM marketplaces. Bundles two reference skills: APM marketplace authoring gotchas (apm pack vs compile, pluginRoot rewrites, prettier conflicts) and the YAML parse trap on slash-command argument-hint values.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin-authoring",
+    "apm",
+    "marketplace",
+    "gotchas",
+    "yaml"
+  ]
+}

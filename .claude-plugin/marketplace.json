@@ -20,6 +20,18 @@
       "source": "./ai-zettelkasten"
     },
     {
+      "name": "cc-plugin-authoring",
+      "description": "Hard-won gotchas from authoring Claude Code plugins and APM marketplaces. Bundles two reference skills: APM marketplace authoring gotchas (apm pack vs compile, pluginRoot rewrites, prettier conflicts) and the YAML parse trap on slash-command argument-hint values.",
+      "version": "0.1.0",
+      "tags": [
+        "claude-code",
+        "plugin-authoring",
+        "apm",
+        "gotchas"
+      ],
+      "source": "./cc-plugin-authoring"
+    },
+    {
       "name": "claudeception",
       "description": "Extracts reusable skills from Claude Code sessions at session end. Analyzes for non-obvious discoveries and creates SKILL.md files.",
       "version": "0.1.0",

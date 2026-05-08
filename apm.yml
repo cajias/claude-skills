@@ -21,6 +21,16 @@ marketplace:
         Stop hooks. Captures facts, decisions, patterns to Obsidian
         and S3 Vectors.
       tags: [knowledge-management, hooks]
+    - name: cc-plugin-authoring
+      source: ./plugins/cc-plugin-authoring
+      version: 0.1.0
+      description: >-
+        Hard-won gotchas from authoring Claude Code plugins and APM
+        marketplaces. Bundles two reference skills: APM marketplace
+        authoring gotchas (apm pack vs compile, pluginRoot rewrites,
+        prettier conflicts) and the YAML parse trap on slash-command
+        argument-hint values.
+      tags: [claude-code, plugin-authoring, apm, gotchas]
     - name: claudeception
       source: ./plugins/claudeception
       version: 0.1.0
