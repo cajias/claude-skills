@@ -1,4 +1,5 @@
 <!-- markdownlint-disable MD013 MD033 MD040 MD041 MD049 -->
+
 ```
  ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗    ███████╗██╗  ██╗██╗██╗     ██╗     ███████╗
 ██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝    ██╔════╝██║ ██╔╝██║██║     ██║     ██╔════╝
@@ -18,7 +19,7 @@
   <img src="https://img.shields.io/badge/Claude%20Code-plugin%20marketplace-C084FC?style=for-the-badge" alt="Claude Code marketplace">
 </p>
 
-**A curated [APM](https://github.com/microsoft/apm) marketplace of skills and plugins that expand what [Claude Code](https://docs.claude.com/en/docs/claude-code) can do.** It bundles standalone *skills* — reusable, multi-step prompts Claude invokes on the fly — alongside installable *plugins* that ship hooks, slash commands, and bundled skills for knowledge management, session mining, terminal control, and developer workflows. Install a plugin by name with `apm`, or drop a skill straight into a Claude Code project.
+**A curated [APM](https://github.com/microsoft/apm) marketplace of skills and plugins that expand what [Claude Code](https://docs.claude.com/en/docs/claude-code) can do.** It bundles standalone _skills_ — reusable, multi-step prompts Claude invokes on the fly — alongside installable _plugins_ that ship hooks, slash commands, and bundled skills for knowledge management, session mining, terminal control, and developer workflows. Install a plugin by name with `apm`, or drop a skill straight into a Claude Code project.
 
 <!-- markdownlint-disable MD033 -->
 <table>
