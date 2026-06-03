@@ -1,9 +1,14 @@
 <!-- markdownlint-disable MD033 MD041 -->
-<p align="center">
-  <img src="assets/banner.png" alt="claude-skills" width="100%">
-</p>
+```
+ ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗    ███████╗██╗  ██╗██╗██╗     ██╗     ███████╗
+██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝    ██╔════╝██║ ██╔╝██║██║     ██║     ██╔════╝
+██║     ██║     ███████║██║   ██║██║  ██║█████╗█████╗███████╗█████╔╝ ██║██║     ██║     ███████╗
+██║     ██║     ██╔══██║██║   ██║██║  ██║██╔══╝╚════╝╚════██║██╔═██╗ ██║██║     ██║     ╚════██║
+╚██████╗███████╗██║  ██║╚██████╔╝██████╔╝███████╗    ███████║██║  ██╗██║███████╗███████╗███████║
+ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝    ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝
+```
 
-# claude-skills
+<p align="center"><em>A collection of skills that expand Claude's capabilities</em></p>
 
 <p align="center">
   <img src="https://img.shields.io/github/languages/top/cajias/claude-skills?style=for-the-badge" alt="Language">
