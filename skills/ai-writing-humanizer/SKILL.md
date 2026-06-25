@@ -1,3 +1,14 @@
+---
+name: ai-writing-humanizer
+description: |
+  Review and rewrite text to eliminate AI writing patterns using an iterative loop-until-clean approach.
+  Analyzes against Wikipedia's "Signs of AI Writing" guidelines across 15 pattern categories.
+author: Raul
+version: 1.0.0
+tags: ["writing", "humanizer", "ai-detection", "editing"]
+level: user
+---
+
 # AI Writing Humanizer Skill
 
 ## Objective
