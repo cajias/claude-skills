@@ -5,8 +5,7 @@
     "url": "https://cajias.io"
   },
   "metadata": {
-    "homepage": "https://github.com/cajias/claude-skills",
-    "pluginRoot": "./plugins"
+    "homepage": "https://github.com/cajias/claude-skills"
   },
   "plugins": [
     {
@@ -17,7 +16,7 @@
         "knowledge-management",
         "hooks"
       ],
-      "source": "./ai-zettelkasten"
+      "source": "./plugins/ai-zettelkasten"
     },
     {
       "name": "cc-plugin-authoring",
@@ -29,7 +28,7 @@
         "apm",
         "gotchas"
       ],
-      "source": "./cc-plugin-authoring"
+      "source": "./plugins/cc-plugin-authoring"
     },
     {
       "name": "claudeception",
@@ -39,7 +38,7 @@
         "skills",
         "learning"
       ],
-      "source": "./claudeception"
+      "source": "./plugins/claudeception"
     },
     {
       "name": "dev",
@@ -49,7 +48,7 @@
         "dev-tools",
         "workflow"
       ],
-      "source": "./dev"
+      "source": "./plugins/dev"
     },
     {
       "name": "isengardcli-aws-auth",
@@ -60,7 +59,7 @@
         "authentication",
         "hooks"
       ],
-      "source": "./isengardcli-aws-auth"
+      "source": "./plugins/isengardcli-aws-auth"
     },
     {
       "name": "iterm-job-controller",
@@ -71,7 +70,7 @@
         "terminal",
         "jobs"
       ],
-      "source": "./iterm-job-controller"
+      "source": "./plugins/iterm-job-controller"
     },
     {
       "name": "iterm-utils",
@@ -81,7 +80,7 @@
         "iterm",
         "terminal"
       ],
-      "source": "./iterm-utils"
+      "source": "./plugins/iterm-utils"
     },
     {
       "name": "md-to-pdf",
@@ -92,7 +91,7 @@
         "pdf",
         "markdown"
       ],
-      "source": "./md-to-pdf"
+      "source": "./plugins/md-to-pdf"
     },
     {
       "name": "obsidian-memory",
@@ -103,7 +102,7 @@
         "memory",
         "knowledge-management"
       ],
-      "source": "./obsidian-memory"
+      "source": "./plugins/obsidian-memory"
     },
     {
       "name": "pr-monitor",
@@ -114,7 +113,7 @@
         "hooks",
         "monitoring"
       ],
-      "source": "./pr-monitor"
+      "source": "./plugins/pr-monitor"
     },
     {
       "name": "semantic-search",
@@ -125,7 +124,7 @@
         "embeddings",
         "obsidian"
       ],
-      "source": "./semantic-search"
+      "source": "./plugins/semantic-search"
     },
     {
       "name": "session-mining",
@@ -135,7 +134,7 @@
         "sessions",
         "knowledge-management"
       ],
-      "source": "./session-mining"
+      "source": "./plugins/session-mining"
     },
     {
       "name": "zettelkasten",
@@ -146,7 +145,7 @@
         "knowledge-management",
         "search"
       ],
-      "source": "./zettelkasten"
+      "source": "./plugins/zettelkasten"
     }
   ]
 }

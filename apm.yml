@@ -9,7 +9,6 @@ marketplace:
     url: https://cajias.io
   metadata:
     homepage: https://github.com/cajias/claude-skills
-    pluginRoot: ./plugins
   build:
     tagPattern: "{name}-v{version}"
   packages:
