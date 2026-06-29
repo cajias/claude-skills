@@ -63,6 +63,16 @@ cp -r plugins/<plugin-name> ~/.claude/plugins/
 | [`iterm-job-controller`](./plugins/iterm-job-controller/) | iTerm2 job dispatcher and session controller — dispatches jobs and monitors progress.        |
 | [`cc-plugin-authoring`](./plugins/cc-plugin-authoring/)   | Hard-won gotchas from authoring Claude Code plugins, with a reference skill.                 |
 
+## Featured skills
+
+A few of the standalone skills under [`skills/`](./skills/):
+
+- [`software-effort-estimation`](./skills/software-effort-estimation/) — codebase valuation and effort estimation across five independent models.
+- [`ai-writing-humanizer`](./skills/ai-writing-humanizer/) — rewrites AI-generated text into natural prose with iterative pattern detection.
+- [`github-issue-grooming`](./skills/github-issue-grooming/) — automates milestones, issue relationships, and label cleanup.
+- [`quip-document-writer`](./skills/quip-document-writer/) — transfers markdown to Quip with formatting validation.
+- [`tell-q-agent-router`](./skills/tell-q-agent-router/) — routes tasks to Amazon Q CLI agents with automatic agent selection.
+
 ## Usage
 
 Skills are invoked automatically by Claude when a task matches; plugins add hooks and slash commands once installed. Each skill directory under `skills/` is self-describing:
