@@ -1,3 +1,14 @@
+---
+name: q-chat-integration
+description: |
+  Enable Claude Code to delegate specific tasks to Amazon Q CLI agents running in the background
+  with full tool permissions. Use when bridging to Q's specialized integrations such as Quip,
+  ticketing systems, or diagram generation that Claude doesn't have direct access to.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # Q Chat Integration Skill
 
 ## Objective

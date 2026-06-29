@@ -25,14 +25,14 @@ When invoking this skill, provide:
 
 1. **Task description** (required): What you want to accomplish
 2. **Deploy command** (optional): e.g., `npm run deploy`
-3. **Integration test command** (optional): e.g., `isengardcli run --account X --role Admin -- npm run test:integration`
+3. **Integration test command** (optional): e.g., `npm run test:integration`
 
 ### Example Invocation
 
 ```bash
 /tdd-plan Implement user authentication with JWT tokens
   --deploy-cmd "npm run deploy"
-  --integration-cmd "isengardcli run --account 338428744595 --role Admin -- npm run test:integration"
+  --integration-cmd "npm run test:integration"
 ```
 
 ## Generated Plan Structure
@@ -241,7 +241,7 @@ For input: "Implement header forwarding in MCP multiplexer"
 - [ ] Build succeeds
 - [ ] Lint passes
 - [ ] Deploy succeeds: `npm run deploy`
-- [ ] Integration tests pass: `isengardcli run --account 338428744595 --role Admin -- npm run test:integration`
+- [ ] Integration tests pass: `npm run test:integration`
 - [ ] `/pr-review-toolkit:review-pr` finds no issues
 
 ## Investigation Tracker
@@ -277,7 +277,7 @@ For input: "Implement header forwarding in MCP multiplexer"
 1. `npm test`
 2. `npm run build && npm run lint`
 3. `npm run deploy`
-4. `isengardcli run --account 338428744595 --role Admin -- npm run test:integration`
+4. `npm run test:integration`
 5. `/pr-review-toolkit:review-pr`
 
 ### Phase 5: COMMIT

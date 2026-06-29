@@ -1,3 +1,14 @@
+---
+name: readme-generator
+description: |
+  Generate or improve README files through iterative analysis and refinement. Analyzes project
+  codebase, creates or enhances README content following best practices, evaluates quality, and
+  applies improvements until a quality threshold is met or maximum iterations reached.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # README Generator Skill
 
 ## Objective
