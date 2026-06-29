@@ -66,7 +66,7 @@ else
 
   # Plugins on disk that are NOT in marketplace.json are intentional
   # (hidden / WIP / private). The marketplace publishes a curated
-  # subset of plugins/ — see apm.yml for the source of truth.
+  # subset of plugins/ — marketplace.json is the source of truth for published plugins.
   hidden_count=$(comm -23 <(echo "$actual_names") <(echo "$marketplace_names") | grep -c . || true)
 
   # Find plugins in marketplace but not on disk

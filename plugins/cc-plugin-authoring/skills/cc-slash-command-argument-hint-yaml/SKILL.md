@@ -63,7 +63,7 @@ Any of these:
   fails with a YAML error instead of an `assert` failure.
 
 - The slash command was added to `plugins/<name>/commands/<cmd>.md` but
-  doesn't show up in Claude Code's `/help` after `apm install`.
+  doesn't show up in Claude Code's `/help` after installing the plugin.
 - The frontmatter on disk shows a value with multiple bracketed tokens:
 
   ```yaml

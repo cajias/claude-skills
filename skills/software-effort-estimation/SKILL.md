@@ -1,3 +1,15 @@
+---
+name: software-effort-estimation
+description: |
+  Generate comprehensive software effort estimation reports that analyze codebase complexity,
+  calculate traditional development effort across five estimation models, and quantify productivity
+  gains from LLM-assisted development. Use when estimating project cost, valuing a codebase, or
+  comparing AI-assisted vs traditional development effort.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # Software Effort Estimation & Codebase Valuation Skill
 
 ## Objective

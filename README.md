@@ -14,30 +14,17 @@ efficiently. Each skill contains:
 
 ## Installation
 
-### Via APM (recommended)
-
-[APM](https://github.com/microsoft/apm) is the dependency manager for AI
-agents. Add this marketplace once, then install plugins by name:
+Clone and symlink all plugins:
 
 ```bash
-# one-time, per consumer repo
-apm marketplace add cajias/claude-skills
-
-# install a plugin
-apm install cajias/claude-skills/<plugin-name>
+git clone https://github.com/cajias/claude-skills
+cd claude-skills && make install
 ```
 
-Available plugins are listed under [Available Plugins](#available-plugins)
-below.
-
-### Manual Installation
-
-Clone this repository to access plugins directly:
+Or install one plugin:
 
 ```bash
-git clone https://github.com/cajias/claude-skills.git
-claude plugin install \
-  https://github.com/cajias/claude-skills/tree/main/plugins/<plugin-name>
+cp -r plugins/<name> ~/.claude/plugins/
 ```
 
 ## Available Skills
@@ -153,8 +140,7 @@ contains:
 **Installation:**
 
 ```bash
-claude plugin install \
-  https://github.com/cajias/claude-skills/tree/main/plugins/PLUGIN_NAME
+cp -r plugins/PLUGIN_NAME ~/.claude/plugins/
 ```
 
 ## Contributing

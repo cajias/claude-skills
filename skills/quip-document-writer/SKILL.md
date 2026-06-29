@@ -1,3 +1,14 @@
+---
+name: quip-document-writer
+description: |
+  Transfer markdown documents to Quip with proper formatting validation, handling common issues
+  with lists, tables, and diagrams that occur during bulk uploads. Use when writing or syncing
+  markdown content to Quip documents with section-by-section transfer for reliability.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # Quip Document Writer Skill
 
 ## Objective

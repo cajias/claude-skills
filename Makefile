@@ -1,14 +1,14 @@
-.PHONY: pack check outdated help
+.PHONY: validate install test-skills help
 
-pack: ## regenerate .claude-plugin/marketplace.json from apm.yml
-	apm pack
+validate: ## validate plugin structure and marketplace sync
+	bash scripts/validate.sh
 
-check: ## validate apm.yml schema (no marketplace.json write)
-	apm pack --dry-run
+install: ## symlink all plugins to ~/.claude/plugins/
+	mkdir -p ~/.claude/plugins
+	for dir in plugins/*/; do name=$$(basename "$$dir"); ln -sf "$$(pwd)/$$dir" ~/.claude/plugins/"$$name"; echo "  linked $$name"; done
 
-outdated: ## report drift between resolved versions and upstream tags
-	apm marketplace outdated
+test-skills: ## run skill eval harness for all plugins
+	bash scripts/test-skills.sh
 
 help: ## show available targets
-	@grep -E '^[a-zA-Z_-]+:.*?##' $(MAKEFILE_LIST) \
-	  | awk -F':.*?## ' '{printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	grep -E "^[a-zA-Z_-]+:.*?##" $(MAKEFILE_LIST) | awk -F":.*?## " '{printf "  %-15s %s\n", $$1, $$2}'

@@ -1,3 +1,14 @@
+---
+name: tell-q-agent-router
+description: |
+  Intelligently route tasks to the most appropriate Amazon Q CLI agent based on task type, with
+  support for explicit agent selection and special workflow patterns. Use when delegating tasks
+  to Q agents or triggering the quip-upload workflow for file uploads to Quip.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # Tell Q Agent Router Skill
 
 ## Objective

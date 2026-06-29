@@ -30,3 +30,6 @@ coverage/
 
 # User-specific Claude Code hooks (not plugin hooks)
 /hooks/
+
+# Claude Code session-local worktrees
+.claude/worktrees/

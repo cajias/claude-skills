@@ -1,3 +1,14 @@
+---
+name: github-issue-grooming
+description: |
+  Organize GitHub repository issues with proper milestones, native relationships, and clean
+  labeling structure. Use when grooming issues, setting up milestones, establishing dependencies,
+  or cleaning up issue tracking in a GitHub repository.
+author: Claude Code
+version: 1.0.0
+date: 2026-06-25
+---
+
 # GitHub Issue Grooming Skill
 
 ## Objective
