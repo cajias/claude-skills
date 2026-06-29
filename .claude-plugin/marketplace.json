@@ -30,13 +30,6 @@
       "source": "./plugins/dev"
     },
     {
-      "name": "isengardcli-aws-auth",
-      "description": "Enforces AWS authentication via isengardcli. Blocks direct aws/cdk/deploy commands. Uses environment variables (DEV, GAMMA, PROD) with color-coded warnings.",
-      "version": "0.1.0",
-      "tags": ["aws", "authentication", "hooks"],
-      "source": "./plugins/isengardcli-aws-auth"
-    },
-    {
       "name": "iterm-job-controller",
       "description": "iTerm2 terminal job dispatcher and session controller — manages terminal sessions, dispatches jobs, and monitors their progress.",
       "version": "0.1.0",
