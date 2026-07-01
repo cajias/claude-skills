@@ -17,6 +17,9 @@ Thumbs.db
 # Node modules (if adding JavaScript tools)
 node_modules/
 
+# Node.js V8 compile cache
+node-compile-cache/
+
 # Python (if adding Python tools)
 __pycache__/
 *.py[cod]
