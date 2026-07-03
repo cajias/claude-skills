@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "categories": [
     {
       "id": "inflated-symbolism",
@@ -1061,6 +1061,118 @@
         {
           "pattern": "could",
           "type": "word"
+        }
+      ]
+    },
+    {
+      "id": "conversational-hooks",
+      "name": "Conversational Hooks / Forced Sass",
+      "priority": "high",
+      "description": "Fake-conversational drama openers and 'hot take' framing LLMs use to manufacture tension",
+      "patterns": [
+        {
+          "pattern": "but here's the thing",
+          "type": "regex",
+          "replacements": ["but"]
+        },
+        {
+          "pattern": "but here's the truth",
+          "type": "regex",
+          "replacements": ["but"]
+        },
+        {
+          "pattern": "but here's what nobody's saying",
+          "type": "regex",
+          "replacements": ["but"]
+        },
+        {
+          "pattern": "here's the deal",
+          "type": "regex",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "here's why that matters",
+          "type": "regex",
+          "replacements": [],
+          "action": "delete"
+        },
+        { "pattern": "then I realized", "type": "phrase", "replacements": [] },
+        {
+          "pattern": "hot take",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "that's the real (unlock|challenge|question|problem)",
+          "type": "regex",
+          "replacements": []
+        },
+        {
+          "pattern": "No [A-Z][a-z]+\\. No [A-Z][a-z]+\\. Just",
+          "type": "regex",
+          "replacements": []
+        }
+      ]
+    },
+    {
+      "id": "ai-lexicon-2025",
+      "name": "AI Lexicon (2025 buzzwords & clichés)",
+      "priority": "high",
+      "description": "Buzzwords and cliché framings that surged in AI-assisted text (Helsinki 2025 study + field observation)",
+      "patterns": [
+        {
+          "pattern": "unlock",
+          "type": "phrase",
+          "replacements": ["enable", "allow"]
+        },
+        {
+          "pattern": "empower",
+          "type": "phrase",
+          "replacements": ["let", "help"]
+        },
+        {
+          "pattern": "elevate",
+          "type": "phrase",
+          "replacements": ["improve", "raise"]
+        },
+        {
+          "pattern": "foster",
+          "type": "phrase",
+          "replacements": ["build", "encourage"]
+        },
+        {
+          "pattern": "navigate the",
+          "type": "phrase",
+          "replacements": ["handle the", "work through the"]
+        },
+        {
+          "pattern": "grounded in",
+          "type": "phrase",
+          "replacements": ["based on"]
+        },
+        {
+          "pattern": "as the world continues to evolve",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "looming challenges",
+          "type": "phrase",
+          "replacements": ["challenges"]
+        },
+        {
+          "pattern": "no fluff",
+          "type": "phrase",
+          "replacements": [],
+          "action": "delete"
+        },
+        {
+          "pattern": "shouting into the void",
+          "type": "phrase",
+          "replacements": []
         }
       ]
     }
