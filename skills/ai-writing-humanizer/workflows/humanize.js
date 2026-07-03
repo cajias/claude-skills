@@ -1,9 +1,6 @@
 export const meta = {
   name: "humanize-writing",
-  description:
-    "Multi-agent AI-writing humanizer: analyze (3 lenses) " +
-    "-> revise -> adversarial review (4 lenses) -> " +
-    "loop-until-clean.",
+  description: "AI-writing humanizer: analyze, revise, adversarially review, loop.",
   phases: [{ title: "Analyze" }, { title: "Revise" }, { title: "Evaluate" }],
 };
 
