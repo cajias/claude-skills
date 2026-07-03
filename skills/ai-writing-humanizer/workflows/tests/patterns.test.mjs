@@ -17,8 +17,10 @@ test('has new conversational-hooks category with forced-sass phrases', () => {
   assert.ok(cat, 'conversational-hooks category exists')
   assert.equal(cat.priority, 'high')
   const joined = JSON.stringify(cat.patterns)
-  assert.match(joined, /here.?s the thing/i)
+  // literal, unaffected by the apostrophe-optional restoration
   assert.match(joined, /hot take/i)
+  // apostrophe-optional regex source ("'?") is restored verbatim on the hook phrases
+  assert.match(joined, /here'\?s the thing/i)
 })
 
 test('has new ai-lexicon-2025 category with 2025 buzzwords', () => {
@@ -30,6 +32,39 @@ test('has new ai-lexicon-2025 category with 2025 buzzwords', () => {
 })
 
 test('all existing category ids preserved (additive only)', () => {
-  for (const id of ['inflated-symbolism'])
+  const expectedIds = [
+    'inflated-symbolism',
+    'promotional-language',
+    'editorializing',
+    'transition-overuse',
+    'negative-parallelism',
+    'participle-endings',
+    'weasel-wording',
+    'em-dash-overuse',
+    'rule-of-three',
+    'formatting-patterns',
+    'buzzwords',
+    'filler-phrases',
+    'chatbot-artifacts',
+    'section-conclusions',
+    'hedge-words'
+  ]
+  for (const id of expectedIds)
     assert.ok(patterns.categories.some(c => c.id === id), `${id} still present`)
+})
+
+test('new categories use the type:phrase/word + regex:true convention, never type:"regex"', () => {
+  const newCatIds = ['conversational-hooks', 'ai-lexicon-2025']
+  for (const catId of newCatIds) {
+    const cat = patterns.categories.find(c => c.id === catId)
+    for (const p of cat.patterns) {
+      assert.notEqual(p.type, 'regex', `${catId}: "${p.pattern}" must not use type:"regex"`)
+      if (p.regex === true) {
+        assert.ok(
+          ['phrase', 'word', 'ending'].includes(p.type),
+          `${catId}: "${p.pattern}" has regex:true but an unexpected type "${p.type}"`
+        )
+      }
+    }
+  }
 })

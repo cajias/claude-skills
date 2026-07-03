@@ -1071,29 +1071,34 @@
       "description": "Fake-conversational drama openers and 'hot take' framing LLMs use to manufacture tension",
       "patterns": [
         {
-          "pattern": "but here's the thing",
-          "type": "regex",
+          "pattern": "but here'?s the thing",
+          "type": "phrase",
+          "regex": true,
           "replacements": ["but"]
         },
         {
-          "pattern": "but here's the truth",
-          "type": "regex",
+          "pattern": "but here'?s the truth",
+          "type": "phrase",
+          "regex": true,
           "replacements": ["but"]
         },
         {
-          "pattern": "but here's what nobody's saying",
-          "type": "regex",
+          "pattern": "but here'?s what nobody'?s saying",
+          "type": "phrase",
+          "regex": true,
           "replacements": ["but"]
         },
         {
-          "pattern": "here's the deal",
-          "type": "regex",
+          "pattern": "here'?s the deal",
+          "type": "phrase",
+          "regex": true,
           "replacements": [],
           "action": "delete"
         },
         {
-          "pattern": "here's why that matters",
-          "type": "regex",
+          "pattern": "here'?s why that matters",
+          "type": "phrase",
+          "regex": true,
           "replacements": [],
           "action": "delete"
         },
@@ -1105,13 +1110,15 @@
           "action": "delete"
         },
         {
-          "pattern": "that's the real (unlock|challenge|question|problem)",
-          "type": "regex",
+          "pattern": "that'?s the real (unlock|challenge|question|problem)",
+          "type": "phrase",
+          "regex": true,
           "replacements": []
         },
         {
           "pattern": "No [A-Z][a-z]+\\. No [A-Z][a-z]+\\. Just",
-          "type": "regex",
+          "type": "phrase",
+          "regex": true,
           "replacements": []
         }
       ]
@@ -1124,22 +1131,22 @@
       "patterns": [
         {
           "pattern": "unlock",
-          "type": "phrase",
+          "type": "word",
           "replacements": ["enable", "allow"]
         },
         {
           "pattern": "empower",
-          "type": "phrase",
+          "type": "word",
           "replacements": ["let", "help"]
         },
         {
           "pattern": "elevate",
-          "type": "phrase",
+          "type": "word",
           "replacements": ["improve", "raise"]
         },
         {
           "pattern": "foster",
-          "type": "phrase",
+          "type": "word",
           "replacements": ["build", "encourage"]
         },
         {
