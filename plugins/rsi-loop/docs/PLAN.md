@@ -235,6 +235,7 @@ can compose substantial existing pieces rather than build from scratch:
 
 | Component | Source | What we reuse |
 | --- | --- | --- |
+| **autoresearch** | [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) (MIT, 5.3k★, active) | Candidate **outer-loop chassis** — see §5.1. Its core loop (modify → mechanical verify → keep/discard, auto-revert, git-as-memory, TSV ledger, guard commands, plateau detection via `/autoresearch:evals`) is exactly the outer step's shape. Not usable as the inner agent. |
 | **Workflow tool** | Claude Code built-in | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts. |
 | **skill-creator** | Anthropic (official) | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally. |
 | **deep-research** | Claude Code built-in | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate). |
@@ -244,6 +245,43 @@ can compose substantial existing pieces rather than build from scratch:
 | **scripts/validate.sh, test-skills.sh, .claude/evals** | this repo | Structural gate every proposed generation must pass before spending eval budget. |
 | **DSPy / GEPA, OpenEvolve (AlphaEvolve OSS)** | Python libraries, not skills | Pattern reference only (evolutionary prompt/code optimization, keep-if-better + lineages). We replicate natively; no dependency. |
 
+### 5.1 `uditgoenka/autoresearch` evaluation
+
+A mature Claude Code skill implementing goal-directed optimization loops: modify → verify
+against a single mechanical metric → commit or auto-revert → repeat, with git history as
+memory, TSV iteration ledgers, must-pass guard commands, safety hooks, and an autonomous
+orchestrator mode (v2.2). Generalizes Karpathy's autoresearch framing beyond ML.
+
+**What it is not** (why it can't be our inner agent): it is a *single-level* hill-climb —
+one atomic change per iteration on a linear history. AIDE0 requires solution-**tree** search
+with parallel drafts and draft/debug/improve operators, a public/private score split (its
+metric is fully visible to the loop; the guard command is the only overfitting defense), a
+fixed cost budget as a first-class constraint, and a bi-level structure where the loop's own
+code is the thing being optimized. None of these exist there.
+
+**What it maps to precisely**: the AIDE² *outer* loop is itself "modify the inner agent's
+files → evaluate mechanically → keep iff better → repeat" — autoresearch's exact contract.
+Adoption sketch:
+
+- scope = the incumbent generation dir; one outer step = one autoresearch iteration
+- metric = aggregate private battery score, emitted by our **immutable** harness script (the
+  outer loop is allowed to see private scores — only inner agents are firewalled)
+- guard = structural validation (`validate.sh`-style) + the verifier's hack check, so hacked
+  wins fail the guard and auto-revert
+- its TSV ledger and plateau detection subsume parts of our `ledger.jsonl` + `/rsi:report`
+
+**Decision point (M2)**: prototype the outer step both ways — (a) depend on autoresearch as an
+installed plugin driving our harness scripts, vs. (b) native Workflow-script outer loop.
+Adopt (a) if its iteration contract accommodates multi-task private scoring + verifier gating
+without forking it; otherwise keep it as pattern/code reference (MIT permits lifting the
+revert/ledger/guard mechanics). Risks of (a): coupling our step semantics to its release
+cadence, and single-metric plumbing flattening the per-task score vector too early.
+
+**Naming collision**: our standalone inner-agent skill is also named `autoresearch`
+(namespaced `rsi-loop:autoresearch` vs. their top-level `autoresearch`). Claude Code
+disambiguates by plugin prefix, but if adoption lands in M2 we should rename ours (e.g.
+`aide-inner` or `tree-research`) to avoid trigger-description competition in the same session.
+
 ## 6. Milestones
 
 - **M0 — placeholder** (this commit): scaffold + this plan.
@@ -251,7 +289,9 @@ can compose substantial existing pieces rather than build from scratch:
   task with public/private scoring, private-dir deny hook, and the standalone `autoresearch`
   skill + `/rsi:autoresearch` command wrapping it. Exit: gen-000 solves the task end-to-end via
   `/rsi:autoresearch` under a token cap; private score computed outside the inner context.
-- **M2 — outer step**: proposer + selection + `ledger.jsonl`; `/rsi:init`, `/rsi:step`. Exit: 3
+- **M2 — outer step**: proposer + selection + `ledger.jsonl`; `/rsi:init`, `/rsi:step`.
+  Includes the §5.1 chassis decision: prototype the outer step on `uditgoenka/autoresearch`
+  vs. a native Workflow script, pick one, record the rationale here. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
 - **M3 — full protocol**: all 3 task families, verifier + <50% hack rule + outlier filter,
   `/rsi:run` with budget accounting. Exit: 10-step unattended run with sane ledger.

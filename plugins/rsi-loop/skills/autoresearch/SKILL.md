@@ -16,5 +16,10 @@ users automatically.
 
 Design details: [`docs/PLAN.md`](../../docs/PLAN.md), §3 "`autoresearch` as a standalone skill".
 
+Naming note: this is distinct from the third-party
+[uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) skill (a single-level
+metric hill-climb loop, evaluated in PLAN.md §5.1 as a candidate outer-loop chassis). If that
+plugin is adopted in M2, this skill will be renamed to avoid trigger collision.
+
 If invoked before implementation lands: explain that the plugin is in design phase and point the
 user to the plan.
