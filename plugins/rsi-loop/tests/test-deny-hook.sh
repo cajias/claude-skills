@@ -64,6 +64,35 @@ expect deny "Bash overwrite battery via tee" Bash \
   '{"command":"echo x | tee rsi-runs/r1/tasks/bp/public/instances.json"}'
 expect deny "Bash append to scorer" Bash \
   '{"command":"echo pwned >> rsi-runs/r1/tasks/bp/score.py"}'
+# ── Regression cases for the audit findings ──────────────────────────
+expect deny "Bash glob evasion priv*" Bash \
+  '{"command":"cat rsi-runs/r1/tasks/bp/priv*/instances.json"}'
+expect deny "Bash glob evasion priva*" Bash \
+  '{"command":"cat rsi-runs/r1/tasks/bp/priva*/instances.json"}'
+expect deny "Bash cwd-relative private instances" Bash \
+  '{"command":"cat private/instances.json"}'
+expect deny "Recursive Grep into plugin-source task root" Grep \
+  '{"pattern":"items","path":"/repo/plugins/rsi-loop/tasks/bin-packing"}'
+expect deny "Recursive Grep into run task root" Grep \
+  '{"pattern":"items","path":"/w/rsi-runs/r1/tasks/bp"}'
+expect deny "Glob recursing task tree" Glob \
+  '{"pattern":"**/*.json","path":"/repo/plugins/rsi-loop/tasks/bin-packing"}'
+expect deny "Bash append to plugin-source scorer (real battery)" Bash \
+  '{"command":"echo pwned >> plugins/rsi-loop/tasks/bin-packing/score.py"}'
+expect deny "Bash cp over plugin-source scorer" Bash \
+  '{"command":"cp evil.py plugins/rsi-loop/tasks/bin-packing/score.py"}'
+expect deny "Bash dd over scorer" Bash \
+  '{"command":"dd if=evil of=holdout-tasks/x/score.py"}'
+expect deny "Write plugin-source instances (real battery)" Write \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/public/instances.json","content":"[]"}'
+expect deny "Write plugin-source task.md" Write \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/task.md","content":"x"}'
+expect deny "Write sandbox scorer copy" Write \
+  '{"file_path":"/w/rsi-runs/r1/eval/gen-001/bp/sandbox/score.py","content":"print(1.0)"}'
+expect deny "Edit sandbox scorer copy" Edit \
+  '{"file_path":"/w/scratch/rsi-autoresearch/bp/sandbox/score.py","old_string":"a","new_string":"b"}'
+expect deny "MCP-style read tool into private" mcp__fs__read_file \
+  '{"path":"/w/rsi-runs/r1/tasks/bp/private/instances.json"}'
 
 # ── Legitimate calls that must be allowed ────────────────────────────
 expect allow "Read task.md" Read \
@@ -88,6 +117,14 @@ expect allow "Grep task.md in sandbox" Grep \
   '{"pattern":"capacity","path":"/w/rsi-runs/r1/work/g1-bp"}'
 expect allow "Edit generation prompt" Edit \
   '{"file_path":"/w/rsi-runs/r1/generations/gen-002/prompts/draft.md","old_string":"a","new_string":"b"}'
+expect allow "Grep the public subdir" Grep \
+  '{"pattern":"capacity","path":"/repo/plugins/rsi-loop/tasks/bin-packing/public"}'
+expect allow "Glob solutions in sandbox" Glob \
+  '{"pattern":"nodes/*/solution.py","path":"/w/rsi-runs/r1/eval/gen-001/bp/sandbox"}'
+expect allow "Read plugin-source task.md" Read \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/task.md"}'
+expect allow "Write solution inside sandbox nodes" Write \
+  '{"file_path":"/w/rsi-runs/r1/eval/gen-001/bp/sandbox/nodes/node-0/solution.py","content":"def pack..."}'
 
 # Disarm escape hatch for humans
 out="$(printf '{"tool_name":"Read","tool_input":{"file_path":"rsi-runs/r/tasks/t/private/x"}}' | RSI_HOOK_DISARM=1 python3 "$HOOK")"
@@ -95,6 +132,19 @@ if [[ -z "$out" ]]; then
   PASS=$((PASS + 1)); echo "  ok   allow    RSI_HOOK_DISARM=1 disarms"
 else
   FAIL=$((FAIL + 1)); echo "  FAIL RSI_HOOK_DISARM=1 did not disarm: $out"
+fi
+
+# The hook docstring promises the outer-loop escape-hatch prefix never appears
+# in a generation directory or inner-agent prompt (or an inner agent could
+# smuggle private access). Assert it over the baseline generation the proposer
+# copies from and its operator prompts.
+PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if grep -rl "RSI_OUTER_LOOP" "$PLUGIN_ROOT/baseline" >/dev/null 2>&1; then
+  FAIL=$((FAIL + 1))
+  echo "  FAIL outer-loop prefix leaked into baseline/ generation dir:"
+  grep -rn "RSI_OUTER_LOOP" "$PLUGIN_ROOT/baseline" | sed 's/^/        /'
+else
+  PASS=$((PASS + 1)); echo "  ok   guard    RSI_OUTER_LOOP absent from baseline/ generation"
 fi
 
 echo

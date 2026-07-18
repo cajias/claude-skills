@@ -38,7 +38,7 @@ experiment and proceed to M3. Do not launch any arm without the user's choice.
 - The Workflow runtime delivers `args` as a JSON **string** — every generation script starts
   with the parse-both-encodings line; keep it when proposers write new generations.
 - Workflow scripts: no `Date.now`/`Math.random` (seeded Lehmer RNG instead), `export const
-  meta = {...}` pure literal first, plain JS only.
+meta = {...}` pure literal first, plain JS only.
 - Private scoring only via `RSI_OUTER_LOOP=1 bash scripts/rsi-score.sh --private ...`
   (the deny hook blocks everything else; `RSI_HOOK_DISARM=1` disarms for plugin dev).
 - Inner evals: ~0.5M tokens / ~30 min each on bin-packing (fixed 9-node budget).

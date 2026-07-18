@@ -26,6 +26,10 @@ for req in task.md score.py public; do
   fi
 done
 
+# Idempotent: clear any prior sandbox so a re-run (e.g. after an inner-agent
+# failure) starts clean — no nested public/public and no stale nodes/ leaking
+# a previous generation's solutions into a fresh run.
+rm -rf "$SANDBOX"
 mkdir -p "$SANDBOX/nodes"
 cp "$TASK_DIR/task.md" "$TASK_DIR/score.py" "$SANDBOX/"
 cp -R "$TASK_DIR/public" "$SANDBOX/public"

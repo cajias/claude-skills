@@ -16,7 +16,7 @@ node's public score. Private scoring is outer-loop-only (`RSI_OUTER_LOOP=1`) and
 the inner agent's context.
 
 The generation is resolved through the run's `best` pointer (falling back to
-`baseline/gen-000`), so improvements discovered by the `/rsi:run` outer loop flow to standalone
+`baseline/gen-000`), so improvements the outer loop discovers (`/rsi:step`) flow to standalone
 users automatically. First verified run: see
 [`docs/experiments/m1-smoke-bin-packing.md`](../../docs/experiments/m1-smoke-bin-packing.md).
 
@@ -25,7 +25,5 @@ Design details: [`docs/PLAN.md`](../../docs/PLAN.md), §3 "`autoresearch` as a s
 Naming note: this is distinct from the third-party
 [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) skill (a single-level
 metric hill-climb loop, evaluated in PLAN.md §5.1 as a candidate outer-loop chassis). If that
-plugin is adopted in M2, this skill will be renamed to avoid trigger collision.
-
-If invoked before implementation lands: explain that the plugin is in design phase and point the
-user to the plan.
+chassis is adopted (the §5.2 experiment, pending), this skill will be renamed to avoid trigger
+collision.

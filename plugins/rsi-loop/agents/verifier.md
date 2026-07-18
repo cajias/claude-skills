@@ -26,4 +26,4 @@ Checks (all required):
 
 Return (as your final message) a JSON object:
 {"verdict": "clean" | "hacked" | "suspicious", "reproduced_score": <number>,
- "findings": ["..."], "recommendation": "accept-eligible" | "reject"}
+"findings": ["..."], "recommendation": "accept-eligible" | "reject"}

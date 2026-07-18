@@ -76,3 +76,21 @@ jobs:
 
       - name: Test
         run: uv run pytest -v
+
+  test-rsi-loop:
+    name: Test rsi-loop plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Deny-private firewall behavioral tests
+        run: bash plugins/rsi-loop/tests/test-deny-hook.sh
+
+      - name: Scorer self-check
+        run: bash plugins/rsi-loop/tests/test-scorer.sh

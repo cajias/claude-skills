@@ -27,13 +27,13 @@ const NUM_DRAFTS = policy.num_drafts ?? 5
 const MAX_NODES = policy.max_nodes ?? 9
 const MODEL = policy.model ?? 'haiku'
 const EFFORT = policy.effort ?? 'low'
-const DIRECTIONS = policy.draft_directions ?? [
-  'simplest correct baseline — prioritize validity over quality',
-  'sorting/preprocessing-based heuristic',
-  'incremental best-choice heuristic (locally optimal placements/decisions)',
-  'deterministic local search: start greedy, then iteratively improve',
-  'hybrid: combine two heuristics, keep the better result (deterministic, fast)',
-]
+// The real per-generation directions live in policy.json (`draft_directions`),
+// which the harness always passes. This inline list is only a last-resort
+// default for a hand-run with no policy — keep it generic, not a shadow copy of
+// any specific generation's tuned directions.
+const DIRECTIONS =
+  policy.draft_directions ??
+  Array.from({ length: NUM_DRAFTS }, (_, i) => `distinct solution direction #${i + 1}`)
 
 // Deterministic Lehmer RNG — Workflow scripts have no Math.random by design.
 let rngState = ((A.seed ?? 42) >>> 0) % 2147483647 || 1

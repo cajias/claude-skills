@@ -10,15 +10,17 @@ Primary sources:
 - Weco first-party report: <https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement>
 - RSI ladder definition: <https://www.weco.ai/blog/4-levels-of-recursive-self-improvement>
 
-Status: **placeholder / design phase**. Nothing here is implemented yet; this document is the
-build spec.
+Status: **M1–M2 implemented** (standalone inner agent, outer step, one completed run); M3–M5
+still to build. This document is the build spec; where the shipped code has diverged from it,
+the deviation is noted inline and in [CONTINUATION.md](CONTINUATION.md). A full as-built
+reconciliation is scheduled for M5.
 
 ---
 
 ## 1. The method we are replicating
 
 AIDE² frames RSI as **bi-level optimization**: an outer-loop agent optimizes the inner-loop
-agent's *ability to optimize*.
+agent's _ability to optimize_.
 
 ### Outer loop (supervisor)
 
@@ -76,12 +78,12 @@ re-testing. Hack rate fell 63% (AIDE0) → 34% (AIDE85).
 
 ### RSI ladder (falsifiable claims)
 
-| Level | Name        | Criterion                                                                | AIDE² result |
-| ----- | ----------- | ------------------------------------------------------------------------ | ------------ |
-| 0     | Delegation  | System improves itself, but slower than human R&D                        | floor        |
-| 1     | Net positive| Improves itself **faster** than human R&D (fair baseline, sustained, general, fixed budget) | claimed ✓ |
-| 2     | Ignition    | vN's improvement campaign beats what vN−1 would produce at equal budget  | rejected (AIDE47-as-outer converged faster but no asymptotic advantage) |
-| 3     | Inflection  | Gains per generation grow under constant investment                      | not claimed  |
+| Level | Name         | Criterion                                                                                   | AIDE² result                                                            |
+| ----- | ------------ | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| 0     | Delegation   | System improves itself, but slower than human R&D                                           | floor                                                                   |
+| 1     | Net positive | Improves itself **faster** than human R&D (fair baseline, sustained, general, fixed budget) | claimed ✓                                                               |
+| 2     | Ignition     | vN's improvement campaign beats what vN−1 would produce at equal budget                     | rejected (AIDE47-as-outer converged faster but no asymptotic advantage) |
+| 3     | Inflection   | Gains per generation grow under constant investment                                         | not claimed                                                             |
 
 ---
 
@@ -92,19 +94,19 @@ The key translation: in AIDE² the inner agent is Python code; here the inner ag
 skill is. "Rewriting the inner agent's code" becomes rewriting those files, which Claude is
 natively good at.
 
-| AIDE² concept                | Claude Code realization                                                                 |
-| ---------------------------- | --------------------------------------------------------------------------------------- |
-| Inner agent "code"           | `generations/gen-NNN/` — Workflow script (tree search) + operator prompts + `policy.json` |
-| Inner agent model (Flash)    | cheap model via `agent(..., {model: 'haiku'})`                                          |
-| Outer agent (Opus 4.7)       | session model (Opus/Fable) running the `/rsi:step` skill                                |
-| Solution tree + operators    | Workflow script: `parallel()` drafts, loop of debug/improve `agent()` calls             |
-| Fixed dollar budget          | Workflow `budget` (token target as dollar proxy) + hard agent-count caps                |
-| Public/private split         | `tasks/<task>/public/` vs `tasks/<task>/private/`; private scoring runs only in the outer loop; a PreToolUse deny hook blocks inner agents from reading `private/` |
-| Keep-if-better selection     | outer skill compares aggregate private scores, updates `ledger.jsonl` + `best` pointer  |
-| Heterogeneous task families  | 3 mini-families checked into `tasks/` (see §4)                                          |
-| Reward-hack detection        | verifier subagent re-runs winners end-to-end; <50%-of-claim rule; outlier filter        |
-| Second-order generalization  | `holdout-tasks/` never used during the run; scored only by `/rsi:report`                |
-| RSI ladder measurement       | `/rsi:report` computes slopes vs. the hand-tuned baseline; `/rsi:ignite` runs the Level-2 swap test |
+| AIDE² concept               | Claude Code realization                                                                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Inner agent "code"          | `generations/gen-NNN/` — Workflow script (tree search) + operator prompts + `policy.json`                                                                          |
+| Inner agent model (Flash)   | cheap model via `agent(..., {model: 'haiku'})`                                                                                                                     |
+| Outer agent (Opus 4.7)      | session model (Opus/Fable) running the `/rsi:step` skill                                                                                                           |
+| Solution tree + operators   | Workflow script: `parallel()` drafts, loop of debug/improve `agent()` calls                                                                                        |
+| Fixed dollar budget         | Workflow `budget` (token target as dollar proxy) + hard agent-count caps                                                                                           |
+| Public/private split        | `tasks/<task>/public/` vs `tasks/<task>/private/`; private scoring runs only in the outer loop; a PreToolUse deny hook blocks inner agents from reading `private/` |
+| Keep-if-better selection    | outer skill compares aggregate private scores, updates `ledger.jsonl` + `best` pointer                                                                             |
+| Heterogeneous task families | 3 mini-families checked into `tasks/` (see §4)                                                                                                                     |
+| Reward-hack detection       | verifier subagent re-runs winners end-to-end; <50%-of-claim rule; outlier filter                                                                                   |
+| Second-order generalization | `holdout-tasks/` never used during the run; scored only by `/rsi:report`                                                                                           |
+| RSI ladder measurement      | `/rsi:report` computes slopes vs. the hand-tuned baseline; `/rsi:ignite` runs the Level-2 swap test                                                                |
 
 Two fidelity compromises, called out explicitly:
 
@@ -112,7 +114,7 @@ Two fidelity compromises, called out explicitly:
    (efficiency-forcing), different unit. The Workflow tool's `budget.spent()`/`remaining()` is
    the enforcement point.
 2. **Scale** — the paper ran 100 outer steps over 8 days on real benchmarks. We target
-   10–30 outer steps on miniature tasks that score in seconds. The *protocol* is the match, not
+   10–30 outer steps on miniature tasks that score in seconds. The _protocol_ is the match, not
    the compute.
 
 ## 3. Plugin architecture
@@ -162,10 +164,10 @@ rsi-runs/<run-id>/
 
 ### The outer step (`/rsi:step`), precisely
 
-1. Read `ledger.jsonl` (full lineage history — the outer agent *does* get history; only the
+1. Read `ledger.jsonl` (full lineage history — the outer agent _does_ get history; only the
    inner agent gets minimal context).
 2. **Proposer** subagent (strong model) writes `gen-N+1/` as a mutation of `best`, with a
-   one-paragraph rationale and a *predicted* effect. Prompted with the paper's proposal
+   one-paragraph rationale and a _predicted_ effect. Prompted with the paper's proposal
    diversity: search policy, context engineering, operator prompts, verification — anything in
    the generation dir.
 3. **Evaluate**: for each task in the battery, run `gen-N+1`'s Workflow script via a cheap-model
@@ -189,7 +191,7 @@ A Workflow script interpreting `policy.json`:
 - Each node = candidate solution + `score.py --public` result. Output: best node by public score.
 
 Everything the proposer may rewrite lives in the generation dir; the runner harness, scorers,
-budget enforcement, and ledger live *outside* it and are immutable to the loop (that boundary is
+budget enforcement, and ledger live _outside_ it and are immutable to the loop (that boundary is
 the paper's harness/agent split, and our main anti-hack wall).
 
 ### `autoresearch` as a standalone skill
@@ -206,7 +208,7 @@ AIDE² wrapped it:
 - Because the skill always resolves through the `best` pointer, users of `/rsi:autoresearch`
   automatically benefit from improvements the outer loop discovers — the paper's "inner
   improvements generalize upward" alternative to stacking meta-loops.
-- Note: this is *experiment-driven* research (write code → run → score → iterate on a solution
+- Note: this is _experiment-driven_ research (write code → run → score → iterate on a solution
   tree), distinct from the built-in `deep-research` skill's web-research loop (search → verify
   sources → cited report). The two are complementary, not substitutes.
 
@@ -233,17 +235,17 @@ Nothing existing implements bi-level RSI as a skill — searched the claude.ai p
 (no hits for self-improvement/prompt-optimization/eval-harness) and known marketplaces. But we
 can compose substantial existing pieces rather than build from scratch:
 
-| Component | Source | What we reuse |
-| --- | --- | --- |
-| **autoresearch** | [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) (MIT, 5.3k★, active) | Candidate **outer-loop chassis** — see §5.1. Its core loop (modify → mechanical verify → keep/discard, auto-revert, git-as-memory, TSV ledger, guard commands, plateau detection via `/autoresearch:evals`) is exactly the outer step's shape. Not usable as the inner agent. |
-| **Workflow tool** | Claude Code built-in | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts. |
-| **skill-creator** | Anthropic (official) | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally. |
-| **deep-research** | Claude Code built-in | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate). |
-| **ralph-loop** | Geoff Huntley's ralph technique (already referenced in this repo's `skills/ralph-loop-invocation`) | Prior art for long-running loop-until-done outer iteration with max-iterations + completion promise; `/rsi:run` follows the same invocation ergonomics. |
-| **/loop** (built-in) + `send_later`/Routines | Claude Code built-in | Multi-day unattended outer-loop pacing — the paper's 8-day unattended run maps to scheduled wakeups re-invoking `/rsi:step`. |
-| **claudeception, session-mining** | this repo | Complementary, not core: mine accepted-proposal rationales from transcripts into reusable skills (a human-digestible byproduct the paper doesn't have). |
-| **scripts/validate.sh, test-skills.sh, .claude/evals** | this repo | Structural gate every proposed generation must pass before spending eval budget. |
-| **DSPy / GEPA, OpenEvolve (AlphaEvolve OSS)** | Python libraries, not skills | Pattern reference only (evolutionary prompt/code optimization, keep-if-better + lineages). We replicate natively; no dependency. |
+| Component                                              | Source                                                                                             | What we reuse                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **autoresearch**                                       | [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) (MIT, 5.3k★, active)         | Candidate **outer-loop chassis** — see §5.1. Its core loop (modify → mechanical verify → keep/discard, auto-revert, git-as-memory, TSV ledger, guard commands, plateau detection via `/autoresearch:evals`) is exactly the outer step's shape. Not usable as the inner agent. |
+| **Workflow tool**                                      | Claude Code built-in                                                                               | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts.       |
+| **skill-creator**                                      | Anthropic (official)                                                                               | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally.                                                                                                                          |
+| **deep-research**                                      | Claude Code built-in                                                                               | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate).                    |
+| **ralph-loop**                                         | Geoff Huntley's ralph technique (already referenced in this repo's `skills/ralph-loop-invocation`) | Prior art for long-running loop-until-done outer iteration with max-iterations + completion promise; `/rsi:run` follows the same invocation ergonomics.                                                                                                                       |
+| **/loop** (built-in) + `send_later`/Routines           | Claude Code built-in                                                                               | Multi-day unattended outer-loop pacing — the paper's 8-day unattended run maps to scheduled wakeups re-invoking `/rsi:step`.                                                                                                                                                  |
+| **claudeception, session-mining**                      | this repo                                                                                          | Complementary, not core: mine accepted-proposal rationales from transcripts into reusable skills (a human-digestible byproduct the paper doesn't have).                                                                                                                       |
+| **scripts/validate.sh, test-skills.sh, .claude/evals** | this repo                                                                                          | Structural gate every proposed generation must pass before spending eval budget.                                                                                                                                                                                              |
+| **DSPy / GEPA, OpenEvolve (AlphaEvolve OSS)**          | Python libraries, not skills                                                                       | Pattern reference only (evolutionary prompt/code optimization, keep-if-better + lineages). We replicate natively; no dependency.                                                                                                                                              |
 
 ### 5.1 `uditgoenka/autoresearch` evaluation
 
@@ -252,14 +254,14 @@ against a single mechanical metric → commit or auto-revert → repeat, with gi
 memory, TSV iteration ledgers, must-pass guard commands, safety hooks, and an autonomous
 orchestrator mode (v2.2). Generalizes Karpathy's autoresearch framing beyond ML.
 
-**What it is not** (why it can't be our inner agent): it is a *single-level* hill-climb —
+**What it is not** (why it can't be our inner agent): it is a _single-level_ hill-climb —
 one atomic change per iteration on a linear history. AIDE0 requires solution-**tree** search
 with parallel drafts and draft/debug/improve operators, a public/private score split (its
 metric is fully visible to the loop; the guard command is the only overfitting defense), a
 fixed cost budget as a first-class constraint, and a bi-level structure where the loop's own
 code is the thing being optimized. None of these exist there.
 
-**What it maps to precisely**: the AIDE² *outer* loop is itself "modify the inner agent's
+**What it maps to precisely**: the AIDE² _outer_ loop is itself "modify the inner agent's
 files → evaluate mechanically → keep iff better → repeat" — autoresearch's exact contract.
 Adoption sketch:
 
@@ -295,7 +297,7 @@ both arms write the same ledger schema so runs are directly comparable. Total: 4
 
 **Metrics** (pre-registered, in priority order):
 
-1. *Primary*: best private aggregate score reached at equal total token budget.
+1. _Primary_: best private aggregate score reached at equal total token budget.
 2. Score-per-token slope across steps (efficiency of the loop itself).
 3. Harness overhead: tokens spent on orchestration vs. on inner-agent evaluation.
 4. Protocol fidelity: did accept/reject always follow private score + guard? any hacked win
@@ -340,7 +342,7 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   inner model, tiny tasks, hard token caps, structural pre-gate before spending eval budget.
 - **Eval noise vs. tiny tasks**: small privates make accept/reject noisy; use multiple seeds per
   task and require the paper's "sustained, multi-step" trend, not single jumps.
-- **Reward hacking of *our* harness**: inner agents run with tool access; the deny hook +
+- **Reward hacking of _our_ harness**: inner agents run with tool access; the deny hook +
   immutable-harness boundary is critical and needs its own tests (try to read `private/` from an
   inner agent; must fail).
 - **Wall-clock**: multi-day unattended runs in ephemeral sessions need Routines/`send_later`

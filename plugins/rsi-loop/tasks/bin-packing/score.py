@@ -68,7 +68,13 @@ def validate(bins, items, capacity):
     return None
 
 
-def run_instance(inst, solution_path, runner_path):
+def lower_bound(inst):
+    return max(math.ceil(sum(inst["items"]) / inst["capacity"]), 1)
+
+
+def run_instance(inst, solution_path, neutral_cwd):
+    """Return (score, bins_used, error). score/bins_used are None on error."""
+    lb = lower_bound(inst)
     payload = json.dumps(
         {
             "items": inst["items"],
@@ -76,30 +82,33 @@ def run_instance(inst, solution_path, runner_path):
             "solution_path": os.path.abspath(solution_path),
         }
     )
-    # Neutral cwd: the solution subprocess gets no incidental access to the
-    # task directory (and therefore never to private/ during private scoring).
-    with tempfile.TemporaryDirectory() as neutral_cwd:
-        try:
-            proc = subprocess.run(
-                [sys.executable, runner_path],
-                input=payload,
-                capture_output=True,
-                text=True,
-                timeout=PER_INSTANCE_TIMEOUT_S,
-                cwd=neutral_cwd,
-            )
-        except subprocess.TimeoutExpired:
-            return 0.0, None, f"timeout after {PER_INSTANCE_TIMEOUT_S}s"
+    # Run the embedded runner via `-c` (no temp file to leak on a timeout kill)
+    # in a neutral cwd, so the solution subprocess gets no incidental access to
+    # the task directory (and therefore never to private/ during private scoring).
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-c", RUNNER_SRC],
+            input=payload,
+            capture_output=True,
+            text=True,
+            timeout=PER_INSTANCE_TIMEOUT_S,
+            cwd=neutral_cwd,
+        )
+    except subprocess.TimeoutExpired:
+        return 0.0, None, f"timeout after {PER_INSTANCE_TIMEOUT_S}s"
     try:
         out = json.loads(proc.stdout.strip().splitlines()[-1])
     except (ValueError, IndexError):
         return 0.0, None, f"unparseable solution output: {proc.stderr.strip()[:200]}"
-    if "error" in out:
-        return 0.0, None, out["error"][:300]
+    if not isinstance(out, dict) or "bins" not in out:
+        # Includes the runner's {"error": ...} path and any stray final line
+        # that is valid JSON but not a packing (e.g. a diagnostic print before
+        # an early exit) — scored 0, never crashes the battery.
+        err = out.get("error") if isinstance(out, dict) else None
+        return 0.0, None, (err or "solution produced no 'bins' output")[:300]
     reason = validate(out["bins"], inst["items"], inst["capacity"])
     if reason is not None:
         return 0.0, None, reason
-    lb = max(math.ceil(sum(inst["items"]) / inst["capacity"]), 1)
     return lb / len(out["bins"]), len(out["bins"]), None
 
 
@@ -109,7 +118,10 @@ def main():
     split.add_argument("--public", action="store_true")
     split.add_argument("--private", action="store_true")
     ap.add_argument("--solution", required=True)
-    ap.add_argument("--json", action="store_true", help="(default; kept for compatibility)")
+    # Output is always JSON; --json is accepted because every documented
+    # invocation (rsi-score.sh, the operator prompts) passes it and evolved
+    # generations may keep passing it. Accept-and-ignore, never require.
+    ap.add_argument("--json", action="store_true", help="accepted no-op; output is always JSON")
     args = ap.parse_args()
 
     split_name = "private" if args.private else "public"
@@ -132,26 +144,23 @@ def main():
 
     with open(instances_path) as f:
         instances = json.load(f)
+    if not isinstance(instances, list) or not instances:
+        print(f"no usable instances in {instances_path}", file=sys.stderr)
+        sys.exit(4)
 
-    with tempfile.NamedTemporaryFile("w", suffix="_runner.py", delete=False) as rf:
-        rf.write(RUNNER_SRC)
-        runner_path = rf.name
-    try:
-        per_instance = []
+    per_instance = []
+    with tempfile.TemporaryDirectory() as neutral_cwd:
         for inst in instances:
-            score, bins_used, error = run_instance(inst, args.solution, runner_path)
-            lb = max(math.ceil(sum(inst["items"]) / inst["capacity"]), 1)
+            score, bins_used, error = run_instance(inst, args.solution, neutral_cwd)
             per_instance.append(
                 {
                     "name": inst["name"],
                     "score": round(score, 6),
                     "bins_used": bins_used,
-                    "lower_bound": lb,
+                    "lower_bound": lower_bound(inst),
                     "error": error,
                 }
             )
-    finally:
-        os.unlink(runner_path)
 
     report = {
         "task": "bin-packing",

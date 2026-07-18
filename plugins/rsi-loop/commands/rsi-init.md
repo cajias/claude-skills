@@ -12,15 +12,19 @@ Initialize an AIDE²-style RSI run.
    - `best.txt` — containing `generations/gen-000`
    - `tasks.txt` — one task dir per line (from `--tasks`, default: every dir under
      `plugins/rsi-loop/tasks/`)
-2. Baseline the incumbent: for each task, evaluate gen-000 with the procedure in
-   `rsi-step.md` steps 3–5 (sandbox → inner workflow → outer private scoring), and append a
+2. Baseline the incumbent: for each task, evaluate gen-000 with the evaluation procedure in
+   `rsi-step.md` steps 3–4 (sandbox → inner workflow → outer private scoring). Do NOT run the
+   verifier (step 5) on the baseline — gen-000 is the plugin's own known-clean generation and
+   becomes the incumbent unconditionally; record `"verifier": null`. Append a
    `{"step": 0, "generation": "gen-000", ...}` ledger line with its public/private scores.
    Skip this baseline only if the user passes `--no-baseline`.
 3. Report the run dir, the tasks in the battery, and gen-000's baseline scores.
 
-Ledger line schema (one JSON object per line, append-only):
-{"step": N, "generation": "gen-NNN", "parent": "gen-MMM", "mutation": "...",
- "rationale": "...", "scores": {"<task>": {"public": x, "private": y}},
- "private_aggregate": <mean of private scores>, "inner_tokens": N,
- "verifier": {"verdict": "...", "findings": [...]}, "accepted": true|false,
- "reason": "..."}
+Ledger line schema (one JSON object per line, append-only). `rationale` and the per-task
+`stress` sub-score are optional (present when the proposer/generation supply them); `verifier`
+is `null` for the step-0 baseline and an object otherwise:
+{"step": N, "generation": "gen-NNN", "parent": "gen-MMM" | null, "mutation": "...",
+"rationale": "..." (optional), "scores": {"<task>": {"public": x, "private": y, "stress": z?}},
+"private_aggregate": <mean of private scores>, "inner_tokens": N,
+"verifier": {"verdict": "...", "findings": [...], "recommendation": "..."} | null,
+"accepted": true|false, "reason": "..."}

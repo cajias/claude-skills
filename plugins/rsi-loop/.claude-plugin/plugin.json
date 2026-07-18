@@ -1,8 +1,14 @@
 {
   "name": "rsi-loop",
-  "description": "PLACEHOLDER (work in progress): AIDE²-style recursive self-improvement loop for Claude Code. Bi-level optimization where an outer-loop agent iteratively rewrites an inner tree-search research agent, selected on private held-out scores under a fixed budget. See docs/PLAN.md.",
+  "description": "AIDE²-style recursive self-improvement loop for Claude Code. Bi-level optimization where an outer-loop agent iteratively rewrites an inner tree-search research agent, selected on private held-out scores under a fixed budget. Standalone /rsi:autoresearch solves tasks by tree search; /rsi:init + /rsi:step run the outer loop. See docs/PLAN.md for the build roadmap (M1-M2 shipped).",
   "version": "0.0.1",
   "author": { "name": "cajias" },
   "license": "MIT",
-  "keywords": ["rsi", "self-improvement", "bi-level-optimization", "workflow", "evals"]
+  "keywords": [
+    "rsi",
+    "self-improvement",
+    "bi-level-optimization",
+    "workflow",
+    "evals"
+  ]
 }

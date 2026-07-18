@@ -20,7 +20,7 @@ Procedure:
    rewrite — search policy (lineage selection, fork-on-stall, bandit exploration), context
    engineering (what history each operator sees), operator prompts, node budget allocation,
    verification steps. Do not change the args contract (`sandbox, genDir, taskName, seed,
-   policy`) or touch anything outside the new generation directory.
+policy`) or touch anything outside the new generation directory.
 4. Write the complete new generation to the target dir you were given (copy-then-modify the
    incumbent; the result must be self-contained and runnable).
 5. Anti-overfitting rules for what you write into inner prompts: never reference private
@@ -29,4 +29,4 @@ Procedure:
 
 Return (as your final message) a JSON object:
 {"mutation": "<one-line name>", "rationale": "<why this should improve research ability>",
- "predicted_effect": "<what should change in scores/behavior>", "files_changed": [...]}
+"predicted_effect": "<what should change in scores/behavior>", "files_changed": [...]}

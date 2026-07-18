@@ -8,10 +8,10 @@
 
 ## Scores
 
-| Split | Score | Notes |
-| --- | --- | --- |
-| Public (inner-visible) | 0.964762 | best = node-0 (First Fit Decreasing draft); optimal on 3/5 instances |
-| Private (outer-only) | 0.937937 | 7 unseen instances, up to 120 items; 1.0 on prv-uniform-15, weakest 0.86 on prv-bimodal-100 |
+| Split                  | Score    | Notes                                                                                       |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| Public (inner-visible) | 0.964762 | best = node-0 (First Fit Decreasing draft); optimal on 3/5 instances                        |
+| Private (outer-only)   | 0.937937 | 7 unseen instances, up to 120 items; 1.0 on prv-uniform-15, weakest 0.86 on prv-bimodal-100 |
 
 Private scoring executed outside the inner context via
 `RSI_OUTER_LOOP=1 rsi-score.sh --private` after the run ended.

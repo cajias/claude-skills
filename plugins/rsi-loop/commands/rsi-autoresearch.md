@@ -24,7 +24,7 @@ Steps:
    counts, token spend, and the path of the best solution.
 5. Public scores only. Do NOT run private scoring unless the user explicitly asks; if they
    do, run `RSI_OUTER_LOOP=1 bash plugins/rsi-loop/scripts/rsi-score.sh --private <task-dir>
-   <best-solution>` yourself (outer context) and label the result clearly as held-out.
+<best-solution>` yourself (outer context) and label the result clearly as held-out.
 
 Never expose `private/` paths or contents to any inner agent, and never edit files under the
 task directory or the generation harness while a run is active.
