@@ -130,7 +130,9 @@ plugins/rsi-loop/
 │   ├── rsi-report.md               # /rsi:report — scores, lineage, ladder-level evidence
 │   └── rsi-ignite.md               # /rsi:ignite — Level-2 test: best gen becomes outer agent
 ├── skills/
-│   └── rsi-loop/SKILL.md           # orchestration knowledge: the outer-loop protocol
+│   ├── rsi-loop/SKILL.md           # orchestration knowledge: the outer-loop protocol
+│   └── autoresearch/SKILL.md       # standalone inner agent: run tree-search autoresearch on
+│                                   # any task with a score script (/rsi:autoresearch <task>)
 ├── agents/
 │   ├── proposer.md                 # outer-loop rewriter (strong model)
 │   ├── verifier.md                 # reward-hack auditor (re-runs winners, <50% rule)
@@ -190,6 +192,24 @@ Everything the proposer may rewrite lives in the generation dir; the runner harn
 budget enforcement, and ledger live *outside* it and are immutable to the loop (that boundary is
 the paper's harness/agent split, and our main anti-hack wall).
 
+### `autoresearch` as a standalone skill
+
+The inner agent is also exposed as its own skill, decoupled from the RSI loop — mirroring the
+paper's lineage, where AIDE was a useful standalone agent (first place on MLE-Bench) before
+AIDE² wrapped it:
+
+- `/rsi:autoresearch <task-dir>` runs whichever generation `best` points to (falling back to
+  `baseline/gen-000`) against any user-supplied task that provides a `task.md` and a scoring
+  command — no outer loop, no private split required.
+- This gives the plugin immediate standalone value (an AIDE-style solve-by-tree-search agent for
+  ML/heuristic/harness tasks) and doubles as the manual test surface for M1.
+- Because the skill always resolves through the `best` pointer, users of `/rsi:autoresearch`
+  automatically benefit from improvements the outer loop discovers — the paper's "inner
+  improvements generalize upward" alternative to stacking meta-loops.
+- Note: this is *experiment-driven* research (write code → run → score → iterate on a solution
+  tree), distinct from the built-in `deep-research` skill's web-research loop (search → verify
+  sources → cited report). The two are complementary, not substitutes.
+
 ## 4. Task battery (miniature but heterogeneous, per the paper's three families)
 
 Each task ships `public/` (data + `score.py --public`), `private/` (held-out data +
@@ -217,6 +237,7 @@ can compose substantial existing pieces rather than build from scratch:
 | --- | --- | --- |
 | **Workflow tool** | Claude Code built-in | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts. |
 | **skill-creator** | Anthropic (official) | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally. |
+| **deep-research** | Claude Code built-in | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate). |
 | **ralph-loop** | Geoff Huntley's ralph technique (already referenced in this repo's `skills/ralph-loop-invocation`) | Prior art for long-running loop-until-done outer iteration with max-iterations + completion promise; `/rsi:run` follows the same invocation ergonomics. |
 | **/loop** (built-in) + `send_later`/Routines | Claude Code built-in | Multi-day unattended outer-loop pacing — the paper's 8-day unattended run maps to scheduled wakeups re-invoking `/rsi:step`. |
 | **claudeception, session-mining** | this repo | Complementary, not core: mine accepted-proposal rationales from transcripts into reusable skills (a human-digestible byproduct the paper doesn't have). |
@@ -227,8 +248,9 @@ can compose substantial existing pieces rather than build from scratch:
 
 - **M0 — placeholder** (this commit): scaffold + this plan.
 - **M1 — inner agent + one task**: `baseline/gen-000` Workflow script, heuristic-optimization
-  task with public/private scoring, private-dir deny hook. Exit: gen-000 solves the task
-  end-to-end under a token cap; private score computed outside the inner context.
+  task with public/private scoring, private-dir deny hook, and the standalone `autoresearch`
+  skill + `/rsi:autoresearch` command wrapping it. Exit: gen-000 solves the task end-to-end via
+  `/rsi:autoresearch` under a token cap; private score computed outside the inner context.
 - **M2 — outer step**: proposer + selection + `ledger.jsonl`; `/rsi:init`, `/rsi:step`. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
 - **M3 — full protocol**: all 3 task families, verifier + <50% hack rule + outlier filter,

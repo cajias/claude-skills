@@ -14,6 +14,8 @@ Method sources: [Weco AIDE² report](https://www.weco.ai/blog/first-evidence-of-
 
 Planned surface:
 
+- `/rsi:autoresearch <task-dir>` — standalone AIDE-style inner agent: tree-search autoresearch
+  on any task with a scoring script (runs the current best evolved generation)
 - `/rsi:init` — scaffold a run (generations, task battery, ledger)
 - `/rsi:step` / `/rsi:run` — execute outer-loop steps (propose → evaluate → select)
 - `/rsi:report` — lineage, scores, and falsifiable RSI-ladder evidence
