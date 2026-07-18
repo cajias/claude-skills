@@ -1,0 +1,11 @@
+{
+    "run": "run-001",
+    "next_step": 4,
+    "incumbent": "gen-002",
+    "incumbent_private_aggregate": 0.940502,
+    "tasks": [
+        "plugins/rsi-loop/tasks/bin-packing"
+    ],
+    "seed": 42,
+    "note": "rebuild a live run dir by copying generations/ from this archive; best.txt -> gen-002"
+}
