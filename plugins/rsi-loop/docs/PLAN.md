@@ -277,6 +277,38 @@ without forking it; otherwise keep it as pattern/code reference (MIT permits lif
 revert/ledger/guard mechanics). Risks of (a): coupling our step semantics to its release
 cadence, and single-metric plumbing flattening the per-task score vector too early.
 
+### 5.2 Chassis experiment: outer loop with vs. without the autoresearch skill
+
+The §5.1 decision is settled empirically, not by taste — a paired A/B run in M2:
+
+**Arms** (everything else held identical: `baseline/gen-000` starting point, task battery,
+proposer + verifier prompts and models, per-eval token cap, seeds):
+
+- **Arm A (with skill)**: outer loop driven by `uditgoenka/autoresearch` — metric script =
+  aggregate private battery score from our immutable harness; guard = structural validation +
+  verifier hack check; its git-commit/auto-revert = our accept/reject.
+- **Arm B (without skill)**: outer loop as our native Workflow script (`/rsi:step` loop) with
+  `ledger.jsonl` accept/reject.
+
+**Protocol**: 10 outer steps per arm, 2 repetitions each (variance on tiny batteries is real);
+both arms write the same ledger schema so runs are directly comparable. Total: 4 short runs.
+
+**Metrics** (pre-registered, in priority order):
+
+1. *Primary*: best private aggregate score reached at equal total token budget.
+2. Score-per-token slope across steps (efficiency of the loop itself).
+3. Harness overhead: tokens spent on orchestration vs. on inner-agent evaluation.
+4. Protocol fidelity: did accept/reject always follow private score + guard? any hacked win
+   slipping past the guard? ledger completeness; crash/resume behavior mid-run.
+5. Friction notes: forks/patches needed, multi-task score plumbing, verifier integration.
+
+**Decision rule** (recorded here with the results when M2 lands): adopt Arm A only if it is
+within noise of or better than Arm B on the primary metric **and** clean on fidelity (4) with
+no fork required (5). Any fidelity violation is disqualifying regardless of score — the outer
+loop is the experiment's control surface and must be exactly the paper's protocol. Otherwise
+ship Arm B and keep autoresearch as pattern reference. Either way the losing arm's run stays
+in the repo under `docs/experiments/` as evidence.
+
 **Naming collision**: our standalone inner-agent skill is also named `autoresearch`
 (namespaced `rsi-loop:autoresearch` vs. their top-level `autoresearch`). Claude Code
 disambiguates by plugin prefix, but if adoption lands in M2 we should rename ours (e.g.
@@ -290,8 +322,9 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   skill + `/rsi:autoresearch` command wrapping it. Exit: gen-000 solves the task end-to-end via
   `/rsi:autoresearch` under a token cap; private score computed outside the inner context.
 - **M2 — outer step**: proposer + selection + `ledger.jsonl`; `/rsi:init`, `/rsi:step`.
-  Includes the §5.1 chassis decision: prototype the outer step on `uditgoenka/autoresearch`
-  vs. a native Workflow script, pick one, record the rationale here. Exit: 3
+  Includes the §5.2 chassis A/B experiment (outer loop on `uditgoenka/autoresearch` vs. native
+  Workflow script — 2×2 paired runs, pre-registered metrics and decision rule); results land in
+  `docs/experiments/` and the winner becomes `/rsi:step`. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
 - **M3 — full protocol**: all 3 task families, verifier + <50% hack rule + outlier filter,
   `/rsi:run` with budget accounting. Exit: 10-step unattended run with sane ledger.
