@@ -48,6 +48,12 @@ OUTER_PREFIX = "RSI_OUTER_LOOP=1 "
 
 # Single source of truth for the protected task-tree roots.
 TREE_ROOTS = r"(?:rsi-runs|holdout-tasks|tasks)"
+# The immutable-harness subset: task/holdout trees. `rsi-runs` is excluded
+# because a run's battery lives at `rsi-runs/<run>/tasks/...`, already covered
+# by the `tasks` alternative.
+HARNESS_ROOTS = r"(?:tasks|holdout-tasks)"
+# The immutable harness files a scorer/task tree exposes.
+HARNESS_FILE = HARNESS_ROOTS + r"/[^\s'\"]*(?:score\.py|task\.md|instances\.json)"
 _BOUND = r"(?:^|[/\s'\"=])"
 
 # A path segment named exactly `private`, e.g. tasks/foo/private/instances.json
@@ -69,23 +75,20 @@ RSI_GLOB = re.compile(_BOUND + TREE_ROOTS + r"/[^\s'\"]*[*?\[]")
 # `tasks/<name>/`, and `tasks/<name>/<wildcard>` — but NOT `tasks/<name>/public`
 # or a single file like `tasks/<name>/task.md` (those don't recurse into private).
 TREE_DIR_RECURSE = re.compile(
-    _BOUND + r"(?:tasks|holdout-tasks)(?:/[^/\s'\"]+)?/?(?:$|[\s'\"*?\[])"
+    _BOUND + HARNESS_ROOTS + r"(?:/[^/\s'\"]+)?/?(?:$|[\s'\"*?\[])"
 )
 
 # Immutable harness files: scorers, task specs, and instance data anywhere under
 # a task tree, plus the score.py/task.md copies inside an inner-agent sandbox.
 IMMUTABLE_FILE = re.compile(
-    r"(?:tasks|holdout-tasks)/[^\s'\"]*(?:score\.py|task\.md|instances\.json)"
-    r"|/sandbox/(?:score\.py|task\.md)"
-    r"|/sandbox/nodes/[^\s'\"]*score\.py"
+    HARNESS_FILE + r"|/sandbox/(?:score\.py|task\.md)|/sandbox/nodes/[^\s'\"]*score\.py"
 )
 
 # Bash writers targeting an immutable harness file. Verb list covers the naive
 # writers; exotic writers are out of scope per the threat model above.
 BASH_WRITE = re.compile(
     r"(?:>>?|\b(?:cp|mv|rm|tee|ln|chmod|truncate|dd|install)\b|sed\s+-i)"
-    r"[^|;&]*(?:(?:tasks|holdout-tasks)/[^\s'\"]*(?:score\.py|task\.md|instances\.json)"
-    r"|/sandbox/(?:score\.py|task\.md))"
+    r"[^|;&]*(?:" + HARNESS_FILE + r"|/sandbox/(?:score\.py|task\.md))"
 )
 
 RECURSIVE_READ_TOOLS = {"Glob", "Grep"}

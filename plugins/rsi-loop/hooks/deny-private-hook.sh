@@ -10,7 +10,7 @@
 # that skips python here would have been allowed there anyway.
 IN=$(cat)
 case "$IN" in
-  *private* | *rsi-runs* | *holdout-tasks* | *tasks/* | *score.py* | *--private* | *sandbox*)
+  *private* | *rsi-runs* | *holdout-tasks* | *tasks* | *score.py* | *sandbox*)
     printf '%s' "$IN" | python3 "$(dirname "$0")/deny-private.py"
     ;;
   *)

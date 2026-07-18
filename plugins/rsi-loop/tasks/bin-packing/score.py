@@ -74,7 +74,6 @@ def lower_bound(inst):
 
 def run_instance(inst, solution_path, neutral_cwd):
     """Return (score, bins_used, error). score/bins_used are None on error."""
-    lb = lower_bound(inst)
     payload = json.dumps(
         {
             "items": inst["items"],
@@ -109,7 +108,7 @@ def run_instance(inst, solution_path, neutral_cwd):
     reason = validate(out["bins"], inst["items"], inst["capacity"])
     if reason is not None:
         return 0.0, None, reason
-    return lb / len(out["bins"]), len(out["bins"]), None
+    return lower_bound(inst) / len(out["bins"]), len(out["bins"]), None
 
 
 def main():

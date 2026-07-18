@@ -3,7 +3,9 @@
 # Claude Code sends on PreToolUse and assert deny/allow.
 set -euo pipefail
 
-HOOK="$(cd "$(dirname "$0")/.." && pwd)/hooks/deny-private.py"
+HOOK_DIR="$(cd "$(dirname "$0")/.." && pwd)/hooks"
+HOOK="$HOOK_DIR/deny-private.py"
+WRAPPER="$HOOK_DIR/deny-private-hook.sh"
 PASS=0
 FAIL=0
 
@@ -146,6 +148,30 @@ if grep -rl "RSI_OUTER_LOOP" "$PLUGIN_ROOT/baseline" >/dev/null 2>&1; then
 else
   PASS=$((PASS + 1)); echo "  ok   guard    RSI_OUTER_LOOP absent from baseline/ generation"
 fi
+
+# Pre-filter parity: the sh wrapper's trigger set MUST be a strict superset of
+# everything the python hook acts on. For each payload the raw hook denies, the
+# wrapper must also deny — a wrapper that drops it silently disables the firewall
+# (regression guard for the bare-`tasks` gap the security review found).
+parity() { # $1 = label, $2 = tool, $3 = tool_input JSON
+  local payload raw wrapped
+  payload="$(printf '{"tool_name":"%s","tool_input":%s}' "$2" "$3")"
+  raw="$(printf '%s' "$payload" | python3 "$HOOK")"
+  [[ "$raw" == *'"permissionDecision": "deny"'* ]] || return 0 # only care about denies
+  wrapped="$(printf '%s' "$payload" | sh "$WRAPPER")"
+  if [[ "$wrapped" == *'"permissionDecision": "deny"'* ]]; then
+    PASS=$((PASS + 1)); printf '  ok   parity   %s\n' "$1"
+  else
+    FAIL=$((FAIL + 1)); printf '  FAIL parity   %s — wrapper dropped a denied payload\n' "$1"
+  fi
+}
+parity "bare tasks Grep" Grep '{"pattern":"x","path":"tasks"}'
+parity "bare holdout-tasks Glob" Glob '{"pattern":"**","path":"holdout-tasks"}'
+parity "private instances Read" Read '{"file_path":"/w/rsi-runs/r1/tasks/bp/private/instances.json"}'
+parity "cwd-relative private" Bash '{"command":"cat private/instances.json"}'
+parity "score --private" Bash '{"command":"python3 score.py --private --solution s.py"}'
+parity "sandbox scorer write" Write '{"file_path":"/w/x/sandbox/score.py","content":"y"}'
+parity "real-battery append" Bash '{"command":"echo x >> plugins/rsi-loop/tasks/bin-packing/score.py"}'
 
 echo
 echo "deny-private hook: $PASS passed, $FAIL failed"
