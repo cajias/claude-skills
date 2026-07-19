@@ -213,16 +213,21 @@ def main():
                     "wildcards under an RSI task tree are blocked (they could "
                     "expand to the private/ split). Name paths explicitly."
                 )
-            if BASH_RECURSIVE_READ.search(cmd) and not _NARROWED_PUBLIC.search(cmd):
-                # A recursive reader (grep -r / rg / ag) with no path recurses
-                # from the cwd, and with a tree/ancestor path recurses into it —
-                # either can surface a private/ answer key. Unless the command is
-                # narrowed to a public/ subtree, deny. (Armed only during a run;
-                # narrow to public/ or read a named file non-recursively instead.)
+            if BASH_RECURSIVE_READ.search(cmd):
+                # A recursive reader (grep -r / rg / ag) can descend into a
+                # private/ split — from the cwd (no path), a tree/ancestor path,
+                # or a private path hidden behind a decoy `/public` token elsewhere
+                # in the command. We cannot reliably parse which arg is the search
+                # TARGET from a stateless string check, so deny every recursive
+                # reader outright while the firewall is armed. Read a named file,
+                # or use the Grep tool with an explicit public/ path (its path
+                # field is checked precisely). The outer harness, which legitimately
+                # needs private access, prefixes commands with RSI_OUTER_LOOP=1 and
+                # is already exempted above.
                 deny(
-                    "a recursive read (grep -r / rg / ag) that is not narrowed to "
-                    "a public/ subtree can descend into a private/ split. Narrow it "
-                    "to a public/ path, or read a named file without recursion."
+                    "recursive filesystem search (grep -r / rg / ag) is blocked "
+                    "during a run — it can descend into a private/ split. Read a "
+                    "named file, or use the Grep tool with an explicit public/ path."
                 )
         # Immutable harness: no shell writes to a scorer / task spec / instance
         # data, outer-marked or not (the outer loop never edits the battery).

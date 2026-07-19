@@ -75,15 +75,27 @@ expect deny "Bash rg at a tree-relative task root" Bash \
   '{"command":"rg answer tasks/bin-packing"}'
 expect deny "Bash grep -rIl (flag cluster) bare" Bash \
   '{"command":"grep -rIl answer"}'
-# ...but a recursive read narrowed to public/, or a specific file, stays allowed.
+# The Grep TOOL checks its path field precisely, so a genuinely public-scoped
+# path or a specific file stays allowed...
 expect allow "Grep narrowed to a task public dir" Grep \
   '{"pattern":"capacity","path":"plugins/rsi-loop/tasks/bin-packing/public"}'
 expect allow "Grep a specific non-private file" Grep \
   '{"pattern":"pack","path":"plugins/rsi-loop/tasks/bin-packing/task.md"}'
-expect allow "Bash grep -r narrowed to public" Bash \
-  '{"command":"grep -rn size plugins/rsi-loop/tasks/bin-packing/public"}'
 expect allow "Grep an unrelated project dir" Grep \
   '{"pattern":"foo","path":"src/components"}'
+# ...but a recursive Bash reader is blocked outright while armed — the whole
+# command can hide a private target behind a decoy /public token, so no
+# per-command "narrowed" escape exists (regression: decoy /public bypass).
+expect deny "Bash grep -r even with a public arg present" Bash \
+  '{"command":"grep -rn size plugins/rsi-loop/tasks/bin-packing/public"}'
+expect deny "Bash decoy public arg beside a private-reaching path" Bash \
+  '{"command":"grep -rn prv- tasks/bin-packing /nonexistent/public"}'
+expect deny "Bash decoy public in a shell comment" Bash \
+  '{"command":"rg prv- tasks/bin-packing # /public"}'
+# The outer harness legitimately needs recursion; the RSI_OUTER_LOOP=1 prefix
+# exempts it (only the outer loop ever runs with that prefix).
+expect allow "Bash recursive read under the outer prefix" Bash \
+  '{"command":"RSI_OUTER_LOOP=1 grep -rn x plugins/rsi-loop/tasks/bin-packing/private"}'
 expect deny "Grep private path" Grep \
   '{"pattern":"score","path":"/w/rsi-runs/r1/tasks/bp/private"}'
 expect deny "Bash cat private file" Bash \
