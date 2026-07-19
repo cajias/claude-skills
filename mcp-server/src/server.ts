@@ -1,21 +1,24 @@
 #!/usr/bin/env node
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
 
-import { fix, FixInput } from './tools/fix.js';
-import { lint, LintInput } from './tools/lint.js';
+import { fix, FixInput } from "./tools/fix.js";
+import { lint, LintInput } from "./tools/lint.js";
 
 const server = new Server(
   {
-    name: 'sca-mcp',
-    version: '1.0.0',
+    name: "sca-mcp",
+    version: "1.0.0",
   },
   {
     capabilities: {
       tools: {},
     },
-  }
+  },
 );
 
 // List available tools
@@ -23,45 +26,45 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'lint',
+        name: "lint",
         description:
-          'Run linters on a project and return structured issues. Returns errors categorized by fixability: auto-fixable (by linter tools), Claude-fixable (complexity, types), and manual-only.',
+          "Run linters on a project and return structured issues. Returns errors categorized by fixability: auto-fixable (by linter tools), Claude-fixable (complexity, types), and manual-only.",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             path: {
-              type: 'string',
-              description: 'Path to the project or file to lint',
+              type: "string",
+              description: "Path to the project or file to lint",
             },
             language: {
-              type: 'string',
-              enum: ['typescript', 'python', 'auto'],
-              description: 'Language to lint (auto-detects if not specified)',
-              default: 'auto',
+              type: "string",
+              enum: ["typescript", "python", "auto"],
+              description: "Language to lint (auto-detects if not specified)",
+              default: "auto",
             },
           },
-          required: ['path'],
+          required: ["path"],
         },
       },
       {
-        name: 'fix',
+        name: "fix",
         description:
-          'Run linter auto-fix on a project. This runs eslint --fix, prettier --write, etc. Only fixes issues that tools can auto-fix; Claude-fixable issues require separate handling.',
+          "Run linter auto-fix on a project. This runs eslint --fix, prettier --write, etc. Only fixes issues that tools can auto-fix; Claude-fixable issues require separate handling.",
         inputSchema: {
-          type: 'object',
+          type: "object",
           properties: {
             path: {
-              type: 'string',
-              description: 'Path to the project or file to fix',
+              type: "string",
+              description: "Path to the project or file to fix",
             },
             language: {
-              type: 'string',
-              enum: ['typescript', 'python', 'auto'],
-              description: 'Language to fix (auto-detects if not specified)',
-              default: 'auto',
+              type: "string",
+              enum: ["typescript", "python", "auto"],
+              description: "Language to fix (auto-detects if not specified)",
+              default: "auto",
             },
           },
-          required: ['path'],
+          required: ["path"],
         },
       },
     ],
@@ -74,25 +77,25 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case 'lint': {
+      case "lint": {
         const input = args as unknown as LintInput;
         const result = await lint(input);
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: JSON.stringify(result, null, 2),
             },
           ],
         };
       }
-      case 'fix': {
+      case "fix": {
         const input = args as unknown as FixInput;
         const result = await fix(input);
         return {
           content: [
             {
-              type: 'text',
+              type: "text",
               text: JSON.stringify(result, null, 2),
             },
           ],
@@ -106,7 +109,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     return {
       content: [
         {
-          type: 'text',
+          type: "text",
           text: JSON.stringify({ error: message }),
         },
       ],
@@ -119,10 +122,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('SCA MCP server started');
+  console.error("SCA MCP server started");
 }
 
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });
