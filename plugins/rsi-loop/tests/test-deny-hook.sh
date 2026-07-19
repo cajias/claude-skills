@@ -65,6 +65,16 @@ expect deny "Bash grep -r at cwd" Bash \
   '{"command":"grep -rn expected ."}'
 expect deny "Bash rg at cwd" Bash \
   '{"command":"rg expected ."}'
+# A recursive reader with NO path arg recurses from cwd — must be denied even
+# though it carries no ancestor token (regression: bare rg/ag bypassed the rule).
+expect deny "Bash bare rg (no path, recurses cwd)" Bash \
+  '{"command":"rg answer"}'
+expect deny "Bash bare ag (no path, recurses cwd)" Bash \
+  '{"command":"ag answer"}'
+expect deny "Bash rg at a tree-relative task root" Bash \
+  '{"command":"rg answer tasks/bin-packing"}'
+expect deny "Bash grep -rIl (flag cluster) bare" Bash \
+  '{"command":"grep -rIl answer"}'
 # ...but a recursive read narrowed to public/, or a specific file, stays allowed.
 expect allow "Grep narrowed to a task public dir" Grep \
   '{"pattern":"capacity","path":"plugins/rsi-loop/tasks/bin-packing/public"}'
@@ -222,6 +232,8 @@ parity "Grep at plugin root" Grep '{"pattern":"expected","path":"/repo/plugins/r
 parity "Grep at cwd" Grep '{"pattern":"expected","path":"."}'
 parity "grep -r at cwd" Bash '{"command":"grep -rn expected ."}'
 parity "rg at cwd" Bash '{"command":"rg expected ."}'
+parity "bare rg no path" Bash '{"command":"rg answer"}'
+parity "bare ag no path" Bash '{"command":"ag answer"}'
 
 echo
 echo "deny-private hook: $PASS passed, $FAIL failed"

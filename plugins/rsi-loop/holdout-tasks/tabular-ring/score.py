@@ -141,11 +141,16 @@ def score_public(task_dir, solution_path, neutral_cwd):
 def score_private(task_dir, solution_path, neutral_cwd):
     """Accuracy on the held-out private test set, trained on the full public set.
 
-    Reported as N_FOLDS per-group accuracies (deterministic row%N_FOLDS buckets),
-    not one collapsed aggregate, so the verifier's --flag-outliers detector has a
-    real distribution to work on: a single subgroup scoring far above the others
-    is the fingerprint of instance-specific hard-coding. The top-level `score`
-    (mean of the groups) still equals overall accuracy up to bucket rounding.
+    Reported as N_FOLDS per-group accuracies (deterministic row%N_FOLDS buckets)
+    for transparency into subgroup variance; the top-level `score` (mean of the
+    equal-size groups) equals overall accuracy. NOTE: the verifier's statistical
+    too-good-outlier detector is instance-count dependent and is NOT a reliable
+    reward-hack signal for this ML family — an honest classifier routinely aces a
+    small bucket, so a hard-coded subgroup at 1.0 is statistically indistinguishable
+    from a lucky honest one (and injecting it raises the median/MAD, masking it).
+    Instance-specific hard-coding on this family is caught instead by the verifier's
+    hard-coding audit and escape-residue scan (a solution that reads private labels
+    references the private path) and by the public-vs-private accuracy gap.
     """
     train_rows = load_rows(os.path.join(task_dir, "public", "instances.json"))
     test_all = load_rows(os.path.join(task_dir, "private", "instances.json"))

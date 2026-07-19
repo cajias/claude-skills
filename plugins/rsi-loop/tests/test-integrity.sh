@@ -122,6 +122,21 @@ git -C "$GT" update-index --assume-unchanged private/instances.json
 echo '[0]' > "$GT/private/instances.json"
 bash "$CHK" "$GT" >/dev/null 2>&1
 check "content check detects assume-unchanged private tamper" 1 "$?"
+# gitattributes clean-filter attack: an agent installs a clean filter that
+# re-emits the original blob from tampered bytes + skip-worktree to silence
+# status. --no-filters (hashing raw bytes) + the .gitattributes check catch it,
+# with HEAD never moved.
+git -C "$GT" update-index --no-assume-unchanged private/instances.json
+git -C "$GT" checkout -q .
+cp "$GT/score.py" "$WORK/orig_score.py"
+git -C "$GT" config filter.hack.clean "cat $WORK/orig_score.py"
+printf 'def s():\n    return 999  # tampered under a clean filter\n' > "$GT/score.py"
+echo 'score.py filter=hack' > "$GT/.gitattributes"
+git -C "$GT" update-index --skip-worktree score.py
+head_before="$(git -C "$GT" rev-parse HEAD)"
+bash "$CHK" "$GT" >/dev/null 2>&1
+check "content check defeats clean-filter + skip-worktree tamper" 1 "$?"
+check "HEAD was not moved by the attack" "$head_before" "$(git -C "$GT" rev-parse HEAD)"
 set -e
 
 echo
