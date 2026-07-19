@@ -21,7 +21,12 @@ genDir: <candidate>, taskName, seed: 42, policy: <parsed policy.json>}})` and aw
    Record its best public score and inner token usage.
 4. **Private scoring** (outer context only): for each task,
    `RSI_OUTER_LOOP=1 bash plugins/rsi-loop/scripts/rsi-score.sh --private <task-dir> <best-solution>`.
-   `private_aggregate` = mean private score across tasks.
+   Compute `private_aggregate` with the immutable helper so the statistic is
+   robust and auditable — pass one seed's score per task (single-step default) or
+   the full seed vector under `/rsi:run --seeds K`:
+   `echo '{"tasks": {"<task>": {"seeds": [p, …]}, …}}' | python3 plugins/rsi-loop/scripts/rsi-aggregate.py --aggregate`.
+   Its `private_aggregate` (mean of per-task medians) is the selection statistic;
+   with a single seed it equals the mean private score across tasks.
 5. **Score gate**: if `private_aggregate` does NOT strictly beat the incumbent's ledger value,
    the step is a rejection — skip the verifier (its verdict cannot change the outcome and each
    run is a full LLM subagent), record `"verifier": null`, and go to step 7. Only when the
@@ -29,8 +34,11 @@ genDir: <candidate>, taskName, seed: 42, policy: <parsed policy.json>}})` and aw
 6. **Verify**: spawn the `rsi-verifier` agent on each task's claimed winner. It re-scores
    against the pristine plugin-source scorer and runs
    `scripts/rsi-check-integrity.sh <task-dir>` (which `rsi-score.sh --private` already
-   enforced in step 4). Any `hacked` verdict — including a tampered-harness integrity
-   failure — ⇒ the step is rejected regardless of scores.
+   enforced in step 4). It also feeds the winner's per-instance private scores to
+   `python3 plugins/rsi-loop/scripts/rsi-aggregate.py --flag-outliers`; a flagged
+   too-good instance is refutation evidence to explain mechanically or reject. Any
+   `hacked` verdict — including a tampered-harness integrity failure — ⇒ the step is
+   rejected regardless of scores.
 7. **Select**: accept iff the candidate passed the score gate (step 5) AND the verifier is
    clean. On accept, write the candidate path into `best.txt`. Either way, append the full
    ledger line (schema in `rsi-init.md`) — rejected generations stay on disk.

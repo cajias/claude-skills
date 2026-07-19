@@ -97,3 +97,6 @@ jobs:
 
       - name: Harness integrity guard
         run: bash plugins/rsi-loop/tests/test-integrity.sh
+
+      - name: Score aggregation and outlier detection
+        run: bash plugins/rsi-loop/tests/test-aggregate.sh
