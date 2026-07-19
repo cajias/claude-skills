@@ -26,8 +26,11 @@ genDir: <candidate>, taskName, seed: 42, policy: <parsed policy.json>}})` and aw
    the step is a rejection — skip the verifier (its verdict cannot change the outcome and each
    run is a full LLM subagent), record `"verifier": null`, and go to step 7. Only when the
    candidate would otherwise be accepted do you continue to step 6.
-6. **Verify**: spawn the `rsi-verifier` agent on each task's claimed winner. Any `hacked`
-   verdict ⇒ the step is rejected regardless of scores.
+6. **Verify**: spawn the `rsi-verifier` agent on each task's claimed winner. It re-scores
+   against the pristine plugin-source scorer and runs
+   `scripts/rsi-check-integrity.sh <task-dir>` (which `rsi-score.sh --private` already
+   enforced in step 4). Any `hacked` verdict — including a tampered-harness integrity
+   failure — ⇒ the step is rejected regardless of scores.
 7. **Select**: accept iff the candidate passed the score gate (step 5) AND the verifier is
    clean. On accept, write the candidate path into `best.txt`. Either way, append the full
    ledger line (schema in `rsi-init.md`) — rejected generations stay on disk.

@@ -53,5 +53,16 @@ meta = {...}` pure literal first, plain JS only.
   (e.g. persist suite spec in the generation dir), not in the immutable harness.
 - Single-task battery; M3 adds the ML-engineering and harness-engineering families
   (pure-stdlib Python only — no numpy/sklearn in this environment).
-- `skills/rsi-loop/SKILL.md` is still a placeholder (update when /rsi:init + /rsi:step have
-  been exercised end-to-end by a user-facing flow, M3).
+
+## Firewall / harness-integrity model (post-audit)
+
+- Agents run as the **same uid as the harness (root here)**, so OS read-only bits cannot
+  PREVENT a write. The immutable-harness guarantee is therefore **detection, not prevention**:
+  `scripts/rsi-check-integrity.sh` anchors scorer/task/instance data to git HEAD (plugin
+  source) or a `.integrity.sha256` manifest (sandbox / run copies); `rsi-score.sh --private`
+  and the verifier refuse to trust a tampered harness (exit 5). Do not reintroduce `chmod`-
+  based "hardening" — it gives false assurance under root.
+- The deny hook (`hooks/deny-private.py`) is the fast-feedback layer for naive/accidental
+  access; the private-read wall for inner agents is structural (sandboxes contain no
+  private/). Tests: `tests/test-deny-hook.sh` (60), `tests/test-scorer.sh` (7),
+  `tests/test-integrity.sh` (6) — all in the `test-rsi-loop` CI job.

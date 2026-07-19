@@ -41,4 +41,12 @@ if find "$SANDBOX" -name "*private*" -print -quit | grep -q .; then
   exit 1
 fi
 
-echo "sandbox ready: $SANDBOX (task.md, score.py, public/, nodes/)"
+# Record a checksum manifest of the immutable inputs the inner agent is scored
+# against. We do NOT chmod them read-only: agents run as the same uid (often
+# root), which bypasses permission bits — read-only would give false assurance.
+# Instead the manifest lets the OUTER harness DETECT tampering (see
+# rsi-check-integrity.sh) and reject a step whose scorer/data was altered.
+( cd "$SANDBOX" && find score.py task.md public -type f -exec sha256sum {} + \
+    | LC_ALL=C sort > .integrity.sha256 )
+
+echo "sandbox ready: $SANDBOX (task.md, score.py, public/, nodes/; .integrity.sha256 recorded)"

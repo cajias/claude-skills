@@ -28,16 +28,25 @@ itself), launch the session with RSI_HOOK_DISARM=1 in the environment.
 Agents cannot set this — hook processes inherit the session environment,
 not the environment of any Bash tool call.
 
-Threat model (mirrors PLAN.md): this blocks accidental leakage and naive
-attempts by sandboxed inner agents. It is NOT a security boundary against an
-adversary with full session permissions. Two residual gaps are covered
-structurally elsewhere, not here: (a) a Bash `cd` into a task dir followed by
-a tree-relative `cat private/...` cannot be seen in a single command string —
-the primary wall is that inner-agent sandboxes are built (by rsi-sandbox.sh)
-with the private/ split absent entirely; (b) exotic writers (`python -c`,
-process substitution) can still reach a scorer copy — the verifier stage
-re-scores accepted winners against the pristine task dir, so a tampered
-sandbox scorer cannot carry a generation to acceptance.
+Threat model (mirrors PLAN.md): this hook blocks accidental leakage and naive
+attempts by sandboxed inner agents. It is the FAST-FEEDBACK layer, not the only
+wall — agents run as the same uid as the harness (often root), so no in-process
+check and no OS permission bit can truly PREVENT a determined write. The
+defenses are layered:
+
+- Private-split READS: the primary wall is that inner-agent sandboxes are built
+  (by rsi-sandbox.sh) with the private/ split absent entirely. This hook adds
+  outer-session coverage: direct refs, the held-out filename, wildcard/recursive
+  reads, and `cd` into a `private` dir (closing the multi-step cwd escape). A
+  residual remains — arbitrary stateful shell maneuvers cannot be caught by a
+  stateless per-command check — but there is no private data in the one place
+  inner agents actually run.
+- Harness WRITES: not prevented but DETECTED. rsi-check-integrity.sh anchors the
+  scorer/task/instance data to git HEAD (or a checksum manifest), and the outer
+  private-scoring path (rsi-score.sh --private) plus the verifier refuse to trust
+  a score from a tampered harness. So any writer — naive `>>`/`tee` or exotic
+  `python -c` / `dd` — fails the step rather than carrying a hacked generation to
+  acceptance. This hook's write rules are the fast, legible first line.
 """
 import json
 import os
@@ -66,6 +75,14 @@ RSI_CONTEXT = re.compile(_BOUND + TREE_ROOTS + r"/")
 PRIVATE_INSTANCES = re.compile(r"private/instances\.json")
 
 PRIVATE_FLAG = re.compile(r"(?:^|\s)--private\b")
+
+# `cd` into a directory named `private`. This closes the multi-step cwd escape
+# (`cd tasks/bp` then `cd private` then `cat instances.json`): the first two
+# steps are individually innocuous to a stateless string check, but a `cd` whose
+# target's final segment is `private` has no legitimate purpose in an RSI session.
+CD_INTO_PRIVATE = re.compile(
+    r"\bcd\s+[\"']?(?:[^\s;&|\"']*/)?private/?[\"']?(?:$|[\s;&|])"
+)
 
 # Bash wildcard under a task tree could expand to private/.
 RSI_GLOB = re.compile(_BOUND + TREE_ROOTS + r"/[^\s'\"]*[*?\[]")
@@ -150,6 +167,11 @@ def main():
                 deny(
                     "this command references a held-out private/ split. "
                     "Inner agents may only touch task.md, score.py and public/."
+                )
+            if CD_INTO_PRIVATE.search(cmd):
+                deny(
+                    "changing directory into a `private` directory is blocked "
+                    "(it would let a later tree-relative read reach the held-out split)."
                 )
             if RSI_GLOB.search(cmd):
                 deny(

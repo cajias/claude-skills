@@ -95,6 +95,12 @@ expect deny "Edit sandbox scorer copy" Edit \
   '{"file_path":"/w/scratch/rsi-autoresearch/bp/sandbox/score.py","old_string":"a","new_string":"b"}'
 expect deny "MCP-style read tool into private" mcp__fs__read_file \
   '{"path":"/w/rsi-runs/r1/tasks/bp/private/instances.json"}'
+expect deny "cd into bare private (multi-step escape)" Bash \
+  '{"command":"cd private"}'
+expect deny "cd into ./private" Bash \
+  '{"command":"cd ./private && cat instances.json"}'
+expect deny "cd into nested private" Bash \
+  '{"command":"cd rsi-runs/r1/tasks/bp/private"}'
 
 # ── Legitimate calls that must be allowed ────────────────────────────
 expect allow "Read task.md" Read \
@@ -127,6 +133,10 @@ expect allow "Read plugin-source task.md" Read \
   '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/task.md"}'
 expect allow "Write solution inside sandbox nodes" Write \
   '{"file_path":"/w/rsi-runs/r1/eval/gen-001/bp/sandbox/nodes/node-0/solution.py","content":"def pack..."}'
+expect allow "cd into task root (not private)" Bash \
+  '{"command":"cd rsi-runs/r1/tasks/bp && ls public"}'
+expect allow "cd into a non-private segment" Bash \
+  '{"command":"cd private_data_dir"}'
 
 # Disarm escape hatch for humans
 out="$(printf '{"tool_name":"Read","tool_input":{"file_path":"rsi-runs/r/tasks/t/private/x"}}' | RSI_HOOK_DISARM=1 python3 "$HOOK")"

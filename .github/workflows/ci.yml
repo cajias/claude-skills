@@ -94,3 +94,6 @@ jobs:
 
       - name: Scorer self-check
         run: bash plugins/rsi-loop/tests/test-scorer.sh
+
+      - name: Harness integrity guard
+        run: bash plugins/rsi-loop/tests/test-integrity.sh
