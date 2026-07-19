@@ -38,6 +38,19 @@ expect deny "Read plugin-source private split" Read \
   '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/private/instances.json"}'
 expect deny "Glob into private dir" Glob \
   '{"pattern":"rsi-runs/r1/tasks/*/private/**"}'
+# The M3 families are covered by the same task-agnostic rules — assert it.
+expect deny "Read tabular-classification private" Read \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/private/instances.json"}'
+expect deny "Read instruction-routing private" Read \
+  '{"file_path":"/w/rsi-runs/r2/tasks/instruction-routing/private/instances.json"}'
+expect deny "Bash cat tabular private" Bash \
+  '{"command":"cat rsi-runs/r2/tasks/tabular-classification/private/instances.json"}'
+expect deny "Write tabular scorer (immutable)" Write \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/score.py","content":"x"}'
+expect deny "Edit instruction-routing task.md (immutable)" Edit \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/instruction-routing/task.md","old_string":"a","new_string":"b"}'
+expect allow "Read tabular-classification public" Read \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/public/instances.json"}'
 expect deny "Grep private path" Grep \
   '{"pattern":"score","path":"/w/rsi-runs/r1/tasks/bp/private"}'
 expect deny "Bash cat private file" Bash \

@@ -78,6 +78,24 @@ RSI_OUTER_LOOP=1 bash "$SCORE_SH" --private "$SB" "$WORK/sol.py" >/dev/null 2>&1
 check "rsi-score --private refuses tampered harness (exit 5)" 5 "$?"
 set -e
 
+# 7. The same guarantees hold for every task in the battery, not just
+#    bin-packing: each committed task dir verifies git-clean, each fresh
+#    sandbox verifies by manifest, and a tampered sandbox scorer is detected.
+for t in tabular-classification instruction-routing; do
+  TD="$PLUGIN_ROOT/tasks/$t"
+  set +e
+  bash "$CHK" "$TD" >/dev/null 2>&1
+  check "$t: git-tracked task dir verifies clean" 0 "$?"
+  SBT="$WORK/sandbox-$t"
+  bash "$SANDBOX_SH" "$TD" "$SBT" >/dev/null
+  bash "$CHK" "$SBT" >/dev/null 2>&1
+  check "$t: fresh sandbox verifies clean (manifest)" 0 "$?"
+  echo "# tamper" >> "$SBT/score.py"
+  bash "$CHK" "$SBT" >/dev/null 2>&1
+  check "$t: tampered sandbox scorer detected" 1 "$?"
+  set -e
+done
+
 echo
 echo "harness integrity: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]
