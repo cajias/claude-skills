@@ -1,9 +1,9 @@
-import { runEslint } from '../runners/eslint.js';
-import { runPrettier } from '../runners/prettier.js';
+import { runEslint } from "../runners/eslint.js";
+import { runPrettier } from "../runners/prettier.js";
 
 export interface FixInput {
   path: string;
-  language?: 'typescript' | 'python' | 'auto';
+  language?: "typescript" | "python" | "auto";
 }
 
 export interface FixResult {
@@ -16,21 +16,22 @@ export interface FixResult {
 }
 
 export async function fix(input: FixInput): Promise<FixResult> {
-  const { path, language = 'auto' } = input;
+  const { path, language = "auto" } = input;
 
   const fixedFiles = new Set<string>();
   let eslintFixed = 0;
   let prettierFixed = 0;
 
   // Determine language
-  const detectedLanguage = language === 'auto' ? detectLanguage(path) : language;
+  const detectedLanguage =
+    language === "auto" ? detectLanguage(path) : language;
 
-  if (detectedLanguage === 'typescript' || detectedLanguage === 'auto') {
+  if (detectedLanguage === "typescript" || detectedLanguage === "auto") {
     // Run ESLint with --fix
     const eslintBefore = await runEslint(path, false);
     const beforeCount = eslintBefore.reduce(
       (sum, f) => sum + f.messages.filter((m) => m.fix !== undefined).length,
-      0
+      0,
     );
 
     await runEslint(path, true);
@@ -38,7 +39,7 @@ export async function fix(input: FixInput): Promise<FixResult> {
     const eslintAfter = await runEslint(path, false);
     const afterCount = eslintAfter.reduce(
       (sum, f) => sum + f.messages.filter((m) => m.fix !== undefined).length,
-      0
+      0,
     );
 
     eslintFixed = beforeCount - afterCount;
@@ -56,7 +57,8 @@ export async function fix(input: FixInput): Promise<FixResult> {
     await runPrettier(path, true);
     const prettierAfter = await runPrettier(path, false);
 
-    prettierFixed = prettierBefore.unformatted.length - prettierAfter.unformatted.length;
+    prettierFixed =
+      prettierBefore.unformatted.length - prettierAfter.unformatted.length;
 
     for (const file of prettierBefore.unformatted) {
       if (!prettierAfter.unformatted.includes(file)) {
@@ -77,17 +79,17 @@ export async function fix(input: FixInput): Promise<FixResult> {
   };
 }
 
-function detectLanguage(path: string): 'typescript' | 'python' | 'auto' {
+function detectLanguage(path: string): "typescript" | "python" | "auto" {
   if (
-    path.endsWith('.ts') ||
-    path.endsWith('.tsx') ||
-    path.endsWith('.js') ||
-    path.endsWith('.jsx')
+    path.endsWith(".ts") ||
+    path.endsWith(".tsx") ||
+    path.endsWith(".js") ||
+    path.endsWith(".jsx")
   ) {
-    return 'typescript';
+    return "typescript";
   }
-  if (path.endsWith('.py')) {
-    return 'python';
+  if (path.endsWith(".py")) {
+    return "python";
   }
-  return 'auto';
+  return "auto";
 }
