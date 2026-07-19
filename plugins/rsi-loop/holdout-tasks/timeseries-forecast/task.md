@@ -34,7 +34,7 @@ For each instance the scorer compares your forecast to the true future values
 with a **smooth skill ratio** against the naive persistence baseline (predicting
 the last observed value for every step):
 
-```
+```text
 score = MAE_persistence / (MAE_persistence + MAE_solution)
 ```
 

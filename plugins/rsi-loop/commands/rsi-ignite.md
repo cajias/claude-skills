@@ -4,7 +4,7 @@ argument-hint: "<source-run-dir> [--max-steps N] [--budget TOKENS]"
 ---
 
 Run the AIDE² **Level-2 (ignition)** test for the run in "$ARGUMENTS". Level 2
-asks whether the system's *self-improvement ability* has itself improved: does a
+asks whether the system's _self-improvement ability_ has itself improved: does a
 campaign whose proposer is informed by the best evolved generation (`vN`) beat
 what the baseline proposer (`vN−1`) produces from the same start at the same
 budget? The paper measured this honestly and did **not** claim it (AIDE47-as
@@ -18,7 +18,7 @@ per-eval budget and seeds, the same verifier, and the same total step/token
 budget. They differ in ONE thing — who proposes:
 
 - **Arm C (control)**: the standard `rsi-proposer` (as in `/rsi:step`).
-- **Arm I (ignited)**: the proposer is briefed with the *discovered strategy*
+- **Arm I (ignited)**: the proposer is briefed with the _discovered strategy_
   of the source run's best generation — its `policy.json` and operator prompts,
   and the ledger rationales of every accepted step on its lineage — and told to
   propose in that idiom (the evolved agent's own search/context principles

@@ -38,12 +38,12 @@ condition, not an open-ended one.
      step 7), rewrite `best.txt` from the ledger — never trust a `best.txt` that
      names a generation absent from, or not accepted in, the ledger;
    - cumulative inner tokens = sum of `inner_tokens` over committed ledger lines.
-   Re-invoking `/rsi:run` on the same dir continues where the last one stopped —
-   never restart from step 1 if the ledger is non-empty. Caveat: a step that
-   crashed *before* its ledger append leaves no committed line, so its partial
-   inner-token spend is not counted and the step re-runs on resume (re-spending
-   those tokens). The `--budget` guard is therefore accurate to committed-step
-   granularity, not to the token; size `--budget` with that slack in mind.
+     Re-invoking `/rsi:run` on the same dir continues where the last one stopped —
+     never restart from step 1 if the ledger is non-empty. Caveat: a step that
+     crashed _before_ its ledger append leaves no committed line, so its partial
+     inner-token spend is not counted and the step re-runs on resume (re-spending
+     those tokens). The `--budget` guard is therefore accurate to committed-step
+     granularity, not to the token; size `--budget` with that slack in mind.
 
 2. **Budget/step guard, then one step.** Before each step, stop and report if:
    any of `--max-steps` (steps taken this invocation), `--budget` (cumulative

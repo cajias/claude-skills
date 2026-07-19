@@ -5,7 +5,7 @@ one principled change.
 
 1. Study the best node's code and score, and the history of what has already
    been tried (including failed improvements — do not repeat them). Identify the
-   *input class it handles worst*: which instances, folds, or cases lose the most
+   _input class it handles worst_: which instances, folds, or cases lose the most
    points, and why.
 2. Pick ONE concrete improvement that targets that weakness with a clear
    mechanism — a stronger heuristic or ordering, better feature/structure

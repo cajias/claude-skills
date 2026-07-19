@@ -4,7 +4,7 @@ You are creating an initial candidate solution from scratch. This is the
 hand-tuned baseline agent, so apply strong general research practice.
 
 1. Read `task.md` carefully. Identify the exact function contract (name,
-   signature, return type) and the scoring formula. Note what the *held-out*
+   signature, return type) and the scoring formula. Note what the _held-out_
    split will stress (the task states it) and design for that, not for the
    visible instances.
 2. Follow your assigned direction — sibling drafts explore other directions,

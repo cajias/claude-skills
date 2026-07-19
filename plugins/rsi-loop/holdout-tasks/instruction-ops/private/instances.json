@@ -1,104 +1,104 @@
 {
- "cases": [
-  {
-   "name": "words-0",
-   "instruction": "how many words are in ledger orange signal orange ledger",
-   "expected": "5"
-  },
-  {
-   "name": "concat-1",
-   "instruction": "join ledger and harness",
-   "expected": "ledgerharness"
-  },
-  {
-   "name": "smallest-2",
-   "instruction": "smallest value in [-13, 10, -13, 5, -3]",
-   "expected": "-13"
-  },
-  {
-   "name": "greater-3",
-   "instruction": "is 14 bigger than -8",
-   "expected": "yes"
-  },
-  {
-   "name": "words-4",
-   "instruction": "how many words are in banana delta harness quick python",
-   "expected": "5"
-  },
-  {
-   "name": "concat-5",
-   "instruction": "combine banana with signal",
-   "expected": "bananasignal"
-  },
-  {
-   "name": "smallest-6",
-   "instruction": "the minimum of [-17, 0, -18, 23]",
-   "expected": "-18"
-  },
-  {
-   "name": "greater-7",
-   "instruction": "is 30 larger than 17",
-   "expected": "yes"
-  },
-  {
-   "name": "words-8",
-   "instruction": "number of words in kernel",
-   "expected": "1"
-  },
-  {
-   "name": "concat-9",
-   "instruction": "combine orange with quick",
-   "expected": "orangequick"
-  },
-  {
-   "name": "smallest-10",
-   "instruction": "the minimum of [-9, 36]",
-   "expected": "-9"
-  },
-  {
-   "name": "greater-11",
-   "instruction": "is 0 more than 17",
-   "expected": "no"
-  },
-  {
-   "name": "words-12",
-   "instruction": "number of words in banana",
-   "expected": "1"
-  },
-  {
-   "name": "concat-13",
-   "instruction": "join harness and delta",
-   "expected": "harnessdelta"
-  },
-  {
-   "name": "smallest-14",
-   "instruction": "the minimum of [34, 12]",
-   "expected": "12"
-  },
-  {
-   "name": "greater-15",
-   "instruction": "is 2 larger than -8",
-   "expected": "yes"
-  },
-  {
-   "name": "words-16",
-   "instruction": "number of words in banana quick banana delta",
-   "expected": "4"
-  },
-  {
-   "name": "concat-17",
-   "instruction": "join quick and python",
-   "expected": "quickpython"
-  },
-  {
-   "name": "smallest-18",
-   "instruction": "the min of [1, 37, 1, 40, 37]",
-   "expected": "1"
-  },
-  {
-   "name": "greater-19",
-   "instruction": "is 40 more than 21",
-   "expected": "yes"
-  }
- ]
+  "cases": [
+    {
+      "name": "words-0",
+      "instruction": "how many words are in ledger orange signal orange ledger",
+      "expected": "5"
+    },
+    {
+      "name": "concat-1",
+      "instruction": "join ledger and harness",
+      "expected": "ledgerharness"
+    },
+    {
+      "name": "smallest-2",
+      "instruction": "smallest value in [-13, 10, -13, 5, -3]",
+      "expected": "-13"
+    },
+    {
+      "name": "greater-3",
+      "instruction": "is 14 bigger than -8",
+      "expected": "yes"
+    },
+    {
+      "name": "words-4",
+      "instruction": "how many words are in banana delta harness quick python",
+      "expected": "5"
+    },
+    {
+      "name": "concat-5",
+      "instruction": "combine banana with signal",
+      "expected": "bananasignal"
+    },
+    {
+      "name": "smallest-6",
+      "instruction": "the minimum of [-17, 0, -18, 23]",
+      "expected": "-18"
+    },
+    {
+      "name": "greater-7",
+      "instruction": "is 30 larger than 17",
+      "expected": "yes"
+    },
+    {
+      "name": "words-8",
+      "instruction": "number of words in kernel",
+      "expected": "1"
+    },
+    {
+      "name": "concat-9",
+      "instruction": "combine orange with quick",
+      "expected": "orangequick"
+    },
+    {
+      "name": "smallest-10",
+      "instruction": "the minimum of [-9, 36]",
+      "expected": "-9"
+    },
+    {
+      "name": "greater-11",
+      "instruction": "is 0 more than 17",
+      "expected": "no"
+    },
+    {
+      "name": "words-12",
+      "instruction": "number of words in banana",
+      "expected": "1"
+    },
+    {
+      "name": "concat-13",
+      "instruction": "join harness and delta",
+      "expected": "harnessdelta"
+    },
+    {
+      "name": "smallest-14",
+      "instruction": "the minimum of [34, 12]",
+      "expected": "12"
+    },
+    {
+      "name": "greater-15",
+      "instruction": "is 2 larger than -8",
+      "expected": "yes"
+    },
+    {
+      "name": "words-16",
+      "instruction": "number of words in banana quick banana delta",
+      "expected": "4"
+    },
+    {
+      "name": "concat-17",
+      "instruction": "join quick and python",
+      "expected": "quickpython"
+    },
+    {
+      "name": "smallest-18",
+      "instruction": "the min of [1, 37, 1, 40, 37]",
+      "expected": "1"
+    },
+    {
+      "name": "greater-19",
+      "instruction": "is 40 more than 21",
+      "expected": "yes"
+    }
+  ]
 }

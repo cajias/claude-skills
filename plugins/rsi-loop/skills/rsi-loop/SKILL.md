@@ -32,7 +32,7 @@ generalizable improvements:
 - **bin-packing** — heuristic/combinatorial optimization (ALE-Bench analog).
 - **tabular-classification** — ML engineering; public score is 5-fold CV
   accuracy, private is a held-out test set (MLE-Bench analog).
-- **instruction-routing** — harness engineering; the solution *is* a tiny agent
+- **instruction-routing** — harness engineering; the solution _is_ a tiny agent
   scaffold, scored on unseen phrasings in private (the self-referential family).
 
 ## Running

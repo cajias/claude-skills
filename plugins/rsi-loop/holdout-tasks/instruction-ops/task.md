@@ -2,7 +2,7 @@
 
 Write a Python 3 solution file that reads a short natural-language instruction,
 works out which operation it asks for, performs it, and returns the exact
-answer. Your solution *is* a miniature agent scaffold: an intent parser plus an
+answer. Your solution _is_ a miniature agent scaffold: an intent parser plus an
 operation dispatcher. Making it better is harness engineering.
 
 ## Contract
@@ -23,12 +23,12 @@ def solve(instruction: str) -> str:
 Every instruction is one of these four operations. The phrasings below are
 examples, not an exhaustive grammar — the held-out cases paraphrase them:
 
-| Operation     | Example instruction                    | Answer      |
-| ------------- | -------------------------------------- | ----------- |
-| count words   | `count the words in the quick cat`     | `3`         |
-| concatenate   | `concatenate cat and banana`           | `catbanana` |
-| smallest num  | `the smallest number in [3, 9, 2]`     | `2`         |
-| greater than  | `is 7 greater than 4`                   | `yes`       |
+| Operation    | Example instruction                | Answer      |
+| ------------ | ---------------------------------- | ----------- |
+| count words  | `count the words in the quick cat` | `3`         |
+| concatenate  | `concatenate cat and banana`       | `catbanana` |
+| smallest num | `the smallest number in [3, 9, 2]` | `2`         |
+| greater than | `is 7 greater than 4`              | `yes`       |
 
 Details:
 
@@ -60,7 +60,7 @@ inspect them freely.
 
 ## What decides acceptance
 
-A held-out **private** case set scores the *same four operations* with different
+A held-out **private** case set scores the _same four operations_ with different
 phrasings and edge-case arguments (negatives, ties, single-word sentences,
 single-item lists). It is never available to you. A scaffold that only matches
 the exact public phrasings — or hard-codes the public answers — scores poorly on
