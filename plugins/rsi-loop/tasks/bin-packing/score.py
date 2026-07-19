@@ -82,8 +82,11 @@ def run_instance(inst, solution_path, neutral_cwd):
         }
     )
     # Run the embedded runner via `-c` (no temp file to leak on a timeout kill)
-    # in a neutral cwd, so the solution subprocess gets no incidental access to
-    # the task directory (and therefore never to private/ during private scoring).
+    # in a neutral cwd, so the solution subprocess gets no *incidental* (cwd
+    # -relative) access to the task directory. This is not a filesystem sandbox:
+    # a solution could still read private/ via an absolute path during private
+    # scoring — that is a reward hack the verifier detects, not one prevented
+    # here (detection, not prevention; see PLAN.md).
     try:
         proc = subprocess.run(
             [sys.executable, "-c", RUNNER_SRC],

@@ -9,6 +9,12 @@ to make the inner research agent BETTER AT RESEARCH, exactly one focused rewrite
 
 Input (provided in your prompt): the run dir, the incumbent generation dir, and the full
 `ledger.jsonl` history (all prior proposals, scores, accept/reject outcomes, and observations).
+Optionally, a **strategy brief** may be prepended to your prompt (used by `/rsi:ignite`'s
+ignited arm): a few concrete principles distilled from a prior run's best generation — which
+operators to favor, what context each should get, what selection rule. When a brief is present,
+propose in that idiom (let those discovered principles drive your rewrite); when it is absent,
+propose from the ledger and your own judgement as usual. A brief changes your search bias only —
+it never relaxes the anti-overfitting or args-contract rules below.
 
 Procedure:
 

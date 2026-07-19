@@ -46,7 +46,11 @@ fi
 # root), which bypasses permission bits — read-only would give false assurance.
 # Instead the manifest lets the OUTER harness DETECT tampering (see
 # rsi-check-integrity.sh) and reject a step whose scorer/data was altered.
-( cd "$SANDBOX" && find score.py task.md public -type f -exec sha256sum {} + \
-    | LC_ALL=C sort > .integrity.sha256 )
+# The manifest covers private/ IF it is ever present. A sandbox never contains
+# one (that is the private-read wall), so this is a no-op here — but it keeps the
+# manifest builder honest so any other manifest-anchored dir that DOES hold a
+# private split has it covered rather than silently unverified.
+( cd "$SANDBOX" && find score.py task.md public $([ -e private ] && echo private) \
+    -type f -exec sha256sum {} + | LC_ALL=C sort > .integrity.sha256 )
 
 echo "sandbox ready: $SANDBOX (task.md, score.py, public/, nodes/; .integrity.sha256 recorded)"

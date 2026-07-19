@@ -9,8 +9,15 @@
 # strict superset of every path/flag deny-private.py inspects, so a payload
 # that skips python here would have been allowed there anyway.
 IN=$(cat)
+# Trigger set is a strict SUPERSET of everything deny-private.py can act on.
+# Besides the protected-tree tokens, route every recursive-read tool (Grep/Glob)
+# and recursive-read shell command (grep/rg/ag) plus any `rsi-loop`-rooted path
+# to python, since the ancestor-recursion rule can deny those even when the
+# payload names no `private`/`tasks` path. Over-triggering only costs a python
+# spawn on a clean payload; under-triggering would silently disable the firewall.
 case "$IN" in
-  *private* | *rsi-runs* | *holdout-tasks* | *tasks* | *score.py* | *sandbox*)
+  *private* | *rsi-runs* | *holdout-tasks* | *tasks* | *score.py* | *sandbox* \
+  | *rsi-loop* | *Grep* | *Glob* | *grep* | *rg\ * | *ag\ *)
     printf '%s' "$IN" | python3 "$(dirname "$0")/deny-private.py"
     ;;
   *)
