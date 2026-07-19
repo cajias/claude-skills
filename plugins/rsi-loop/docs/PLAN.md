@@ -10,10 +10,26 @@ Primary sources:
 - Weco first-party report: <https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement>
 - RSI ladder definition: <https://www.weco.ai/blog/4-levels-of-recursive-self-improvement>
 
-Status: **M1–M2 implemented** (standalone inner agent, outer step, one completed run); M3–M5
-still to build. This document is the build spec; where the shipped code has diverged from it,
-the deviation is noted inline and in [CONTINUATION.md](CONTINUATION.md). A full as-built
-reconciliation is scheduled for M5.
+Status: **M1–M2 shipped; M3 code complete (runtime 10-step exit run pending); M4–M5 machinery
+built** (standalone inner agent, outer step, one completed run, three-family battery, `/rsi:run`,
+robust aggregation + outlier detection, `gen-human` baseline, `holdout-tasks/`, `/rsi:report`,
+`/rsi:ignite`). The runtime exit-criteria runs (M3's ≥10-step three-family run, the §5.2 chassis
+A/B, and the report/ignite campaigns) are the execution phase that follows this code landing. This document is the
+build spec; where the shipped code has diverged from it, the deviation is noted inline and in
+[CONTINUATION.md](CONTINUATION.md). A full as-built reconciliation is scheduled for M5.
+
+As-built notes (M3 additions):
+
+- The paper's three reward-hack defense layers (§1) split by ownership: the anti-overfitting
+  stage prompts (layer 1) live in each generation's mutable prompts; the "statistical removal
+  of too-good results" (layer 3) is realized as an **immutable outer-side detector**,
+  `scripts/rsi-aggregate.py --flag-outliers`, consumed by the verifier — a harness DETECTION
+  mechanism, consistent with the integrity model, not a generation-side trick the loop must
+  discover. Robust cross-seed aggregation (median of seeds) in the same script addresses the
+  tiny-battery noise risk (§7).
+- `/rsi:run` is the native-Workflow chassis (Arm B). The §5.2 chassis A/B decides whether the
+  autoresearch plugin (Arm A) supersedes it; until that experiment's decision rule fires, the
+  native driver stands.
 
 ---
 
@@ -328,13 +344,17 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   Workflow script — 2×2 paired runs, pre-registered metrics and decision rule); results land in
   `docs/experiments/` and the winner becomes `/rsi:step`. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
-- **M3 — full protocol**: all 3 task families, verifier + <50% hack rule + outlier filter,
-  `/rsi:run` with budget accounting. Exit: 10-step unattended run with sane ledger.
-- **M4 — measurement**: `gen-human` hand-tuned baseline, `holdout-tasks/`, `/rsi:report` with
-  ladder-level evidence (improvement slope vs. baseline, generalization deltas, hack-rate trend).
-- **M5 — ignition test**: `/rsi:ignite` swaps the best generation's strategy into the proposer
-  role and compares campaigns at equal budget (the paper's Level-2 test — expect, like Weco, to
-  measure it honestly rather than to pass it).
+- **M3 — full protocol** _(code complete)_: all 3 task families (bin-packing,
+  tabular-classification, instruction-routing), verifier + <50% hack rule + outlier filter
+  (`scripts/rsi-aggregate.py`), `/rsi:run` with budget accounting. Exit: 10-step unattended run
+  with sane ledger.
+- **M4 — measurement** _(machinery built)_: `baseline/gen-human` hand-tuned baseline,
+  `holdout-tasks/` (one per family + a far-OOD time-series task), `/rsi:report`
+  (`scripts/rsi-report.py`) with ladder-level evidence (improvement slope vs. baseline,
+  generalization deltas, hack-rate trend).
+- **M5 — ignition test** _(machinery built)_: `/rsi:ignite` swaps the best generation's strategy
+  into the proposer role and compares campaigns at equal budget (the paper's Level-2 test —
+  expect, like Weco, to measure it honestly rather than to pass it).
 
 ## 7. Risks / open questions
 

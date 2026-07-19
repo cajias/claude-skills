@@ -38,6 +38,64 @@ expect deny "Read plugin-source private split" Read \
   '{"file_path":"/repo/plugins/rsi-loop/tasks/bin-packing/private/instances.json"}'
 expect deny "Glob into private dir" Glob \
   '{"pattern":"rsi-runs/r1/tasks/*/private/**"}'
+# The M3 families are covered by the same task-agnostic rules — assert it.
+expect deny "Read tabular-classification private" Read \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/private/instances.json"}'
+expect deny "Read instruction-routing private" Read \
+  '{"file_path":"/w/rsi-runs/r2/tasks/instruction-routing/private/instances.json"}'
+expect deny "Bash cat tabular private" Bash \
+  '{"command":"cat rsi-runs/r2/tasks/tabular-classification/private/instances.json"}'
+expect deny "Write tabular scorer (immutable)" Write \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/score.py","content":"x"}'
+expect deny "Edit instruction-routing task.md (immutable)" Edit \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/instruction-routing/task.md","old_string":"a","new_string":"b"}'
+expect allow "Read tabular-classification public" Read \
+  '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/public/instances.json"}'
+# Ancestor-rooted recursive reads: a Grep/grep -r above the task trees recurses
+# into private/ and leaks answer keys even though it names no `private` path.
+expect deny "Grep at plugin root (ancestor recurse)" Grep \
+  '{"pattern":"expected","path":"/home/user/claude-skills/plugins/rsi-loop"}'
+expect deny "Grep at cwd (bare root recurse)" Grep \
+  '{"pattern":"expected","path":"."}'
+expect deny "Glob pattern rooted at rsi-loop" Glob \
+  '{"pattern":"plugins/rsi-loop/**/*.json"}'
+expect deny "Bash grep -r at plugin root" Bash \
+  '{"command":"grep -rn expected /home/user/claude-skills/plugins/rsi-loop"}'
+expect deny "Bash grep -r at cwd" Bash \
+  '{"command":"grep -rn expected ."}'
+expect deny "Bash rg at cwd" Bash \
+  '{"command":"rg expected ."}'
+# A recursive reader with NO path arg recurses from cwd — must be denied even
+# though it carries no ancestor token (regression: bare rg/ag bypassed the rule).
+expect deny "Bash bare rg (no path, recurses cwd)" Bash \
+  '{"command":"rg answer"}'
+expect deny "Bash bare ag (no path, recurses cwd)" Bash \
+  '{"command":"ag answer"}'
+expect deny "Bash rg at a tree-relative task root" Bash \
+  '{"command":"rg answer tasks/bin-packing"}'
+expect deny "Bash grep -rIl (flag cluster) bare" Bash \
+  '{"command":"grep -rIl answer"}'
+# The Grep TOOL checks its path field precisely, so a genuinely public-scoped
+# path or a specific file stays allowed...
+expect allow "Grep narrowed to a task public dir" Grep \
+  '{"pattern":"capacity","path":"plugins/rsi-loop/tasks/bin-packing/public"}'
+expect allow "Grep a specific non-private file" Grep \
+  '{"pattern":"pack","path":"plugins/rsi-loop/tasks/bin-packing/task.md"}'
+expect allow "Grep an unrelated project dir" Grep \
+  '{"pattern":"foo","path":"src/components"}'
+# ...but a recursive Bash reader is blocked outright while armed — the whole
+# command can hide a private target behind a decoy /public token, so no
+# per-command "narrowed" escape exists (regression: decoy /public bypass).
+expect deny "Bash grep -r even with a public arg present" Bash \
+  '{"command":"grep -rn size plugins/rsi-loop/tasks/bin-packing/public"}'
+expect deny "Bash decoy public arg beside a private-reaching path" Bash \
+  '{"command":"grep -rn prv- tasks/bin-packing /nonexistent/public"}'
+expect deny "Bash decoy public in a shell comment" Bash \
+  '{"command":"rg prv- tasks/bin-packing # /public"}'
+# The outer harness legitimately needs recursion; the RSI_OUTER_LOOP=1 prefix
+# exempts it (only the outer loop ever runs with that prefix).
+expect allow "Bash recursive read under the outer prefix" Bash \
+  '{"command":"RSI_OUTER_LOOP=1 grep -rn x plugins/rsi-loop/tasks/bin-packing/private"}'
 expect deny "Grep private path" Grep \
   '{"pattern":"score","path":"/w/rsi-runs/r1/tasks/bp/private"}'
 expect deny "Bash cat private file" Bash \
@@ -182,6 +240,12 @@ parity "cwd-relative private" Bash '{"command":"cat private/instances.json"}'
 parity "score --private" Bash '{"command":"python3 score.py --private --solution s.py"}'
 parity "sandbox scorer write" Write '{"file_path":"/w/x/sandbox/score.py","content":"y"}'
 parity "real-battery append" Bash '{"command":"echo x >> plugins/rsi-loop/tasks/bin-packing/score.py"}'
+parity "Grep at plugin root" Grep '{"pattern":"expected","path":"/repo/plugins/rsi-loop"}'
+parity "Grep at cwd" Grep '{"pattern":"expected","path":"."}'
+parity "grep -r at cwd" Bash '{"command":"grep -rn expected ."}'
+parity "rg at cwd" Bash '{"command":"rg expected ."}'
+parity "bare rg no path" Bash '{"command":"rg answer"}'
+parity "bare ag no path" Bash '{"command":"ag answer"}'
 
 echo
 echo "deny-private hook: $PASS passed, $FAIL failed"

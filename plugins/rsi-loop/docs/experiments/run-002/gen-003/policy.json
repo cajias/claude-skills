@@ -1,0 +1,17 @@
+{
+  "algorithm": "robustness-aware-tree-search",
+  "num_drafts": 5,
+  "max_nodes": 9,
+  "model": "haiku",
+  "effort": "low",
+  "context_mode": "full-history-with-robustness",
+  "selection": "combined-public-times-robustness",
+  "robustness_weight": 0.5,
+  "draft_directions": [
+    "simplest correct baseline — prioritize validity and robust handling of varied inputs over cleverness",
+    "sorting/preprocessing-based heuristic (e.g. handle the hardest elements first)",
+    "incremental best-choice heuristic: at each step take the locally optimal placement/decision",
+    "deterministic local search: start from a greedy solution, then iteratively improve it",
+    "robustness-first: parse/interpret the input tolerantly (accept rephrasings, synonyms, reordering, formatting variation) and normalize before solving, so the same intent always maps to the same answer"
+  ]
+}

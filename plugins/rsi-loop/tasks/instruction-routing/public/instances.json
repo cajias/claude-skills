@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "name": "add-0",
+      "instruction": "add 11 and 16",
+      "expected": "27"
+    },
+    {
+      "name": "subtract-1",
+      "instruction": "subtract 18 from 27",
+      "expected": "9"
+    },
+    {
+      "name": "multiply-2",
+      "instruction": "multiply 6 by 7",
+      "expected": "42"
+    },
+    {
+      "name": "reverse-3",
+      "instruction": "reverse the word python",
+      "expected": "nohtyp"
+    },
+    {
+      "name": "uppercase-4",
+      "instruction": "uppercase the word python",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-5",
+      "instruction": "how many letters in banana",
+      "expected": "6"
+    },
+    {
+      "name": "nth-6",
+      "instruction": "the 2nd item in [kiwi, pear, apple]",
+      "expected": "pear"
+    },
+    {
+      "name": "max-7",
+      "instruction": "the largest number in [37, 22, 19, 36, 33]",
+      "expected": "37"
+    },
+    {
+      "name": "add-8",
+      "instruction": "add 11 and 8",
+      "expected": "19"
+    },
+    {
+      "name": "subtract-9",
+      "instruction": "subtract 6 from 5",
+      "expected": "-1"
+    },
+    {
+      "name": "multiply-10",
+      "instruction": "multiply 2 by 3",
+      "expected": "6"
+    },
+    {
+      "name": "reverse-11",
+      "instruction": "reverse the word kernel",
+      "expected": "lenrek"
+    },
+    {
+      "name": "uppercase-12",
+      "instruction": "uppercase the word python",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-13",
+      "instruction": "how many letters in harness",
+      "expected": "7"
+    },
+    {
+      "name": "nth-14",
+      "instruction": "the 3rd item in [lime, date, plum]",
+      "expected": "plum"
+    },
+    {
+      "name": "max-15",
+      "instruction": "the largest number in [25, 2, 7]",
+      "expected": "25"
+    },
+    {
+      "name": "add-16",
+      "instruction": "add 5 and 10",
+      "expected": "15"
+    },
+    {
+      "name": "subtract-17",
+      "instruction": "subtract 20 from 9",
+      "expected": "-11"
+    },
+    {
+      "name": "multiply-18",
+      "instruction": "multiply 8 by 9",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-19",
+      "instruction": "reverse the word orange",
+      "expected": "egnaro"
+    },
+    {
+      "name": "uppercase-20",
+      "instruction": "uppercase the word banana",
+      "expected": "BANANA"
+    },
+    {
+      "name": "letters-21",
+      "instruction": "how many letters in kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-22",
+      "instruction": "the 3rd item in [plum, fig, kiwi]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-23",
+      "instruction": "the largest number in [31, 16, 5, 22]",
+      "expected": "31"
+    },
+    {
+      "name": "add-24",
+      "instruction": "add 8 and 5",
+      "expected": "13"
+    },
+    {
+      "name": "subtract-25",
+      "instruction": "subtract 19 from 18",
+      "expected": "-1"
+    },
+    {
+      "name": "multiply-26",
+      "instruction": "multiply 7 by 4",
+      "expected": "28"
+    },
+    {
+      "name": "reverse-27",
+      "instruction": "reverse the word signal",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-28",
+      "instruction": "uppercase the word delta",
+      "expected": "DELTA"
+    },
+    {
+      "name": "letters-29",
+      "instruction": "how many letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-30",
+      "instruction": "the 3rd item in [pear, apple, mango, lime, date]",
+      "expected": "mango"
+    },
+    {
+      "name": "max-31",
+      "instruction": "the largest number in [4, 17, 2, 15, 16]",
+      "expected": "17"
+    }
+  ]
+}

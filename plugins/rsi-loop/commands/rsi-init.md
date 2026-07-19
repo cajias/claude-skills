@@ -21,10 +21,13 @@ Initialize an AIDE²-style RSI run.
 3. Report the run dir, the tasks in the battery, and gen-000's baseline scores.
 
 Ledger line schema (one JSON object per line, append-only). `rationale` and the per-task
-`stress` sub-score are optional (present when the proposer/generation supply them); `verifier`
-is `null` for the step-0 baseline and an object otherwise:
+`stress` sub-score are optional (present when the proposer/generation supply them);
+`private_seeds` is optional (present under `/rsi:run --seeds K>1`, the per-seed private
+vector behind the robust aggregate); `verifier` is `null` for the step-0 baseline and an
+object otherwise:
 {"step": N, "generation": "gen-NNN", "parent": "gen-MMM" | null, "mutation": "...",
-"rationale": "..." (optional), "scores": {"<task>": {"public": x, "private": y, "stress": z?}},
-"private_aggregate": <mean of private scores>, "inner_tokens": N,
+"rationale": "..." (optional), "scores": {"<task>": {"public": x, "private": y, "stress": z?,
+"private_seeds": [..]? }}, "private_aggregate": <robust aggregate (rsi-aggregate.py)>,
+"inner_tokens": N,
 "verifier": {"verdict": "...", "findings": [...], "recommendation": "..."} | null,
 "accepted": true|false, "reason": "..."}

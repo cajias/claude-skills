@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "name": "add-0",
+      "instruction": "what is 7 plus 2",
+      "expected": "9"
+    },
+    {
+      "name": "subtract-1",
+      "instruction": "-3 - 12",
+      "expected": "-15"
+    },
+    {
+      "name": "multiply-2",
+      "instruction": "what is -2 times 7",
+      "expected": "-14"
+    },
+    {
+      "name": "reverse-3",
+      "instruction": "spell orange backwards",
+      "expected": "egnaro"
+    },
+    {
+      "name": "uppercase-4",
+      "instruction": "convert python to uppercase",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-5",
+      "instruction": "length of the word kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-6",
+      "instruction": "what is element 1 in [pear, apple, mango, lime, date]",
+      "expected": "pear"
+    },
+    {
+      "name": "max-7",
+      "instruction": "biggest number in [2, 39, 14, 37]",
+      "expected": "39"
+    },
+    {
+      "name": "add-8",
+      "instruction": "what is 13 plus 20",
+      "expected": "33"
+    },
+    {
+      "name": "subtract-9",
+      "instruction": "-9 - 6",
+      "expected": "-15"
+    },
+    {
+      "name": "multiply-10",
+      "instruction": "what is 0 times 1",
+      "expected": "0"
+    },
+    {
+      "name": "reverse-11",
+      "instruction": "spell kernel backwards",
+      "expected": "lenrek"
+    },
+    {
+      "name": "uppercase-12",
+      "instruction": "convert python to uppercase",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-13",
+      "instruction": "length of the word python",
+      "expected": "6"
+    },
+    {
+      "name": "nth-14",
+      "instruction": "item number 2 of [fig, kiwi, pear, apple]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-15",
+      "instruction": "biggest number in [19, 8, 37]",
+      "expected": "37"
+    },
+    {
+      "name": "add-16",
+      "instruction": "sum of 15 and -6",
+      "expected": "9"
+    },
+    {
+      "name": "subtract-17",
+      "instruction": "27 - -6",
+      "expected": "33"
+    },
+    {
+      "name": "multiply-18",
+      "instruction": "what is 4 times 5",
+      "expected": "20"
+    },
+    {
+      "name": "reverse-19",
+      "instruction": "spell python backwards",
+      "expected": "nohtyp"
+    },
+    {
+      "name": "uppercase-20",
+      "instruction": "convert banana to uppercase",
+      "expected": "BANANA"
+    },
+    {
+      "name": "letters-21",
+      "instruction": "length of the word kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-22",
+      "instruction": "what is element 2 in [mango, lime, date]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-23",
+      "instruction": "biggest number in [16, 35, 18, 5]",
+      "expected": "35"
+    },
+    {
+      "name": "add-24",
+      "instruction": "sum of -3 and 14",
+      "expected": "11"
+    },
+    {
+      "name": "subtract-25",
+      "instruction": "-9 - 12",
+      "expected": "-21"
+    },
+    {
+      "name": "multiply-26",
+      "instruction": "what is 8 times 9",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-27",
+      "instruction": "spell kernel backwards",
+      "expected": "lenrek"
+    },
+    {
+      "name": "uppercase-28",
+      "instruction": "convert banana to uppercase",
+      "expected": "BANANA"
+    },
+    {
+      "name": "letters-29",
+      "instruction": "length of the word kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-30",
+      "instruction": "what is element 2 in [fig, kiwi, pear, apple, mango]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-31",
+      "instruction": "the maximum of [6, -3, 12]",
+      "expected": "12"
+    }
+  ]
+}
