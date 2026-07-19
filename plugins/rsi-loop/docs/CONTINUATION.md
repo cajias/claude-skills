@@ -31,7 +31,7 @@ item. Write both arms up under `docs/experiments/`; the pre-registered decision 
 §5.2) picks the `/rsi:step` chassis. Do NOT fabricate any eval score — every ledger line must
 come from real Workflow compute or be clearly marked not-yet-run.
 
-## RUN STATUS (2026-07-19): run-002 PAUSED at step 2 by monthly spend limit
+## RUN STATUS (2026-07-19): run-002 at step 3, incumbent gen-005
 
 The M3 exit run is live in scratchpad (`rsi-runs/run-002`, evidence mirrored to
 `docs/experiments/run-002/`). Steps done, on the 3-family battery:
@@ -40,17 +40,24 @@ The M3 exit run is live in scratchpad (`rsi-runs/run-002`, evidence mirrored to
 - step 1 — gen-003 (per-node robustness self-check) **REJECTED** (tie 0.575): the self-check
   saturated (every node self-grades robustness 1.0).
 - step 2 — gen-004 (shared **adversarial** probe, decoupled from the solver) **ACCEPTED**,
-  private aggregate **0.648** (+0.073), driven by instruction-routing 0.0 → **0.219**. `best`
-  now = gen-004. Accept gated by MECHANICAL verifier checks (LLM verifier blocked by spend limit).
+  private aggregate **0.648** (+0.073), driven by instruction-routing 0.0 → **0.219**.
+- step 3 — gen-005 (**lineage-aware probe pool**: always include improve/explore leaves, cap
+  scales with the tie count) **ACCEPTED**, private aggregate **0.856** (+0.208) — the largest
+  single-step gain. Fixed gen-004's `probe_topk=4` truncation: the probe pool now reaches the
+  synonym-tolerant improve leaves, lifting instruction-routing **0.219 → 0.844** while bin-packing
+  (0.938, probe saturated → top-public fallback) and tabular (0.788) held. `best` now = gen-005.
+  Accept gated by MECHANICAL verifier checks (LLM verifier still blocked by spend limit).
 
-**Blocker: the account hit its monthly spend limit** mid-step-2 (truncated gen-004's tabular
-probe-eval). No further inner-agent Workflow compute can run until the user raises the limit at
-claude.ai/settings/usage. All local work (scoring, integrity, git) still works.
+Spend note: the LLM-adversarial verifier subagent remains unavailable (monthly spend limit), so
+steps 2–3 were gated by the mechanical battery (reproduce vs pristine scorer, git integrity,
+escape-residue, hard-coding audit, too-good outlier) — all clean. Inner-agent Workflow compute
+DID run this session (3 family evals × ~0.6M tokens each), so the earlier hard block has eased;
+budget for the remaining big-compute items (chassis A/B, steps 4–10) is the live constraint.
 
-Resume plan when compute returns: continue run-002 from step 3 (incumbent gen-004). Next
-proposer should (a) widen `probe_topk` — gen-004 capped the probe pool to 4 public-tied nodes
-and missed synonym-heavy improve nodes that reached private 0.5; (b) keep iterating toward the
-10-step exit criterion. Then §5.2 chassis A/B, M4 `/rsi:report`, M5 `/rsi:ignite`.
+Resume plan: continue run-002 from step 4 (incumbent **gen-005**). The `probe_topk` follow-up is
+now RESOLVED. Next proposer targets remaining headroom (tabular private stuck at 0.788 across
+gen-000→005; instruction-routing has ~0.156 left to 1.0). Then §5.2 chassis A/B, M4 `/rsi:report`,
+M5 `/rsi:ignite`.
 
 ## Pending execution phase (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
 

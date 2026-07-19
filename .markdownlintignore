@@ -5,6 +5,7 @@ node_modules
 plugins/rsi-loop/docs/experiments/run-001/
 plugins/rsi-loop/docs/experiments/run-002/gen-003/
 plugins/rsi-loop/docs/experiments/run-002/gen-004/
+plugins/rsi-loop/docs/experiments/run-002/gen-005/
 
 **/.venv/
 **/.pytest_cache/
