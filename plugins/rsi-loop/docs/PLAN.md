@@ -10,9 +10,11 @@ Primary sources:
 - Weco first-party report: <https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement>
 - RSI ladder definition: <https://www.weco.ai/blog/4-levels-of-recursive-self-improvement>
 
-Status: **M1–M3 implemented; M4–M5 machinery built** (standalone inner agent, outer step, one
-completed run, three-family battery, `/rsi:run`, robust aggregation + outlier detection,
-`gen-human` baseline, `holdout-tasks/`, `/rsi:report`, `/rsi:ignite`). This document is the
+Status: **M1–M2 shipped; M3 code complete (runtime 10-step exit run pending); M4–M5 machinery
+built** (standalone inner agent, outer step, one completed run, three-family battery, `/rsi:run`,
+robust aggregation + outlier detection, `gen-human` baseline, `holdout-tasks/`, `/rsi:report`,
+`/rsi:ignite`). The runtime exit-criteria runs (M3's ≥10-step three-family run, the §5.2 chassis
+A/B, and the report/ignite campaigns) are the execution phase that follows this code landing. This document is the
 build spec; where the shipped code has diverged from it, the deviation is noted inline and in
 [CONTINUATION.md](CONTINUATION.md). A full as-built reconciliation is scheduled for M5.
 

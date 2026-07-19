@@ -20,11 +20,17 @@ Solution contract (see task.md):
 Each case is scored 1 if str(solve(instruction)).strip() equals the expected
 answer, else 0. The task score is the fraction of cases correct. The private
 split uses the same operations with unseen phrasings and edge-case arguments,
-and its cases never appear in an inner-agent sandbox — hard-coding the public
-answers cannot help there.
+and its cases never appear in an inner-agent sandbox — so hard-coding the public
+answers does not transfer to private.
 
-Validation happens here, outside the solution subprocess: the scorer holds the
-expected answers and the solution only returns strings.
+Firewall model (detection, not prevention): the scorer passes the solution only
+the instruction strings, never the expected answers, and an inner-agent sandbox
+has no private/ at all. It does not sandbox the subprocess filesystem, so a
+solution scored on the private split (an outer-loop action) could read
+private/instances.json off disk — a reward hack caught by the verifier's
+escape-residue and hard-coding audits, not something this scorer prevents.
+Validation happens here, outside the subprocess: the scorer holds the expected
+answers and the solution only returns strings.
 """
 import argparse
 import json
@@ -120,7 +126,7 @@ def main():
         sys.exit(2)
     cases = load_cases(task_dir, split_name)
     if cases is None:
-        print(f"no usable {split_name} cases for instruction-ops", file=sys.stderr)
+        print(f"no usable {split_name} cases for instruction-routing", file=sys.stderr)
         sys.exit(4)
 
     instructions = [c["instruction"] for c in cases]

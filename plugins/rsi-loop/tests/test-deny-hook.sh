@@ -51,6 +51,29 @@ expect deny "Edit instruction-routing task.md (immutable)" Edit \
   '{"file_path":"/repo/plugins/rsi-loop/tasks/instruction-routing/task.md","old_string":"a","new_string":"b"}'
 expect allow "Read tabular-classification public" Read \
   '{"file_path":"/repo/plugins/rsi-loop/tasks/tabular-classification/public/instances.json"}'
+# Ancestor-rooted recursive reads: a Grep/grep -r above the task trees recurses
+# into private/ and leaks answer keys even though it names no `private` path.
+expect deny "Grep at plugin root (ancestor recurse)" Grep \
+  '{"pattern":"expected","path":"/home/user/claude-skills/plugins/rsi-loop"}'
+expect deny "Grep at cwd (bare root recurse)" Grep \
+  '{"pattern":"expected","path":"."}'
+expect deny "Glob pattern rooted at rsi-loop" Glob \
+  '{"pattern":"plugins/rsi-loop/**/*.json"}'
+expect deny "Bash grep -r at plugin root" Bash \
+  '{"command":"grep -rn expected /home/user/claude-skills/plugins/rsi-loop"}'
+expect deny "Bash grep -r at cwd" Bash \
+  '{"command":"grep -rn expected ."}'
+expect deny "Bash rg at cwd" Bash \
+  '{"command":"rg expected ."}'
+# ...but a recursive read narrowed to public/, or a specific file, stays allowed.
+expect allow "Grep narrowed to a task public dir" Grep \
+  '{"pattern":"capacity","path":"plugins/rsi-loop/tasks/bin-packing/public"}'
+expect allow "Grep a specific non-private file" Grep \
+  '{"pattern":"pack","path":"plugins/rsi-loop/tasks/bin-packing/task.md"}'
+expect allow "Bash grep -r narrowed to public" Bash \
+  '{"command":"grep -rn size plugins/rsi-loop/tasks/bin-packing/public"}'
+expect allow "Grep an unrelated project dir" Grep \
+  '{"pattern":"foo","path":"src/components"}'
 expect deny "Grep private path" Grep \
   '{"pattern":"score","path":"/w/rsi-runs/r1/tasks/bp/private"}'
 expect deny "Bash cat private file" Bash \
@@ -195,6 +218,10 @@ parity "cwd-relative private" Bash '{"command":"cat private/instances.json"}'
 parity "score --private" Bash '{"command":"python3 score.py --private --solution s.py"}'
 parity "sandbox scorer write" Write '{"file_path":"/w/x/sandbox/score.py","content":"y"}'
 parity "real-battery append" Bash '{"command":"echo x >> plugins/rsi-loop/tasks/bin-packing/score.py"}'
+parity "Grep at plugin root" Grep '{"pattern":"expected","path":"/repo/plugins/rsi-loop"}'
+parity "Grep at cwd" Grep '{"pattern":"expected","path":"."}'
+parity "grep -r at cwd" Bash '{"command":"grep -rn expected ."}'
+parity "rg at cwd" Bash '{"command":"rg expected ."}'
 
 echo
 echo "deny-private hook: $PASS passed, $FAIL failed"

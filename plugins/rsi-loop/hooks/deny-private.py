@@ -95,6 +95,41 @@ TREE_DIR_RECURSE = re.compile(
     _BOUND + HARNESS_ROOTS + r"(?:/[^/\s'\"]+)?/?(?:$|[\s'\"*?\[])"
 )
 
+# A recursive content read rooted at an ANCESTOR of a protected tree recurses
+# INTO the private/ splits below it and returns held-out answers as match lines,
+# even though the command/path names no `private`. Two ancestor shapes: the
+# plugin's own tree (any path containing an `rsi-loop` segment) and a bare
+# filesystem/session root (`.`, `..`, `/`, `~`). Either is denied for a
+# recursive read UNLESS it is narrowed to a `public/` subtree or a single file.
+# Backstop only (the primary wall is that inner-agent sandboxes contain no
+# private/); a residual remains for a recursive read rooted at some arbitrary
+# absolute repo path this stateless check cannot resolve.
+_ANCESTOR_ROOT = re.compile(
+    r"(?:(?:^|[/\s'\"=])(?:\.\.?|~|/)|rsi-loop)(?:/|$|[\s'\"])"
+)
+_NARROWED_PUBLIC = re.compile(r"/public(?:/|$|[\s'\"])")
+_SPECIFIC_FILE = re.compile(r"\.(?:py|md|json|txt|csv|mjs|sh|toml|ya?ml)(?:$|[\s'\"])")
+
+
+def recursive_read_reaches_private(path):
+    """True if a recursive read at `path` would descend into a protected private/
+    split: `path` is an RSI task tree, a task-root, or a broad ancestor of one,
+    and is not narrowed to public/ or a single file."""
+    if not path:
+        return True  # empty path == cwd == recurse from here
+    if _NARROWED_PUBLIC.search(path) or _SPECIFIC_FILE.search(path):
+        return False
+    if TREE_DIR_RECURSE.search(path):
+        return True
+    return bool(_ANCESTOR_ROOT.search(path))
+
+
+# Recursive-read Bash invocations (grep with an -r/-R in any flag cluster, e.g.
+# -rn/-nR/-rIl; ripgrep; silver searcher) whose target could be a broad ancestor
+# of a protected tree. The r/R may sit anywhere in a dash-flag cluster and be
+# followed by more flags, and the flag need not immediately follow `grep`.
+BASH_RECURSIVE_READ = re.compile(r"\bgrep\b[^|;&\n]*?-[A-Za-z]*[rR]|\b(?:rg|ag)\b")
+
 # Immutable harness files: scorers, task specs, and instance data anywhere under
 # a task tree, plus the score.py/task.md copies inside an inner-agent sandbox.
 IMMUTABLE_FILE = re.compile(
@@ -178,23 +213,45 @@ def main():
                     "wildcards under an RSI task tree are blocked (they could "
                     "expand to the private/ split). Name paths explicitly."
                 )
+            if (
+                BASH_RECURSIVE_READ.search(cmd)
+                and _ANCESTOR_ROOT.search(cmd)
+                and not _NARROWED_PUBLIC.search(cmd)
+            ):
+                deny(
+                    "a recursive read (grep -r / rg) rooted at a broad ancestor "
+                    "directory would descend into a private/ split. Narrow it to "
+                    "a public/ subtree or a named file."
+                )
         # Immutable harness: no shell writes to a scorer / task spec / instance
         # data, outer-marked or not (the outer loop never edits the battery).
         if BASH_WRITE.search(cmd):
             deny("the task battery (scorers, task specs, instance data) is immutable.")
         sys.exit(0)
 
-    # Every non-Bash tool (built-in or MCP): a held-out reference is always denied.
+    # Recursive-read tools (Grep/Glob): deny a search whose base path — or, for
+    # Glob, its pattern — is a task tree or a broad ancestor of one. Checked on
+    # the path/pattern fields specifically (not the Grep regex, which would
+    # false-positive on a pattern that merely looks path-like).
+    if tool in RECURSIVE_READ_TOOLS:
+        candidates = [tool_input.get("path", "")]
+        if tool == "Glob":
+            candidates.append(tool_input.get("pattern", ""))
+        for c in candidates:
+            if isinstance(c, str) and recursive_read_reaches_private(c):
+                deny(
+                    f"{tool} on a task-root or broad ancestor directory would "
+                    "recurse into the private/ split. Target the public/ "
+                    "subdirectory or a named file."
+                )
+
+    # Every non-Bash tool (built-in or MCP): a held-out reference is always denied,
+    # and no write may touch the immutable harness.
     for s in strings_of(tool_input):
         if is_private_ref(s):
             deny(
                 f"{tool} may not touch a held-out private/ split. "
                 "Only the outer harness scores private data."
-            )
-        if tool in RECURSIVE_READ_TOOLS and TREE_DIR_RECURSE.search(s):
-            deny(
-                f"{tool} on a task-root directory would recurse into the "
-                "private/ split. Target the public/ subdirectory or a named file."
             )
         if tool in WRITE_TOOLS and IMMUTABLE_FILE.search(s):
             deny(

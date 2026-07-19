@@ -22,11 +22,18 @@ Public score is a seeded 5-fold cross-validation accuracy over the public
 training rows: the solution never sees a held-out fold's labels, so there is no
 answer key to memorize — the public signal rewards a model that generalizes.
 Private score is accuracy on a genuinely held-out test set (private/), trained
-on the full public set. The private labels never enter the solution subprocess
-and never appear in an inner-agent sandbox (which contains no private/).
+on the full public set.
 
-Validation happens here, outside the solution subprocess: a solution cannot fake
-accuracy — it returns predictions, the scorer compares them to labels it holds.
+Firewall model (detection, not prevention — see PLAN.md and the plugin threat
+model): the scorer never PASSES private labels into the solution subprocess (it
+hands the solution only training rows and unlabelled test features), and an
+inner-agent sandbox contains no private/ at all. It does NOT sandbox the
+subprocess's filesystem, so a solution scored on the private split (an
+outer-loop action) could in principle read private/instances.json off disk —
+that is a reward hack, caught by the verifier's escape-residue and hard-coding
+audits and by the public-vs-private gap, not something this scorer claims to
+make impossible. Validation happens here, outside the subprocess: a solution
+returns predictions and the scorer compares them to labels it holds.
 """
 import argparse
 import json
@@ -132,7 +139,14 @@ def score_public(task_dir, solution_path, neutral_cwd):
 
 
 def score_private(task_dir, solution_path, neutral_cwd):
-    """Accuracy on the held-out private test set, trained on the full public set."""
+    """Accuracy on the held-out private test set, trained on the full public set.
+
+    Reported as N_FOLDS per-group accuracies (deterministic row%N_FOLDS buckets),
+    not one collapsed aggregate, so the verifier's --flag-outliers detector has a
+    real distribution to work on: a single subgroup scoring far above the others
+    is the fingerprint of instance-specific hard-coding. The top-level `score`
+    (mean of the groups) still equals overall accuracy up to bucket rounding.
+    """
     train_rows = load_rows(os.path.join(task_dir, "public", "instances.json"))
     test_all = load_rows(os.path.join(task_dir, "private", "instances.json"))
     if train_rows is None or test_all is None:
@@ -141,9 +155,20 @@ def score_private(task_dir, solution_path, neutral_cwd):
     test_labels = [r[-1] for r in test_all]
     pred, err = run_predict(train_rows, test_rows, solution_path, neutral_cwd)
     if err is not None:
-        return [{"name": "private-holdout", "score": 0.0, "n": len(test_labels), "error": err}]
-    acc, reason = accuracy(pred, test_labels)
-    return [{"name": "private-holdout", "score": round(acc, 6), "n": len(test_labels), "error": reason}]
+        return [{"name": f"private-group-{g}", "score": 0.0, "n": 0, "error": err}
+                for g in range(N_FOLDS)]
+    # Per-row correctness, then bucket into N_FOLDS groups by index.
+    per_group = []
+    for g in range(N_FOLDS):
+        idx = [i for i in range(len(test_labels)) if i % N_FOLDS == g]
+        gp = [pred[i] for i in idx] if isinstance(pred, list) and len(pred) == len(test_labels) else []
+        gl = [test_labels[i] for i in idx]
+        if not gl:
+            per_group.append({"name": f"private-group-{g}", "score": 0.0, "n": 0, "error": "empty group"})
+            continue
+        acc, reason = accuracy(gp, gl)
+        per_group.append({"name": f"private-group-{g}", "score": round(acc, 6), "n": len(gl), "error": reason})
+    return per_group
 
 
 def main():

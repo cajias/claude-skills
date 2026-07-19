@@ -1,6 +1,6 @@
 ---
 description: Level-2 ignition test — does a campaign driven by the best evolved generation beat the baseline campaign at equal budget?
-argument-hint: "<source-run-dir> [--steps N] [--budget TOKENS]"
+argument-hint: "<source-run-dir> [--max-steps N] [--budget TOKENS]"
 ---
 
 Run the AIDE² **Level-2 (ignition)** test for the run in "$ARGUMENTS". Level 2
@@ -27,24 +27,31 @@ budget. They differ in ONE thing — who proposes:
 
 ## Procedure
 
-1. Read the source run's `best.txt`, its accepted-lineage ledger lines, and the
-   best generation dir (`policy.json`, `prompts/*.md`). Summarize the discovered
-   strategy into an "ignited proposer" brief (a few sentences of concrete
-   principles: which operators, what context each gets, what selection rule).
-   Record the brief in `<source-run-dir>/ignite/strategy-brief.md`.
+1. Read the source run's incumbent (derived from the last accepted ledger line),
+   its accepted-lineage ledger lines, and the best generation dir (`policy.json`,
+   `prompts/*.md`). Summarize the discovered strategy into an "ignited proposer"
+   brief (a few sentences of concrete principles: which operators, what context
+   each gets, what selection rule).
 
-2. Scaffold two fresh runs with `/rsi:init` (no baseline re-eval needed beyond
-   gen-000): `<source>/ignite/arm-control` and `<source>/ignite/arm-ignited`,
-   both with the full battery.
+2. Scaffold two fresh runs with `/rsi:init` (both from gen-000, full battery):
+   `<source>/ignite/arm-control` and `<source>/ignite/arm-ignited`. Write the
+   brief to `<source>/ignite/arm-ignited/ignite/strategy-brief.md` **only** — this
+   is the seam `/rsi:step` step 2 reads to prepend the brief to the proposer, so
+   Arm I proposes in the evolved idiom while Arm C (no such file) uses the stock
+   proposer. That single file is the ONLY difference between the arms.
 
-3. Drive each with `/rsi:run` for the same `--max-steps N` (default 8) and equal
-   `--budget`. Arm I's `/rsi:step` proposer calls prepend the strategy brief to
-   the proposer prompt; Arm C uses the stock proposer. Everything else identical.
+3. Drive each arm with `/rsi:run` at the **same** `--max-steps N` (default 8),
+   the **same** `--budget`, and `--plateau 0` (disable the early stop) so both
+   arms execute an equal step budget — "equal budget" is enforced, not assumed.
+   Everything else (battery, seeds, per-eval budget, verifier) is identical.
 
 4. Compare with the analyzer:
    `python3 plugins/rsi-loop/scripts/rsi-report.py --ledger <arm>/ledger.jsonl`
-   for each arm. Report side by side: best private aggregate at equal budget,
-   improvement slope, acceptance rate, and hack rate.
+   for each arm, and read each arm's **cumulative inner tokens** (sum of
+   `inner_tokens` over its ledger) so the equal-budget claim is measured, not
+   asserted. Report side by side: best private aggregate, cumulative inner tokens
+   spent, best-so-far growth rate and `n_accepted_improvements`, acceptance rate,
+   and hack rate.
 
 5. **Verdict (honest).** Level 2 is supported only if Arm I strictly beats Arm C
    on best-private-aggregate-at-equal-budget **and** the advantage is asymptotic

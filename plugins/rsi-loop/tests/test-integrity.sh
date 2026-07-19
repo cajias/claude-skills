@@ -96,6 +96,34 @@ for t in tabular-classification instruction-routing; do
   set -e
 done
 
+# 8. git anchor compares CONTENT, not `git status`: an edit hidden with
+#    skip-worktree / assume-unchanged (which silence status) is still detected.
+#    Self-contained temp repo so it does not depend on the plugin's own git state.
+GT="$WORK/gittamper"
+mkdir -p "$GT/public" "$GT/private"
+git -C "$GT" init -q
+git -C "$GT" config user.email t@t; git -C "$GT" config user.name t
+printf 'def s():\n    return 1\n' > "$GT/score.py"
+echo '[1]' > "$GT/public/instances.json"; echo '[2]' > "$GT/private/instances.json"
+echo '# t' > "$GT/task.md"
+git -C "$GT" add -A; git -C "$GT" commit -qm init
+set +e
+bash "$CHK" "$GT" >/dev/null 2>&1
+check "content-verified clean tracked dir passes" 0 "$?"
+git -C "$GT" update-index --skip-worktree score.py
+printf 'def s():\n    return 999  # tampered\n' > "$GT/score.py"
+git -C "$GT" status --porcelain -- score.py | grep -q . && st=dirty || st=clean
+check "skip-worktree hides the edit from git status" "clean" "$st"
+bash "$CHK" "$GT" >/dev/null 2>&1
+check "content check detects skip-worktree-hidden tamper" 1 "$?"
+git -C "$GT" update-index --no-skip-worktree score.py
+git -C "$GT" checkout -q score.py
+git -C "$GT" update-index --assume-unchanged private/instances.json
+echo '[0]' > "$GT/private/instances.json"
+bash "$CHK" "$GT" >/dev/null 2>&1
+check "content check detects assume-unchanged private tamper" 1 "$?"
+set -e
+
 echo
 echo "harness integrity: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]

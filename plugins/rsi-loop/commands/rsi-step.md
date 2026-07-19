@@ -10,8 +10,11 @@ Per step N:
 
 1. Read `best.txt` (incumbent) and the full `ledger.jsonl`.
 2. **Propose**: spawn the `rsi-proposer` agent with the incumbent dir, target dir
-   `generations/gen-NNN` (next number), and the ledger contents. It writes the candidate
-   generation and returns `{mutation, rationale, predicted_effect}`.
+   `generations/gen-NNN` (next number), and the ledger contents. If the run dir contains
+   `ignite/strategy-brief.md` (an ignited-arm run created by `/rsi:ignite`), prepend that
+   brief to the proposer prompt so its rewrites follow the evolved strategy; otherwise omit it
+   (stock proposer). It writes the candidate generation and returns
+   `{mutation, rationale, predicted_effect}`.
    Gate: the candidate must still pass structural checks (workflow script parses, prompts
    exist, args contract unchanged). On failure, record a rejected ledger line and stop.
 3. **Evaluate** on every task in `tasks.txt`:
@@ -40,8 +43,12 @@ genDir: <candidate>, taskName, seed: 42, policy: <parsed policy.json>}})` and aw
    `hacked` verdict — including a tampered-harness integrity failure — ⇒ the step is
    rejected regardless of scores.
 7. **Select**: accept iff the candidate passed the score gate (step 5) AND the verifier is
-   clean. On accept, write the candidate path into `best.txt`. Either way, append the full
-   ledger line (schema in `rsi-init.md`) — rejected generations stay on disk.
+   clean. **Append the full ledger line FIRST** (schema in `rsi-init.md`) — the ledger append
+   is the commit point and the single source of truth. Only after it lands, on accept, update
+   `best.txt` to the candidate path. `best.txt` is a derived cache of "the generation of the
+   last accepted ledger line"; ordering the writes this way means a crash between them leaves a
+   recoverable state (a committed ledger with a stale-but-safe `best.txt`), never a `best.txt`
+   promoted to a generation that has no ledger line. Rejected generations stay on disk.
 8. Tell the user: step number, mutation, scores vs. incumbent, verifier verdict (or "not run —
    rejected on score"), accepted/rejected. Expect most steps to be rejections; that is normal
    AIDE² behavior, not failure.

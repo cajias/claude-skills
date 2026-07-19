@@ -23,14 +23,27 @@ condition, not an open-ended one.
   cost.
 - `--plateau P` (default 4) — stop early after P consecutive rejected steps (the
   search has stalled; a human should inspect the diagnoses before spending more).
+  `--plateau 0` disables the plateau stop so the run always executes the full
+  `--max-steps` — used by `/rsi:ignite` to hold both arms to an equal step budget.
 
 ## Procedure
 
-1. **Resume-aware start.** Read `ledger.jsonl` and `best.txt`. The next step
-   number is `(max step in ledger) + 1`; cumulative inner tokens is the sum of
-   `inner_tokens` over all ledger lines. Re-invoking `/rsi:run` on the same dir
-   continues where the last one stopped — never restart from step 1 if the
-   ledger is non-empty.
+1. **Resume-aware start (ledger is the source of truth).** Read `ledger.jsonl`;
+   treat it, not `best.txt`, as authoritative. Derive:
+   - next step number = `(max step in ledger) + 1`;
+   - incumbent = the generation named by the **last accepted** ledger line
+     (fall back to `generations/gen-000` if none accepted). **Reconcile
+     `best.txt` against this**: if `best.txt` disagrees (e.g. a crash landed
+     between the ledger append and the `best.txt` write, per `rsi-step.md`
+     step 7), rewrite `best.txt` from the ledger — never trust a `best.txt` that
+     names a generation absent from, or not accepted in, the ledger;
+   - cumulative inner tokens = sum of `inner_tokens` over committed ledger lines.
+   Re-invoking `/rsi:run` on the same dir continues where the last one stopped —
+   never restart from step 1 if the ledger is non-empty. Caveat: a step that
+   crashed *before* its ledger append leaves no committed line, so its partial
+   inner-token spend is not counted and the step re-runs on resume (re-spending
+   those tokens). The `--budget` guard is therefore accurate to committed-step
+   granularity, not to the token; size `--budget` with that slack in mind.
 
 2. **Budget/step guard, then one step.** Before each step, stop and report if:
    any of `--max-steps` (steps taken this invocation), `--budget` (cumulative
