@@ -1,0 +1,9 @@
+{
+  "name": "python-tooling",
+  "description": "Hard-won gotchas from the Python toolchain: importlib class identity, pip/PyPI name collisions, mock.patch.object vs __slots__, ruff on notebooks, and uv in fresh worktrees.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": ["python", "gotchas", "uv", "ruff", "pytest"]
+}

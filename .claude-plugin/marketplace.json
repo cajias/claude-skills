@@ -16,11 +16,41 @@
       "source": "./plugins/ai-writing"
     },
     {
+      "name": "cc-authoring",
+      "description": "Hard-won gotchas from authoring and distributing Claude Code plugins, skills, hooks, and Workflow scripts. Bundles APM packaging traps, plugin cache and marketplace path failures, hook main-vs-subagent detection, Workflow meta parsing breaks, and orchestration verification playbooks.",
+      "version": "0.1.0",
+      "tags": [
+        "claude-code",
+        "plugin-authoring",
+        "skill-authoring",
+        "workflows",
+        "hooks",
+        "apm",
+        "gotchas"
+      ],
+      "source": "./plugins/cc-authoring"
+    },
+    {
       "name": "cc-plugin-authoring",
       "description": "Hard-won gotchas from authoring Claude Code plugins. Includes a reference skill for the YAML parse trap on slash-command argument-hint values.",
       "version": "0.1.0",
       "tags": ["claude-code", "plugin-authoring", "gotchas"],
       "source": "./plugins/cc-plugin-authoring"
+    },
+    {
+      "name": "ci-build",
+      "description": "Hard-won gotchas from CI pipelines and build environments: GitHub Actions, Copilot CLI headless runs, cron block generation, Docker on Apple Silicon, and TypeScript monorepo scaffolding.",
+      "version": "0.1.0",
+      "tags": [
+        "ci",
+        "github-actions",
+        "build",
+        "docker",
+        "cron",
+        "monorepo",
+        "gotchas"
+      ],
+      "source": "./plugins/ci-build"
     },
     {
       "name": "claudeception",
@@ -35,6 +65,33 @@
       "version": "0.1.0",
       "tags": ["dev-tools", "workflow"],
       "source": "./plugins/dev"
+    },
+    {
+      "name": "dev-process",
+      "description": "Design-and-build process skills: layered design docs, C4 architecture artifacts, Diataxis documentation, README authoring, a milestone execution harness, positive-framing spec guidance, and a schema drift playbook.",
+      "version": "0.1.0",
+      "tags": [
+        "design-docs",
+        "documentation",
+        "planning",
+        "build-loop",
+        "process"
+      ],
+      "source": "./plugins/dev-process"
+    },
+    {
+      "name": "git-workflow",
+      "description": "Hard-won gotchas from real git and gh workflows: PR create/merge quirks, worktree races, rebase in non-interactive shells, squash-merge diagnosis, and deadlock recovery via plumbing.",
+      "version": "0.1.0",
+      "tags": ["git", "github", "gh-cli", "worktree", "rebase", "gotchas"],
+      "source": "./plugins/git-workflow"
+    },
+    {
+      "name": "integrations",
+      "description": "Operational gotchas and references for third-party integrations driven from Claude Code — Cloudflare Workers, Grafana, Notion, OpenPencil, Playwright, and MCP file transport.",
+      "version": "0.1.0",
+      "tags": ["claude-code", "integrations", "mcp", "cloudflare", "gotchas"],
+      "source": "./plugins/integrations"
     },
     {
       "name": "iterm-job-controller",
@@ -72,6 +129,13 @@
       "source": "./plugins/pr-monitor"
     },
     {
+      "name": "python-tooling",
+      "description": "Hard-won gotchas from the Python toolchain: importlib class identity, pip/PyPI name collisions, mock.patch.object vs __slots__, ruff on notebooks, and uv in fresh worktrees.",
+      "version": "0.1.0",
+      "tags": ["python", "gotchas", "uv", "ruff", "pytest"],
+      "source": "./plugins/python-tooling"
+    },
+    {
       "name": "semantic-search",
       "description": "Semantic search over Obsidian notes using LanceDB and sentence-transformers for local embeddings.",
       "version": "0.1.0",
@@ -84,6 +148,19 @@
       "version": "0.1.0",
       "tags": ["sessions", "knowledge-management"],
       "source": "./plugins/session-mining"
+    },
+    {
+      "name": "testing",
+      "description": "Skills for verifying that tests actually test something: a dependency-free harness for unit-testing Workflow scripts, mutation-verification for renderer tests, real-browser checks for Streamlit UIs, and zsh traps that fake out verification blocks.",
+      "version": "0.1.0",
+      "tags": [
+        "claude-code",
+        "testing",
+        "verification",
+        "mutation-testing",
+        "workflow"
+      ],
+      "source": "./plugins/testing"
     }
   ]
 }
