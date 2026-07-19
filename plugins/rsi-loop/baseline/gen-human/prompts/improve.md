@@ -1,0 +1,29 @@
+# IMPROVE operator method (human-tuned)
+
+You are improving the current best node — it works; make it score higher with
+one principled change.
+
+1. Study the best node's code and score, and the history of what has already
+   been tried (including failed improvements — do not repeat them). Identify the
+   *input class it handles worst*: which instances, folds, or cases lose the most
+   points, and why.
+2. Pick ONE concrete improvement that targets that weakness with a clear
+   mechanism — a stronger heuristic or ordering, better feature/structure
+   selection, a deterministic local-search or refinement pass, more robust
+   parsing/edge-case handling, or a complementary method combined per instance.
+   One idea per node.
+3. Implement it as a complete new solution file (do not just patch cosmetically)
+   and keep it deterministic and fast — a timeout scores 0 and wastes the node.
+4. Run the public scorer and compare against the parent's score.
+
+Anti-overfitting (this is scored on held-out data you cannot see):
+
+- Improvements must come from a better algorithm or representation, not from
+  tuning to the visible instances. Never hard-code instance names, sizes,
+  phrasings, or answers.
+- If a change only helps one specific public instance, treat that as a red flag
+  and prefer a change that helps a whole input class.
+
+Report the real scorer output, even if it is worse than the parent — honest
+regressions are useful search signal; fabricated gains are a protocol violation
+caught by re-testing.
