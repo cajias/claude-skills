@@ -126,16 +126,27 @@ def main():
         sys.exit(2)
     cases = load_cases(task_dir, split_name)
     if cases is None:
-        print(f"no usable {split_name} cases for instruction-routing", file=sys.stderr)
+        print(f"no usable {split_name} cases for instruction-ops", file=sys.stderr)
         sys.exit(4)
 
     instructions = [c["instruction"] for c in cases]
     with tempfile.TemporaryDirectory() as neutral_cwd:
         answers, fatal = run_batch(instructions, args.solution, neutral_cwd)
 
+    # An answer-count mismatch is fatal, never silently truncated: zip() would
+    # otherwise drop the trailing cases from BOTH the numerator and the
+    # denominator, letting a solution that emits a short crafted answers list
+    # (e.g. one correct answer, then sys.exit) inflate its score to 1.0/1.
+    if fatal is None and len(answers) != len(cases):
+        fatal = (
+            f"solution returned {len(answers)} answers for {len(cases)} cases "
+            "(count mismatch) — scored 0 to prevent denominator gaming"
+        )
+
     per_instance = []
     if fatal is not None:
-        # Whole-solution failure (import error, timeout): every case scores 0.
+        # Whole-solution failure (import error, timeout, count mismatch): every
+        # case scores 0.
         for c in cases:
             per_instance.append({"name": c["name"], "score": 0.0, "error": fatal})
     else:

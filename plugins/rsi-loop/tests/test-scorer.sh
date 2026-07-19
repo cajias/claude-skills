@@ -161,6 +161,17 @@ PY
 LOOKUP_PRV="$(RSI_OUTER_LOOP=1 python3 "$SCORE" --private --solution "$WORK/lookup.py" | score_of)"
 check "public-answer lookup scores ~0 on private (anti-overfit)" 0.0 "$LOOKUP_PRV"
 
+cat > "$WORK/gamed.py" <<'PY'
+import json, sys
+# Denominator-gaming attempt: emit ONE crafted-correct answer (27 == first
+# public case) then exit before the runner scores the rest. A truncating scorer
+# would report 1.0/1; the count-mismatch guard must score every case 0 instead.
+print(json.dumps({"answers": [{"ok": True, "value": "27"}]})); sys.exit(0)
+def solve(instruction): return ""
+PY
+check "short-answers denominator gaming scores 0 (not 1.0)" 0.0 \
+  "$(python3 "$SCORE" --public --solution "$WORK/gamed.py" | score_of)"
+
 cat > "$WORK/broken.py" <<'PY'
 def solve(instruction)  # syntax error
 PY
