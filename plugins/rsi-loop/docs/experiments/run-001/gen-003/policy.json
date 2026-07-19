@@ -1,0 +1,17 @@
+{
+  "algorithm": "aide2-exploit-explorer-tree-search",
+  "num_drafts": 5,
+  "max_nodes": 9,
+  "model": "haiku",
+  "effort": "low",
+  "context_mode": "full-history for improve/debug; code-blind (families+scores+summaries only) for explore",
+  "selection": "lexicographic (public, stress); explore only while the top is lexicographically co-tied on BOTH scores or after a failed improve; greedy improve on the unique lexicographic best otherwise (exploits stress-winning explore roots)",
+  "stress_harness": true,
+  "draft_directions": [
+    "family 'naive-baseline': simplest correct baseline — prioritize validity over quality",
+    "family 'sorted-greedy': order the input once, then place each element by a fixed greedy rule",
+    "family 'complement-matching': build the solution by explicitly pairing/grouping complementary elements that combine tightly — NOT a one-pass greedy placement",
+    "family 'local-search-repack': start from a trivial valid solution, then apply deterministic improvement moves (relocate, swap, merge, re-split) until a fixpoint — the move engine is the point, and it must actually change the solution it is given",
+    "family 'exact-hybrid': solve small subproblems exactly (bounded DP / branch-and-bound / exhaustive over small subsets, with strict cutoffs) and fall back safely on large inputs"
+  ]
+}
