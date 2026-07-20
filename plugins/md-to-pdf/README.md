@@ -6,6 +6,7 @@ Convert a directory of markdown files to PDF with Mermaid diagram rendering.
 
 - Combines multiple markdown files into a single PDF
 - Renders Mermaid diagrams using the mermaid.ink API
+- Generates the PDF in a single pandoc call (`--pdf-engine=weasyprint`)
 - Strips YAML frontmatter from files
 - Alphabetical file ordering (use numeric prefixes like `00-`, `01-` for custom order)
 - Professional styling with proper typography
@@ -40,8 +41,7 @@ This will:
 1. **File Discovery**: Finds all `.md` files, excludes README.md, CHANGELOG.md, etc.
 2. **Frontmatter Stripping**: Removes YAML frontmatter (`---` blocks) from each file
 3. **Mermaid Rendering**: Sends Mermaid code blocks to mermaid.ink API, downloads as PNG
-4. **HTML Generation**: Uses pandoc to convert markdown to styled HTML
-5. **PDF Generation**: Uses weasyprint to convert HTML to PDF
+4. **PDF Generation**: Uses pandoc with the weasyprint PDF engine and a stylesheet
 
 ## File Ordering
 
