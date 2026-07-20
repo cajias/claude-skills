@@ -36,7 +36,10 @@ fix: node_modules ## auto-fix lint issues then format
 lint-file: node_modules ## format+lint one file: make lint-file FILE=path
 	@test -n "$(FILE)" || { echo "usage: make lint-file FILE=path" >&2; exit 2; }
 	@case "$(FILE)" in \
-	  *semantic-search/*.py) uv run --directory plugins/semantic-search ruff format "$(FILE)" && uv run --directory plugins/semantic-search ruff check --fix "$(FILE)" && uv run --directory plugins/semantic-search ruff check "$(FILE)" ;; \
+	  plugins/*.py) f='$(FILE)'; d=$${f#plugins/}; d="plugins/$${d%%/*}"; r=$${f#$$d/}; \
+	    if [ -f "$$d/pyproject.toml" ]; then \
+	      uv run --directory "$$d" --all-extras ruff format "$$r" && uv run --directory "$$d" --all-extras ruff check --fix "$$r" && uv run --directory "$$d" --all-extras ruff check "$$r"; \
+	    fi ;; \
 	  *.md) npx prettier --write "$(FILE)" && npx markdownlint --fix "$(FILE)" && npx markdownlint "$(FILE)" ;; \
 	  *.json|*.yml|*.yaml) npx prettier --write "$(FILE)" ;; \
 	  *.ts|*.tsx|*.mjs|*.js) npx prettier --write "$(FILE)" ;; \
