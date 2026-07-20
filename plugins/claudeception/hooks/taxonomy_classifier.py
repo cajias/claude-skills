@@ -273,56 +273,6 @@ def get_target_directory(classification: str, cwd: str = "") -> Optional[Path]:
     return None
 
 
-def extract_generalization(skill_data: dict) -> Optional[dict]:
-    """If a project-level skill could be generalized, suggest how.
-
-    Returns modified skill_data with project-specific parts removed,
-    or None if cannot be generalized.
-    """
-    analysis = analyze_skill_content(skill_data)
-
-    # If too many project identifiers, can't easily generalize
-    if len(analysis["project_identifiers"]) > 3:
-        log("Too many project identifiers to generalize")
-        return None
-
-    # If no universal indicators, probably not generalizable
-    if not analysis["universal_indicators"]:
-        log("No universal indicators found")
-        return None
-
-    # Create generalized version
-    generalized = skill_data.copy()
-
-    # Remove/replace project-specific content
-    for field in ["description", "problem", "solution", "triggers"]:
-        if field in generalized:
-            text = generalized[field]
-
-            # Replace absolute paths with placeholders
-            text = re.sub(r"/Users/[^/]+/[^\s]+", "<project-path>", text)
-            text = re.sub(r"/home/[^/]+/[^\s]+", "<project-path>", text)
-
-            # Replace AWS account IDs
-            text = re.sub(r"\b\d{12}\b", "<aws-account-id>", text)
-
-            # Replace specific file paths
-            text = re.sub(r"(?:src|lib|app)/[a-zA-Z0-9_/-]+\.[a-z]+", "<source-file>", text)
-
-            generalized[field] = text
-
-    # Update name to indicate it's generalized
-    if "name" in generalized:
-        generalized["original_name"] = generalized["name"]
-        # Don't change name, just note it
-
-    generalized["_generalized"] = True
-    generalized["_original_project_identifiers"] = [p["match"] for p in analysis["project_identifiers"]]
-
-    log("Created generalized version of skill")
-    return generalized
-
-
 # ============================================================================
 # CLI Interface
 # ============================================================================
