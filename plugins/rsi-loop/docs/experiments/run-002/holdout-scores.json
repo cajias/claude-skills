@@ -1,0 +1,14 @@
+{
+ "reference": {
+  "interval-scheduling": 1.0,
+  "instruction-ops": 0.0,
+  "timeseries-forecast": 0.920822,
+  "tabular-ring": 0.975
+ },
+ "best": {
+  "instruction-ops": 0.85,
+  "interval-scheduling": 1.0,
+  "timeseries-forecast": 0.904989,
+  "tabular-ring": 0.9625
+ }
+}

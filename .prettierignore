@@ -1,7 +1,8 @@
 # Frozen RSI experiment evidence — machine-generated run artifacts and preserved
 # generation copies. Prettier must not rewrite recorded run data.
 plugins/rsi-loop/docs/experiments/run-001/
-plugins/rsi-loop/docs/experiments/run-002/ledger.jsonl
+plugins/rsi-loop/docs/experiments/run-002/*.jsonl
+plugins/rsi-loop/docs/experiments/run-002/*.json
 plugins/rsi-loop/docs/experiments/run-002/*.py
 plugins/rsi-loop/docs/experiments/run-002/gen-003/
 plugins/rsi-loop/docs/experiments/run-002/gen-004/
