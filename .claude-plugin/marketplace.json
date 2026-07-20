@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "ai-writing",
-      "description": "AI-writing toolkit: detect, analyze, fix, and humanize AI-generated text, including a multi-agent humanizer Workflow over a 15+ category pattern database.",
+      "description": "AI-writing toolkit: detect and humanize AI-generated text, including a multi-agent humanizer Workflow over a 15+ category pattern database.",
       "version": "0.1.0",
       "tags": ["writing", "ai-detection", "humanizer", "workflow"],
       "source": "./plugins/ai-writing"
@@ -134,6 +134,19 @@
       "version": "0.1.0",
       "tags": ["python", "gotchas", "uv", "ruff", "pytest"],
       "source": "./plugins/python-tooling"
+    },
+    {
+      "name": "rsi-loop",
+      "description": "AIDE²-style recursive self-improvement loop: an outer agent iteratively rewrites an inner tree-search research agent, keeping a rewrite only when it beats the incumbent on private held-out scores under a fixed budget across an optimization / ML-engineering / harness-engineering battery. Standalone /rsi:autoresearch solves tasks by tree search; /rsi:init + /rsi:step + /rsi:run drive the outer loop.",
+      "version": "0.1.0",
+      "tags": [
+        "rsi",
+        "self-improvement",
+        "bi-level-optimization",
+        "workflow",
+        "evals"
+      ],
+      "source": "./plugins/rsi-loop"
     },
     {
       "name": "semantic-search",

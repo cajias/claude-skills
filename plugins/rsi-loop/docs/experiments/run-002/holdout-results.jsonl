@@ -1,0 +1,8 @@
+{"task":"interval-scheduling","gen":"gen000","node":0,"private":1.0}
+{"task":"instruction-ops","gen":"gen000","node":0,"private":0.0}
+{"task":"instruction-ops","gen":"gen005","node":7,"private":0.85}
+{"task":"interval-scheduling","gen":"gen005","node":0,"private":1.0}
+{"task":"timeseries-forecast","gen":"gen000","node":8,"private":0.920822}
+{"task":"tabular-ring","gen":"gen000","node":3,"private":0.975}
+{"task":"timeseries-forecast","gen":"gen005","node":1,"private":0.904989}
+{"task":"tabular-ring","gen":"gen005","node":6,"private":0.9625}

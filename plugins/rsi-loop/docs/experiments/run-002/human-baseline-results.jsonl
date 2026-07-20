@@ -1,0 +1,3 @@
+{"task":"instruction-routing","gen":"genhuman","node":0,"private":0.0}
+{"task":"bin-packing","gen":"genhuman","node":"node-0","public":0.964762,"private":0.937937}
+{"task":"tabular-classification","gen":"genhuman","node":"node-6","public":0.82,"private":0.825}

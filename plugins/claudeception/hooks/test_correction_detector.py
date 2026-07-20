@@ -16,12 +16,10 @@ import sys
 
 from correction_detector import (
     CorrectionType,
-    analyze_correction_batch,
     detect_correction,
     detect_negation_with_reference,
     extract_correction_insight,
     fix_common_typos,
-    fuzzy_match,
     normalize_text,
 )
 
@@ -338,40 +336,6 @@ class TestExtractCorrectionInsight:
         assert insight  # Should return something even if generic
 
 
-class TestAnalyzeCorrectionBatch:
-    """Tests for batch analysis function."""
-
-    def test_batch_analysis(self):
-        """Test analyzing multiple messages."""
-        messages = [
-            {"user": "Help me with Python", "assistant": "Sure, here's how..."},
-            {"user": "No, that's wrong", "assistant": "Let me fix that..."},
-            {"user": "Perfect, thanks!", "assistant": "You're welcome!"},
-        ]
-
-        results = analyze_correction_batch(messages)
-
-        assert len(results) == 3
-        assert results[0]["is_correction"] is False  # "Help me with Python"
-        assert results[1]["is_correction"] is True  # "No, that's wrong"
-        assert results[2]["is_correction"] is False  # "Perfect, thanks!"
-
-    def test_batch_with_context(self):
-        """Test that batch analysis uses context from previous responses."""
-        messages = [
-            {"user": "The answer is wrong", "assistant": "I said 42"},
-        ]
-
-        results = analyze_correction_batch(messages)
-        assert len(results) == 1
-        assert results[0]["is_correction"] is True
-
-    def test_empty_batch(self):
-        """Test empty batch handling."""
-        results = analyze_correction_batch([])
-        assert results == []
-
-
 class TestHelperFunctions:
     """Tests for helper functions."""
 
@@ -385,12 +349,6 @@ class TestHelperFunctions:
         assert "wrong" in fix_common_typos("worng")
         assert "actually" in fix_common_typos("actualy")
         assert "incorrect" in fix_common_typos("incorect")
-
-    def test_fuzzy_match(self):
-        """Test fuzzy matching."""
-        assert fuzzy_match("wrong", "wrong") is True
-        assert fuzzy_match("worng", "wrong", threshold=0.75) is True
-        assert fuzzy_match("xyz", "wrong", threshold=0.75) is False
 
     def test_detect_negation_with_reference(self):
         """Test negation with reference detection."""
@@ -463,7 +421,6 @@ def run_tests_without_pytest():
     test_classes = [
         TestDetectCorrection,
         TestExtractCorrectionInsight,
-        TestAnalyzeCorrectionBatch,
         TestHelperFunctions,
         TestCorrectionTypes,
         TestRealWorldExamples,

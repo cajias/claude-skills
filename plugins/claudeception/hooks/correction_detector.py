@@ -14,14 +14,13 @@ Detection categories:
 - Misunderstanding: "you misunderstood", "that's not what I"
 - Negation with reference: mentions previous response + negative sentiment
 
-The module is robust to typos (fuzzy matching for common corrections).
+The module is robust to typos (see TYPO_CORRECTIONS / fix_common_typos).
 """
 
 import re
 from dataclasses import dataclass
-from difflib import SequenceMatcher
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class CorrectionType(Enum):
@@ -179,29 +178,6 @@ def fix_common_typos(text: str) -> str:
             pattern = r"\b" + re.escape(typo) + r"\b"
             fixed = re.sub(pattern, correct, fixed)
     return fixed
-
-
-def fuzzy_match(word: str, target: str, threshold: float = 0.8) -> bool:
-    """Check if word fuzzy-matches target (for typo tolerance)."""
-    if len(word) < 2 or len(target) < 2:
-        return word == target
-    ratio = SequenceMatcher(None, word.lower(), target.lower()).ratio()
-    return ratio >= threshold
-
-
-def detect_typo_correction(text: str, correction_word: str) -> Optional[tuple[str, float]]:
-    """Detect if a typo version of a correction word is present.
-
-    Returns (matched_word, confidence_penalty) or None.
-    """
-    words = text.lower().split()
-    for word in words:
-        if fuzzy_match(word, correction_word, threshold=0.75):
-            if word != correction_word.lower():
-                # It is a typo - return with slight confidence penalty
-                return (word, 0.9)  # 10% confidence penalty for typo
-            return (word, 1.0)  # Exact match
-    return None
 
 
 def detect_negation_with_reference(text: str, previous_response: str = "") -> tuple[bool, float]:
@@ -381,40 +357,10 @@ def detect_correction(user_message: str, previous_response: str = "") -> dict[st
     ).to_dict()
 
 
-def analyze_correction_batch(messages: list[dict[str, str]]) -> list[dict[str, Any]]:
-    """Analyze a batch of messages for corrections.
-
-    Useful for analyzing conversation history to find all corrections.
-
-    Args:
-        messages: List of dicts with 'user' and optionally 'assistant' keys
-
-    Returns:
-        List of detection results for each message
-    """
-    results = []
-    previous_response = ""
-
-    for msg in messages:
-        user_message = msg.get("user", "")
-        if user_message:
-            result = detect_correction(user_message, previous_response)
-            result["original_message"] = user_message
-            results.append(result)
-
-        # Update previous response for context
-        assistant_response = msg.get("assistant", "")
-        if assistant_response:
-            previous_response = assistant_response
-
-    return results
-
-
 # Module-level convenience exports
 __all__ = [
     "CorrectionResult",
     "CorrectionType",
-    "analyze_correction_batch",
     "detect_correction",
     "extract_correction_insight",
 ]

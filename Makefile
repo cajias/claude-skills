@@ -1,4 +1,4 @@
-.PHONY: validate install test-skills lint lint-fix format format-check fix lint-file deps deps-python help
+.PHONY: validate install test-skills lint lint-fix format format-check fix lint-file deps-python help
 
 validate: ## validate plugin structure and marketplace sync
 	bash scripts/validate.sh
@@ -14,14 +14,8 @@ node_modules: package.json ## install npm dev dependencies
 	npm install
 	@touch node_modules
 
-deps: mcp-server/node_modules ## install mcp-server npm deps (runs its postinstall)
-
 deps-python: ## install semantic-search python deps (HEAVY: pulls torch, multi-GB)
 	cd plugins/semantic-search && uv sync
-
-mcp-server/node_modules: mcp-server/package.json
-	cd mcp-server && npm install
-	@touch mcp-server/node_modules
 
 lint: node_modules ## lint markdown + filenames
 	npm run lint

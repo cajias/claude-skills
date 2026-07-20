@@ -4,22 +4,48 @@ Snapshot for resuming the KICKOFF.md build in a fresh session. Everything needed
 this repo; the scratchpad run directory is ephemeral and fully reconstructable from
 `docs/experiments/run-001/`.
 
-## Where the build stands (2026-07-19)
+## Where the build stands (2026-07-20 — banked)
 
 - **M1 — done** (`docs/experiments/m1-smoke-bin-packing.md`): gen-000 verified end-to-end;
   `/rsi:autoresearch` live.
 - **M2 — exit criteria met** (`docs/experiments/run-001/README.md`): 3 manual outer steps,
   gen-002 accepted (private 0.9405 > 0.9379), steps 1 and 3 rejected with recorded diagnoses.
-- **M3 — CODE COMPLETE** (PR #39, branch `claude/rsi-skills-implementation-o8q1zv`): three-family
-  battery (bin-packing + tabular-classification + instruction-routing), `scripts/rsi-aggregate.py`
-  (robust cross-seed aggregate + too-good outlier flag), `/rsi:run` driver, verifier wired to
-  <50% rule + `--flag-outliers`. Runtime exit criterion (10-step unattended run) is the pending
-  execution phase.
-- **M4 — MACHINERY BUILT** (PR #39): `baseline/gen-human`, `holdout-tasks/` (interval-scheduling,
-  tabular-ring, instruction-ops, timeseries-forecast), `scripts/rsi-report.py` + `/rsi:report`.
-  Pending: real report run producing ladder evidence.
-- **M5 — MACHINERY BUILT** (PR #39): `/rsi:ignite` Level-2 swap test. Pending: real ignite run.
-- Tests all green: deny-hook 66, scorer 18, integrity 12, aggregate 12, report 16; validate + test-skills pass.
+- **M3 — code complete; exit run demonstrated** (`docs/experiments/run-002/`): three-family
+  battery, `scripts/rsi-aggregate.py`, `/rsi:run` driver. run-002 ran 4 steps with a complete
+  diagnose→repair→improve arc (gen-003 rejected → gen-004 accepted → gen-005 accepted, private
+  aggregate 0.575 → **0.856**). Banked at step 3; the ≥10-step target (steps 4–10) is optional
+  extra evidence, not a blocker.
+- **M4 — MEASURED** (`docs/experiments/m4-report.md`): Level 0 and Level 1 both met; gen-005
+  beats the hand-tuned `gen-human` baseline 0.588 by +0.269; holdout near-transfer mean Δ +0.279,
+  far-OOD Δ −0.016 (reported separately). Real `/rsi:report` output committed.
+- **M5 — MACHINERY BUILT** (`commands/rsi-ignite.md`): `/rsi:ignite` Level-2 swap test. The
+  real ignition campaign is **not yet run** (see "How to continue").
+- Tests all green in CI (`test-rsi-loop`): deny-hook, scorer, integrity, aggregate, report.
+
+## How to continue (from the banked state)
+
+The scientific core is proven and committed (M1–M4). Three optional real-compute runs remain,
+each an independent multi-hour Workflow job; none depends on the others. All are driven from the
+committed run-002 evidence — the scratchpad run dir is ephemeral and reconstructable from
+`docs/experiments/run-002/` (ledger + `gen-000/003/004/005` generation dirs + winning-node
+snapshots). Rebuild it, then:
+
+1. **M3 steps 4–10 (extend the ladder).** Continue run-002 from step 4 with incumbent **gen-005**.
+   The next proposer's clearest target is **tabular-classification**, whose private score is stuck
+   at **0.7875** across every generation (gen-000→005) — likely because gen-005's adversarial probe
+   generates paraphrase perturbations that cannot discriminate ML-model candidates on a 5-fold-CV
+   task; a data-perturbation probe mode (feature noise / row resampling / mild shift) is the
+   hypothesis to try. Drive with `/rsi:run <run-dir> --max-steps 10`.
+2. **M4 Level 2 — `/rsi:ignite <run-dir>`.** Paired A/B of two full 8-step campaigns (control vs a
+   proposer briefed with gen-005's discovered strategy), ~48 evals. The paper found a Level-2
+   _rejection_ (faster convergence, same ceiling) and the command is instrumented to measure that
+   honestly, not to pass — expect to document a known-negative.
+3. **§5.2 chassis A/B (`docs/PLAN.md` §5.2).** ~40 evals choosing the outer-loop driver: Arm A
+   `uditgoenka/autoresearch` (`npx skills add uditgoenka/autoresearch`) vs Arm B native `/rsi:run`.
+   An engineering decision, not a new scientific claim; apply the pre-registered decision rule.
+
+Do NOT fabricate any eval score — every ledger line must come from real Workflow compute or be
+clearly marked not-yet-run. Operational gotchas for whoever runs these are in the sections below.
 
 ## §5.2 chassis decision (RESOLVED by the user) — FULL pre-registered scale
 
@@ -31,7 +57,7 @@ item. Write both arms up under `docs/experiments/`; the pre-registered decision 
 §5.2) picks the `/rsi:step` chassis. Do NOT fabricate any eval score — every ledger line must
 come from real Workflow compute or be clearly marked not-yet-run.
 
-## RUN STATUS (2026-07-19): run-002 PAUSED at step 2 by monthly spend limit
+## RUN STATUS (2026-07-19): run-002 at step 3, incumbent gen-005
 
 The M3 exit run is live in scratchpad (`rsi-runs/run-002`, evidence mirrored to
 `docs/experiments/run-002/`). Steps done, on the 3-family battery:
@@ -40,17 +66,24 @@ The M3 exit run is live in scratchpad (`rsi-runs/run-002`, evidence mirrored to
 - step 1 — gen-003 (per-node robustness self-check) **REJECTED** (tie 0.575): the self-check
   saturated (every node self-grades robustness 1.0).
 - step 2 — gen-004 (shared **adversarial** probe, decoupled from the solver) **ACCEPTED**,
-  private aggregate **0.648** (+0.073), driven by instruction-routing 0.0 → **0.219**. `best`
-  now = gen-004. Accept gated by MECHANICAL verifier checks (LLM verifier blocked by spend limit).
+  private aggregate **0.648** (+0.073), driven by instruction-routing 0.0 → **0.219**.
+- step 3 — gen-005 (**lineage-aware probe pool**: always include improve/explore leaves, cap
+  scales with the tie count) **ACCEPTED**, private aggregate **0.856** (+0.208) — the largest
+  single-step gain. Fixed gen-004's `probe_topk=4` truncation: the probe pool now reaches the
+  synonym-tolerant improve leaves, lifting instruction-routing **0.219 → 0.844** while bin-packing
+  (0.938, probe saturated → top-public fallback) and tabular (0.788) held. `best` now = gen-005.
+  Accept gated by MECHANICAL verifier checks (LLM verifier still blocked by spend limit).
 
-**Blocker: the account hit its monthly spend limit** mid-step-2 (truncated gen-004's tabular
-probe-eval). No further inner-agent Workflow compute can run until the user raises the limit at
-claude.ai/settings/usage. All local work (scoring, integrity, git) still works.
+Spend note: the LLM-adversarial verifier subagent remains unavailable (monthly spend limit), so
+steps 2–3 were gated by the mechanical battery (reproduce vs pristine scorer, git integrity,
+escape-residue, hard-coding audit, too-good outlier) — all clean. Inner-agent Workflow compute
+DID run this session (3 family evals × ~0.6M tokens each), so the earlier hard block has eased;
+budget for the remaining big-compute items (chassis A/B, steps 4–10) is the live constraint.
 
-Resume plan when compute returns: continue run-002 from step 3 (incumbent gen-004). Next
-proposer should (a) widen `probe_topk` — gen-004 capped the probe pool to 4 public-tied nodes
-and missed synonym-heavy improve nodes that reached private 0.5; (b) keep iterating toward the
-10-step exit criterion. Then §5.2 chassis A/B, M4 `/rsi:report`, M5 `/rsi:ignite`.
+Resume plan: see the "How to continue" section above. In short — continue run-002 from step 4
+(incumbent **gen-005**; the `probe_topk` follow-up is RESOLVED; tabular private is the stuck
+headroom at 0.7875), and/or run M5 `/rsi:ignite` and the §5.2 chassis A/B. M4 `/rsi:report` is
+already done (`docs/experiments/m4-report.md`).
 
 ## Pending execution phase (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
 

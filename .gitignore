@@ -41,5 +41,5 @@ coverage/
 # Local plugin-install snapshots (canonical plugins live in plugins/)
 .claude/plugins/
 
-# Ralph orchestrator transient state
+# Ralph-loop scratchpad (session state, not source)
 .agent/

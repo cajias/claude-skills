@@ -14,6 +14,7 @@ import sys
 import os
 import re
 import base64
+import json
 import zlib
 import urllib.request
 import subprocess
@@ -53,9 +54,9 @@ def combine_markdown_files(files: list[Path]) -> str:
 
 def mermaid_to_url(mermaid_code: str) -> str:
     """Convert Mermaid code to mermaid.ink URL."""
-    escaped = mermaid_code.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
-    json_str = f'{{"code":"{escaped}","mermaid":"{{\\\"theme\\\":\\\"default\\\"}}"}}'
-    compressed = zlib.compress(json_str.encode("utf-8"), 9)
+    # mermaid.ink takes the config as a JSON *string*, not a nested object.
+    payload = json.dumps({"code": mermaid_code, "mermaid": '{"theme":"default"}'})
+    compressed = zlib.compress(payload.encode("utf-8"), 9)
     encoded = base64.urlsafe_b64encode(compressed).decode("utf-8")
     return f"https://mermaid.ink/img/pako:{encoded}"
 
@@ -108,11 +109,9 @@ def render_mermaid_diagrams(content: str, temp_dir: Path) -> str:
     return re.sub(mermaid_pattern, replace_mermaid, content, flags=re.DOTALL)
 
 
-def create_html(markdown_content: str, temp_dir: Path) -> Path:
-    """Convert markdown to HTML using pandoc."""
+def markdown_to_pdf(markdown_content: str, temp_dir: Path, output_pdf: Path) -> None:
+    """Convert markdown straight to PDF via pandoc's weasyprint engine."""
     md_file = temp_dir / "combined.md"
-    html_file = temp_dir / "output.html"
-
     md_file.write_text(markdown_content, encoding="utf-8")
 
     # Create CSS for styling
@@ -140,29 +139,19 @@ img { max-width: 100%; height: auto; display: block; margin: 1em auto; }
     css_file = temp_dir / "style.css"
     css_file.write_text(css_content, encoding="utf-8")
 
-    # Run pandoc
     cmd = [
         "pandoc",
         str(md_file),
-        "-o", str(html_file),
+        "-o", str(output_pdf),
+        "--pdf-engine=weasyprint",
         "--standalone",
         f"--css={css_file}",
-        "--embed-resources"
+        "--embed-resources",
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(f"pandoc failed: {result.stderr}")
-
-    return html_file
-
-
-def html_to_pdf(html_file: Path, output_pdf: Path) -> None:
-    """Convert HTML to PDF using weasyprint."""
-    cmd = ["weasyprint", str(html_file), str(output_pdf)]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        raise RuntimeError(f"weasyprint failed: {result.stderr}")
 
 
 def main():
@@ -200,13 +189,9 @@ def main():
         print("\nRendering Mermaid diagrams...")
         rendered = render_mermaid_diagrams(combined, temp_path)
 
-        # Convert to HTML
-        print("\nGenerating HTML...")
-        html_file = create_html(rendered, temp_path)
-
         # Convert to PDF
         print("\nGenerating PDF...")
-        html_to_pdf(html_file, Path(output_pdf))
+        markdown_to_pdf(rendered, temp_path, Path(output_pdf))
 
     print(f"\nPDF created: {output_pdf}")
 

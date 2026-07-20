@@ -13,7 +13,6 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 
 # Configuration
@@ -21,7 +20,6 @@ LOG_FILE = Path(os.environ.get("CLAUDECEPTION_LOG_FILE", os.path.expanduser("~/.
 DEBUG = os.environ.get("CLAUDECEPTION_DEBUG", "true").lower() == "true"
 DRY_RUN = os.environ.get("CLAUDECEPTION_DRY_RUN", "false").lower() == "true"
 METRICS_DIR = Path(os.path.expanduser("~/.claude/claudeception-metrics"))
-EVENTS_DIR = METRICS_DIR / "events"
 
 # Breakthrough score threshold for extraction
 BREAKTHROUGH_THRESHOLD = 0.15
@@ -82,20 +80,6 @@ def log(message: str) -> None:
 def ensure_directories() -> None:
     """Ensure required directories exist."""
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
-    EVENTS_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def emit_event(event: dict[str, Any]) -> None:
-    """Write event to daily JSONL log."""
-    ensure_directories()
-    today = datetime.now().strftime("%Y-%m-%d")
-    events_file = EVENTS_DIR / f"{today}.jsonl"
-    try:
-        with open(events_file, "a") as f:
-            f.write(json.dumps(event) + "\n")
-        log(f"Emitted {event.get('event_type', 'unknown')} event")
-    except Exception as e:
-        log(f"Error writing event: {e}")
 
 
 def to_kebab_case(text: str) -> str:
@@ -171,16 +155,7 @@ def create_skill(
     if HAS_DUPLICATE_DETECTOR:
         should_reject, reason = should_reject_duplicate(skill_data)
         if should_reject:
-            log(f"Duplicate rejected: {reason}")
-            emit_event(
-                {
-                    "event_type": "skill_rejected",
-                    "timestamp": datetime.now().isoformat(),
-                    "skill_name": name,
-                    "reason": "duplicate",
-                    "details": reason,
-                }
-            )
+            log(f"Duplicate rejected: {name} - {reason}")
             return False
 
     # Prepare template
@@ -209,19 +184,7 @@ def create_skill(
     try:
         skill_dir.mkdir(parents=True, exist_ok=True)
         skill_file.write_text(content)
-        log(f"Created skill: {name} at {skill_file}")
-
-        emit_event(
-            {
-                "event_type": "skill_created",
-                "timestamp": datetime.now().isoformat(),
-                "skill_name": name,
-                "level": level,
-                "breakthrough_score": breakthrough_score,
-                "target_dir": str(target_dir),
-            }
-        )
-
+        log(f"Created skill: {name} at {skill_file} (level={level}, score={breakthrough_score:.2f})")
         return True
     except Exception as e:
         log(f"Error creating skill: {e}")
@@ -247,15 +210,6 @@ def extract_skills_from_session(session_data: dict, signal_summary: dict) -> int
     # Check if session meets extraction threshold
     if breakthrough_score < BREAKTHROUGH_THRESHOLD:
         log(f"Breakthrough score {breakthrough_score:.2f} below threshold {BREAKTHROUGH_THRESHOLD}")
-        emit_event(
-            {
-                "event_type": "extraction_skipped",
-                "timestamp": datetime.now().isoformat(),
-                "session_id": session_id,
-                "reason": "below_threshold",
-                "breakthrough_score": breakthrough_score,
-            }
-        )
         return 0
 
     log(f"Breakthrough score {breakthrough_score:.2f} meets threshold!")
@@ -445,9 +399,6 @@ def analyze_transcript_for_knowledge(conversation_text: str) -> dict:
         "has_workaround": False,
         "has_discovery": False,
         "has_pattern_learning": False,
-        "key_topics": [],
-        "error_patterns": [],
-        "tools_used": set(),
     }
 
     text_lower = conversation_text.lower()
@@ -473,132 +424,7 @@ def analyze_transcript_for_knowledge(conversation_text: str) -> dict:
     pattern_indicators = ["pattern", "best practice", "should always", "remember to", "learned", "gotcha"]
     analysis["has_pattern_learning"] = any(ind in text_lower for ind in pattern_indicators)
 
-    # Extract error patterns (look for common error formats)
-    error_patterns = re.findall(r"(?:error|exception|failed)[\s:]+([^\n]{10,100})", text_lower)
-    analysis["error_patterns"] = list(set(error_patterns[:5]))  # Dedupe and limit
-
-    # Extract tools used
-    tool_matches = re.findall(r"\[Tool:\s*([^\]]+)\]", conversation_text)
-    analysis["tools_used"] = list(set(tool_matches))
-
-    # Extract key topics (capitalized multi-word terms)
-    topic_matches = re.findall(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b", conversation_text)
-    analysis["key_topics"] = list(set(topic_matches[:10]))
-
     return analysis
-
-
-def build_extraction_prompt(conversation_text: str, analysis: dict, signal_summary: dict, hook_event: str) -> str:
-    """Build a comprehensive extraction prompt for the LLM.
-
-    Args:
-        conversation_text: The conversation content to analyze
-        analysis: Pre-analysis metadata
-        signal_summary: Accumulated signals from session
-        hook_event: Which hook triggered this (SessionEnd or PreCompact)
-
-    Returns:
-        Formatted prompt for Claude to analyze and extract skills
-    """
-    # Build context summary
-    context_parts = []
-
-    if analysis["has_error_resolution"]:
-        context_parts.append("✓ Error was debugged and resolved")
-    if analysis["has_workaround"]:
-        context_parts.append("✓ Workaround or alternative approach found")
-    if analysis["has_discovery"]:
-        context_parts.append("✓ Non-obvious discovery made")
-    if analysis["has_pattern_learning"]:
-        context_parts.append("✓ Pattern or best practice identified")
-
-    if analysis["error_patterns"]:
-        context_parts.append(f"Error patterns seen: {', '.join(analysis['error_patterns'][:3])}")
-
-    if analysis["tools_used"]:
-        context_parts.append(f"Tools used: {', '.join(analysis['tools_used'][:5])}")
-
-    context_summary = "\n".join(context_parts) if context_parts else "No specific patterns detected"
-
-    # Signal summary
-    signal_text = f"""
-Signals accumulated:
-- Errors: {signal_summary.get("error_count", 0)}
-- Retries: {signal_summary.get("retry_count", 0)}
-- Web searches: {signal_summary.get("web_search_count", 0)}
-- User corrections: {signal_summary.get("correction_count", 0)}
-- User teaching: {signal_summary.get("teaching_count", 0)}
-- Breakthrough score: {signal_summary.get("breakthrough_score", 0):.2f}
-"""
-
-    # Truncate conversation if needed
-    max_conv_len = 30000
-    if len(conversation_text) > max_conv_len:
-        # Keep beginning and end for context
-        half = max_conv_len // 2
-        conversation_text = (
-            conversation_text[:half]
-            + f"\n\n[... {len(conversation_text) - max_conv_len} characters truncated ...]\n\n"
-            + conversation_text[-half:]
-        )
-
-    return f"""
-================================================================================
-CLAUDECEPTION - SESSION KNOWLEDGE EXTRACTION
-================================================================================
-Trigger: {hook_event}
-
-**Pre-Analysis:**
-{context_summary}
-
-{signal_text}
-
-**Session Conversation:**
---------------------------------------------------------------------------------
-{conversation_text}
---------------------------------------------------------------------------------
-
-**Your Task:**
-Analyze this conversation for skill-worthy knowledge. Look for:
-
-| Category | What to Extract | Skip If |
-|----------|-----------------|---------|
-| Debugging Insight | Root cause of non-obvious error | Just a typo or syntax error |
-| Workaround | Solution to tool/framework limitation | Standard documented approach |
-| Pattern | Reusable technique discovered | Project-specific config |
-| Integration | How to connect systems | Already well-documented |
-| Gotcha | Surprising behavior that caught us | Common knowledge |
-
-**Extraction Criteria:**
-- Must be REUSABLE (not one-off project-specific)
-- Must be NON-OBVIOUS (required investigation)
-- Must be VERIFIED (actually worked in this session)
-- Should benefit FUTURE sessions
-
-**Output Format:**
-If skill-worthy knowledge found, respond with JSON:
-```json
-{{
-  "skills": [
-    {{
-      "name": "kebab-case-name",
-      "title": "Brief Descriptive Title",
-      "description": "One-line summary for semantic matching - include error messages, tool names",
-      "problem": "What problem this solves",
-      "triggers": "When to use: specific symptoms, error messages, scenarios",
-      "solution": "Step-by-step approach or key insight",
-      "verification": "How to confirm it worked",
-      "tags": ["category", "tool-name", "error-type"],
-      "confidence": 0.8
-    }}
-  ]
-}}
-```
-
-If nothing notable, respond: "No skill-worthy knowledge to extract."
-
-================================================================================
-"""
 
 
 def main() -> int:
@@ -718,20 +544,13 @@ def _fallback_signal_extraction(session_data: dict, hook_event: str) -> int:
 def _finalize_extraction(
     session_data: dict, signal_summary: dict, hook_event: str, total_lines: int, skills_created: int
 ) -> int:
-    """Finalize extraction: emit events and handle state based on hook type."""
-    # Emit summary event
-    emit_event(
-        {
-            "event_type": "extraction_complete",
-            "timestamp": datetime.now().isoformat(),
-            "session_id": session_data.get("session_id", "unknown"),
-            "hook_event": hook_event,
-            "breakthrough_score": signal_summary.get("breakthrough_score", 0),
-            "skills_created": skills_created,
-            "corrections_count": signal_summary.get("correction_count", 0),
-            "teaching_count": signal_summary.get("teaching_count", 0),
-            "transcript_lines_analyzed": total_lines - signal_summary.get("last_compaction_line", 0),
-        }
+    """Finalize extraction: log the summary and handle state based on hook type."""
+    log(
+        f"Extraction complete [{hook_event}] session={session_data.get('session_id', 'unknown')} "
+        f"score={signal_summary.get('breakthrough_score', 0):.2f} skills_created={skills_created} "
+        f"corrections={signal_summary.get('correction_count', 0)} "
+        f"teaching={signal_summary.get('teaching_count', 0)} "
+        f"lines={total_lines - signal_summary.get('last_compaction_line', 0)}"
     )
 
     # Handle state based on hook type

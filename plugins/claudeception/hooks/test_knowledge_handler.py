@@ -152,7 +152,7 @@ class TestKnowledgeHandlerBackwardCompatibility:
         assert callable(main)
 
     def test_reads_from_stdin(self):
-        """Should read JSON from stdin like correction_handler did."""
+        """Should read JSON from stdin."""
         from knowledge_handler import main
 
         # Mock stdin with test data

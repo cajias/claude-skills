@@ -374,107 +374,6 @@ def detect_knowledge(user_message: str, assistant_response: str = "") -> Knowled
     return result
 
 
-def generate_classification_prompt(knowledge_result: KnowledgeResult) -> dict[str, Any]:
-    """Generate a classification prompt for user/project level classification.
-
-    Creates an AskUserQuestion-compatible format for asking the user
-    how to classify the extracted knowledge.
-
-    Args:
-        knowledge_result: The KnowledgeResult to generate prompt for
-
-    Returns:
-        Dictionary in AskUserQuestion format
-    """
-    # Get a preview of the knowledge (first 100 chars)
-    preview = knowledge_result.extracted_knowledge[:100]
-    if len(knowledge_result.extracted_knowledge) > 100:
-        preview += "..."
-
-    return {
-        "questions": [
-            {
-                "question": f'How should this knowledge be classified?\n"{preview}"',
-                "header": "Scope",
-                "options": [
-                    {
-                        "label": "User-level",
-                        "description": "Applies across all projects (personal preferences, tool knowledge)",
-                    },
-                    {
-                        "label": "Project-level",
-                        "description": "Specific to this project only (local patterns, file paths)",
-                    },
-                    {"label": "Skip", "description": "Don't extract this as a skill"},
-                ],
-                "multiSelect": False,
-            }
-        ]
-    }
-
-
-def suggest_classification(knowledge_result: KnowledgeResult) -> str:
-    """Provide a heuristic suggestion for classification.
-
-    Uses simple heuristics to suggest whether knowledge should be
-    user-level, project-level, or skipped.
-
-    Args:
-        knowledge_result: The KnowledgeResult to classify
-
-    Returns:
-        Suggested classification: "user", "project", or "skip"
-    """
-    knowledge = knowledge_result.extracted_knowledge.lower()
-
-    # Project-level indicators (paths, specific services, accounts)
-    project_indicators = [
-        r"/src/",
-        r"/lib/",
-        r"/config/",
-        r"/app/",  # Common paths
-        r"\b\d{12}\b",  # AWS account IDs
-        r"\.json\b",
-        r"\.yaml\b",
-        r"\.yml\b",  # Config file types
-        r"\bthis\s+project\b",
-        r"\bthis\s+repo\b",
-        r"\bour\s+api\b",
-        r"\bour\s+service\b",
-    ]
-
-    # User-level indicators (tools, general patterns)
-    user_indicators = [
-        r"\bdocker\b",
-        r"\bgit\b",
-        r"\bnpm\b",
-        r"\bpython\b",
-        r"\btypescript\b",
-        r"\brust\b",
-        r"\bgo\b",
-        r"\balways\b",
-        r"\bnever\b",
-        r"\bprefer\b",
-        r"\brestart\b",
-        r"\bconfig\b",
-        r"\bchanges\b",
-    ]
-
-    project_score = sum(1 for p in project_indicators if re.search(p, knowledge))
-    user_score = sum(1 for p in user_indicators if re.search(p, knowledge))
-
-    # Low confidence knowledge should be skipped
-    if knowledge_result.total_confidence < 0.5:
-        return "skip"
-
-    if project_score > user_score:
-        return "project"
-    if user_score > project_score:
-        return "user"
-    # Default to project if unclear (safer)
-    return "project"
-
-
 # Module exports
 __all__ = [
     "KnowledgeResult",
@@ -485,8 +384,6 @@ __all__ = [
     "detect_knowledge",
     "detect_response_knowledge",
     "detect_teaching",
-    "generate_classification_prompt",
-    "suggest_classification",
 ]
 
 

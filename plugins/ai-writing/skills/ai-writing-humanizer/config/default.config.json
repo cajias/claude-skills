@@ -1,16 +1,7 @@
 {
-  "$schema": "./config.schema.json",
-  "mode": "interactive",
   "max_iterations": 5,
   "auto_fix_priority": ["critical", "high"],
-  "require_approval_for": ["medium", "low"],
-  "strict_mode": false,
-  "preserve_technical_terms": true,
-  "output_format": "markdown",
-  "categories_to_skip": [],
   "strict_thresholds": {
-    "em_dash": 2,
-    "transitions": 1,
-    "hedge_words": 3
+    "em_dash": 2
   }
 }

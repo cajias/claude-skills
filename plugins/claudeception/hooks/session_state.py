@@ -22,7 +22,7 @@ import os
 import sys
 import time
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
@@ -134,26 +134,6 @@ def file_lock(timeout: float = LOCK_TIMEOUT):
                 log("Lock released", "DEBUG")
             except Exception as e:
                 log(f"Error releasing lock: {e}", "WARNING")
-
-
-@dataclass
-class ExchangeSummary:
-    """Summary of a single exchange (user prompt + assistant response)."""
-
-    exchange_id: str
-    timestamp: str
-    user_prompt_preview: str
-    assistant_response_preview: str
-    tool_calls_count: int = 0
-    errors_in_exchange: int = 0
-    duration_seconds: float = 0.0
-
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ExchangeSummary":
-        return cls(**data)
 
 
 @dataclass

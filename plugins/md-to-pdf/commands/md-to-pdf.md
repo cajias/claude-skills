@@ -21,7 +21,7 @@ Convert a directory of markdown files into a single PDF document with properly r
 3. **Check dependencies**: Ensure weasyprint and pandoc are installed (auto-install weasyprint via pipx if missing)
 4. **Combine markdown files**: Merge all .md files in alphabetical order, stripping YAML frontmatter
 5. **Render Mermaid diagrams**: Download diagrams from mermaid.ink API as PNG images
-6. **Generate PDF**: Use pandoc + weasyprint to create the final PDF
+6. **Generate PDF**: Use pandoc with `--pdf-engine=weasyprint` to create the final PDF
 7. **Open PDF**: Display the result to the user
 
 ## Implementation
@@ -65,8 +65,7 @@ The script handles:
 
 - Combining markdown files alphabetically
 - Downloading Mermaid diagrams from mermaid.ink
-- Generating HTML with pandoc
-- Converting to PDF with weasyprint
+- Generating the styled PDF with pandoc's weasyprint engine
 
 ### Step 5: Open Result
 

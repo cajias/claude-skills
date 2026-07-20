@@ -3,9 +3,6 @@
 Automated GitHub pull request monitoring for Claude Code. Automatically resumes Claude when new
 commits are detected.
 
-> 📖 **New to this plugin?** See the [Complete Usage Guide](./USAGE-GUIDE.md) for step-by-step
-> instructions, troubleshooting, and examples.
-
 ## Overview
 
 This plugin provides:
@@ -191,6 +188,12 @@ Disable for specific project:
 - GitHub API limit: 5,000 requests/hour
 - Be mindful of rate limits with many PRs
 
+### Repository Constraints
+
+- Repo must exist on the local filesystem — no auto-clone
+- State file line 1 must be a valid absolute path
+- If the path is gone when the hook runs, the state file is deleted and monitoring stops
+
 ## Troubleshooting
 
 ### Hook Not Triggering
@@ -207,11 +210,24 @@ ls -la ~/.claude/plugins/pr-monitor
 cat ~/.claude/plugins/pr-monitor/hooks/hooks.json
 ```
 
+**Check the script is executable:**
+
+```bash
+ls -l ~/.claude/plugins/pr-monitor/scripts/Stop.sh
+# Should show: -rwxr-xr-x
+```
+
 **Test hook manually:**
 
 ```bash
 echo '{"stop_hook_active": false}' | bash ~/.claude/plugins/pr-monitor/scripts/Stop.sh
+
+# With trace output when the above is silent:
+echo '{"stop_hook_active": false}' | bash -x ~/.claude/plugins/pr-monitor/scripts/Stop.sh
 ```
+
+If the hook still never runs: restart Claude Code completely, and check that
+`.claude/settings.json` does not set `disableAllHooks: true`.
 
 ### PR Not Detected
 
@@ -225,19 +241,79 @@ ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
 
 ```bash
 cat ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
-# Should have 3 lines
+# Should have exactly 3 lines: repo path, PR number, last commit SHA
 ```
 
 **Test GitHub CLI:**
 
 ```bash
-gh pr view PR_NUMBER --json headRefOid,commits
+gh pr view PR_NUMBER --json headRefOid,state,commits
 ```
 
 **Check authentication:**
 
 ```bash
 gh auth status
+```
+
+### State File Issues
+
+**Not found** - check the repo name spelling in the filename and that the file is
+in `~/.claude/pr-monitor/`. Note the hook deletes the state file if line 1 is not an
+existing directory.
+
+**Wrong format** - recreate it:
+
+```bash
+REPO_PATH=/path/to/repo
+PR_NUMBER=123
+CURRENT_SHA=$(cd "$REPO_PATH" && gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
+
+cat > ~/.claude/pr-monitor/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
+$REPO_PATH
+$PR_NUMBER
+$CURRENT_SHA
+EOF
+```
+
+**Unreadable** - `chmod 644 ~/.claude/pr-monitor/claude_monitor_pr_*`
+
+### GitHub API Issues
+
+**Rate limit exceeded:**
+
+```bash
+gh api rate_limit   # resets hourly
+```
+
+**Authentication expired:** re-run `gh auth login`.
+
+**Permission denied:** confirm you can reach the repo at all with
+`gh repo view OWNER/REPO`.
+
+**Hook timing out:** check network connectivity and reduce the number of
+monitored PRs — each one costs an API round-trip per stop.
+
+### Claude Not Auto-Resuming
+
+**Check hook output** - it must emit JSON with `"decision": "block"`:
+
+```bash
+echo '{"stop_hook_active": false}' | bash ~/.claude/plugins/pr-monitor/scripts/Stop.sh
+```
+
+**Verify the SHA actually changed:**
+
+```bash
+gh pr view PR_NUMBER --json headRefOid --jq '.headRefOid'
+sed -n '3p' ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
+```
+
+**Check the PR is still open** - a merged or closed PR blocks once, then
+deletes its own state file:
+
+```bash
+gh pr view PR_NUMBER --json state --jq '.state'
 ```
 
 ### Multiple Triggers
@@ -290,13 +366,12 @@ rm ~/.claude/pr-monitor/claude_monitor_pr_*
 ### Monitor External Repository PR
 
 ```bash
-# Ask Claude:
-"Monitor PR #123 in owner/repo"
+# Clone it first — the hook needs a local path
+gh repo clone owner/repo
+cd repo
 
-# Claude:
-# 1. Clones repo (if not local)
-# 2. Creates state file
-# 3. Enables monitoring
+# Then ask Claude:
+"Monitor PR #123 in this repository"
 ```
 
 ### Monitor Multiple PRs
@@ -320,6 +395,60 @@ rm ~/.claude/pr-monitor/claude_monitor_pr_*
 # Or manually:
 rm ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
+
+## Advanced Usage
+
+### Custom State File Location
+
+State files live in `/tmp` because that is where `Stop.sh` looks. To move them,
+edit the `find /tmp -name "claude_monitor_pr_*"` line in the script.
+
+### Batch Monitoring Setup
+
+```bash
+#!/bin/bash
+# monitor-prs.sh /path/to/repo 1 2 3
+REPO_PATH=$1
+shift
+
+cd "$REPO_PATH"
+REPO_NAME=$(basename "$REPO_PATH")
+
+for pr in "$@"; do
+  CURRENT_SHA=$(gh pr view "$pr" --json headRefOid --jq '.headRefOid')
+  cat > ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${pr} <<EOF
+$REPO_PATH
+$pr
+$CURRENT_SHA
+EOF
+  echo "✓ Monitoring PR #$pr"
+done
+```
+
+## FAQ
+
+**How quickly are new commits detected?** Only when Claude Code would otherwise
+stop or idle — not in real time. Each monitored PR adds roughly 1-3 seconds to
+that check.
+
+**Can I monitor private repos?** Yes, if `gh` is authenticated with read access
+and the repo is cloned locally.
+
+**Does it work with GitHub Enterprise?** Yes, once `gh` is pointed at your
+instance: `gh auth login --hostname github.enterprise.com`.
+
+**How many PRs at once?** No hard limit, but each costs an API call per check
+against a 5,000 requests/hour budget. 5-10 is a comfortable ceiling.
+
+**Can I change the notification text?** Yes — edit the `"reason"` string in
+`scripts/Stop.sh`.
+
+**Does it work offline?** No. It needs the GitHub API, and fails quietly without it.
+
+**What happens when the PR merges or closes?** The hook blocks once with a
+state-change notice, then deletes the state file and stops monitoring.
+
+**Can I monitor draft PRs?** Yes — the hook does not distinguish draft from ready.
 
 ## Development
 
@@ -378,7 +507,6 @@ cajias
 
 ## Documentation
 
-- 📘 [**Complete Usage Guide**](./USAGE-GUIDE.md) - Comprehensive how-to guide with examples
 - 📋 [**PR Monitor Skill**](./skills/pr-monitor/SKILL.md) - Detailed skill instructions
 - 🔧 [**Stop Hook Script**](./scripts/Stop.sh) - Hook implementation
 
@@ -403,4 +531,3 @@ cajias
 - PR monitor skill
 - Multi-PR support
 - Auto-cleanup on merge/close
-- Comprehensive usage guide with troubleshooting and examples

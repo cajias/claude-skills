@@ -6,8 +6,7 @@
   "scripts": {
     "lint": "npm run lint:md && ls-lint",
     "lint:md": "npx markdownlint --dot '**/*.md' --ignore node_modules",
-    "lint:fix": "npm run lint:md:fix",
-    "lint:md:fix": "npx markdownlint --dot '**/*.md' --ignore node_modules --fix",
+    "lint:fix": "npx markdownlint --dot '**/*.md' --ignore node_modules --fix",
     "format": "npx prettier --write '**/*.{md,json,yml,yaml,mjs,js}' --ignore-path .gitignore --ignore-path .prettierignore",
     "format:check": "npx prettier --check '**/*.{md,json,yml,yaml,mjs,js}' --ignore-path .gitignore --ignore-path .prettierignore",
     "validate": "bash scripts/validate.sh",

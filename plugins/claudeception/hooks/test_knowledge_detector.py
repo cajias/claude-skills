@@ -212,43 +212,6 @@ class TestUnifiedKnowledgeDetection:
         assert "is_correction" in result_dict
 
 
-class TestClassificationPrompt:
-    """Test classification prompt generation."""
-
-    def test_generate_classification_options(self):
-        """Should generate proper classification options."""
-        from knowledge_detector import detect_knowledge, generate_classification_prompt
-
-        result = detect_knowledge(user_message="Remember that our API uses JWT tokens", assistant_response="")
-
-        prompt = generate_classification_prompt(result)
-
-        assert "questions" in prompt
-        assert len(prompt["questions"]) > 0
-        assert "options" in prompt["questions"][0]
-
-        # Should have user-level, project-level, skip options
-        labels = [opt["label"] for opt in prompt["questions"][0]["options"]]
-        assert any("user" in label.lower() for label in labels)
-        assert any("project" in label.lower() for label in labels)
-
-    def test_user_project_default_heuristics(self):
-        """Should provide heuristic defaults for classification."""
-        from knowledge_detector import detect_knowledge, suggest_classification
-
-        # Tool-related should suggest user-level
-        result1 = detect_knowledge(
-            user_message="Remember that Docker needs to restart after config changes", assistant_response=""
-        )
-        suggestion1 = suggest_classification(result1)
-        assert suggestion1 in ["user", "project", "skip"]
-
-        # Project-specific path should suggest project-level
-        result2 = detect_knowledge(user_message="Remember that /src/config uses JSON format", assistant_response="")
-        suggestion2 = suggest_classification(result2)
-        assert suggestion2 in ["user", "project", "skip"]
-
-
 class TestIntegrationWithExistingCorrection:
     """Test that existing correction detection still works."""
 

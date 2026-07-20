@@ -11,9 +11,45 @@ records in `ledger.jsonl`.
 | 0    | gen-000    | baseline AIDE0                      | 0.938    | 0.788   | 0.000       | 0.575       | incumbent             |
 | 1    | gen-003    | robustness-aware selection          | 0.938    | 0.788   | 0.000       | 0.575       | **rejected** (tie)    |
 | 2    | gen-004    | shared adversarial robustness probe | 0.938    | 0.788   | **0.219**   | **0.648**   | **ACCEPTED** (+0.073) |
+| 3    | gen-005    | lineage-aware probe pool            | 0.938    | 0.788   | **0.844**   | **0.856**   | **ACCEPTED** (+0.208) |
 
 **M3 exit criterion** is a multi-step unattended run with a sane ledger; this
 directory is that ledger as it accumulates.
+
+## Step 3 — the pool fix lands the improve leaves (ACCEPTED)
+
+Step 2 left a load-bearing follow-up: gen-004's `probe_topk=4` truncated the
+probe candidate pool to the four earliest public-tied nodes — all early
+_drafts_ — so the synonym-heavy _improve_ leaves that generalize best were never
+probed and could never be selected. gen-005 keeps gen-004's working core (public
+search, one shared hard battery, anti-saturation guard, near-public-tie band)
+and refines **only the pool**: within the tie band it now always includes every
+improve/explore-lineage leaf and scales a still-bounded cap (`probe_topk` 4 base,
+`probe_topk_max` 8 ceiling) with the tie count, filling remaining slots with the
+strongest drafts as brittle contrast.
+
+The fix landed on the family it targeted:
+
+- **instruction-routing**: the probe pool became `[0,1,5,6,7,8]` — drafts _and_
+  improve leaves — with a real spread of 0.375 (drafts at 0.075, improve leaves
+  climbing to 0.45). The loop returned the synonym-tolerant improve leaf node-8,
+  lifting private **0.219 → 0.844** (+0.625). Verified a genuine 210-line
+  tolerant parser (filler-phrase stripping, punctuation normalization, word
+  ordinals, synonym sets) — not a lookup; 0.844 on _unseen_ paraphrases is real
+  generalization, and no instance-level outlier fired.
+- **bin-packing**: the improve leaves entered the pool but the battery correctly
+  **saturated** (packing is inherently reorder-robust, all robustness 1.0); the
+  guard fell back to deterministic top-public — FFD node-0 returned, private
+  **0.938 held, no regression**.
+- **tabular-classification**: the pool `[7,8,5,6]` spread 0.273 and returned the
+  improve leaf node-8 (public 0.81 → 0.825), private **0.788 held**.
+
+Net: private aggregate **0.856 > 0.648** (+0.208), the **largest single-step
+gain in the run** and the **second accepted generation**. Steps 1–3 form a
+sustained diagnose → repair → improve → repair-again arc: gen-004 fixed the
+saturated instrument, gen-005 fixed the pool coverage that instrument fed on.
+`best` now points to gen-005. Accept gated by the same **mechanical** verifier
+battery (LLM verifier still unavailable) — all checks clean.
 
 ## Step 2 — the loop repairs its own instrument and improves (ACCEPTED)
 

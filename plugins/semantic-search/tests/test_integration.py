@@ -100,6 +100,13 @@ def test_search_with_limit(vault_and_db):
     assert len(results) == 2
 
 
+def test_search_no_query_fails(vault_and_db):
+    _, _, env = vault_and_db
+
+    r = _run_cmd(["uv", "run", "ss-search"], env)
+    assert r.returncode != 0
+
+
 def test_mocs_not_indexed(vault_and_db):
     _, _, env = vault_and_db
 

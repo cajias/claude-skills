@@ -23,9 +23,9 @@
 
 <table>
 <tr><td><b>Claude Code marketplace</b></td><td>A hand-authored <code>.claude-plugin/marketplace.json</code> lists every plugin so Claude Code can discover and install them natively — no extra package manager required.</td></tr>
-<tr><td><b>Skills library</b></td><td>A library of standalone skills under <code>skills/</code>, each a self-contained <code>SKILL.md</code> + <code>README.md</code> with instructions, procedures, and examples Claude can follow.</td></tr>
-<tr><td><b>Installable plugins</b></td><td>11 published plugins under <code>plugins/</code> — Obsidian memory, semantic search, session mining, iTerm control, PR monitoring, and dev tooling.</td></tr>
-<tr><td><b>Hooks &amp; automation</b></td><td>Plugins like <code>pr-monitor</code> and <code>claudeception</code> wire lifecycle hooks that auto-resume Claude on new PR commits or extract reusable knowledge at session end.</td></tr>
+<tr><td><b>Skills library</b></td><td>37 skills under <code>skills/</code>, each a self-contained <code>SKILL.md</code> + <code>README.md</code> with instructions, procedures, and examples Claude can follow.</td></tr>
+<tr><td><b>Installable plugins</b></td><td>19 plugins under <code>plugins/</code> — Obsidian memory, semantic search, session mining, iTerm control, PR monitoring, and dev tooling.</td></tr>
+<tr><td><b>Hooks &amp; automation</b></td><td>Plugins like <code>pr-monitor</code> and <code>obsidian-memory</code> wire lifecycle hooks that auto-resume Claude on new PR commits or surface persistent memory at session start.</td></tr>
 <tr><td><b>Semantic + vector search</b></td><td><code>semantic-search</code> embeds your Obsidian notes locally (LanceDB + sentence-transformers) for offline retrieval over your knowledge base.</td></tr>
 <tr><td><b>CI-enforced quality</b></td><td>GitHub Actions lint Markdown, enforce file naming, verify every skill has the required files, and check formatting; <code>make test-skills</code> validates every plugin under <code>plugins/</code>.</td></tr>
 </table>
@@ -150,6 +150,7 @@ npm run lint         # markdownlint + ls-lint
 npm run format:check # prettier --check
 make validate        # plugin structure + marketplace sync
 make test-skills     # skill eval harness for every plugin
+bash scripts/test-skills.sh dev   # or a single plugin by name
 
 # per-plugin test suites (mirror CI)
 (cd plugins/semantic-search && uv sync && uv run ruff check src/ tests/ && uv run pytest -v)

@@ -10,13 +10,17 @@ Primary sources:
 - Weco first-party report: <https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement>
 - RSI ladder definition: <https://www.weco.ai/blog/4-levels-of-recursive-self-improvement>
 
-Status: **M1–M2 shipped; M3 code complete (runtime 10-step exit run pending); M4–M5 machinery
-built** (standalone inner agent, outer step, one completed run, three-family battery, `/rsi:run`,
-robust aggregation + outlier detection, `gen-human` baseline, `holdout-tasks/`, `/rsi:report`,
-`/rsi:ignite`). The runtime exit-criteria runs (M3's ≥10-step three-family run, the §5.2 chassis
-A/B, and the report/ignite campaigns) are the execution phase that follows this code landing. This document is the
-build spec; where the shipped code has diverged from it, the deviation is noted inline and in
-[CONTINUATION.md](CONTINUATION.md). A full as-built reconciliation is scheduled for M5.
+Status: **M1–M2 shipped; M3 code complete and its exit run live (run-002 at step 3 of the
+three-family battery, incumbent gen-005); M4 measured (Level 0 and Level 1 met — see
+`docs/experiments/m4-report.md`); M5 machinery built, ignition run pending.** The plugin is
+promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-000 floor
+0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
+gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
+mean Δ +0.279 (carried by instruction-ops 0.0 → 0.85), far-OOD Δ −0.016 (timeseries-forecast,
+reported separately). Remaining execution phase: M3 steps 4–10, the §5.2 chassis A/B, and the
+M5 `/rsi:ignite` Level-2 campaign — each a large real-compute run. This document is the build
+spec; where the shipped code has diverged from it, the deviation is noted inline and in
+[CONTINUATION.md](CONTINUATION.md).
 
 As-built notes (M3 additions):
 
@@ -238,7 +242,7 @@ Each task ships `public/` (data + `score.py --public`), `private/` (held-out dat
 2. **Heuristic optimization** — bin-packing / TSP-style instances; public = visible instance
    set, private = hidden instances of different sizes. (ALE-Bench analog.)
 3. **Harness engineering** — improve a small agent scaffold's prompt+context against a fixed
-   eval set (can reuse this repo's `.claude/evals` + `scripts/test-skills.sh` conventions);
+   eval set (can reuse this repo's `scripts/test-skills.sh` conventions);
    private = unseen eval cases. (The self-referential family from the paper.)
 
 `holdout-tasks/`: one unseen task per family plus one far-OOD task (WeatherBench-2 analog —
@@ -251,17 +255,17 @@ Nothing existing implements bi-level RSI as a skill — searched the claude.ai p
 (no hits for self-improvement/prompt-optimization/eval-harness) and known marketplaces. But we
 can compose substantial existing pieces rather than build from scratch:
 
-| Component                                              | Source                                                                                             | What we reuse                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **autoresearch**                                       | [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) (MIT, 5.3k★, active)         | Candidate **outer-loop chassis** — see §5.1. Its core loop (modify → mechanical verify → keep/discard, auto-revert, git-as-memory, TSV ledger, guard commands, plateau detection via `/autoresearch:evals`) is exactly the outer step's shape. Not usable as the inner agent. |
-| **Workflow tool**                                      | Claude Code built-in                                                                               | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts.       |
-| **skill-creator**                                      | Anthropic (official)                                                                               | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally.                                                                                                                          |
-| **deep-research**                                      | Claude Code built-in                                                                               | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate).                    |
-| **ralph-loop**                                         | Geoff Huntley's ralph technique (already referenced in this repo's `skills/ralph-loop-invocation`) | Prior art for long-running loop-until-done outer iteration with max-iterations + completion promise; `/rsi:run` follows the same invocation ergonomics.                                                                                                                       |
-| **/loop** (built-in) + `send_later`/Routines           | Claude Code built-in                                                                               | Multi-day unattended outer-loop pacing — the paper's 8-day unattended run maps to scheduled wakeups re-invoking `/rsi:step`.                                                                                                                                                  |
-| **claudeception, session-mining**                      | this repo                                                                                          | Complementary, not core: mine accepted-proposal rationales from transcripts into reusable skills (a human-digestible byproduct the paper doesn't have).                                                                                                                       |
-| **scripts/validate.sh, test-skills.sh, .claude/evals** | this repo                                                                                          | Structural gate every proposed generation must pass before spending eval budget.                                                                                                                                                                                              |
-| **DSPy / GEPA, OpenEvolve (AlphaEvolve OSS)**          | Python libraries, not skills                                                                       | Pattern reference only (evolutionary prompt/code optimization, keep-if-better + lineages). We replicate natively; no dependency.                                                                                                                                              |
+| Component                                       | Source                                                                                             | What we reuse                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **autoresearch**                                | [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) (MIT, 5.3k★, active)         | Candidate **outer-loop chassis** — see §5.1. Its core loop (modify → mechanical verify → keep/discard, auto-revert, git-as-memory, TSV ledger, guard commands, plateau detection via `/autoresearch:evals`) is exactly the outer step's shape. Not usable as the inner agent. |
+| **Workflow tool**                               | Claude Code built-in                                                                               | The entire orchestration substrate: deterministic loops, `parallel()` fan-out, per-agent `model`/`effort` overrides (model asymmetry), `budget` (fixed-budget constraint), structured-output schemas (scores), journals (transcripts). Both loops are Workflow scripts.       |
+| **skill-creator**                               | Anthropic (official)                                                                               | Skill authoring + its eval/benchmark harness — used to build the harness-engineering task family and to validate rewritten generations structurally.                                                                                                                          |
+| **deep-research**                               | Claude Code built-in                                                                               | Pattern reference for the verifier stage (adversarial claim-checking before accepting results). Not reusable as the inner agent: it does web research (search → verify → cited report), not experiment-driven autoresearch (code → run → score → iterate).                    |
+| **ralph-loop**                                  | Geoff Huntley's ralph technique (already referenced in this repo's `skills/ralph-loop-invocation`) | Prior art for long-running loop-until-done outer iteration with max-iterations + completion promise; `/rsi:run` follows the same invocation ergonomics.                                                                                                                       |
+| **/loop** (built-in) + `send_later`/Routines    | Claude Code built-in                                                                               | Multi-day unattended outer-loop pacing — the paper's 8-day unattended run maps to scheduled wakeups re-invoking `/rsi:step`.                                                                                                                                                  |
+| **claudeception, session-mining**               | this repo                                                                                          | Complementary, not core: mine accepted-proposal rationales from transcripts into reusable skills (a human-digestible byproduct the paper doesn't have).                                                                                                                       |
+| **scripts/validate.sh, scripts/test-skills.sh** | this repo                                                                                          | Structural gate every proposed generation must pass before spending eval budget.                                                                                                                                                                                              |
+| **DSPy / GEPA, OpenEvolve (AlphaEvolve OSS)**   | Python libraries, not skills                                                                       | Pattern reference only (evolutionary prompt/code optimization, keep-if-better + lineages). We replicate natively; no dependency.                                                                                                                                              |
 
 ### 5.1 `uditgoenka/autoresearch` evaluation
 
@@ -344,15 +348,16 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   Workflow script — 2×2 paired runs, pre-registered metrics and decision rule); results land in
   `docs/experiments/` and the winner becomes `/rsi:step`. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
-- **M3 — full protocol** _(code complete)_: all 3 task families (bin-packing,
-  tabular-classification, instruction-routing), verifier + <50% hack rule + outlier filter
-  (`scripts/rsi-aggregate.py`), `/rsi:run` with budget accounting. Exit: 10-step unattended run
-  with sane ledger.
-- **M4 — measurement** _(machinery built)_: `baseline/gen-human` hand-tuned baseline,
-  `holdout-tasks/` (one per family + a far-OOD time-series task), `/rsi:report`
-  (`scripts/rsi-report.py`) with ladder-level evidence (improvement slope vs. baseline,
-  generalization deltas, hack-rate trend).
-- **M5 — ignition test** _(machinery built)_: `/rsi:ignite` swaps the best generation's strategy
+- **M3 — full protocol** _(code complete; exit run demonstrated, run-002 banked at step 3)_: all
+  3 task families (bin-packing, tabular-classification, instruction-routing), verifier + <50% hack
+  rule + outlier filter (`scripts/rsi-aggregate.py`), `/rsi:run` with budget accounting. Exit
+  criterion (10-step unattended run) partially met — a 4-step diagnose→repair→improve arc is
+  recorded; steps 4–10 are optional extra evidence (see `CONTINUATION.md`).
+- **M4 — measurement** _(measured — Level 0 and Level 1 met; see `docs/experiments/m4-report.md`)_:
+  `baseline/gen-human` hand-tuned baseline, `holdout-tasks/` (one per family + a far-OOD
+  time-series task), `/rsi:report` (`scripts/rsi-report.py`) with ladder-level evidence
+  (improvement slope vs. baseline, generalization deltas, hack-rate trend).
+- **M5 — ignition test** _(machinery built; ignition run pending)_: `/rsi:ignite` swaps the best generation's strategy
   into the proposer role and compares campaigns at equal budget (the paper's Level-2 test —
   expect, like Weco, to measure it honestly rather than to pass it).
 
