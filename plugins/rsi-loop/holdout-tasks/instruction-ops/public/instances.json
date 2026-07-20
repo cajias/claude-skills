@@ -1,0 +1,104 @@
+{
+  "cases": [
+    {
+      "name": "words-0",
+      "instruction": "count the words in python signal harness signal orange",
+      "expected": "5"
+    },
+    {
+      "name": "concat-1",
+      "instruction": "concatenate python and delta",
+      "expected": "pythondelta"
+    },
+    {
+      "name": "smallest-2",
+      "instruction": "the smallest number in [38, 35, 36]",
+      "expected": "35"
+    },
+    {
+      "name": "greater-3",
+      "instruction": "is 2 greater than 15",
+      "expected": "no"
+    },
+    {
+      "name": "words-4",
+      "instruction": "count the words in harness signal harness",
+      "expected": "3"
+    },
+    {
+      "name": "concat-5",
+      "instruction": "concatenate harness and cat",
+      "expected": "harnesscat"
+    },
+    {
+      "name": "smallest-6",
+      "instruction": "the smallest number in [38, 11, 36]",
+      "expected": "11"
+    },
+    {
+      "name": "greater-7",
+      "instruction": "is 26 greater than 15",
+      "expected": "yes"
+    },
+    {
+      "name": "words-8",
+      "instruction": "count the words in orange delta python cat harness quick",
+      "expected": "6"
+    },
+    {
+      "name": "concat-9",
+      "instruction": "concatenate signal and banana",
+      "expected": "signalbanana"
+    },
+    {
+      "name": "smallest-10",
+      "instruction": "the smallest number in [17, 34, 23, 8, 29, 38]",
+      "expected": "8"
+    },
+    {
+      "name": "greater-11",
+      "instruction": "is 12 greater than 1",
+      "expected": "yes"
+    },
+    {
+      "name": "words-12",
+      "instruction": "count the words in banana signal harness ledger banana",
+      "expected": "5"
+    },
+    {
+      "name": "concat-13",
+      "instruction": "concatenate banana and delta",
+      "expected": "bananadelta"
+    },
+    {
+      "name": "smallest-14",
+      "instruction": "the smallest number in [30, 27, 36]",
+      "expected": "27"
+    },
+    {
+      "name": "greater-15",
+      "instruction": "is 34 greater than 39",
+      "expected": "no"
+    },
+    {
+      "name": "words-16",
+      "instruction": "count the words in orange delta orange cat kernel",
+      "expected": "5"
+    },
+    {
+      "name": "concat-17",
+      "instruction": "concatenate banana and quick",
+      "expected": "bananaquick"
+    },
+    {
+      "name": "smallest-18",
+      "instruction": "the smallest number in [12, 33, 34, 7, 40]",
+      "expected": "7"
+    },
+    {
+      "name": "greater-19",
+      "instruction": "is 30 greater than 35",
+      "expected": "no"
+    }
+  ]
+}

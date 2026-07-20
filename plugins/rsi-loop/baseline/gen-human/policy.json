@@ -1,0 +1,17 @@
+{
+  "algorithm": "aide-human-tuned-tree-search",
+  "_comment": "AIDEhuman analog (PLAN.md §3): the best HAND-TUNED inner-agent config, the fair Level-1 baseline the outer loop's discovered gains are measured against. Same proven gen-000 search engine, but with family-diverse draft directions, a larger node budget, and operator prompts that encode strong general research practice. It is deliberately NOT allowed to use operators or context tricks the loop is meant to DISCOVER (explore lineages, matrix context gating) — those belong to evolved generations, not the human baseline.",
+  "num_drafts": 5,
+  "max_nodes": 11,
+  "model": "haiku",
+  "effort": "low",
+  "context_mode": "full-history",
+  "selection": "greedy-public",
+  "draft_directions": [
+    "simplest correct baseline — a valid, obviously-correct solution that establishes a floor; prioritize validity over quality",
+    "principled greedy/heuristic: sort or preprocess so the hardest elements are handled first, then make the locally optimal choice at each step",
+    "model/structure selection: identify which inputs actually carry signal (drop or down-weight the rest) and choose the representation that fits the problem's structure rather than a one-size-fits-all method",
+    "robust generalization: handle edge cases and input variety explicitly (unusual sizes, signs, phrasings, distributions) so the solution holds beyond the visible instances",
+    "deterministic local search / ensemble: start from a strong greedy solution and iteratively refine it, or run two complementary methods and keep the better result per instance — deterministic and fast"
+  ]
+}

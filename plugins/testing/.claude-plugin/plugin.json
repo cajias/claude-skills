@@ -1,0 +1,15 @@
+{
+  "name": "testing",
+  "description": "Skills for verifying that tests actually test something: a dependency-free harness for unit-testing Workflow scripts, mutation-verification for renderer tests, real-browser checks for Streamlit UIs, and zsh traps that fake out verification blocks.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "claude-code",
+    "testing",
+    "verification",
+    "mutation-testing",
+    "workflow"
+  ]
+}

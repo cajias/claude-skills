@@ -1,0 +1,9 @@
+{
+  "name": "git-workflow",
+  "description": "Hard-won gotchas from real git and gh workflows: PR create/merge quirks, worktree races, rebase in non-interactive shells, squash-merge diagnosis, and deadlock recovery via plumbing.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": ["git", "github", "gh-cli", "worktree", "rebase", "gotchas"]
+}
