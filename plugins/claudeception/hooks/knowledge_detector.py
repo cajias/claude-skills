@@ -219,7 +219,9 @@ def detect_teaching(user_message: str) -> TeachingResult:
             matched_patterns=[],
         )
 
-    normalized = normalize_text(user_message)
+    # Collapse whitespace but keep original case: patterns below all match with
+    # re.IGNORECASE, and extracted_knowledge is stored verbatim ("TypeScript", not "typescript").
+    normalized = " ".join(user_message.split())
     matched_patterns: list[str] = []
     max_confidence = 0.0
     detected_type = TeachingType.UNKNOWN

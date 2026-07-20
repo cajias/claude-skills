@@ -25,7 +25,7 @@ Success Criteria:
 - [ ] Triggering context is clear in the description
 - [ ] No placeholder text (TODO, TBD) in production commands/skills
       Expected Output: All skill quality checks pass
-      Grader: code-based (char count, grep)
+      Grader: manual (not implemented by scripts/test-skills.sh)
 
 ## Regression Evals
 
@@ -92,4 +92,3 @@ This plugin provides iTerm2 pane and session management utilities for Claude Cod
 ## Metrics Target
 
 - pass@1: 100% for structure (deterministic)
-- pass@3: > 90% for skill quality

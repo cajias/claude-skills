@@ -16,18 +16,14 @@ if [ "$stop_hook_active" = "true" ]; then
 fi
 
 # Check if we're monitoring any PRs
-# State file format: /tmp/claude_monitor_pr_<repo>_<pr_number>
-monitor_files=$(find /tmp -name "claude_monitor_pr_*" -type f 2>/dev/null || true)
-
-if [ -z "$monitor_files" ]; then
-  # No active PR monitoring
-  exit 0
-fi
+# State file format: $STATE_DIR/claude_monitor_pr_<repo>_<pr_number>
+STATE_DIR="${HOME}/.claude/pr-monitor"
+mkdir -p -m 700 "$STATE_DIR"
 
 # Check each monitored PR
-for state_file in $monitor_files; do
+while IFS= read -r state_file; do
   # Extract repo and PR number from filename
-  # Format: /tmp/claude_monitor_pr_<repo>_<pr_number>
+  # Format: $STATE_DIR/claude_monitor_pr_<repo>_<pr_number>
   basename=$(basename "$state_file")
 
   # Read the state file which contains: repo_path, pr_number, last_commit_sha
@@ -68,12 +64,7 @@ for state_file in $monitor_files; do
     echo "$current_sha" >> "$state_file"
 
     # Block stopping and provide reason for continuation
-    cat <<EOF
-{
-  "decision": "block",
-  "reason": "New commits detected in PR #${pr_number} (${repo_path##*/}). Current commit: ${current_sha:0:8}. There are now ${commit_count} total commits. Please review the new changes and provide feedback."
-}
-EOF
+    jq -n --arg reason "New commits detected in PR #${pr_number} (${repo_path##*/}). Current commit: ${current_sha:0:8}. There are now ${commit_count} total commits. Please review the new changes and provide feedback." '{decision: "block", reason: $reason}'
     exit 0
   fi
 
@@ -82,15 +73,10 @@ EOF
     # PR is no longer open, notify and clean up
     rm -f "$state_file"
 
-    cat <<EOF
-{
-  "decision": "block",
-  "reason": "PR #${pr_number} in ${repo_path##*/} has been ${pr_state}. Monitoring stopped. Please review the final state."
-}
-EOF
+    jq -n --arg reason "PR #${pr_number} in ${repo_path##*/} has been ${pr_state}. Monitoring stopped. Please review the final state." '{decision: "block", reason: $reason}'
     exit 0
   fi
-done
+done < <(find "$STATE_DIR" -name 'claude_monitor_pr_*' -type f 2>/dev/null)
 
 # No new commits detected, allow stopping normally
 exit 0

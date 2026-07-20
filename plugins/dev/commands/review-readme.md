@@ -35,7 +35,7 @@ Before starting, ensure:
 1. You have access to the project repository and its files
 2. You can read and analyze code in the project's primary language(s)
 3. You understand the project's purpose and key features
-4. You have access to the configuration in `config/readme-generator/default.config.json`
+4. You have access to the configuration in `${CLAUDE_PLUGIN_ROOT}/config/readme-generator/default.config.json`
 
 ## Reading the README
 
@@ -61,7 +61,7 @@ Use Claude Code's `!` prefix (bash execution) to gather project context:
 
 ## Configuration
 
-The command supports extensive configuration via `config/readme-generator/default.config.json`:
+The command supports extensive configuration via `${CLAUDE_PLUGIN_ROOT}/config/readme-generator/default.config.json`:
 
 ### Core Settings
 

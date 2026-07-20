@@ -27,8 +27,8 @@ This plugin provides:
 ### Via Plugin Manager (Recommended)
 
 ```bash
-claude plugin install \
-  https://github.com/cajias/claude-skills/tree/main/skills/pr-monitor
+claude plugin marketplace add cajias/claude-skills
+claude plugin install pr-monitor@claude-skills
 ```
 
 After installation, restart Claude Code for the hook to activate.
@@ -39,14 +39,13 @@ After installation, restart Claude Code for the hook to activate.
 
    ```bash
    git clone https://github.com/cajias/claude-skills.git
-   cd claude-skills/skills/pr-monitor
+   cd claude-skills
    ```
 
 2. Copy to Claude plugins directory:
 
    ```bash
-   mkdir -p ~/.claude/plugins/pr-monitor
-   cp -r ./* ~/.claude/plugins/pr-monitor/
+   cp -r plugins/pr-monitor ~/.claude/plugins/
    ```
 
 3. Restart Claude Code
@@ -78,7 +77,7 @@ cd /path/to/repository
 CURRENT_SHA=$(gh pr view 2 --json headRefOid --jq '.headRefOid')
 
 # Create state file
-cat > /tmp/claude_monitor_pr_$(basename $(pwd))_2 <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_$(basename $(pwd))_2 <<EOF
 $(pwd)
 2
 $CURRENT_SHA
@@ -96,7 +95,7 @@ Stop monitoring PR #2
 Or manually:
 
 ```bash
-rm /tmp/claude_monitor_pr_REPO_PR
+rm ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
 ```
 
 ## How It Works
@@ -108,7 +107,7 @@ User works on tasks
        ↓
 Claude finishes task → Would normally stop
        ↓
-Stop Hook triggers → Checks /tmp/claude_monitor_pr_* files
+Stop Hook triggers → Checks ~/.claude/pr-monitor/claude_monitor_pr_* files
        ↓
 Queries GitHub API → Compares commit SHAs
        ↓
@@ -119,7 +118,7 @@ Claude auto-resumes → Reviews changes and provides feedback
 
 ### State File Format
 
-Files stored in `/tmp/claude_monitor_pr_<repo-name>_<pr-number>`:
+Files stored in `~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>`:
 
 ```text
 Line 1: /path/to/repository
@@ -140,7 +139,7 @@ a19ca15f67612f2ed5501d5cb2a65f1b7c1f94d7
 The Stop hook:
 
 - Runs when Claude Code would naturally stop/idle
-- Checks all state files in `/tmp/claude_monitor_pr_*`
+- Checks all state files in `~/.claude/pr-monitor/claude_monitor_pr_*`
 - Queries GitHub for each monitored PR
 - Compares current commit SHA with last known SHA
 - If different:
@@ -160,34 +159,8 @@ The Stop hook:
 
 ## Configuration
 
-### Global Settings
-
-Add to `~/.claude/settings.json` to customize (optional):
-
-```json
-{
-  "hooks": {
-    "Stop": {
-      "enabled": true,
-      "timeout": 30000
-    }
-  }
-}
-```
-
-### Project Settings
-
-Add to `.claude/settings.json` in your project (optional):
-
-```json
-{
-  "hooks": {
-    "Stop": {
-      "enabled": true
-    }
-  }
-}
-```
+The Stop hook auto-registers from `hooks/hooks.json` on install. No `settings.json` edits are
+needed.
 
 Disable for specific project:
 
@@ -210,12 +183,6 @@ Disable for specific project:
 - Monitoring only active during Claude Code session
 - Stops when you quit Claude Code
 - No background daemon
-
-### State Persistence
-
-- State files in `/tmp` may be cleared on reboot
-- Need to recreate monitoring after system restart
-- Consider moving to persistent location if needed
 
 ### API Rate Limits
 
@@ -251,13 +218,13 @@ echo '{"stop_hook_active": false}' | bash ~/.claude/plugins/pr-monitor/scripts/S
 **Verify state file exists:**
 
 ```bash
-ls -la /tmp/claude_monitor_pr_*
+ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
 
 **Check state file format:**
 
 ```bash
-cat /tmp/claude_monitor_pr_REPO_PR
+cat ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
 # Should have 3 lines
 ```
 
@@ -278,25 +245,25 @@ gh auth status
 **List all monitors:**
 
 ```bash
-ls -la /tmp/claude_monitor_pr_*
+ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
 
 **Remove specific monitor:**
 
 ```bash
-rm /tmp/claude_monitor_pr_REPO_PR
+rm ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
 ```
 
 **Clear all monitors:**
 
 ```bash
-rm /tmp/claude_monitor_pr_*
+rm ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
 
 ## Security Considerations
 
 - Hook executes with your user privileges
-- Reads PR state files from `/tmp` (world-readable)
+- Reads PR state files from `~/.claude/pr-monitor`
 - Uses `gh` CLI with your GitHub authentication
 - Does NOT modify code or create commits
 - Read-only access to repositories
@@ -317,7 +284,7 @@ rm /tmp/claude_monitor_pr_*
 "Monitor PR #5 in this repository"
 
 # Claude creates:
-# /tmp/claude_monitor_pr_myrepo_5
+# ~/.claude/pr-monitor/claude_monitor_pr_myrepo_5
 ```
 
 ### Monitor External Repository PR
@@ -339,9 +306,9 @@ rm /tmp/claude_monitor_pr_*
 "Monitor PRs #1, #2, and #3 in this repository"
 
 # Claude creates:
-# /tmp/claude_monitor_pr_myrepo_1
-# /tmp/claude_monitor_pr_myrepo_2
-# /tmp/claude_monitor_pr_myrepo_3
+# ~/.claude/pr-monitor/claude_monitor_pr_myrepo_1
+# ~/.claude/pr-monitor/claude_monitor_pr_myrepo_2
+# ~/.claude/pr-monitor/claude_monitor_pr_myrepo_3
 ```
 
 ### Stop All Monitoring
@@ -351,7 +318,7 @@ rm /tmp/claude_monitor_pr_*
 "Stop monitoring all PRs"
 
 # Or manually:
-rm /tmp/claude_monitor_pr_*
+rm ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
 
 ## Development
@@ -369,7 +336,8 @@ pr-monitor/
 ├── skills/
 │   └── pr-monitor/
 │       └── SKILL.md          # Skill instructions
-└── README.md                 # This file
+├── README.md                 # This file
+└── USAGE-GUIDE.md            # Detailed usage guide and troubleshooting
 ```
 
 ### Testing
@@ -378,7 +346,7 @@ Test the hook manually:
 
 ```bash
 # Create test state file
-cat > /tmp/claude_monitor_pr_test_1 <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_test_1 <<EOF
 /path/to/test/repo
 1
 abc123def456
@@ -388,7 +356,7 @@ EOF
 echo '{"stop_hook_active": false}' | bash scripts/Stop.sh
 
 # Clean up
-rm /tmp/claude_monitor_pr_test_1
+rm ~/.claude/pr-monitor/claude_monitor_pr_test_1
 ```
 
 ### Contributing
@@ -402,7 +370,7 @@ Contributions welcome! Please:
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - see the repository LICENSE.
 
 ## Author
 
@@ -422,7 +390,7 @@ cajias
 
 ## Related
 
-- [GitHub Issue Grooming Skill](../github-issue-grooming/)
+- [GitHub Issue Grooming Skill](../../skills/github-issue-grooming/)
 - [Claude Code Hooks Guide](https://code.claude.com/docs/en/hooks-guide.md)
 - [Claude Code Plugins](https://code.claude.com/docs/en/plugins.md)
 

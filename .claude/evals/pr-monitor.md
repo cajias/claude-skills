@@ -25,7 +25,7 @@ Success Criteria:
 - [ ] Triggering context is clear in the description
 - [ ] No placeholder text (TODO, TBD) in production skills
       Expected Output: All skill quality checks pass
-      Grader: code-based (char count, grep)
+      Grader: manual (not implemented by scripts/test-skills.sh)
 
 ## Regression Evals
 
@@ -46,8 +46,9 @@ enables automatic PR change detection.
 ### Skill: pr-monitor
 
 **What it does:** Guides Claude through setting up automated GitHub PR monitoring
-using a state file at `/tmp/claude_monitor_pr_<repo-name>_<pr-number>`. When
-activated, a Stop hook (`hooks/Stop.sh`) intercepts each natural session end,
+using a state file at `~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>`. When
+activated, a Stop hook (`scripts/Stop.sh`, registered via `hooks/hooks.json`)
+intercepts each natural session end,
 queries GitHub via `gh pr view`, compares the current commit SHA against the
 recorded one, and auto-resumes the session with a new-commit notification if
 the PR has been updated. Monitoring stops automatically when the PR is merged
@@ -64,11 +65,10 @@ GitHub Copilot) pushes changes to a PR;
 - [ ] `hooks/hooks.json` registers a `Stop` hook that invokes
       `${CLAUDE_PLUGIN_ROOT}/scripts/Stop.sh` — this is the automation backbone;
       without it the skill is documentation only
-- [ ] `hooks/Stop.sh` (symlinked or copied from `scripts/Stop.sh`) exists and
-      is executable
+- [ ] `scripts/Stop.sh` exists and is executable (mode 755)
 - [ ] The SKILL.md describes all six phases: Identify, Setup, Initial Review,
       Wait, Auto-Resume, and Stop
-- [ ] State file path convention (`/tmp/claude_monitor_pr_<repo>_<pr>`) is
+- [ ] State file path convention (`~/.claude/pr-monitor/claude_monitor_pr_<repo>_<pr>`) is
       documented with all three required lines (repo_path, pr_number, last_sha)
 - [ ] The skill documents automatic cleanup — PR merged/closed causes the Stop
       hook to remove the state file rather than resuming indefinitely
@@ -92,4 +92,3 @@ GitHub Copilot) pushes changes to a PR;
 ## Metrics Target
 
 - pass@1: 100% for structure (deterministic)
-- pass@3: > 90% for skill quality

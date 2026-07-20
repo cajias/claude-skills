@@ -5,7 +5,7 @@ Semantic search over Obsidian Zettelkasten notes using LanceDB + sentence-transf
 ## Development
 
 ```bash
-cd /Users/rc/Projects/workspace/claude-skills/plugins/semantic-search
+cd plugins/semantic-search
 uv sync
 uv run pytest -v         # run tests
 uv run ruff check src/ tests/  # lint
@@ -19,5 +19,5 @@ uv run ruff check src/ tests/  # lint
 
 ## Environment Variables
 
-- `SEMANTIC_SEARCH_VAULT_PATH` — Vault root (default: `/Users/rc/Documents/Obsidian Vault`)
-- `SEMANTIC_SEARCH_DB_PATH` — LanceDB dir (default: `/Users/rc/Documents/Obsidian Vault/.lancedb`)
+- `SEMANTIC_SEARCH_VAULT_PATH` — Vault root (default: `~/Documents/Obsidian Vault`)
+- `SEMANTIC_SEARCH_DB_PATH` — LanceDB dir (default: `<vault>/.lancedb`)

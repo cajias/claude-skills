@@ -253,4 +253,3 @@ Final improvements checklist:
 ### Examples
 
 - **`examples/chapter-template.tex`** - Standard chapter structure
-- **`examples/tcolorbox-styles.tex`** - Box environment definitions

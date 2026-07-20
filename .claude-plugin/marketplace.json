@@ -25,49 +25,49 @@
     {
       "name": "claudeception",
       "description": "Extracts reusable skills from Claude Code sessions at session end. Analyzes for non-obvious discoveries and creates SKILL.md files.",
-      "version": "0.1.0",
+      "version": "4.2.1",
       "tags": ["skills", "learning"],
       "source": "./plugins/claudeception"
     },
     {
       "name": "dev",
-      "description": "Development workflow tools — README generation, code review, and more.",
-      "version": "0.1.0",
+      "description": "Development workflow tools — README generation and review workflows.",
+      "version": "1.0.0",
       "tags": ["dev-tools", "workflow"],
       "source": "./plugins/dev"
     },
     {
       "name": "iterm-job-controller",
       "description": "iTerm2 terminal job dispatcher and session controller — manages terminal sessions, dispatches jobs, and monitors their progress.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "tags": ["iterm", "terminal", "jobs"],
       "source": "./plugins/iterm-job-controller"
     },
     {
       "name": "iterm-utils",
       "description": "iTerm2 utilities for Claude Code — pane and session management.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "tags": ["iterm", "terminal"],
       "source": "./plugins/iterm-utils"
     },
     {
       "name": "md-to-pdf",
       "description": "Convert markdown directories to PDF with Mermaid diagram rendering.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "tags": ["documents", "pdf", "markdown"],
       "source": "./plugins/md-to-pdf"
     },
     {
       "name": "obsidian-memory",
       "description": "Persistent memory system using Obsidian vault. Teaches Claude when/how to use Obsidian for storing decisions, learnings, workflow facts, and retrieving context.",
-      "version": "0.1.0",
+      "version": "1.2.0",
       "tags": ["obsidian", "memory", "knowledge-management"],
       "source": "./plugins/obsidian-memory"
     },
     {
       "name": "pr-monitor",
       "description": "Automated PR monitoring with Stop hook that auto-resumes Claude Code when new commits are detected.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "tags": ["github", "hooks", "monitoring"],
       "source": "./plugins/pr-monitor"
     },
@@ -81,7 +81,7 @@
     {
       "name": "session-mining",
       "description": "Mine Claude Code sessions for knowledge extraction. Process session history to identify learnings, patterns, and improvement opportunities.",
-      "version": "0.1.0",
+      "version": "1.0.0",
       "tags": ["sessions", "knowledge-management"],
       "source": "./plugins/session-mining"
     }

@@ -1,10 +1,7 @@
 ---
 name: mine-sessions
 description: Mine past Claude Code sessions for extractable knowledge. Runs claudeception on historical sessions to identify patterns, lessons, and improvement opportunities.
-arguments:
-  - name: options
-    description: "Options: --since DAYS, --limit N, --dry-run, --filter PATTERN, --project PATH"
-    required: false
+argument-hint: "[--since DAYS] [--limit N] [--dry-run] [--filter PATTERN] [--project PATH]"
 ---
 
 # Mine Sessions for Knowledge

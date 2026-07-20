@@ -1,8 +1,8 @@
 node_modules
 .agent
-skills/correction-*
-skills/teaching-*
-README.md
 # Frozen RSI experiment evidence — verbatim proposer-generated run artifacts,
 # preserved as-is (see .prettierignore). Not authored docs; not linted.
 plugins/rsi-loop/docs/experiments/run-001/
+**/.venv/
+**/.pytest_cache/
+.remember/

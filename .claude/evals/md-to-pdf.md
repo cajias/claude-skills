@@ -25,7 +25,7 @@ Success Criteria:
 - [ ] Triggering context is clear in the description
 - [ ] No placeholder text (TODO, TBD) in production commands
       Expected Output: All skill quality checks pass
-      Grader: code-based (char count, grep)
+      Grader: manual (not implemented by scripts/test-skills.sh)
 
 ## Regression Evals
 
@@ -89,4 +89,3 @@ install --system` or `sudo pip install`)
 ## Metrics Target
 
 - pass@1: 100% for structure (deterministic)
-- pass@3: > 90% for skill quality

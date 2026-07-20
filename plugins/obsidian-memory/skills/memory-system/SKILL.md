@@ -1,5 +1,5 @@
 ---
-name: obsidian-memory:memory-system
+name: memory-system
 description: |
   Use Obsidian as Claude's primary workspace and persistent memory. Activates for ALL file
   operations during sessions - working notes, scratchpads, analysis, task tracking - not just

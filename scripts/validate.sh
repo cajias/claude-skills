@@ -34,7 +34,7 @@ for dir in "$REPO_ROOT"/plugins/*/; do
     error "plugins/$name — plugin.json is invalid JSON"
   else
     # Check required fields
-    for field in name description; do
+    for field in name description version; do
       val=$(jq -r ".$field // empty" "$manifest")
       if [[ -z "$val" ]]; then
         error "plugins/$name — plugin.json missing required field: $field"
@@ -82,6 +82,16 @@ else
     published_count=$(echo "$marketplace_names" | wc -l | tr -d ' ')
     pass "marketplace.json: $published_count published, $hidden_count hidden, $actual_count total on disk"
   fi
+
+  # Version in marketplace.json must match each plugin's plugin.json (source of truth)
+  while IFS=$'\t' read -r mp_name mp_version; do
+    manifest="$REPO_ROOT/plugins/$mp_name/.claude-plugin/plugin.json"
+    [[ -f "$manifest" ]] || continue
+    pl_version=$(jq -r '.version // empty' "$manifest")
+    if [[ "$mp_version" != "$pl_version" ]]; then
+      error "$mp_name — marketplace.json version ($mp_version) != plugin.json version ($pl_version)"
+    fi
+  done < <(jq -r '.plugins[] | "\(.name)\t\(.version)"' "$MARKETPLACE")
 fi
 
 # ─── 3. Hooks Schema ──────────────────────────────────────────────
@@ -100,10 +110,7 @@ while IFS= read -r -d '' hooks_file; do
   # with event names (PreToolUse, PostToolUse, etc.) as children
   has_hooks_key=$(jq 'has("hooks")' "$hooks_file")
   if [[ "$has_hooks_key" != "true" ]]; then
-    # Also accept inline hooks in plugin.json (different format)
-    if [[ "$(basename "$hooks_file")" == "hooks.json" ]]; then
-      error "$rel — missing top-level 'hooks' key (expected nested schema)"
-    fi
+    error "$rel — missing top-level 'hooks' key (expected nested schema)"
   else
     pass "$rel"
   fi
@@ -114,9 +121,8 @@ while IFS= read -r -d '' manifest; do
   rel="${manifest#"$REPO_ROOT"/}"
   has_hooks=$(jq 'has("hooks")' "$manifest" 2>/dev/null)
   if [[ "$has_hooks" == "true" ]]; then
-    # Validate each hook entry has required fields
     hook_count=$(jq '.hooks | length' "$manifest")
-    pass "$rel — $hook_count inline hook(s)"
+    pass "$rel — $hook_count hook event(s)"
   fi
 done < <(find "$REPO_ROOT/plugins" -path "*/.claude-plugin/plugin.json" -print0)
 

@@ -29,6 +29,7 @@ venv/
 
 # Test outputs
 coverage/
+.coverage
 .pytest_cache/
 
 # User-specific Claude Code hooks (not plugin hooks)
@@ -36,3 +37,9 @@ coverage/
 
 # Claude Code session-local worktrees
 .claude/worktrees/
+
+# Local plugin-install snapshots (canonical plugins live in plugins/)
+.claude/plugins/
+
+# Ralph orchestrator transient state
+.agent/

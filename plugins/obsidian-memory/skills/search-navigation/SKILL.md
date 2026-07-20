@@ -1,5 +1,5 @@
 ---
-name: obsidian-memory:search-navigation
+name: search-navigation
 description: Use this skill for efficient Obsidian vault navigation and search. Covers which MCP tools to use, search strategies, batch operations, and how to leverage frontmatter summaries for quick triage.
 ---
 

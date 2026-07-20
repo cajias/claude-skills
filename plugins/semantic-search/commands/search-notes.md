@@ -1,10 +1,7 @@
 ---
 name: search-notes
 description: Search Zettelkasten notes by meaning using semantic similarity
-args:
-  - name: query
-    description: What to search for
-    required: true
+argument-hint: "<query>"
 ---
 
 # /search-notes
@@ -16,7 +13,7 @@ Search your knowledge base using semantic similarity.
 1. Run the search:
 
    ```bash
-   uv run --project ${CLAUDE_PLUGIN_ROOT} ss-search "$QUERY" --limit 5
+   uv run --project ${CLAUDE_PLUGIN_ROOT} ss-search "$ARGUMENTS" --limit 5
    ```
 
 2. Parse the JSON output

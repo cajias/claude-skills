@@ -33,10 +33,12 @@ class TestKnowledgeHandlerIntegration:
         from knowledge_handler import process_user_prompt
 
         with patch("knowledge_handler.record_signal") as mock_record:
-            process_user_prompt({
-                "prompt": "Remember that API calls should always include auth headers",
-                "session_id": "test-session",
-            })
+            process_user_prompt(
+                {
+                    "prompt": "Remember that API calls should always include auth headers",
+                    "session_id": "test-session",
+                }
+            )
 
             # Should record a teaching signal
             calls = mock_record.call_args_list
@@ -48,10 +50,12 @@ class TestKnowledgeHandlerIntegration:
         from knowledge_handler import process_user_prompt
 
         with patch("knowledge_handler.record_signal") as mock_record:
-            process_user_prompt({
-                "prompt": "No, that's wrong. I meant to use POST not GET",
-                "session_id": "test-session",
-            })
+            process_user_prompt(
+                {
+                    "prompt": "No, that's wrong. I meant to use POST not GET",
+                    "session_id": "test-session",
+                }
+            )
 
             # Should record a correction signal
             calls = mock_record.call_args_list
@@ -83,10 +87,12 @@ class TestKnowledgeHandlerIntegration:
         from knowledge_handler import process_user_prompt
 
         with patch("knowledge_handler.record_signal") as mock_record:
-            process_user_prompt({
-                "prompt": "Always use TypeScript for new modules",
-                "session_id": "test-session",
-            })
+            process_user_prompt(
+                {
+                    "prompt": "Always use TypeScript for new modules",
+                    "session_id": "test-session",
+                }
+            )
 
             # Find the teaching signal call
             for call in mock_record.call_args_list:
@@ -150,10 +156,12 @@ class TestKnowledgeHandlerBackwardCompatibility:
         from knowledge_handler import main
 
         # Mock stdin with test data
-        test_input = json.dumps({
-            "prompt": "test prompt",
-            "session_id": "test-session",
-        })
+        test_input = json.dumps(
+            {
+                "prompt": "test prompt",
+                "session_id": "test-session",
+            }
+        )
 
         with (
             patch("sys.stdin", StringIO(test_input)),
@@ -180,17 +188,21 @@ class TestKnowledgeHandlerSignalRecording:
         from knowledge_handler import process_user_prompt
 
         with patch("knowledge_handler.record_signal") as mock_record:
-            process_user_prompt({
-                "prompt": "Remember that we use tabs not spaces",
-                "session_id": "test-session",
-            })
+            process_user_prompt(
+                {
+                    "prompt": "Remember that we use tabs not spaces",
+                    "session_id": "test-session",
+                }
+            )
 
             # Find exchange signal
             for call in mock_record.call_args_list:
                 if call[0][0] == "exchange":
                     signal_data = call[0][1] if len(call[0]) > 1 else {}
                     # Should have knowledge-related flags
-                    assert "user_prompt" in signal_data or "is_teaching" in signal_data or "is_correction" in signal_data
+                    assert (
+                        "user_prompt" in signal_data or "is_teaching" in signal_data or "is_correction" in signal_data
+                    )
 
     def test_high_confidence_threshold_for_extraction(self):
         """Only output extraction prompt for confidence >= 0.7."""
@@ -205,13 +217,18 @@ class TestKnowledgeHandlerSignalRecording:
                 to_dict=lambda: {"is_teaching": True, "teaching_confidence": 0.5},
             )
 
-            with patch("knowledge_handler.output_knowledge_extraction_prompt"):
-                process_user_prompt({
-                    "prompt": "maybe use typescript",
-                    "session_id": "test",
-                })
+            with (
+                patch("knowledge_handler.record_signal"),
+                patch("knowledge_handler.output_knowledge_extraction_prompt") as mock_output,
+            ):
+                process_user_prompt(
+                    {
+                        "prompt": "maybe use typescript",
+                        "session_id": "test",
+                    }
+                )
                 # Should NOT call output for low confidence
-                # (This depends on implementation - adjust assertion as needed)
+                mock_output.assert_not_called()
 
 
 if __name__ == "__main__":

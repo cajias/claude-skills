@@ -1,3 +1,0 @@
-# correction-user-wants-of-cri
-
-Learned from user correction: Correction: User wants 'of critical' instead of 'a loss' | User need: 'to' | Expected behavior: 'follow refactored code\n\n| # | original comment | where it should go | assessment |\n|---|-----------------|-------------------|-----------|\n| 11 | `buildmcproute()` jsdoc: detailed explanation of prefix matching and prefix-rewrite semantics with example (`/mcp/weather-api/tools/list → upstream receives /mcp/tools/list`) | already covered by existing `routespec` interface jsdoc (lines 348-363) and `buildroutefromspec()` jsdoc (lines 439-447)'

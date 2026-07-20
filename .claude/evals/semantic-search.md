@@ -25,7 +25,7 @@ Success Criteria:
 - [ ] Triggering context is clear in the description
 - [ ] No placeholder text (TODO, TBD) in production skills
       Expected Output: All skill quality checks pass
-      Grader: code-based (char count, grep)
+      Grader: manual (not implemented by scripts/test-skills.sh)
 
 ## Regression Evals
 
@@ -48,7 +48,7 @@ Tests:
 
 ### Skill: semantic-search
 
-- **Location**: `.claude-plugin/skills/semantic-search/SKILL.md`
+- **Location**: `skills/semantic-search/SKILL.md`
 - **What it does**: Embeds Obsidian Zettelkasten notes with `all-MiniLM-L6-v2`
   (local, no API calls) via sentence-transformers, stores vectors in LanceDB
   (embedded, serverless, stored in vault `.lancedb/`), and surfaces results by
@@ -58,8 +58,8 @@ Tests:
   results, then reads top 2-3 matching notes via Obsidian MCP tools
   (`mcp__obsidian__read_note`), and summarizes for the user.
 - **Environment variables required**:
-  - `SEMANTIC_SEARCH_VAULT_PATH` (default: `/Users/rc/Documents/Obsidian Vault`)
-  - `SEMANTIC_SEARCH_DB_PATH` (default: `/Users/rc/Documents/Obsidian Vault/.lancedb`)
+  - `SEMANTIC_SEARCH_VAULT_PATH` (default: `~/Documents/Obsidian Vault`)
+  - `SEMANTIC_SEARCH_DB_PATH` (default: `<vault>/.lancedb`)
 
 ### Plugin-specific assertions
 
@@ -76,4 +76,3 @@ Tests:
 ## Metrics Target
 
 - pass@1: 100% for structure (deterministic)
-- pass@3: > 90% for skill quality
