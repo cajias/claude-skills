@@ -3,8 +3,6 @@
 
 UserPromptSubmit hook that detects both user corrections AND teaching patterns,
 recording them as high-weight signals (3x) for breakthrough scoring.
-
-This replaces correction_handler.py with unified knowledge detection.
 """
 
 import json
