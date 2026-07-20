@@ -38,7 +38,7 @@ snapshots). Rebuild it, then:
    hypothesis to try. Drive with `/rsi:run <run-dir> --max-steps 10`.
 2. **M4 Level 2 — `/rsi:ignite <run-dir>`.** Paired A/B of two full 8-step campaigns (control vs a
    proposer briefed with gen-005's discovered strategy), ~48 evals. The paper found a Level-2
-   *rejection* (faster convergence, same ceiling) and the command is instrumented to measure that
+   _rejection_ (faster convergence, same ceiling) and the command is instrumented to measure that
    honestly, not to pass — expect to document a known-negative.
 3. **§5.2 chassis A/B (`docs/PLAN.md` §5.2).** ~40 evals choosing the outer-loop driver: Arm A
    `uditgoenka/autoresearch` (`npx skills add uditgoenka/autoresearch`) vs Arm B native `/rsi:run`.
