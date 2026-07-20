@@ -10,6 +10,11 @@ plugins/rsi-loop/docs/experiments/run-002/gen-004/
 **/.pytest_cache/
 .remember/
 
+# Session-local worktrees. Gitignored, but lint:md runs with --dot and
+# markdownlint does not read .gitignore, so without this it descends into
+# sibling worktrees and fails on another branch's checked-out files.
+.claude/worktrees/
+
 # Verbatim-imported skills from the maintainer's user-level skills directory.
 # Preserved as authored; not reformatted to this repo's markdown style.
 plugins/cc-authoring/skills/
