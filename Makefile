@@ -45,7 +45,7 @@ lint-file: node_modules ## format+lint one file: make lint-file FILE=path
 	  *semantic-search/*.py) uv run --directory plugins/semantic-search ruff format "$(FILE)" && uv run --directory plugins/semantic-search ruff check --fix "$(FILE)" && uv run --directory plugins/semantic-search ruff check "$(FILE)" ;; \
 	  *.md) npx prettier --write "$(FILE)" && npx markdownlint --fix "$(FILE)" && npx markdownlint "$(FILE)" ;; \
 	  *.json|*.yml|*.yaml) npx prettier --write "$(FILE)" ;; \
-	  *.ts|*.tsx) npx prettier --write "$(FILE)" ;; \
+	  *.ts|*.tsx|*.mjs|*.js) npx prettier --write "$(FILE)" ;; \
 	  *) : ;; \
 	esac
 
