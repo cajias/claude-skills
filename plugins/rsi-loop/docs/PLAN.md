@@ -348,15 +348,16 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   Workflow script — 2×2 paired runs, pre-registered metrics and decision rule); results land in
   `docs/experiments/` and the winner becomes `/rsi:step`. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
-- **M3 — full protocol** _(code complete)_: all 3 task families (bin-packing,
-  tabular-classification, instruction-routing), verifier + <50% hack rule + outlier filter
-  (`scripts/rsi-aggregate.py`), `/rsi:run` with budget accounting. Exit: 10-step unattended run
-  with sane ledger.
-- **M4 — measurement** _(machinery built)_: `baseline/gen-human` hand-tuned baseline,
-  `holdout-tasks/` (one per family + a far-OOD time-series task), `/rsi:report`
-  (`scripts/rsi-report.py`) with ladder-level evidence (improvement slope vs. baseline,
-  generalization deltas, hack-rate trend).
-- **M5 — ignition test** _(machinery built)_: `/rsi:ignite` swaps the best generation's strategy
+- **M3 — full protocol** _(code complete; exit run demonstrated, run-002 banked at step 3)_: all
+  3 task families (bin-packing, tabular-classification, instruction-routing), verifier + <50% hack
+  rule + outlier filter (`scripts/rsi-aggregate.py`), `/rsi:run` with budget accounting. Exit
+  criterion (10-step unattended run) partially met — a 4-step diagnose→repair→improve arc is
+  recorded; steps 4–10 are optional extra evidence (see `CONTINUATION.md`).
+- **M4 — measurement** _(measured — Level 0 and Level 1 met; see `docs/experiments/m4-report.md`)_:
+  `baseline/gen-human` hand-tuned baseline, `holdout-tasks/` (one per family + a far-OOD
+  time-series task), `/rsi:report` (`scripts/rsi-report.py`) with ladder-level evidence
+  (improvement slope vs. baseline, generalization deltas, hack-rate trend).
+- **M5 — ignition test** _(machinery built; ignition run pending)_: `/rsi:ignite` swaps the best generation's strategy
   into the proposer role and compares campaigns at equal budget (the paper's Level-2 test —
   expect, like Weco, to measure it honestly rather than to pass it).
 
