@@ -10,7 +10,7 @@ Success Criteria:
 
 - [ ] .claude-plugin/plugin.json exists and is valid JSON
 - [ ] plugin.json has name, description, and version fields
-- [ ] At least one SKILL.md file exists (root or examples/)
+- [ ] At least one SKILL.md file exists (skills/ or examples/)
 - [ ] Each SKILL.md has YAML frontmatter with name and description
 - [ ] No APM references (apm pack, apm marketplace, Agent Package Manager)
       Expected Output: All structural checks pass
@@ -25,7 +25,7 @@ Success Criteria:
 - [ ] Triggering context is clear in the description
 - [ ] No placeholder text (TODO, TBD) in production skills
       Expected Output: All skill quality checks pass
-      Grader: code-based (char count, grep)
+      Grader: manual (not implemented by scripts/test-skills.sh)
 
 ## Regression Evals
 
@@ -60,11 +60,11 @@ Assertions:
 
 ### Skills Inventory
 
-The plugin ships with one root SKILL.md and three example skills under examples/:
+The plugin ships with one skill at skills/claudeception/SKILL.md and three example skills under examples/:
 
 | Skill name                         | Location                                             | Purpose                                                                             |
 | ---------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| claudeception                      | SKILL.md (root)                                      | Meta-skill: how to extract and create reusable skills from sessions                 |
+| claudeception                      | skills/claudeception/SKILL.md                        | Meta-skill: how to extract and create reusable skills from sessions                 |
 | nextjs-server-side-error-debugging | examples/nextjs-server-side-error-debugging/SKILL.md | Debug getServerSideProps/getStaticProps silent failures by checking terminal logs   |
 | prisma-connection-pool-exhaustion  | examples/prisma-connection-pool-exhaustion/SKILL.md  | Fix Prisma P2024/too-many-connections errors in serverless environments             |
 | typescript-circular-dependency     | examples/typescript-circular-dependency/SKILL.md     | Detect and resolve circular import dependencies causing undefined values at runtime |
@@ -76,14 +76,14 @@ Assertions for each skill:
 - [ ] Body has at least a Problem, Solution, and Verification section
 - [ ] No APM references or stale installation paths in skill body
 
-### Meta-skill Behavior (claudeception root SKILL.md)
+### Meta-skill Behavior (claudeception SKILL.md)
 
-The root SKILL.md describes the skill extraction workflow itself. Additional assertions:
+The skill describes the skill extraction workflow itself. Additional assertions:
 
 - [ ] Describes command trigger (/claudeception) and natural language triggers ("save this as a skill")
 - [ ] Includes a quality gate checklist (non-obvious, investigation required, not just docs)
 - [ ] Skill template embedded in the skill body is syntactically valid YAML frontmatter
-- [ ] Path references in the skill use ~/.claude/my-claude-skills/ (not APM paths)
+- [ ] Script paths in the skill body use ${CLAUDE_PLUGIN_ROOT} (no hardcoded home paths)
 
 ### Supporting Infrastructure
 
@@ -97,4 +97,3 @@ The root SKILL.md describes the skill extraction workflow itself. Additional ass
 ## Metrics Target
 
 - pass@1: 100% for structure (deterministic)
-- pass@3: > 90% for skill quality

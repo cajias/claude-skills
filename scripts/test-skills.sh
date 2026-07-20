@@ -93,7 +93,7 @@ check_plugin() {
 
   # (e) No APM references in any file under the plugin directory
   local apm_hits
-  apm_hits="$(grep -rl "apm pack\|apm marketplace\|Agent Package Manager" "$plugin_dir" 2>/dev/null || true)"
+  apm_hits="$(grep -rl --exclude-dir=node_modules --exclude-dir=.venv "apm pack\|apm marketplace\|Agent Package Manager" "$plugin_dir" 2>/dev/null || true)"
   if [[ -n "$apm_hits" ]]; then
     while IFS= read -r hit_file; do
       local rel="${hit_file#"$plugin_dir"/}"
@@ -139,7 +139,6 @@ else
   # All-plugins mode
   for plugin_dir in "$PLUGINS_DIR"/*/; do
     [[ -d "$plugin_dir" ]] || continue
-    [[ "$(basename "$plugin_dir")" == "README.md" ]] && continue
     check_plugin "$plugin_dir"
   done
 fi

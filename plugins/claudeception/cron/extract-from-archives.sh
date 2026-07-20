@@ -7,8 +7,6 @@
 
 set -euo pipefail
 
-export CLAUDE_CODE_USE_BEDROCK=1
-
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ARCHIVE_DIR="$HOME/.config/superpowers/conversation-archive"
 PROCESSED_DIR="$HOME/.claude/claudeception-metrics/processed"
@@ -51,7 +49,7 @@ for jsonl_file in "${jsonl_files[@]}"; do
     log "Processing: $jsonl_file"
 
     # Convert JSONL to readable text, write to temp file
-    conv_file="$TMPDIR/claudeception-conv-$$.txt"
+    conv_file=$(mktemp "$TMPDIR/claudeception-conv.XXXXXX")
     if ! python3 "$ARCHIVE_TO_TEXT" "$jsonl_file" > "$conv_file" 2>/dev/null; then
         log "  Failed to convert archive to text: $jsonl_file"
         rm -f "$conv_file"
@@ -69,7 +67,7 @@ for jsonl_file in "${jsonl_files[@]}"; do
     log "  Converted to text ($conv_size bytes)"
 
     # Build extraction prompt in a temp file
-    prompt_file="$TMPDIR/claudeception-prompt-$$.txt"
+    prompt_file=$(mktemp "$TMPDIR/claudeception-prompt.XXXXXX")
     cat > "$prompt_file" <<'PROMPT_HEADER'
 Analyze this conversation for skill-worthy knowledge. Extract reusable patterns, discoveries, workarounds, or best practices.
 
@@ -90,7 +88,7 @@ PROMPT_HEADER
     rm -f "$conv_file"
 
     # Call Claude in headless mode
-    response_file="$TMPDIR/claudeception-response-$$.json"
+    response_file=$(mktemp "$TMPDIR/claudeception-response.XXXXXX")
     if ! claude -p --output-format json < "$prompt_file" > "$response_file" 2>/dev/null; then
         log "  Claude headless call failed for: $jsonl_file"
         rm -f "$prompt_file" "$response_file"

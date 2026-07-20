@@ -1,5 +1,5 @@
 ---
-name: HLD Phase Executor
+name: hld-phase-executor
 description: This skill should be used when the user asks to "execute an HLD", "implement a high-level design", "run phased migration", "execute architecture phases", "implement HLD with TDD", or has a multi-phase project document (HLD, architecture doc, migration plan) that needs systematic implementation with phase gates and dependency tracking.
 version: 1.0.0
 ---
@@ -31,7 +31,7 @@ This skill transforms HLD documents into executable phase plans, ensuring:
 
 | Dependency                                   | Purpose                           |
 | -------------------------------------------- | --------------------------------- |
-| `tdd-skills:tdd-plan`                        | Generate TDD plans for each phase |
+| `tdd-plan`                                   | Generate TDD plans for each phase |
 | `ralph-loop:ralph-loop`                      | Execute iterative TDD loops       |
 | `superpowers:verification-before-completion` | Pre-completion validation         |
 

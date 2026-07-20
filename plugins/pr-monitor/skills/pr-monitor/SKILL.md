@@ -78,13 +78,15 @@ Use this skill when:
 3. **Create monitoring state file:**
 
    ```bash
-   # Format: /tmp/claude_monitor_pr_<repo-name>_<pr-number>
+   # Format: ~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>
    # Extract repo name from path
    REPO_NAME=$(basename "$REPO_PATH")
-   STATE_FILE="/tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}"
+   STATE_DIR="$HOME/.claude/pr-monitor"
+   mkdir -p -m 700 "$STATE_DIR"
+   STATE_FILE="$STATE_DIR/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}"
 
    # Write state file with 3 lines: repo_path, pr_number, last_sha
-   cat > "$STATE_FILE" <<'EOF'
+   cat > "$STATE_FILE" <<EOF
    $REPO_PATH
    $PR_NUMBER
    $CURRENT_SHA
@@ -176,7 +178,7 @@ When Claude Code would normally stop:
 1. **Remove state file:**
 
    ```bash
-   rm /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
+   rm ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
    ```
 
 2. **Confirm stopped:**
@@ -197,7 +199,7 @@ When Claude Code would normally stop:
 
 1. **Hook not triggering:**
    - Verify plugin is installed: Check hooks are registered
-   - Verify state file exists: `ls -la /tmp/claude_monitor_pr_*`
+   - Verify state file exists: `ls -la ~/.claude/pr-monitor/claude_monitor_pr_*`
    - Test hook manually: `echo '{"stop_hook_active": false}' | bash /path/to/Stop.sh`
 
 2. **PR not accessible:**
@@ -206,9 +208,9 @@ When Claude Code would normally stop:
    - Ensure repository path is correct in state file
 
 3. **Multiple PRs monitored:**
-   - List all monitors: `ls -la /tmp/claude_monitor_pr_*`
-   - View specific monitor: `cat /tmp/claude_monitor_pr_REPO_PR`
-   - Stop specific monitor: `rm /tmp/claude_monitor_pr_REPO_PR`
+   - List all monitors: `ls -la ~/.claude/pr-monitor/claude_monitor_pr_*`
+   - View specific monitor: `cat ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR`
+   - Stop specific monitor: `rm ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR`
 
 ## Limitations
 
@@ -221,9 +223,9 @@ When Claude Code would normally stop:
    - Monitoring only active when Claude Code session is running
    - Stops when you quit Claude Code
 
-3. **State files in /tmp:**
-   - May be cleared on system reboot
-   - Need to recreate after reboot if persistent monitoring needed
+3. **Persistent state files:**
+   - State files persist in `~/.claude/pr-monitor` across reboots
+   - Remove them manually to stop monitoring
 
 4. **GitHub API rate limits:**
    - Stop hook queries GitHub each time it runs
@@ -264,7 +266,7 @@ PR_NUMBER=2
 CURRENT_SHA=$(gh pr view 2 --json headRefOid --jq '.headRefOid')
 REPO_NAME=$(basename "$REPO_PATH")
 
-cat > /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER} <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER} <<EOF
 $REPO_PATH
 $PR_NUMBER
 $CURRENT_SHA
@@ -285,13 +287,13 @@ After enabling monitoring, verify:
 1. **State file created:**
 
    ```bash
-   ls -la /tmp/claude_monitor_pr_*
+   ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
    ```
 
 2. **State file format correct:**
 
    ```bash
-   cat /tmp/claude_monitor_pr_REPO_PR
+   cat ~/.claude/pr-monitor/claude_monitor_pr_REPO_PR
    # Should show 3 lines: repo_path, pr_number, sha
    ```
 

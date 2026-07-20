@@ -49,6 +49,7 @@ except ImportError:
     def record_compaction(line_count):
         pass
 
+
 try:
     from duplicate_detector import should_reject_duplicate
 
@@ -350,16 +351,16 @@ def read_transcript(transcript_path: str, start_line: int = 0) -> tuple[list[dic
                 if i < start_line:
                     continue  # Skip lines before start_line
 
-                line = line.strip()
-                if not line:
+                stripped = line.strip()
+                if not stripped:
                     continue
 
                 try:
-                    msg = json.loads(line)
+                    msg = json.loads(stripped)
                     messages.append(msg)
                 except json.JSONDecodeError:
                     # Not JSON, might be plain text - store as raw
-                    messages.append({"type": "raw", "content": line})
+                    messages.append({"type": "raw", "content": stripped})
 
         log(f"Read {len(messages)} messages from transcript (lines {start_line}-{total_lines})")
     except FileNotFoundError:
@@ -473,26 +474,21 @@ def analyze_transcript_for_knowledge(conversation_text: str) -> dict:
     analysis["has_pattern_learning"] = any(ind in text_lower for ind in pattern_indicators)
 
     # Extract error patterns (look for common error formats)
-    error_patterns = re.findall(r'(?:error|exception|failed)[\s:]+([^\n]{10,100})', text_lower)
+    error_patterns = re.findall(r"(?:error|exception|failed)[\s:]+([^\n]{10,100})", text_lower)
     analysis["error_patterns"] = list(set(error_patterns[:5]))  # Dedupe and limit
 
     # Extract tools used
-    tool_matches = re.findall(r'\[Tool:\s*([^\]]+)\]', conversation_text)
+    tool_matches = re.findall(r"\[Tool:\s*([^\]]+)\]", conversation_text)
     analysis["tools_used"] = list(set(tool_matches))
 
     # Extract key topics (capitalized multi-word terms)
-    topic_matches = re.findall(r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b', conversation_text)
+    topic_matches = re.findall(r"\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)+)\b", conversation_text)
     analysis["key_topics"] = list(set(topic_matches[:10]))
 
     return analysis
 
 
-def build_extraction_prompt(
-    conversation_text: str,
-    analysis: dict,
-    signal_summary: dict,
-    hook_event: str
-) -> str:
+def build_extraction_prompt(conversation_text: str, analysis: dict, signal_summary: dict, hook_event: str) -> str:
     """Build a comprehensive extraction prompt for the LLM.
 
     Args:
@@ -527,12 +523,12 @@ def build_extraction_prompt(
     # Signal summary
     signal_text = f"""
 Signals accumulated:
-- Errors: {signal_summary.get('error_count', 0)}
-- Retries: {signal_summary.get('retry_count', 0)}
-- Web searches: {signal_summary.get('web_search_count', 0)}
-- User corrections: {signal_summary.get('correction_count', 0)}
-- User teaching: {signal_summary.get('teaching_count', 0)}
-- Breakthrough score: {signal_summary.get('breakthrough_score', 0):.2f}
+- Errors: {signal_summary.get("error_count", 0)}
+- Retries: {signal_summary.get("retry_count", 0)}
+- Web searches: {signal_summary.get("web_search_count", 0)}
+- User corrections: {signal_summary.get("correction_count", 0)}
+- User teaching: {signal_summary.get("teaching_count", 0)}
+- Breakthrough score: {signal_summary.get("breakthrough_score", 0):.2f}
 """
 
     # Truncate conversation if needed
@@ -546,7 +542,7 @@ Signals accumulated:
             + conversation_text[-half:]
         )
 
-    prompt = f"""
+    return f"""
 ================================================================================
 CLAUDECEPTION - SESSION KNOWLEDGE EXTRACTION
 ================================================================================
@@ -603,7 +599,6 @@ If nothing notable, respond: "No skill-worthy knowledge to extract."
 
 ================================================================================
 """
-    return prompt
 
 
 def main() -> int:
@@ -669,8 +664,10 @@ def main() -> int:
 
     # Analyze transcript for knowledge patterns
     analysis = analyze_transcript_for_knowledge(conversation_text)
-    log(f"Analysis: debugging={analysis['has_debugging']}, resolution={analysis['has_error_resolution']}, "
-        f"discovery={analysis['has_discovery']}, workaround={analysis['has_workaround']}")
+    log(
+        f"Analysis: debugging={analysis['has_debugging']}, resolution={analysis['has_error_resolution']}, "
+        f"discovery={analysis['has_discovery']}, workaround={analysis['has_workaround']}"
+    )
 
     # Check if there's anything worth extracting
     has_potential = (
@@ -719,14 +716,9 @@ def _fallback_signal_extraction(session_data: dict, hook_event: str) -> int:
 
 
 def _finalize_extraction(
-    session_data: dict,
-    signal_summary: dict,
-    hook_event: str,
-    total_lines: int,
-    skills_created: int
+    session_data: dict, signal_summary: dict, hook_event: str, total_lines: int, skills_created: int
 ) -> int:
     """Finalize extraction: emit events and handle state based on hook type."""
-
     # Emit summary event
     emit_event(
         {

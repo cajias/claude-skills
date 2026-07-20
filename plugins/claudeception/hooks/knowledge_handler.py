@@ -118,10 +118,7 @@ def process_user_prompt(data: dict) -> None:
 
     # Handle corrections (high-weight signal: 3x)
     if result.is_correction:
-        log(
-            f"CORRECTION DETECTED: type={result.correction_type}, "
-            f"confidence={result.correction_confidence:.2f}"
-        )
+        log(f"CORRECTION DETECTED: type={result.correction_type}, confidence={result.correction_confidence:.2f}")
         log(f"  Knowledge: {result.extracted_knowledge[:200]}")
 
         record_signal(
@@ -140,10 +137,7 @@ def process_user_prompt(data: dict) -> None:
 
     # Handle teaching patterns (high-weight signal: 3x)
     if result.is_teaching:
-        log(
-            f"TEACHING DETECTED: type={result.teaching_type}, "
-            f"confidence={result.teaching_confidence:.2f}"
-        )
+        log(f"TEACHING DETECTED: type={result.teaching_type}, confidence={result.teaching_confidence:.2f}")
         log(f"  Knowledge: {result.extracted_knowledge[:200]}")
 
         record_signal(
@@ -176,9 +170,7 @@ def process_user_prompt(data: dict) -> None:
     )
 
 
-def output_knowledge_extraction_prompt(
-    prompt: str, knowledge_result: dict, knowledge_type: str = "knowledge"
-) -> None:
+def output_knowledge_extraction_prompt(prompt: str, knowledge_result: dict, knowledge_type: str = "knowledge") -> None:
     """Output a prompt for Claude to process detected knowledge.
 
     Works for both corrections and teaching patterns.

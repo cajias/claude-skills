@@ -1,6 +1,6 @@
 # Dev Plugin
 
-Development workflow tools for Claude Code - README generation, code review, and more.
+Development workflow tools for Claude Code — README generation and review workflows.
 
 ## Overview
 
@@ -46,13 +46,19 @@ Evaluate and improve README files with iterative refinement.
 5. Evaluates against banesullivan/README best practices
 6. Iterates until quality threshold met (default: 85/100)
 
+## Agents
+
+### `orchestrator`
+
+Default working mode. Plans first, then dispatches subagents for implementation. Runs on `sonnet`.
+
 ## Installation
 
 ### Via Plugin Manager (Recommended)
 
 ```bash
-claude plugin install \
-  https://github.com/cajias/claude-skills/tree/main/plugins/dev
+claude plugin marketplace add cajias/claude-skills
+claude plugin install dev@claude-skills
 ```
 
 After installation, restart Claude Code for the commands to become available.
@@ -63,14 +69,13 @@ After installation, restart Claude Code for the commands to become available.
 
    ```bash
    git clone https://github.com/cajias/claude-skills.git
-   cd claude-skills/plugins/dev
+   cd claude-skills
    ```
 
 2. Copy to Claude plugins directory:
 
    ```bash
-   mkdir -p ~/.claude/plugins/dev
-   cp -r ./* ~/.claude/plugins/dev/
+   cp -r plugins/dev ~/.claude/plugins/
    ```
 
 3. Restart Claude Code
@@ -307,7 +312,7 @@ Contributions are welcome! Please:
 
 ## License
 
-MIT License - See LICENSE file for details
+MIT License - see the repository LICENSE.
 
 ## Author
 
@@ -316,6 +321,7 @@ cajias
 ## Documentation
 
 - 📘 [Command Documentation](./commands/review-readme.md) - Full command instructions
+- 🤖 [Orchestrator Agent](./agents/orchestrator.md) - Default plan-and-delegate working mode
 - 📋 [Example Workflow](./examples/readme-workflow.md) - Complete walkthrough
 - 🔧 [Configuration Schema](./config/readme-generator/config.schema.json) - Full config options
 

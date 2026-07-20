@@ -47,9 +47,10 @@ Exit code `0` means all plugins are clean. Any failure exits `1`.
 
 Create `.claude/evals/<plugin-name>.md` following the existing files in this directory.
 
-Each eval file documents the expected checks for one plugin. The bash grader in
-`scripts/test-skills.sh` reads the plugin directory — the `.md` files here are the
-human-readable spec that the script implements.
+Each eval file documents the expected checks for one plugin. `scripts/test-skills.sh`
+implements only the four structural checks listed in the Purpose section above; the
+per-plugin assertions in these `.md` files are manual review notes that the script
+does **not** grade.
 
 Sections to include:
 
@@ -73,7 +74,6 @@ file-existence tests.
 
 ## Metrics targets
 
-| Metric                        | Target                                     |
-| ----------------------------- | ------------------------------------------ |
-| pass@1 — structure checks     | 100% (deterministic; any failure is a bug) |
-| pass@3 — skill quality checks | > 90%                                      |
+| Metric                    | Target                                     |
+| ------------------------- | ------------------------------------------ |
+| pass@1 — structure checks | 100% (deterministic; any failure is a bug) |

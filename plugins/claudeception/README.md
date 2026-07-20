@@ -9,86 +9,36 @@ the skill gets loaded automatically.
 
 ## Installation
 
-### Step 1: Clone the skill
-
-#### User-level (recommended)
+Install every plugin in this repo:
 
 ```bash
-git clone https://github.com/blader/Claudeception.git ~/.claude/skills/claudeception
+git clone https://github.com/cajias/claude-skills
+cd claude-skills
+make install
 ```
 
-#### Project-level
+Or install just this plugin:
 
 ```bash
-git clone https://github.com/blader/Claudeception.git .claude/skills/claudeception
+cp -r plugins/claudeception ~/.claude/plugins/
 ```
 
-### Step 2: Set up the activation hook (recommended)
+All four hooks (`PostToolUse`, `UserPromptSubmit`, `SessionEnd`, `PreCompact`) auto-register from
+`.claude-plugin/plugin.json`. No `settings.json` edits are needed.
 
-The skill can activate via semantic matching, but a hook ensures it evaluates every session for extractable knowledge.
-
-#### User-level setup (recommended)
-
-1. Create the hooks directory and copy the script:
+### Optional: hourly archive extraction (macOS)
 
 ```bash
-mkdir -p ~/.claude/hooks
-cp ~/.claude/skills/claudeception/scripts/claudeception-activator.sh ~/.claude/hooks/
-chmod +x ~/.claude/hooks/claudeception-activator.sh
+bash setup.sh
 ```
 
-1. Add the hook to your global Claude settings (`~/.claude/settings.json`):
+This installs a launchd agent that runs `cron/extract-from-archives.sh` hourly from 12:00-20:00 to mine
+conversation archives for extractable knowledge.
 
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### Project-level setup
-
-1. Create the hooks directory inside your project and copy the script:
-
-```bash
-mkdir -p .claude/hooks
-cp .claude/skills/claudeception/scripts/claudeception-activator.sh .claude/hooks/
-chmod +x .claude/hooks/claudeception-activator.sh
-```
-
-1. Add the hook to your project settings (`.claude/settings.json` in the repo):
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/claudeception-activator.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-If you already have a `settings.json`, merge the `hooks` configuration into it.
-
-The hook injects a reminder on every prompt that tells Claude to evaluate whether the current task produced
-extractable knowledge. This achieves higher activation rates than relying on semantic description matching alone.
+**Prerequisite:** the script reads conversation archives from `~/.config/superpowers/conversation-archive`,
+a directory produced by the third-party `superpowers` plugin, which this repo does not ship. Without that
+directory the hourly job exits immediately and does nothing. Its output is logged to
+`~/.claude/claudeception-cron.log`.
 
 ## Usage
 

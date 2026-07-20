@@ -8,9 +8,6 @@ ls:
   skills/*/config:
     .json: kebab-case
 
-  skills/*/patterns:
-    .json: kebab-case | PascalCase
-
   skills/*/prompts:
     .md: kebab-case
 

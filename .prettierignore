@@ -19,3 +19,7 @@ plugins/testing/skills/
 plugins/dev-process/skills/
 plugins/ci-build/skills/
 plugins/integrations/skills/
+
+# Session-local agent memory (self-ignoring via nested .gitignore; Prettier
+# only reads the root .gitignore, so it must be listed here explicitly).
+.remember/

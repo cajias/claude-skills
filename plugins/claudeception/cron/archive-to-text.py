@@ -8,10 +8,12 @@ Output: Conversation text to stdout (max 50K chars).
 import json
 import sys
 
+
 MAX_CHARS = 50_000
 
 
-def main():
+def main() -> None:
+    """Read the archive JSONL at argv[1] and print its conversation text."""
     if len(sys.argv) < 2:
         print("Usage: archive-to-text.py <jsonl-file>", file=sys.stderr)
         sys.exit(1)
@@ -21,8 +23,8 @@ def main():
     total = 0
 
     with open(path) as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
                 continue
             try:

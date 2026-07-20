@@ -56,8 +56,9 @@ cat document.md | analyze_for_ai_patterns
 ### Step 1: Load Pattern Database
 
 ```python
-import json
-patterns = json.load(open('patterns/patterns.json'))
+import json, os
+root = os.environ["CLAUDE_PLUGIN_ROOT"]
+patterns = json.load(open(f"{root}/skills/ai-writing-humanizer/patterns/patterns.json"))
 ```
 
 ### Step 2: Run Detection

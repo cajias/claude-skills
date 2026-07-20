@@ -1,14 +1,8 @@
 #!/bin/bash
-# Session Context Check - UserPromptSubmit Hook
-# Lightweight reminder to check persistent memory (only outputs on first few messages)
+# Session Context Check - SessionStart Hook
+# Lightweight reminder to check persistent memory (prints once at session start)
 
-# Use a state file to track if we've shown the reminder in this session
-STATE_FILE="/tmp/obsidian-memory-session-$$"
-
-# Only show on first message of session (state file doesn't exist)
-if [ ! -f "$STATE_FILE" ]; then
-    touch "$STATE_FILE"
-    cat << 'EOF'
+cat << 'EOF'
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧠 OBSIDIAN MEMORY AVAILABLE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -20,4 +14,3 @@ For this session, remember:
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EOF
-fi

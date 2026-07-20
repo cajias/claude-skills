@@ -19,7 +19,7 @@ with a notification when new commits are detected.
 ```text
 ┌─────────────────────────────────────────────────────────────┐
 │ User enables PR monitoring                                   │
-│ Creates state file: /tmp/claude_monitor_pr_<repo>_<pr>      │
+│ Creates state file: ~/.claude/pr-monitor/claude_monitor_pr_<repo>_<pr>      │
 └────────────────────────┬────────────────────────────────────┘
                          │
                          ▼
@@ -30,7 +30,7 @@ with a notification when new commits are detected.
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ Stop Hook Triggers                                           │
-│ - Checks for state files in /tmp/claude_monitor_pr_*        │
+│ - Checks for state files in ~/.claude/pr-monitor/claude_monitor_pr_*        │
 │ - Queries GitHub API for each monitored PR                  │
 │ - Compares current commit SHA with last known SHA           │
 └────────────────────────┬────────────────────────────────────┘
@@ -58,8 +58,8 @@ with a notification when new commits are detected.
 ### Method 1: Via Claude Plugin Manager (Recommended)
 
 ```bash
-claude plugin install \
-  https://github.com/cajias/claude-skills/tree/main/plugins/pr-monitor
+claude plugin marketplace add cajias/claude-skills
+claude plugin install pr-monitor@claude-skills
 ```
 
 **Then restart Claude Code:**
@@ -76,8 +76,7 @@ git clone https://github.com/cajias/claude-skills.git
 cd claude-skills
 
 # 2. Copy plugin to Claude plugins directory
-mkdir -p ~/.claude/plugins/pr-monitor
-cp -r plugins/pr-monitor/* ~/.claude/plugins/pr-monitor/
+cp -r plugins/pr-monitor ~/.claude/plugins/
 
 # 3. Verify installation
 ls -la ~/.claude/plugins/pr-monitor/
@@ -158,19 +157,19 @@ REPO_PATH=$(pwd)
 REPO_NAME=$(basename "$REPO_PATH")
 
 # 4. Create state file
-cat > /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER} <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER} <<EOF
 $REPO_PATH
 $PR_NUMBER
 $CURRENT_SHA
 EOF
 
 # 5. Verify
-cat /tmp/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
+cat ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${PR_NUMBER}
 ```
 
 ### State File Format
 
-State files are stored in `/tmp/claude_monitor_pr_<repo-name>_<pr-number>`
+State files are stored in `~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>`
 
 **Format (3 lines):**
 
@@ -211,10 +210,10 @@ Stop monitoring PR cajias/claude-skills#2
 
 ```bash
 # Stop specific PR monitoring
-rm /tmp/claude_monitor_pr_<repo-name>_<pr-number>
+rm ~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>
 
 # Stop all PR monitoring
-rm /tmp/claude_monitor_pr_*
+rm ~/.claude/pr-monitor/claude_monitor_pr_*
 ```
 
 ## Troubleshooting
@@ -245,7 +244,7 @@ rm /tmp/claude_monitor_pr_*
 1. **Verify state file format:**
 
    ```bash
-   cat /tmp/claude_monitor_pr_<repo-name>_<pr-number>
+   cat ~/.claude/pr-monitor/claude_monitor_pr_<repo-name>_<pr-number>
    # Should have exactly 3 lines:
    # Line 1: Repository path
    # Line 2: PR number
@@ -255,7 +254,7 @@ rm /tmp/claude_monitor_pr_*
 2. **Check if state file exists:**
 
    ```bash
-   ls -la /tmp/claude_monitor_pr_*
+   ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
    ```
 
 3. **Verify PR is accessible:**
@@ -284,7 +283,7 @@ rm /tmp/claude_monitor_pr_*
 1. **State file not found:**
    - Ensure you created the state file correctly
    - Check spelling of repo name in filename
-   - Verify file is in `/tmp` directory
+   - Verify file is in `~/.claude/pr-monitor/` directory
 
 2. **Incorrect format:**
 
@@ -294,7 +293,7 @@ rm /tmp/claude_monitor_pr_*
    PR_NUMBER=123
    CURRENT_SHA=$(cd "$REPO_PATH" && gh pr view "$PR_NUMBER" --json headRefOid --jq '.headRefOid')
 
-   cat > /tmp/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
+   cat > ~/.claude/pr-monitor/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
    $REPO_PATH
    $PR_NUMBER
    $CURRENT_SHA
@@ -305,7 +304,7 @@ rm /tmp/claude_monitor_pr_*
 
    ```bash
    # Ensure state file is readable
-   chmod 644 /tmp/claude_monitor_pr_*
+   chmod 644 ~/.claude/pr-monitor/claude_monitor_pr_*
    ```
 
 ### GitHub API Issues
@@ -351,10 +350,10 @@ rm /tmp/claude_monitor_pr_*
 
    ```bash
    # List all monitored PRs
-   ls -la /tmp/claude_monitor_pr_*
+   ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
 
    # Remove unwanted monitors
-   rm /tmp/claude_monitor_pr_<repo>_<pr>
+   rm ~/.claude/pr-monitor/claude_monitor_pr_<repo>_<pr>
    ```
 
 3. **Hook timing out:**
@@ -380,7 +379,7 @@ rm /tmp/claude_monitor_pr_*
    gh pr view PR_NUMBER --json headRefOid --jq '.headRefOid'
 
    # Compare with SHA in state file
-   cat /tmp/claude_monitor_pr_<repo>_<pr> | sed -n '3p'
+   cat ~/.claude/pr-monitor/claude_monitor_pr_<repo>_<pr> | sed -n '3p'
    ```
 
 3. **Check PR state:**
@@ -395,13 +394,13 @@ rm /tmp/claude_monitor_pr_*
 
 ### Custom State File Location
 
-By default, state files are stored in `/tmp`. To use a custom location:
+By default, state files are stored in `~/.claude/pr-monitor`. To use a custom location:
 
 ```bash
 # Modify the Stop.sh script to look in a different directory
 # Edit ~/.claude/plugins/pr-monitor/scripts/Stop.sh
-# Change: monitor_files=$(find /tmp -name "claude_monitor_pr_*" -type f 2>/dev/null || true)
-# To: monitor_files=$(find /custom/path -name "claude_monitor_pr_*" -type f 2>/dev/null || true)
+# Change line 20: STATE_DIR="${HOME}/.claude/pr-monitor"
+# To: STATE_DIR="/custom/path"
 ```
 
 ### Monitoring External Repositories
@@ -416,7 +415,7 @@ REPO_PATH=$(pwd)
 PR_NUMBER=123
 CURRENT_SHA=$(gh pr view $PR_NUMBER --json headRefOid --jq '.headRefOid')
 
-cat > /tmp/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_$(basename "$REPO_PATH")_${PR_NUMBER} <<EOF
 $REPO_PATH
 $PR_NUMBER
 $CURRENT_SHA
@@ -454,7 +453,7 @@ for pr in "${PR_NUMBERS[@]}"; do
   CURRENT_SHA=$(gh pr view "$pr" --json headRefOid --jq '.headRefOid')
   REPO_NAME=$(basename "$REPO_PATH")
 
-  cat > /tmp/claude_monitor_pr_${REPO_NAME}_${pr} <<EOF
+  cat > ~/.claude/pr-monitor/claude_monitor_pr_${REPO_NAME}_${pr} <<EOF
 $REPO_PATH
 $pr
 $CURRENT_SHA
@@ -478,7 +477,7 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
 
 - **Read access**: Repository contents, PR data, commit history
 - **Network access**: GitHub API (via `gh` CLI)
-- **File system**: Reads/writes state files in `/tmp`
+- **File system**: Reads/writes state files in `~/.claude/pr-monitor` (created mode 700)
 - **Execution privileges**: Runs with your user permissions
 
 ### What the Plugin Cannot Do
@@ -506,22 +505,22 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
 
    ```bash
    # Remove old state files
-   rm /tmp/claude_monitor_pr_*
+   rm ~/.claude/pr-monitor/claude_monitor_pr_*
    ```
 
 4. **Protect state files:**
 
    ```bash
-   # State files may contain repo paths
+   # The state directory is created mode 700
+   # State files still contain repo paths
    # Don't share or commit state files
-   # They're in /tmp and world-readable by default
    ```
 
 5. **Audit monitoring:**
 
    ```bash
    # Regularly check what's being monitored
-   ls -la /tmp/claude_monitor_pr_*
+   ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
    ```
 
 ## Limitations
@@ -536,12 +535,11 @@ bash monitor-prs.sh /path/to/repo 1 2 3 4 5
 
 - **Requires Claude running**: Monitoring only active during Claude Code session
 - **Stops when quit**: No background daemon or service
-- **No persistence**: Must recreate monitors after system restart
 
 ### State Persistence
 
-- **Temporary storage**: State files in `/tmp` cleared on reboot
-- **Manual recreation**: Need to recreate monitoring after restart
+- **Persistent storage**: State files live in `~/.claude/pr-monitor` and survive reboots; remove them
+  manually to stop monitoring
 - **No backup**: State files not backed up or synced
 
 ### API Rate Limits
@@ -575,14 +573,14 @@ REPO_PATH=$(pwd)  # /home/user/Projects/claude-skills
 PR_NUMBER=2
 CURRENT_SHA=$(gh pr view 2 --json headRefOid --jq '.headRefOid')
 
-cat > /tmp/claude_monitor_pr_claude-skills_2 <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_2 <<EOF
 $REPO_PATH
 $PR_NUMBER
 $CURRENT_SHA
 EOF
 
 # Verification:
-cat /tmp/claude_monitor_pr_claude-skills_2
+cat ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_2
 # Output:
 # /home/user/Projects/claude-skills
 # 2
@@ -600,10 +598,10 @@ cd ~/Projects/claude-skills
 "Monitor PRs #1, #2, and #3 in this repository"
 
 # Creates three state files:
-ls -la /tmp/claude_monitor_pr_*
-# /tmp/claude_monitor_pr_claude-skills_1
-# /tmp/claude_monitor_pr_claude-skills_2
-# /tmp/claude_monitor_pr_claude-skills_3
+ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
+# ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_1
+# ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_2
+# ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_3
 ```
 
 ### Example 3: Monitor External Repository
@@ -620,14 +618,14 @@ REPO_PATH=$(pwd)
 PR_NUMBER=456
 CURRENT_SHA=$(gh pr view 456 --json headRefOid --jq '.headRefOid')
 
-cat > /tmp/claude_monitor_pr_react_456 <<EOF
+cat > ~/.claude/pr-monitor/claude_monitor_pr_react_456 <<EOF
 $REPO_PATH
 $PR_NUMBER
 $CURRENT_SHA
 EOF
 
 # Verify
-cat /tmp/claude_monitor_pr_react_456
+cat ~/.claude/pr-monitor/claude_monitor_pr_react_456
 ```
 
 ### Example 4: Stop Monitoring Specific PR
@@ -636,12 +634,12 @@ cat /tmp/claude_monitor_pr_react_456
 
 ```bash
 # Remove specific state file
-rm /tmp/claude_monitor_pr_claude-skills_2
+rm ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_2
 
 # Verify others still monitored
-ls -la /tmp/claude_monitor_pr_*
-# /tmp/claude_monitor_pr_claude-skills_1
-# /tmp/claude_monitor_pr_claude-skills_3
+ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
+# ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_1
+# ~/.claude/pr-monitor/claude_monitor_pr_claude-skills_3
 ```
 
 ### Example 5: Stop All Monitoring
@@ -653,10 +651,10 @@ ls -la /tmp/claude_monitor_pr_*
 "Stop monitoring all PRs"
 
 # Or manually:
-rm /tmp/claude_monitor_pr_*
+rm ~/.claude/pr-monitor/claude_monitor_pr_*
 
 # Verify
-ls -la /tmp/claude_monitor_pr_*
+ls -la ~/.claude/pr-monitor/claude_monitor_pr_*
 # Output: No such file or directory
 ```
 
@@ -682,13 +680,8 @@ This is **not real-time**. There may be delays between commit push and detection
 
 ### Q: What happens if I restart my computer?
 
-**A:** State files in `/tmp` are typically cleared on reboot. You'll need to:
-
-1. Recreate monitoring state files
-2. Re-authenticate `gh` if needed
-3. Restart Claude Code
-
-Consider moving state files to a persistent location if needed.
+**A:** State files in `~/.claude/pr-monitor` persist across reboots; monitoring resumes when you
+restart Claude Code.
 
 ### Q: Can I monitor PRs in repositories I don't own?
 

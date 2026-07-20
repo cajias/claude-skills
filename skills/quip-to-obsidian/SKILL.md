@@ -66,8 +66,11 @@ export QUIP_API_TOKEN="your-token"
 export BLOB_LIST="/tmp/quip-blobs-filtered.txt"
 export OUTPUT_DIR="/path/to/obsidian/folder/attachments"
 
+# Path to this skill's directory (where SKILL.md and scripts/ live)
+export SKILL_DIR="/path/to/claude-skills/skills/quip-to-obsidian"
+
 # Run download script
-bash ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/download-quip-blobs.sh
+bash "$SKILL_DIR/scripts/download-quip-blobs.sh"
 ```
 
 The script:
@@ -92,7 +95,7 @@ find "$OBSIDIAN_DIR" -name "*.md" -type f -exec sed -i '' -E \
 Obsidian works better with inline image syntax. Use the Python script at `scripts/fix-obsidian-images.py`:
 
 ```bash
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-obsidian-images.py \
+python3 "$SKILL_DIR/scripts/fix-obsidian-images.py" \
   --directory "/path/to/obsidian/folder"
 ```
 
@@ -114,14 +117,14 @@ To inline format:
 Quip exports code blocks with extra blank lines between every line. Fix the spacing:
 
 ```bash
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-code-block-spacing.py \
+python3 "$SKILL_DIR/scripts/fix-code-block-spacing.py" \
   "/path/to/obsidian/folder"
 ```
 
 Then add language hints (Quip exports without them):
 
 ```bash
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-code-block-langs.py \
+python3 "$SKILL_DIR/scripts/fix-code-block-langs.py" \
   "/path/to/obsidian/folder"
 ```
 
@@ -132,7 +135,7 @@ Detects: mermaid, json, yaml, typescript, python, go, bash, cedar, sql, http, xm
 Quip exports contain zero-width space characters (U+200B) that break markdown rendering:
 
 ```bash
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-zero-width-spaces.py \
+python3 "$SKILL_DIR/scripts/fix-zero-width-spaces.py" \
   "/path/to/obsidian/folder"
 ```
 
@@ -142,11 +145,11 @@ Quip exports tables with extra empty columns, row numbers, and escaped character
 
 ```bash
 # Fix table structure (empty columns, row numbers, escaped chars)
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-quip-tables.py \
+python3 "$SKILL_DIR/scripts/fix-quip-tables.py" \
   "/path/to/obsidian/folder"
 
 # Fix separator lines to match column count
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-table-separators.py \
+python3 "$SKILL_DIR/scripts/fix-table-separators.py" \
   "/path/to/obsidian/folder"
 
 # Remove any remaining escaped characters
@@ -177,6 +180,7 @@ For a complete migration in one go:
 # Set environment
 export QUIP_API_TOKEN="your-token"
 export OBSIDIAN_DIR="/path/to/obsidian/migration/folder"
+export SKILL_DIR="/path/to/claude-skills/skills/quip-to-obsidian"
 
 # 1. Extract blob list
 grep -rhoE '/blob/[A-Za-z0-9]+/[A-Za-z0-9_-]+' "$OBSIDIAN_DIR" | \
@@ -187,22 +191,22 @@ mkdir -p "$OBSIDIAN_DIR/attachments"
 
 # 3. Download blobs
 BLOB_LIST=/tmp/quip-blobs.txt OUTPUT_DIR="$OBSIDIAN_DIR/attachments" \
-  bash ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/download-quip-blobs.sh
+  bash "$SKILL_DIR/scripts/download-quip-blobs.sh"
 
 # 4. Update references and convert format
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-obsidian-images.py \
+python3 "$SKILL_DIR/scripts/fix-obsidian-images.py" \
   --directory "$OBSIDIAN_DIR"
 
 # 5. Fix code block formatting
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-code-block-spacing.py "$OBSIDIAN_DIR"
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-code-block-langs.py "$OBSIDIAN_DIR"
+python3 "$SKILL_DIR/scripts/fix-code-block-spacing.py" "$OBSIDIAN_DIR"
+python3 "$SKILL_DIR/scripts/fix-code-block-langs.py" "$OBSIDIAN_DIR"
 
 # 6. Remove invisible characters (zero-width spaces)
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-zero-width-spaces.py "$OBSIDIAN_DIR"
+python3 "$SKILL_DIR/scripts/fix-zero-width-spaces.py" "$OBSIDIAN_DIR"
 
 # 7. Fix table formatting
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-quip-tables.py "$OBSIDIAN_DIR"
-python3 ~/.claude/my-claude-skills/skills/quip-to-obsidian/scripts/fix-table-separators.py "$OBSIDIAN_DIR"
+python3 "$SKILL_DIR/scripts/fix-quip-tables.py" "$OBSIDIAN_DIR"
+python3 "$SKILL_DIR/scripts/fix-table-separators.py" "$OBSIDIAN_DIR"
 find "$OBSIDIAN_DIR" -name "*.md" -exec sed -i '' 's/\\(/(/g; s/\\)/)/g; s/\\_/_/g' {} \;
 ```
 

@@ -1,8 +1,0 @@
-{
-  "name": "dev",
-  "description": "Development workflow tools - README generation, code review, and more",
-  "version": "1.0.0",
-  "author": {
-    "name": "cajias"
-  }
-}
