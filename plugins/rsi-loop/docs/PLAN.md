@@ -10,13 +10,17 @@ Primary sources:
 - Weco first-party report: <https://www.weco.ai/blog/first-evidence-of-recursive-self-improvement>
 - RSI ladder definition: <https://www.weco.ai/blog/4-levels-of-recursive-self-improvement>
 
-Status: **M1–M2 shipped; M3 code complete (runtime 10-step exit run pending); M4–M5 machinery
-built** (standalone inner agent, outer step, one completed run, three-family battery, `/rsi:run`,
-robust aggregation + outlier detection, `gen-human` baseline, `holdout-tasks/`, `/rsi:report`,
-`/rsi:ignite`). The runtime exit-criteria runs (M3's ≥10-step three-family run, the §5.2 chassis
-A/B, and the report/ignite campaigns) are the execution phase that follows this code landing. This document is the
-build spec; where the shipped code has diverged from it, the deviation is noted inline and in
-[CONTINUATION.md](CONTINUATION.md). A full as-built reconciliation is scheduled for M5.
+Status: **M1–M2 shipped; M3 code complete and its exit run live (run-002 at step 3 of the
+three-family battery, incumbent gen-005); M4 measured (Level 0 and Level 1 met — see
+`docs/experiments/m4-report.md`); M5 machinery built, ignition run pending.** The plugin is
+promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-000 floor
+0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
+gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
+mean Δ +0.279 (carried by instruction-ops 0.0 → 0.85), far-OOD Δ −0.016 (timeseries-forecast,
+reported separately). Remaining execution phase: M3 steps 4–10, the §5.2 chassis A/B, and the
+M5 `/rsi:ignite` Level-2 campaign — each a large real-compute run. This document is the build
+spec; where the shipped code has diverged from it, the deviation is noted inline and in
+[CONTINUATION.md](CONTINUATION.md).
 
 As-built notes (M3 additions):
 
