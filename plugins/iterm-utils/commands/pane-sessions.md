@@ -12,20 +12,35 @@ Map all active iTerm2 panes to their corresponding Claude Code sessions, showing
 ### Step 1: Get All Panes
 
 Use the `mcp__iterm2__iterm2_list_panes` tool to get all panes with their working directories.
+Each pane ID looks like `w<window>t<tab>p<pane>` (e.g. `w1t2p1`).
 
-### Step 2: Generate Table
+### Step 2: Look Up Each Session
 
-Parse the pane list and pipe to the table generator script. Format each pane as `pane_id|cwd`:
+For each pane, run the session-info script with that pane's working directory:
 
 ```bash
-echo "w1t1p1|$HOME/Projects
-w2t1p1|$HOME/Projects/foo
-w2t2p1|$HOME/Projects/bar" | ${CLAUDE_PLUGIN_ROOT}/scripts/generate-pane-table.sh
+${CLAUDE_PLUGIN_ROOT}/scripts/get-session-info.sh "<cwd>"
 ```
 
-### Step 3: Output
+It prints JSON with `session_id`, `slug`, `last_ts`, and `current_task`.
+A result of `{"session_id": null}` means no Claude session exists for that directory.
 
-Display the script output directly - it produces the complete formatted table.
+### Step 3: Render the Table
+
+Print a summary line with the window / tab / pane counts, then this table:
+
+```markdown
+| Win | Tab | Pane | Session | Project | Current Task | Status |
+| --- | --- | ---- | ------- | ------- | ------------ | ------ |
+```
+
+- **Win / Tab / Pane** — the numbers parsed out of the pane ID
+- **Session** — `session_id`, or `(none)` when null
+- **Project** — the basename of the pane's working directory
+- **Current Task** — `current_task`, or `-` when empty
+- **Status** — see the icons below
+
+Close with the resume hint: Resume with `claude -r <session-id>`.
 
 ## Status Icons
 
