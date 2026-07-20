@@ -1,0 +1,3 @@
+4322a8f Revert "experiment: decoupled independent-oracle probe selection"
+62d6601 experiment: decoupled independent-oracle probe selection
+d36b1aa baseline: gen-000 inner agent
