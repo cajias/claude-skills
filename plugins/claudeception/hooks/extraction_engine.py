@@ -545,7 +545,6 @@ def _finalize_extraction(
     session_data: dict, signal_summary: dict, hook_event: str, total_lines: int, skills_created: int
 ) -> int:
     """Finalize extraction: log the summary and handle state based on hook type."""
-
     log(
         f"Extraction complete [{hook_event}] session={session_data.get('session_id', 'unknown')} "
         f"score={signal_summary.get('breakthrough_score', 0):.2f} skills_created={skills_created} "

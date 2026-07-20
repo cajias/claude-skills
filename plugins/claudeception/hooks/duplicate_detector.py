@@ -66,8 +66,11 @@ def tokenize(text: str) -> list[str]:
     return re.findall(r"\b[a-z][a-z0-9-]*[a-z0-9]\b|\b[a-z]\b", text.lower())
 
 
+# SIM905 is suppressed below: the split-a-literal form is 6 lines against ~60 for
+# the list literal ruff suggests, and this is a module-level constant built once
+# at import, so the runtime split costs nothing measurable.
 STOPWORDS = frozenset(
-    "a an the is are was were be been being have has had do does did will would could should "
+    "a an the is are was were be been being have has had do does did will would could should "  # noqa: SIM905
     "may might must shall can need dare ought used to of in for on with at by from as into "
     "through during before after above below between under again further then once here there "
     "when where why how all each few more most other some such no nor not only own same so than "
