@@ -1,6 +1,6 @@
 {
   "name": "ai-writing",
-  "description": "AI-writing toolkit: detect, analyze, fix, and humanize AI-generated text. Includes lightweight detector/analyzer/fixer skills and a multi-agent 'humanizer' Workflow (analyze → revise → adversarial review → loop-until-clean) over a 15+ category pattern database.",
+  "description": "AI-writing toolkit: detect and humanize AI-generated text. Includes a lightweight detector skill and a multi-agent 'humanizer' Workflow (analyze → revise → adversarial review → loop-until-clean) over a 15+ category pattern database.",
   "version": "0.1.0",
   "author": { "name": "cajias" },
   "license": "MIT",
