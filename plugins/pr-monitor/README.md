@@ -400,8 +400,9 @@ rm ~/.claude/pr-monitor/claude_monitor_pr_*
 
 ### Custom State File Location
 
-State files live in `/tmp` because that is where `Stop.sh` looks. To move them,
-edit the `find /tmp -name "claude_monitor_pr_*"` line in the script.
+State files live in `~/.claude/pr-monitor/`, set by the `STATE_DIR` variable near
+the top of `Stop.sh`. To move them, edit that variable — the script creates the
+directory and scans it for `claude_monitor_pr_*`.
 
 ### Batch Monitoring Setup
 
@@ -465,8 +466,7 @@ pr-monitor/
 ├── skills/
 │   └── pr-monitor/
 │       └── SKILL.md          # Skill instructions
-├── README.md                 # This file
-└── USAGE-GUIDE.md            # Detailed usage guide and troubleshooting
+└── README.md                 # This file
 ```
 
 ### Testing
