@@ -1,0 +1,17 @@
+{
+  "name": "ci-build",
+  "description": "Hard-won gotchas from CI pipelines and build environments: GitHub Actions, Copilot CLI headless runs, cron block generation, Docker on Apple Silicon, and TypeScript monorepo scaffolding.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "ci",
+    "github-actions",
+    "build",
+    "docker",
+    "cron",
+    "monorepo",
+    "gotchas"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "cc-authoring",
+  "description": "Hard-won gotchas from authoring and distributing Claude Code plugins, skills, hooks, and Workflow scripts. Bundles APM packaging traps, plugin cache and marketplace path failures, hook main-vs-subagent detection, Workflow meta parsing breaks, and orchestration verification playbooks.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin-authoring",
+    "skill-authoring",
+    "workflows",
+    "hooks",
+    "apm",
+    "gotchas"
+  ]
+}
