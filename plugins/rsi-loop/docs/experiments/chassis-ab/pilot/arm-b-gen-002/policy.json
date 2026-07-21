@@ -1,0 +1,20 @@
+{
+  "algorithm": "aide2-adversarial-probe-selected-tree-search",
+  "num_drafts": 5,
+  "max_nodes": 9,
+  "model": "haiku",
+  "effort": "low",
+  "context_mode": "full-history",
+  "selection": "clean-public-search-then-shared-adversarial-probe-rerank",
+  "probe_top_k": 3,
+  "probe_public_margin": 0.02,
+  "probe_spread_eps": 0.15,
+  "probe_battery_size": 12,
+  "draft_directions": [
+    "simplest correct baseline — prioritize validity over quality",
+    "sorting/preprocessing-based heuristic (e.g. handle the hardest elements first)",
+    "incremental best-choice heuristic: at each step take the locally optimal placement/decision",
+    "deterministic local search: start from a greedy solution, then iteratively improve it",
+    "hybrid: run two different heuristics and keep the better result per instance (deterministic, fast)"
+  ]
+}

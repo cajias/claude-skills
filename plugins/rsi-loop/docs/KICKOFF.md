@@ -1,16 +1,27 @@
 # Kickoff prompt for implementing rsi-loop
 
-Paste the prompt below into a fresh Claude Code session on this repo to start the build.
+> **Status: build banked (M1–M4 done, M5 machinery built, §5.2 resolved → ship Arm B).**
+> M1–M4 exit criteria are met and committed; the native chassis (`/rsi:step` / `/rsi:run`) is
+> shipped and the `/rsi:ignite` machinery is built. **To CONTINUE, read `docs/CONTINUATION.md`**
+> (the resume snapshot) — the next live phase is **M3 steps 4–10** (extend run-002 from incumbent
+> gen-005), then the M5 `/rsi:ignite` ignition run. The prompt below is the original
+> **from-scratch contract**, retained for reference; its 5-step loop and Definition of done are
+> still the governing standard for any remaining work.
+
+Paste the prompt below into a fresh Claude Code session on this repo to start (or resume) the build.
 
 ---
 
 Implement the `rsi-loop` plugin end-to-end, following the spec in
-`plugins/rsi-loop/docs/PLAN.md` on branch `claude/rsi-skills-implementation-o8q1zv`. The plan
+`plugins/rsi-loop/docs/PLAN.md` on the designated branch (the work currently lives on
+`worktree-soft-crafting-bachman`). The plan
 is the contract: an AIDE²-style bi-level RSI loop — tree-search inner agent (draft/debug/
 improve), outer propose→evaluate→select loop on private held-out scores under a fixed token
 budget, three-layer reward-hacking defenses, and RSI-ladder measurement. Work milestone by
 milestone (M1 → M5) and do not start a milestone until the previous one's exit criteria are
-demonstrably met.
+demonstrably met. **Most of this is already banked** — M1–M4 are done, M5 machinery is built,
+and §5.2 is resolved (see the status banner above and `docs/CONTINUATION.md`); the remaining live
+work is **M3 steps 4–10** and the **M5 ignition run**. Apply the loop below to that remaining work.
 
 Run every milestone through this iterative loop until it converges:
 
@@ -32,7 +43,9 @@ Run every milestone through this iterative loop until it converges:
 
 Repeat 1–5 until a full iteration produces zero gaps and zero surviving adversarial findings —
 only then is the milestone done. Commit at each green iteration with conventional-commit
-messages and push to the designated branch.
+messages and push to the designated branch. (Most M1–M5 boxes are already checked; the live
+work left to run this loop against is **M3 steps 4–10** and the **M5 ignition run** — see
+`docs/CONTINUATION.md` for the exact resume steps and the current incumbent, gen-005.)
 
 Use these skills and tools while building:
 
@@ -45,23 +58,34 @@ Use these skills and tools while building:
   writing commands/hooks.
 - **verify** — exercise each change end-to-end before committing, not just unit tests.
 - **code-review / simplify** — run at every bar-raise step.
-- **uditgoenka/autoresearch** — install for M2 and run the §5.2 chassis A/B experiment exactly
-  as pre-registered (2×2 paired runs, same seeds/budget); write results to
-  `plugins/rsi-loop/docs/experiments/` and let the pre-registered decision rule pick the
-  outer-loop chassis. Do not skip the losing arm's write-up.
+- **uditgoenka/autoresearch** — **§5.2 chassis A/B: DONE / RESOLVED.** The pre-registered
+  experiment ran and the decision rule shipped **Arm B** (native `/rsi:step` / `/rsi:run`);
+  autoresearch is kept as a pattern reference, not the chassis. Evidence is under
+  `plugins/rsi-loop/docs/experiments/chassis-ab/`. No install or run needed to continue.
 - **deep-research pattern** — model the verifier agent's adversarial claim-checking on it.
 - **ralph-loop ergonomics** — `/rsi:run` takes max-iterations and a completion condition the
   same way.
 
-Definition of done — all of the following, verified in the final iteration's test run:
+Definition of done — all of the following, verified in the final iteration's test run.
+Checked boxes are already banked; the two unchecked items are the remaining live work:
 
-- M1–M5 exit criteria all met (standalone `/rsi:autoresearch` solves a task under budget;
-  ≥1 accepted generation on private score in a 3-step manual run; a 10-step unattended
-  `/rsi:run` with a sane ledger; `/rsi:report` produces ladder-level evidence against the
-  hand-tuned baseline and holdout tasks; `/rsi:ignite` runs the Level-2 swap test).
-- §5.2 experiment executed and recorded, winner shipped as `/rsi:step`.
-- All repo validation green; the plugin promoted into `.claude-plugin/marketplace.json`.
-- PLAN.md updated so it matches what was actually built, with every deviation explained.
+- [x] M1–M4 exit criteria met (standalone `/rsi:autoresearch` solves a task under budget;
+      ≥1 accepted generation on private score in a 3-step manual run; `/rsi:run` produces a sane
+      ledger — run-002 banked at step 3, gen-005 incumbent; `/rsi:report` produces ladder-level
+      evidence against the hand-tuned baseline and holdout tasks — Level 0 & 1 met).
+- [ ] **M3 steps 4–10** — extend the unattended `/rsi:run` from incumbent gen-005 to the full
+      10-step ladder (clearest lever: tabular-classification private is stuck at 0.7875 across
+      gen-000→005; try a data-perturbation probe mode — feature noise / row resampling / mild shift).
+- [ ] **M5 ignition run** — `/rsi:ignite` executes the Level-2 swap test (machinery built; run pending).
+- [x] §5.2 experiment executed and recorded, winner shipped as `/rsi:step` (**Arm B, native**).
+- [x] Plugin promoted into `.claude-plugin/marketplace.json`; repo validation green.
+- [ ] PLAN.md kept matching what was actually built as the remaining runs land, with every
+      deviation explained.
 
-Everything committed and pushed to `claude/rsi-skills-implementation-o8q1zv`. If a step is
-blocked on something only I can decide, ask; otherwise keep iterating until done.
+The inner eval is **Workflow-tool-only**, so the outer loop must be driven from a
+Workflow-tool-capable session — not a headless shell and not a subagent. Every ledger line must
+come from real Workflow compute or be clearly marked not-yet-run; do not fabricate any score.
+
+Everything committed and pushed to the designated branch (currently
+`worktree-soft-crafting-bachman`). If a step is blocked on something only I can decide, ask;
+otherwise keep iterating until done.

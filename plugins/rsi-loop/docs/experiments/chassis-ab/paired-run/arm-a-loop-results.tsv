@@ -1,0 +1,4 @@
+# metric_direction: higher_is_better
+iteration	timestamp	commit	metric	delta	guard	guard-metric	status	description
+0	baseline	d36b1aa	0.587646	0.0	pass	-	baseline	gen-000 initial incumbent
+1	iter-1	62d6601	0.570979	-0.016667	pass	-	discard	decoupled independent-oracle probe selection

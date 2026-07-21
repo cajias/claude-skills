@@ -1,0 +1,4 @@
+e47ffac Revert "experiment: saturation-aware improve-operator broadening"
+1c6c06f experiment: saturation-aware improve-operator broadening
+86abba3 experiment: decoupled independent-oracle probe as final selection stage
+f1a8ef2 baseline: gen-000 inner agent (scope for autoresearch)
