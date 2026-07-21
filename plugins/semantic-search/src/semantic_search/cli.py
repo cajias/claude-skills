@@ -27,6 +27,7 @@ def index_cmd() -> None:
 
     notes = load_notes(vault_path)
     table = get_table(db_path)
+    table.delete("true")  # clear existing rows so a full re-index replaces rather than appends
     count = add_documents(table, notes)
     print(f"Indexed {count} notes")
 
@@ -44,7 +45,14 @@ def search_cmd() -> None:
     limit = 5
     if "--limit" in args:
         idx = args.index("--limit")
-        limit = int(args[idx + 1])
+        if idx + 1 >= len(args):
+            print("Usage: ss-search <query> [--limit N]", file=sys.stderr)
+            sys.exit(1)
+        try:
+            limit = int(args[idx + 1])
+        except ValueError:
+            print("Usage: ss-search <query> [--limit N]", file=sys.stderr)
+            sys.exit(1)
 
     table = get_table(db_path)
     results = search(table, query, limit=limit)

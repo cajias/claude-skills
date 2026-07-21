@@ -25,15 +25,27 @@ def get_relative_path(from_file: Path, to_dir: Path) -> str:
 
 
 def update_blob_references(content: str, attachments_rel_path: str) -> str:
-    """Replace /blob/THREAD/BLOB references with local attachment paths."""
-    # Pattern: /blob/THREAD_ID/BLOB_ID
-    blob_pattern = r'/blob/([A-Za-z0-9]+)/([A-Za-z0-9_-]+)'
+    """Replace Quip /blob/THREAD/BLOB references with local attachment paths.
+
+    Only Quip's own blob image refs are rewritten. Links into code hosts such as
+    github.com/.../blob/main/file or GitLab's /-/blob/ form are left untouched.
+    """
+    # Capture the URL/path text immediately before /blob/ so we can tell a bare
+    # Quip ref (/blob/...) apart from a source-host URL that happens to contain /blob/.
+    # Thread and blob use named groups so positional indices can't drift.
+    blob_pattern = r'(?P<prefix>\S*?)/blob/(?P<thread>[A-Za-z0-9]+)/(?P<blob>[A-Za-z0-9_-]+)'
+    code_hosts = ('github', 'gitlab', 'bitbucket')
 
     def replace_blob(match):
-        thread_id = match.group(1)
-        blob_id = match.group(2)
+        prefix = match.group('prefix')
+        # Leave source-host URLs untouched: named code hosts, or GitLab's /-/blob/
+        # form (the trailing '/' belongs to /blob/, so the prefix ends with '/-').
+        if prefix.endswith('/-') or any(host in prefix.lower() for host in code_hosts):
+            return match.group(0)
+        thread_id = match.group('thread')
+        blob_id = match.group('blob')
         # Assume PNG extension (most common), actual extension determined at download time
-        return f'{attachments_rel_path}/{thread_id}_{blob_id}.png'
+        return f'{prefix}{attachments_rel_path}/{thread_id}_{blob_id}.png'
 
     return re.sub(blob_pattern, replace_blob, content)
 

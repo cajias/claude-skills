@@ -60,28 +60,30 @@ def build_report(steps, baseline_human, holdout):
     floor = gen000.get("private_aggregate")
 
     best_so_far = []
-    cur = floor
+    cur = floor if isinstance(floor, (int, float)) else None
     for s in by_step:
         if s.get("accepted") and isinstance(s.get("private_aggregate"), (int, float)):
-            cur = max(cur, s["private_aggregate"])
-        best_so_far.append({"step": s.get("step"), "incumbent_private_aggregate": round(cur, 6),
+            cur = s["private_aggregate"] if cur is None else max(cur, s["private_aggregate"])
+        incumbent = round(cur, 6) if isinstance(cur, (int, float)) else None
+        best_so_far.append({"step": s.get("step"), "incumbent_private_aggregate": incumbent,
                             "generation": s.get("generation"), "accepted": bool(s.get("accepted"))})
     best_value = best_so_far[-1]["incumbent_private_aggregate"]
 
-    xs = [p["step"] for p in best_so_far]
-    ys = [p["incumbent_private_aggregate"] for p in best_so_far]
+    xs = [p["step"] for p in best_so_far if p["incumbent_private_aggregate"] is not None]
+    ys = [p["incumbent_private_aggregate"] for p in best_so_far if p["incumbent_private_aggregate"] is not None]
     slope = linfit_slope(xs, ys)
     # Distinct accepted improvements that strictly raised the incumbent: this is
     # what separates a single lucky jump (1) from a sustained multi-step trend
     # (>=2). The slope alone cannot, because the best-so-far series is monotone.
     n_improvements = 0
-    prev = floor
+    prev = floor if isinstance(floor, (int, float)) else None
     for s in by_step:
         if s.get("step") == 0:
             continue
-        if s.get("accepted") and isinstance(s.get("private_aggregate"), (int, float)) and s["private_aggregate"] > prev:
-            n_improvements += 1
-            prev = s["private_aggregate"]
+        if s.get("accepted") and isinstance(s.get("private_aggregate"), (int, float)):
+            if prev is None or s["private_aggregate"] > prev:
+                n_improvements += 1
+                prev = s["private_aggregate"]
 
     proposals = [s for s in by_step if s.get("step", 0) > 0]  # exclude step-0 baseline
     n_prop = len(proposals)
@@ -112,8 +114,9 @@ def build_report(steps, baseline_human, holdout):
         "accepted": n_acc,
         "acceptance_rate": round(n_acc / n_prop, 4) if n_prop else None,
         "gen000_floor": round(floor, 6) if isinstance(floor, (int, float)) else None,
-        "best_private_aggregate": round(best_value, 6),
-        "improvement_over_gen000": round(best_value - floor, 6) if isinstance(floor, (int, float)) else None,
+        "best_private_aggregate": round(best_value, 6) if isinstance(best_value, (int, float)) else None,
+        "improvement_over_gen000": round(best_value - floor, 6)
+        if isinstance(floor, (int, float)) and isinstance(best_value, (int, float)) else None,
         "best_so_far_growth_rate_per_step": round(slope, 6),
         "n_accepted_improvements": n_improvements,
         "sustained": n_improvements >= 2,
@@ -138,16 +141,18 @@ def build_report(steps, baseline_human, holdout):
     ladder = {
         "level_0_delegation": {
             "criterion": "the loop improves the inner agent at all (best > gen-000 floor)",
-            "met": bool(isinstance(floor, (int, float)) and best_value > floor),
+            "met": None if best_value is None
+            else bool(isinstance(floor, (int, float)) and best_value > floor),
         }
     }
     if baseline_human is not None:
         report["baseline_human"] = round(baseline_human, 6)
-        report["improvement_over_human"] = round(best_value - baseline_human, 6)
+        report["improvement_over_human"] = round(best_value - baseline_human, 6) \
+            if isinstance(best_value, (int, float)) else None
         ladder["level_1_net_positive"] = {
             "criterion": "best evolved generation beats the fair hand-tuned human baseline "
                          "at equal per-eval budget",
-            "met": bool(best_value > baseline_human),
+            "met": bool(best_value > baseline_human) if isinstance(best_value, (int, float)) else None,
             "caveat": "a single run on a miniature battery is weak evidence; the paper's "
                       "claim rests on a sustained multi-step trend across families",
         }

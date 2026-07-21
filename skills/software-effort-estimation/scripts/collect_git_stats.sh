@@ -9,8 +9,8 @@ OUTPUT_FILE="${2:-git_stats.txt}"
 
 cd "$REPO_PATH"
 
-# Verify git repository
-if [ ! -d ".git" ]; then
+# Verify git repository (handles worktrees and submodules where .git is a file)
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "Error: Not a git repository: $REPO_PATH"
   exit 1
 fi

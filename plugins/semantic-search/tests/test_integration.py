@@ -89,6 +89,25 @@ def test_index_then_status(vault_and_db):
     assert "4 notes indexed" in r.stdout
 
 
+def test_reindex_is_idempotent(vault_and_db):
+    _, _, env = vault_and_db
+
+    # First index
+    r = _run_cmd(["uv", "run", "ss-index"], env)
+    assert r.returncode == 0
+    assert "Indexed 4 notes" in r.stdout
+
+    # Second index must replace, not append
+    r = _run_cmd(["uv", "run", "ss-index"], env)
+    assert r.returncode == 0
+    assert "Indexed 4 notes" in r.stdout
+
+    # Status still reports 4, not 8
+    r = _run_cmd(["uv", "run", "ss-status"], env)
+    assert r.returncode == 0
+    assert "4 notes indexed" in r.stdout
+
+
 def test_search_with_limit(vault_and_db):
     _, _, env = vault_and_db
 

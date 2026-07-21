@@ -74,11 +74,11 @@ def fix_content(content: str) -> str:
     fixed_lines = []
 
     for line in lines:
-        fixed = fix_table_line(line)
-        # Skip empty lines that were table artifacts
-        if fixed == '' and is_empty_table_line(line.strip() if line.strip() else '|'):
+        # An empty table row (just pipes, e.g. ||||) should be removed entirely,
+        # but genuine blank lines (paragraph separators) must be preserved.
+        if is_table_line(line) and is_empty_table_line(line):
             continue
-        fixed_lines.append(fixed)
+        fixed_lines.append(fix_table_line(line))
 
     return '\n'.join(fixed_lines)
 

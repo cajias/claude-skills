@@ -50,7 +50,10 @@ with open(session_file, 'r') as f:
             msg = data.get('message', {})
             role = msg.get('role', '')
 
-            for c in msg.get('content', []):
+            content = msg.get('content', [])
+            if isinstance(content, str):
+                content = [{'type': 'text', 'text': content}]
+            for c in content:
                 if not isinstance(c, dict):
                     continue
 
