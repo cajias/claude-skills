@@ -2,7 +2,7 @@
 
 Snapshot for resuming the KICKOFF.md build in a fresh session. Everything needed lives in
 this repo; the scratchpad run directory is ephemeral and fully reconstructable from
-`docs/experiments/run-001/`.
+`docs/experiments/run-002/` (the current run; `run-001/` mirrors the earlier M2 campaign).
 
 ## Where the build stands (2026-07-20 — banked)
 
@@ -20,14 +20,18 @@ this repo; the scratchpad run directory is ephemeral and fully reconstructable f
   far-OOD Δ −0.016 (reported separately). Real `/rsi:report` output committed.
 - **M5 — MACHINERY BUILT** (`commands/rsi-ignite.md`): `/rsi:ignite` Level-2 swap test. The
   real ignition campaign is **not yet run** (see "How to continue").
+- **§5.2 chassis A/B — RESOLVED (2026-07-20)** (`docs/experiments/chassis-ab/`): ship **Arm B**
+  (native `/rsi:step` / `/rsi:run`); keep autoresearch as pattern reference. Decided on the
+  pre-registered structural metrics via a paired run + the Arm A chassis demo (not the full
+  2×2×10). See "§5.2 chassis decision" below.
 - Tests all green in CI (`test-rsi-loop`): deny-hook, scorer, integrity, aggregate, report.
 
 ## How to continue (from the banked state)
 
-The scientific core is proven and committed (M1–M4). Three optional real-compute runs remain,
-each an independent multi-hour Workflow job; none depends on the others. All are driven from the
-committed run-002 evidence — the scratchpad run dir is ephemeral and reconstructable from
-`docs/experiments/run-002/` (ledger + `gen-000/003/004/005` generation dirs + winning-node
+The scientific core is proven and committed (M1–M4), and §5.2 is decided. Two optional real-compute
+runs remain, each an independent multi-hour Workflow job; neither depends on the other. Both are
+driven from the committed run-002 evidence — the scratchpad run dir is ephemeral and reconstructable
+from `docs/experiments/run-002/` (ledger + `gen-000/003/004/005` generation dirs + winning-node
 snapshots). Rebuild it, then:
 
 1. **M3 steps 4–10 (extend the ladder).** Continue run-002 from step 4 with incumbent **gen-005**.
@@ -36,26 +40,42 @@ snapshots). Rebuild it, then:
    generates paraphrase perturbations that cannot discriminate ML-model candidates on a 5-fold-CV
    task; a data-perturbation probe mode (feature noise / row resampling / mild shift) is the
    hypothesis to try. Drive with `/rsi:run <run-dir> --max-steps 10`.
-2. **M4 Level 2 — `/rsi:ignite <run-dir>`.** Paired A/B of two full 8-step campaigns (control vs a
+2. **M5 — `/rsi:ignite <run-dir>`.** Paired A/B of two full 8-step campaigns (control vs a
    proposer briefed with gen-005's discovered strategy), ~48 evals. The paper found a Level-2
    _rejection_ (faster convergence, same ceiling) and the command is instrumented to measure that
    honestly, not to pass — expect to document a known-negative.
-3. **§5.2 chassis A/B (`docs/PLAN.md` §5.2).** ~40 evals choosing the outer-loop driver: Arm A
-   `uditgoenka/autoresearch` (`npx skills add uditgoenka/autoresearch`) vs Arm B native `/rsi:run`.
-   An engineering decision, not a new scientific claim; apply the pre-registered decision rule.
+
+**§5.2 chassis A/B — DONE** (was item 3). Ship **Arm B** (native `/rsi:step` / `/rsi:run`); keep
+autoresearch as pattern reference. Full evidence in `docs/experiments/chassis-ab/`.
 
 Do NOT fabricate any eval score — every ledger line must come from real Workflow compute or be
 clearly marked not-yet-run. Operational gotchas for whoever runs these are in the sections below.
 
-## §5.2 chassis decision (RESOLVED by the user) — FULL pre-registered scale
+## §5.2 chassis decision — RESOLVED (2026-07-20): ship Arm B
 
-The user chose **full pre-registered scale**: 2 arms (Arm A = `uditgoenka/autoresearch` plugin
-driving our harness; Arm B = native `/rsi:run`) × 2 reps × 10 steps ≈ 40 evaluations ≈ 20M+
-tokens, ~20h. Arm A install: `npx skills add uditgoenka/autoresearch`; its single-metric
-contract maps onto `rsi-aggregate.py`'s `private_aggregate`. This is the pending big-compute
-item. Write both arms up under `docs/experiments/`; the pre-registered decision rule (PLAN.md
-§5.2) picks the `/rsi:step` chassis. Do NOT fabricate any eval score — every ledger line must
-come from real Workflow compute or be clearly marked not-yet-run.
+**Verdict: ship Arm B (native `/rsi:step` / `/rsi:run`); keep autoresearch as pattern reference.**
+Evidence committed under `docs/experiments/chassis-ab/` (PRE-REGISTRATION.md, PILOT-RESULTS.md,
+ARM-A-CHASSIS-DEMO.md, PAIRED-RUN-FINDINGS.md + `pilot/`, `arm-a-chassis-demo/`, `paired-run/`).
+
+Why the decision holds without the full campaign: the chassis is **downstream of scoring**, so
+both chassis make the **identical** accept/reject decision on the same eval — the primary metric
+(best `private_aggregate`) is **chassis-invariant by construction**. The decision therefore turns
+on the pre-registered **structural** metrics: fidelity (metric 4) favors native's single atomic
+ledger-append over autoresearch's git commit/revert (which had a caught exit-code bug); friction
+(metric 5) is decisive — Arm A requires the `metric.txt` shim (the inner eval is Workflow-tool-only,
+so autoresearch's shell `Verify:` can't spawn it — a Workflow-capable agent must stay in the loop),
+a git-repo scope, and `AR_DISABLE_*` hook overrides, while native needs none. This matches the
+pre-registered a priori expectation and the paper's §5.1/§5.2 finding.
+
+Empirically confirmed on real compute: a paired fresh run drove ONE eval result (0.570979 <
+baseline 0.587646) to the identical REJECT in both chassis (native score-gate reject; Arm A git
+revert `4322a8f`), and the earlier keep-path demo showed the accept branch (iter-1 keep +0.029166).
+
+The DECISION was reached via that **paired run** (which isolates the chassis) plus the Arm A chassis
+demo. The full 2×2×10 (2 arms × 2 reps × 10 steps ≈ 40 evals, ~20M tokens, ~20h) was **NOT needed**
+for the chassis decision — it would only add RSI-dynamics data (repair stabilization, score/token
+slope, harness overhead at scale) — so it is now **OPTIONAL, not pending**. Do NOT fabricate any
+eval score — every ledger line must come from real Workflow compute or be clearly marked not-yet-run.
 
 ## RUN STATUS (2026-07-19): run-002 at step 3, incumbent gen-005
 
@@ -78,29 +98,32 @@ Spend note: the LLM-adversarial verifier subagent remains unavailable (monthly s
 steps 2–3 were gated by the mechanical battery (reproduce vs pristine scorer, git integrity,
 escape-residue, hard-coding audit, too-good outlier) — all clean. Inner-agent Workflow compute
 DID run this session (3 family evals × ~0.6M tokens each), so the earlier hard block has eased;
-budget for the remaining big-compute items (chassis A/B, steps 4–10) is the live constraint.
+budget for the remaining big-compute items (M3 steps 4–10, M5 `/rsi:ignite`) is the live constraint.
 
 Resume plan: see the "How to continue" section above. In short — continue run-002 from step 4
 (incumbent **gen-005**; the `probe_topk` follow-up is RESOLVED; tabular private is the stuck
-headroom at 0.7875), and/or run M5 `/rsi:ignite` and the §5.2 chassis A/B. M4 `/rsi:report` is
-already done (`docs/experiments/m4-report.md`).
+headroom at 0.7875), and/or run M5 `/rsi:ignite`. §5.2 chassis A/B is DONE (ship Arm B —
+`docs/experiments/chassis-ab/`); M4 `/rsi:report` is already done (`docs/experiments/m4-report.md`).
 
 ## Pending execution phase (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
 
-Order: (1) §5.2 chassis A/B (40 evals), (2) M3 10-step exit run on the 3-family battery,
-(3) M4 `/rsi:report` (gen-human battery + best-vs-gen000 holdout scoring), (4) M5 `/rsi:ignite`.
-Pace multi-hour runs via `send_later`/ScheduleWakeup re-invoking `/rsi:run` on the same run dir
-(resume-aware from ledger + best.txt). Final: promote rsi-loop in `.claude-plugin/marketplace.json`
-(currently hidden) and do the full as-built PLAN.md reconciliation.
+§5.2 chassis A/B is **DONE** (ship Arm B — `docs/experiments/chassis-ab/`) and M4 `/rsi:report`
+is **DONE** (`docs/experiments/m4-report.md`). Remaining order: (1) **M3 steps 4–10** (the 10-step
+unattended exit run on the 3-family battery), then (2) **M5 `/rsi:ignite`**. Pace multi-hour runs
+via `send_later`/ScheduleWakeup re-invoking `/rsi:run` on the same run dir (resume-aware from the
+ledger plus best.txt). Final: promote rsi-loop in `.claude-plugin/marketplace.json` (currently
+hidden) and do the full as-built PLAN.md reconciliation.
 
 ## How to resume a live run
 
-1. `RUN=<scratchpad>/rsi-runs/run-001 && mkdir -p $RUN/generations $RUN/eval`
-2. Copy `docs/experiments/run-001/{gen-001,gen-002,gen-003}` into `$RUN/generations/`,
+Target: **run-002, incumbent gen-005, next step 4.**
+
+1. `RUN=<scratchpad>/rsi-runs/run-002 && mkdir -p $RUN/generations $RUN/eval`
+2. Copy `docs/experiments/run-002/{gen-003,gen-004,gen-005}` into `$RUN/generations/`,
    plus `plugins/rsi-loop/baseline/gen-000` as `$RUN/generations/gen-000`.
-3. Copy `docs/experiments/run-001/ledger.jsonl` to `$RUN/ledger.jsonl`;
-   `run-state.json` has the incumbent (gen-002) and next step number (4) —
-   write `$RUN/best.txt` and `$RUN/tasks.txt` from it.
+3. Copy `docs/experiments/run-002/ledger.jsonl` to `$RUN/ledger.jsonl`; write
+   `$RUN/best.txt` = `generations/gen-005` (the incumbent, next step 4) and
+   `$RUN/tasks.txt` = the 3-family battery (bin-packing + tabular-classification + instruction-routing).
 4. Outer-step procedure: `commands/rsi-step.md` (proposer prompt pattern used for steps 1-3
    is reflected in `agents/proposer.md`; per-eval budget: haiku, 9 nodes, seed 42).
 

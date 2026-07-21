@@ -17,8 +17,10 @@ promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-
 0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
 gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
 mean Δ +0.279 (carried by instruction-ops 0.0 → 0.85), far-OOD Δ −0.016 (timeseries-forecast,
-reported separately). Remaining execution phase: M3 steps 4–10, the §5.2 chassis A/B, and the
-M5 `/rsi:ignite` Level-2 campaign — each a large real-compute run. This document is the build
+reported separately). The §5.2 chassis A/B is **resolved (2026-07-20): ship Arm B (native
+`/rsi:step` / `/rsi:run`); autoresearch stays as pattern reference** (evidence in
+`docs/experiments/chassis-ab/`). Remaining execution phase: M3 steps 4–10 and the M5
+`/rsi:ignite` Level-2 campaign — each a large real-compute run. This document is the build
 spec; where the shipped code has diverged from it, the deviation is noted inline and in
 [CONTINUATION.md](CONTINUATION.md).
 
@@ -31,9 +33,9 @@ As-built notes (M3 additions):
   mechanism, consistent with the integrity model, not a generation-side trick the loop must
   discover. Robust cross-seed aggregation (median of seeds) in the same script addresses the
   tiny-battery noise risk (§7).
-- `/rsi:run` is the native-Workflow chassis (Arm B). The §5.2 chassis A/B decides whether the
-  autoresearch plugin (Arm A) supersedes it; until that experiment's decision rule fires, the
-  native driver stands.
+- `/rsi:run` is the native-Workflow chassis (Arm B). The §5.2 chassis A/B is resolved
+  (2026-07-20) in favor of Arm B — the native driver stands, and autoresearch (Arm A) stays as
+  pattern reference (evidence in `docs/experiments/chassis-ab/`).
 
 ---
 
@@ -331,6 +333,22 @@ loop is the experiment's control surface and must be exactly the paper's protoco
 ship Arm B and keep autoresearch as pattern reference. Either way the losing arm's run stays
 in the repo under `docs/experiments/` as evidence.
 
+**Result (2026-07-20): ship Arm B (native `/rsi:step` / `/rsi:run`); keep autoresearch as
+pattern reference.** Applying the decision rule to the banked evidence: the primary metric (1)
+is a **tie by construction** — the chassis is downstream of scoring, so both chassis make the
+identical accept/reject decision on the same eval. The call therefore turns on the
+pre-registered structural metrics. Fidelity (4) favors native's single atomic `ledger.jsonl`
+append over autoresearch's git commit/revert (sharper failure edges). Friction (5) is decisive
+against Arm A: it requires the `metric.txt` shim (the inner eval is Workflow-tool-only, so
+autoresearch's shell `Verify:` cannot spawn it — a Workflow-capable agent must stay in the
+loop), a git-repo scope, and `AR_DISABLE_*` hook overrides, while native needs none. This
+matches the pre-registered a priori expectation and the paper's §5.1/§5.2 finding. Confirmed on
+real compute: a paired fresh run drove one eval (`0.570979 < 0.587646` incumbent) to the
+identical REJECT in both chassis, plus a keep-path demo (iter-1 `+0.029166`). The full 2×2×10
+was **not** needed for the chassis decision — the structural metrics settle it — and remains
+optional RSI-dynamics evidence. Full evidence: `docs/experiments/chassis-ab/`
+(PRE-REGISTRATION.md, PILOT-RESULTS.md, ARM-A-CHASSIS-DEMO.md, PAIRED-RUN-FINDINGS.md).
+
 **Naming collision**: our standalone inner-agent skill is also named `autoresearch`
 (namespaced `rsi-loop:autoresearch` vs. their top-level `autoresearch`). Claude Code
 disambiguates by plugin prefix, but if adoption lands in M2 we should rename ours (e.g.
@@ -345,8 +363,10 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   `/rsi:autoresearch` under a token cap; private score computed outside the inner context.
 - **M2 — outer step**: proposer + selection + `ledger.jsonl`; `/rsi:init`, `/rsi:step`.
   Includes the §5.2 chassis A/B experiment (outer loop on `uditgoenka/autoresearch` vs. native
-  Workflow script — 2×2 paired runs, pre-registered metrics and decision rule); results land in
-  `docs/experiments/` and the winner becomes `/rsi:step`. Exit: 3
+  Workflow script — pre-registered metrics and decision rule) — **DONE (2026-07-20)**: results
+  landed in `docs/experiments/chassis-ab/`, winner = **Arm B (native)**, shipped as `/rsi:step`;
+  the chassis decision turned on the structural metrics (4 fidelity, 5 friction), so the full
+  2×2×10 was not required and remains optional. Exit: 3
   manual outer steps produce ≥1 accepted generation on private score.
 - **M3 — full protocol** _(code complete; exit run demonstrated, run-002 banked at step 3)_: all
   3 task families (bin-packing, tabular-classification, instruction-routing), verifier + <50% hack
