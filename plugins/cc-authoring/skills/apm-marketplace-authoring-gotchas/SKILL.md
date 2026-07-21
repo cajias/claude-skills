@@ -4,11 +4,12 @@ description: |
   Eight APM-marketplace-authoring gotchas discovered during real
   migrations from hand-authored .claude-plugin/marketplace.json to
   APM-managed and from CC-native plugin authoring.
-  Use when: (1) running `apm pack`, `apm marketplace check`, or `apm pack
-  --dry-run` in a repo with an `apm.yml`; (2) wiring CI for an APM
-  marketplace; (3) the CI staleness check (`apm pack && git diff
+  Use when: (1) running APM's packaging step (with or without
+  `--dry-run`) or its marketplace-check command in a repo with an
+  `apm.yml`; (2) wiring CI for an APM
+  marketplace; (3) the CI staleness check (repack, then `git diff
   --quiet`) fails despite a clean local; (4) prettier reformats
-  `marketplace.json` after `apm pack` writes it; (5) APM exit code 1 on
+  `marketplace.json` after APM's packer writes it; (5) APM exit code 1 on
   local-path-only marketplaces; (6) confused by `packages:` in apm.yml
   vs `plugins:` in marketplace.json; (7) commitlint rejects a commit
   with `footer-leading-blank` despite no apparent footer; (8) `apm
@@ -32,7 +33,7 @@ them up front collapses the discovery cycle.
 
 ## Problem
 
-You set up `apm.yml` with a `marketplace:` block, run `apm pack`,
+You set up `apm.yml` with a `marketplace:` block, run APM's packer,
 commit the regenerated `.claude-plugin/marketplace.json`, push, and
 CI fails. You fix the obvious thing, push again, CI fails again with
 a different error. After ~6 such loops you find yourself rewriting
@@ -42,7 +43,7 @@ git history. The fix sequence below short-circuits the loop.
 
 Any of these symptoms point here:
 
-- `apm marketplace check` (with or without `--offline`) exits 1 even
+- APM's marketplace-check command (with or without `--offline`) exits 1 even
   though every entry shows `[x]` in the table.
 - CI's "verify marketplace.json is up-to-date" step fails with a diff
   showing `"source": "./plugins/foo"` vs `"source": "./foo"`.
@@ -60,8 +61,8 @@ Any of these symptoms point here:
 `curl -sSL https://aka.ms/apm-unix | sh` (the canonical install line)
 fetches the **latest** release. Local installs are easy to leave
 behind. Version drift between local and CI silently changes the
-output of `apm pack`, which breaks any staleness check
-(`apm pack && git diff --quiet`).
+output of APM's packer, which breaks any staleness check
+(repack, then `git diff --quiet`).
 
 The installer accepts a version tag:
 
@@ -78,47 +79,47 @@ To install to a non-sudo location locally:
 curl -sSL https://aka.ms/apm-unix | APM_INSTALL_DIR="$HOME/.local/bin" bash -s -- @v0.12.1
 ```
 
-### 2. `apm pack --dry-run` is the schema-validation command (not `apm marketplace check`)
+### 2. A dry-run pack is the schema-validation command (not the marketplace-check command)
 
-`apm marketplace check` runs `git ls-remote` against every package by
+APM's marketplace-check command runs `git ls-remote` against every package by
 default. For a marketplace where every entry is `source: ./local-path`,
 ls-remote fails with exit 128 ("not a remote"), so the command exits
 1 even though the manifest is valid.
 
 `--offline` is supposed to fix this but actually flips the failure
 mode — every entry now gets "No cached refs (offline)" as a Detail
-and the command still exits 1. (Running `apm pack` first populates
+and the command still exits 1. (Running the packer first populates
 some cache and *temporarily* flips it to exit 0, but this is racy and
 unreliable.)
 
-Use `apm pack --dry-run` for schema validation. It validates the
+Use a dry-run pack (`--dry-run`) for schema validation. It validates the
 `marketplace:` block, refuses on schema errors, exits 0 on success,
 and writes nothing.
 
 ```make
 check: ## validate apm.yml schema
- apm pack --dry-run
+ # (run APM's packaging step with --dry-run here)
 ```
 
 For CI:
 
 ```yaml
 - name: Validate apm.yml schema
-  run: apm pack --dry-run
+  run: apm-pack --dry-run   # APM packaging step, dry-run
 
 - name: Verify marketplace.json is up-to-date
   run: |
-    apm pack
+    apm-pack
     if ! git diff --quiet .claude-plugin/marketplace.json; then
-      echo "::error::marketplace.json is stale. Run 'apm pack' locally."
+      echo "::error::marketplace.json is stale. Run the APM packaging step locally."
       git --no-pager diff .claude-plugin/marketplace.json
       exit 1
     fi
 ```
 
-### 3. `apm pack` emits inline JSON; prettier reformats to multi-line
+### 3. APM's packer emits inline JSON; prettier reformats to multi-line
 
-`apm pack` writes `"tags": ["a", "b"]` (inline). Husky/lint-staged
+APM's packer writes `"tags": ["a", "b"]` (inline). Husky/lint-staged
 running prettier on commit reformats to:
 
 ```json
@@ -259,17 +260,17 @@ It isn't broken. It's working as designed for the wrong input.
 
 **Detection signal:** `find plugins/<name> -name 'agent.yaml' -o -name 'tool.yaml' | head`.
 If empty → CC-native authoring; `apm compile` is irrelevant for
-your build path. Rely on `apm pack` alone to package the
+your build path. Rely on APM's packer alone to package the
 marketplace, and don't run `apm compile -t claude` in CI.
 
 **Two valid authoring paths, don't mix:**
 
 | Path | Author in | Build with | Notes |
 |---|---|---|---|
-| **APM-native** | `agent.yaml`, `tool.yaml`, etc. under plugin source | `apm compile -t claude` (translate) → `apm pack` (package) | Required if one source must compile to multiple targets (Claude, Cursor, Copilot, …). |
-| **CC-native** | `SKILL.md` + `plugin.json` directly in CC layout | `apm pack` only — `compile` is a no-op | Faster authoring, but Claude-only. |
+| **APM-native** | `agent.yaml`, `tool.yaml`, etc. under plugin source | `apm compile -t claude` (translate) → APM packer (package) | Required if one source must compile to multiple targets (Claude, Cursor, Copilot, …). |
+| **CC-native** | `SKILL.md` + `plugin.json` directly in CC layout | APM packer only — `compile` is a no-op | Faster authoring, but Claude-only. |
 
-**The trap:** if you set up CI with `apm compile -t claude && apm pack`
+**The trap:** if you set up CI with `apm compile -t claude` then the packer
 expecting the first command to be the build step, the build will
 look successful (exit 0) but your packaged marketplace will be
 empty or stale, depending on what's in `plugins/`. Symptom is
@@ -311,7 +312,7 @@ or terminal output
 ````
 
 But the bare ```` ``` ```` (no language tag) trips MD040. The
-`apm pack` step ran fine; the staleness check would have passed; the
+APM packaging step ran fine; the staleness check would have passed; the
 plugin tests pass. The only thing blocking the commit is markdownlint
 on the SKILL.md itself.
 
@@ -355,8 +356,8 @@ After applying the five fixes:
 
 ```bash
 # locally
-apm pack --dry-run                                       # exit 0
-apm pack && git diff --quiet .claude-plugin/marketplace.json  # exit 0
+apm-pack --dry-run                                       # exit 0
+apm-pack && git diff --quiet .claude-plugin/marketplace.json  # exit 0
 npm run format:check                                     # exit 0
 
 # in CI: lint, apm-marketplace, commitlint, plugin tests all pass
@@ -382,7 +383,7 @@ honoring `.prettierignore`. Re-check the `--ignore-path` flags.
 
 ## References
 
-- microsoft/apm marketplace-authoring docs:
+- microsoft/apm — marketplace-authoring docs:
   <https://microsoft.github.io/apm/guides/marketplace-authoring/>
 - APM CLI installer source (accepts `@vX.Y.Z`):
   <https://aka.ms/apm-unix>

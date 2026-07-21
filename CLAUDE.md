@@ -4,7 +4,9 @@ Claude Code plugin/skill marketplace. Editing here triggers automation — read 
 
 ## Commands
 
-- `make validate` — plugin-structure + marketplace-sync checks (also runs at husky pre-commit; NOT in CI).
+- `make validate` — structural checks: plugin structure, marketplace sync (plugin.json `version` must match
+  marketplace.json), hook schema, agent frontmatter (`name`/`description`/`model`), and skill completeness
+  (`SKILL.md` + `README.md`). Runs at husky pre-commit; NOT in CI.
 - `make test-skills` — per-plugin structural eval via `scripts/test-skills.sh`; runs in neither CI nor
   pre-commit. One plugin: `bash scripts/test-skills.sh <name>`.
 - `make install` — symlink every `plugins/*/` into `~/.claude/plugins/` (live symlinks; edits apply without reinstall).
