@@ -63,7 +63,7 @@ while IFS= read -r blob_path; do
     # Skip if extraction failed
     if [[ -z "$thread_id" ]] || [[ -z "$blob_id" ]]; then
         echo "[SKIP] Invalid blob path: $blob_path"
-        ((failed++))
+        failed=$((failed + 1))
         continue
     fi
 
@@ -88,11 +88,11 @@ while IFS= read -r blob_path; do
             *) ext="bin" ;;
         esac
         mv "$OUTPUT_DIR/${filename}.tmp" "$OUTPUT_DIR/${filename}.${ext}"
-        ((downloaded++))
+        downloaded=$((downloaded + 1))
         echo "[$downloaded/$total] Downloaded: ${filename}.${ext}"
     else
         rm -f "$OUTPUT_DIR/${filename}.tmp"
-        ((failed++))
+        failed=$((failed + 1))
         echo "[FAILED] $blob_path (HTTP $http_code)"
     fi
 done < "$BLOB_LIST"

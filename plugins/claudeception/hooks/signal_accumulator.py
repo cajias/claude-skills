@@ -39,7 +39,7 @@ def process_tool_use(data: dict) -> None:
     """Process a PostToolUse event and record relevant signals."""
     tool_name = data.get("tool_name", "")
     tool_input = data.get("tool_input", {})
-    tool_output = data.get("tool_output", {})
+    tool_response = data.get("tool_response", data.get("tool_output", {}))
     session_id = data.get("session_id", "")
 
     log(f"Processing tool use: {tool_name}")
@@ -63,9 +63,15 @@ def process_tool_use(data: dict) -> None:
                 init_session(session_id, {"source": "signal_accumulator"})
 
     # Check for errors
-    exit_code = tool_output.get("exit_code")
-    error = tool_output.get("error")
-    stderr = tool_output.get("stderr", "")
+    if isinstance(tool_response, dict):
+        exit_code = tool_response.get("exit_code")
+        error = tool_response.get("error")
+        stderr = tool_response.get("stderr", "")
+    else:
+        # string result (no structured error fields)
+        exit_code = None
+        error = None
+        stderr = ""
 
     if exit_code and exit_code != 0:
         record_signal("error", {"tool": tool_name, "exit_code": exit_code, "error": error or stderr[:200]})

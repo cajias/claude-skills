@@ -19,7 +19,10 @@ for line in sys.stdin:
     try:
         data = json.loads(line)
         if 'message' in data and data['message'].get('role') == 'user':
-            for c in data['message'].get('content', []):
+            content = data['message'].get('content', [])
+            if isinstance(content, str):
+                content = [{'type': 'text', 'text': content}]
+            for c in content:
                 if not isinstance(c, dict):
                     continue
                 if c.get('type') == 'text':

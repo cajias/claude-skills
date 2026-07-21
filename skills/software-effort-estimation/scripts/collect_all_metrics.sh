@@ -18,6 +18,8 @@ echo ""
 
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
+# Absolutize so sub-scripts' `cd "$REPO_PATH"` doesn't misplace output
+OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd)"
 
 # Step 1: Collect git statistics
 echo "[1/3] Collecting git statistics..."

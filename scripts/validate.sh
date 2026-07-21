@@ -20,6 +20,12 @@ pass()    { dim "  OK:    $1"; }
 
 section() { printf "\n\033[1m[%s]\033[0m\n" "$1"; }
 
+# Print the YAML frontmatter (between the first '---' on line 1 and the next '---').
+# Emits nothing if the file does not start with '---'.
+extract_frontmatter() {
+  awk 'NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} {print}' "$1"
+}
+
 # ─── 1. Plugin Structure ───────────────────────────────────────────
 
 section "Plugin Structure"
@@ -137,7 +143,7 @@ for agent_file in "$REPO_ROOT"/agents/*.md; do
   name="$(basename "$agent_file")"
 
   # Extract YAML frontmatter (between first two --- lines)
-  frontmatter=$(sed -n '/^---$/,/^---$/p' "$agent_file" | sed '1d;$d')
+  frontmatter=$(extract_frontmatter "$agent_file")
 
   if [[ -z "$frontmatter" ]]; then
     error "agents/$name — no YAML frontmatter found"
@@ -146,7 +152,7 @@ for agent_file in "$REPO_ROOT"/agents/*.md; do
 
   has_error=false
   for field in "${REQUIRED_AGENT_FIELDS[@]}"; do
-    if ! echo "$frontmatter" | grep -q "^${field}:"; then
+    if ! grep -q "^${field}:" <<< "$frontmatter"; then
       error "agents/$name — missing required frontmatter field: $field"
       has_error=true
     fi
@@ -154,7 +160,7 @@ for agent_file in "$REPO_ROOT"/agents/*.md; do
 
   if [[ "$has_error" == false ]]; then
     # Validate model value
-    model_val=$(echo "$frontmatter" | grep "^model:" | sed 's/^model:[[:space:]]*//')
+    model_val=$(grep "^model:" <<< "$frontmatter" | sed 's/^model:[[:space:]]*//')
     case "$model_val" in
       sonnet|haiku|opus) pass "agents/$name (model: $model_val)" ;;
       *) warn "agents/$name — non-standard model value: '$model_val' (expected: sonnet, haiku, or opus)" ;;
@@ -204,11 +210,11 @@ for dir in "$REPO_ROOT"/skills/*/; do
   fi
 
   # Check required frontmatter fields
-  fm=$(sed -n '/^---$/,/^---$/p' "$skill_file" | sed '1d;$d')
-  if ! echo "$fm" | grep -q "^name:"; then
+  fm=$(extract_frontmatter "$skill_file")
+  if ! grep -q "^name:" <<< "$fm"; then
     warn "skills/$name — frontmatter missing 'name' field"
   fi
-  if ! echo "$fm" | grep -q "^description:"; then
+  if ! grep -q "^description:" <<< "$fm"; then
     warn "skills/$name — frontmatter missing 'description' field"
   fi
 

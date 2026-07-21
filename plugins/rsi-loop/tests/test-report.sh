@@ -71,6 +71,23 @@ check "far-OOD not averaged into near-transfer" "['timeseries-forecast']" \
   "$(echo "$OUT" | field "v['generalization']['far_ood_tasks']")"
 check "near transfer positive" True "$(echo "$OUT" | field "v['generalization']['transfers_near']")"
 
+# Regression: a ledger with NO step-0 line (the documented --no-baseline mode)
+# whose first line is a REJECTED proposal lacking a numeric private_aggregate
+# used to crash on round(None) -> TypeError -> exit 1. The incumbent-trajectory
+# logic is now None-safe: gen000_floor is null and best_private_aggregate
+# reflects the first numeric accepted step.
+NB="$WORK/no-baseline.jsonl"
+cat > "$NB" <<'JSONL'
+{"step":1,"generation":"gen-001","parent":null,"mutation":"m1","inner_tokens":100,"verifier":null,"accepted":false,"reason":"regressed"}
+{"step":2,"generation":"gen-002","parent":"gen-001","mutation":"m2","private_aggregate":0.70,"inner_tokens":100,"verifier":{"verdict":"clean"},"accepted":true,"reason":"beats"}
+JSONL
+set +e
+OUT="$(python3 "$REP" --ledger "$NB")"
+check "no-step-0 ledger exits 0 (no round(None) crash)" 0 "$?"
+set -e
+check "gen000_floor is null without step-0 baseline" True "$(echo "$OUT" | field "v['gen000_floor'] is None")"
+check "best_private_aggregate is first numeric accepted 0.70" 0.7 "$(echo "$OUT" | field "v['best_private_aggregate']")"
+
 # Usage errors.
 set +e
 python3 "$REP" --ledger "$WORK/nope.jsonl" >/dev/null 2>&1

@@ -89,6 +89,25 @@ def test_index_then_status(vault_and_db):
     assert "4 notes indexed" in r.stdout
 
 
+def test_reindex_is_idempotent(vault_and_db):
+    _, _, env = vault_and_db
+
+    # First index
+    r = _run_cmd(["uv", "run", "ss-index"], env)
+    assert r.returncode == 0
+    assert "Indexed 4 notes" in r.stdout
+
+    # Second index must replace, not append
+    r = _run_cmd(["uv", "run", "ss-index"], env)
+    assert r.returncode == 0
+    assert "Indexed 4 notes" in r.stdout
+
+    # Status still reports 4, not 8
+    r = _run_cmd(["uv", "run", "ss-status"], env)
+    assert r.returncode == 0
+    assert "4 notes indexed" in r.stdout
+
+
 def test_search_with_limit(vault_and_db):
     _, _, env = vault_and_db
 
@@ -105,6 +124,30 @@ def test_search_no_query_fails(vault_and_db):
 
     r = _run_cmd(["uv", "run", "ss-search"], env)
     assert r.returncode != 0
+
+
+def test_search_limit_missing_or_bad_value(vault_and_db):
+    _, _, env = vault_and_db
+
+    # Index first so the happy-path assertion has data to return.
+    # The guard fires during arg-parse (before DB access), but keep it realistic.
+    _run_cmd(["uv", "run", "ss-index"], env)
+
+    # --limit with no value must exit cleanly with usage, not an IndexError traceback.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit"], env)
+    assert r.returncode == 1
+    assert "Usage" in r.stderr
+    assert "Traceback" not in r.stderr
+
+    # --limit with a non-numeric value must exit cleanly with usage, not a ValueError traceback.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit", "abc"], env)
+    assert r.returncode == 1
+    assert "Usage" in r.stderr
+    assert "Traceback" not in r.stderr
+
+    # Happy path: a valid --limit still works, so the guard did not break valid usage.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit", "2"], env)
+    assert r.returncode == 0
 
 
 def test_mocs_not_indexed(vault_and_db):

@@ -48,7 +48,10 @@ with open(session_file, 'r') as f:
                     stats['assistant_messages'] += 1
 
                 # Count tool uses and track names
-                for c in data['message'].get('content', []):
+                content = data['message'].get('content', [])
+                if isinstance(content, str):
+                    content = [{'type': 'text', 'text': content}]
+                for c in content:
                     if not isinstance(c, dict):
                         continue
                     if c.get('type') == 'tool_use':

@@ -1,7 +1,7 @@
 ---
 name: apm-plugin-distribution-paths
 description: |
-  Canonical authoring layout for an APM (Agent Package Manager — microsoft/apm)
+  Canonical authoring layout for an APM (microsoft/apm)
   package, plus the decision matrix for whether you need a `marketplace:` block.
   Use when: (1) you've run `apm init` and are unsure where SKILL.md / agent .md
   / command .md files belong (answer: under `.apm/`, NOT at repo root); (2)
@@ -11,7 +11,7 @@ description: |
   the three layouts APM recognizes (one-skill repo, multi-primitive `.apm/`,
   Claude plugin); (4) `apm targets` fails with "No such command" in CLI 0.12.1
   (subcommand doesn't exist); (5) `apm validate` fails with "No such command"
-  in CLI 0.12.1 (use `apm pack --dry-run` instead); (6) wondering whether
+  in CLI 0.12.1 (use APM's packaging command in dry-run mode instead); (6) wondering whether
   `apm compile -t claude` will generate output for a hand-authored CC-native
   plugin (it won't; it's a no-op for layout #3); (7) wondering if you need a
   `marketplace:` block in apm.yml (you don't, for a single-plugin repo).
@@ -64,7 +64,7 @@ Any of these point here:
 - `apm targets` exits 2 with `Error: No such command 'targets'` (despite
   the dependencies guide referencing the command — it's not shipped in 0.12.1).
 - `apm validate` exits 2 with `Error: No such command 'validate'`.
-  Validation is folded into `apm pack --dry-run`.
+  Validation is folded into APM's packaging command run with `--dry-run`.
 - `apm compile -t claude --dry-run` exits 0 with `[x] No APM content found
   to compile` — confirms you have no `.apm/` source content (only deployed
   copies at root). For canonical authoring, the message should disappear.
@@ -99,7 +99,7 @@ the multi-target benefit.
 
 ### Canonical `.apm/` source → plugin-bundle remap
 
-`apm pack` reads from `.apm/` and emits a plugin bundle under
+APM's packaging step reads from `.apm/` and emits a plugin bundle under
 `build/<name>-<version>/`. The remap table:
 
 | `.apm/` source path | Plugin output path |
@@ -145,12 +145,12 @@ rmdir agents
 git mv commands/* .apm/commands/
 rmdir commands
 
-# 5. Optionally remove plugin.json (apm pack synthesizes it from apm.yml)
+# 5. Optionally remove plugin.json (APM's packaging step synthesizes it from apm.yml)
 git rm .claude-plugin/plugin.json
 rmdir .claude-plugin
 
 # 6. Verify
-apm pack --dry-run    # exit 0; should now list all primitives from .apm/
+# (run APM's packaging step in --dry-run mode here) → exit 0; should now list all primitives from .apm/
 apm install --dry-run # would deploy to .claude/, .github/, etc.
 ```
 
@@ -170,7 +170,7 @@ Once your source is canonical, here's how others consume it:
 |---|---|---|
 | **APM Package** (canonical) | `apm install owner/repo` | `apm.yml` + `.apm/` source ✓ default |
 | **Marketplace Plugin** | `apm install owner/repo/plugins/<name>` | Content under `./plugins/<name>/` (multi-plugin repos) |
-| **CC `/plugin marketplace add`** | `/plugin marketplace add owner/repo` | `marketplace:` block in `apm.yml` so `apm pack` emits `marketplace.json` |
+| **CC `/plugin marketplace add`** | `/plugin marketplace add owner/repo` | `marketplace:` block in `apm.yml` so APM's packaging step emits `marketplace.json` |
 | **Manual install** | `git clone` + copy | Just the file layout |
 
 The first row is what `apm init` aims at. Add a `marketplace:` block only if
@@ -185,8 +185,8 @@ Real subcommands (verified by `apm --help`):
 apm init                       # Scaffold apm.yml
 apm install                    # Resolve deps + deploy local .apm/ content
 apm compile [-t <target>]      # Translate .apm/* sources to native formats
-apm pack [--dry-run]           # Validate schema + build plugin bundle
-apm marketplace check          # Runs git ls-remote (often fails for local-only)
+# APM's packaging step, optional --dry-run  # Validate schema + build plugin bundle
+# APM's marketplace-check command           # Runs git ls-remote (often fails for local-only)
 apm policy
 apm preview
 ```
@@ -195,7 +195,7 @@ Non-existent in 0.12.1 (referenced in older docs/skills):
 
 - `apm targets` — auto-detection runs *during* install/compile/pack.
   To preview compile output, use `apm compile -t <target> --dry-run`.
-- `apm validate` — schema validation is `apm pack --dry-run`.
+- `apm validate` — schema validation is APM's packaging step run with `--dry-run`.
 
 ### Minimum viable `apm.yml` (matches `apm init -y`)
 
@@ -220,7 +220,7 @@ disables local-content deployment.
 After authoring at `.apm/skills/<name>/SKILL.md` and friends:
 
 ```bash
-apm pack --dry-run                     # Schema validation; exit 0
+# (run APM's packaging step with --dry-run) # Schema validation; exit 0
 apm install --dry-run                  # Preview deployment; exit 0
 apm compile -t claude --dry-run        # Should now show content (not the
                                        # "No APM content found" message
@@ -239,7 +239,7 @@ dependencies:
 apm install --dry-run                  # Should resolve your package
 ```
 
-If `apm pack --dry-run` lists fewer primitives than expected after
+If APM's packaging step (with `--dry-run`) lists fewer primitives than expected after
 migration, check that agent files use `.agent.md` (not bare `.md`) and that
 commands moved to `.apm/commands/` (not the deployed `commands/` at root).
 
@@ -274,7 +274,7 @@ step writes:
 
 - `apm.lock.yaml` should be **tracked** (committed) for reproducibility,
   not gitignored. `apm_modules/` should be gitignored. `build/` (where
-  `apm pack` writes) should also be gitignored.
+  APM's packaging step writes) should also be gitignored.
 - The `microsoft/apm` repo itself dogfoods layout 2 — `.apm/skills/python-architecture/SKILL.md`
   is the source; `.github/skills/python-architecture/SKILL.md` is the
   deployed copy that the in-repo Copilot agent loads. Use this as a real

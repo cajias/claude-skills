@@ -15,3 +15,5 @@ ignore:
   - node_modules
   - .git
   - plugins
+  - "**/__pycache__"
+  - "**/.pytest_cache"
