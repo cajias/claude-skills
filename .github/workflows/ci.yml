@@ -146,3 +146,30 @@ jobs:
 
       - name: Ladder-evidence report
         run: bash plugins/rsi-loop/tests/test-report.sh
+
+  test-scripts:
+    name: Test scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: validate.sh frontmatter extraction
+        run: bash scripts/test-validate.sh
+
+      - name: session-analysis scripts
+        run: python3 -m pytest skills/claude-session-analysis/scripts/test_session_analysis.py -v
+
+      - name: quip-to-obsidian transforms
+        run: python3 -m pytest skills/quip-to-obsidian/scripts/test_quip_transforms.py -v
+
+      - name: software-effort-estimation scripts
+        run: bash skills/software-effort-estimation/scripts/test_estimation_scripts.sh

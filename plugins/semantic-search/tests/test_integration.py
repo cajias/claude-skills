@@ -126,6 +126,30 @@ def test_search_no_query_fails(vault_and_db):
     assert r.returncode != 0
 
 
+def test_search_limit_missing_or_bad_value(vault_and_db):
+    _, _, env = vault_and_db
+
+    # Index first so the happy-path assertion has data to return.
+    # The guard fires during arg-parse (before DB access), but keep it realistic.
+    _run_cmd(["uv", "run", "ss-index"], env)
+
+    # --limit with no value must exit cleanly with usage, not an IndexError traceback.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit"], env)
+    assert r.returncode == 1
+    assert "Usage" in r.stderr
+    assert "Traceback" not in r.stderr
+
+    # --limit with a non-numeric value must exit cleanly with usage, not a ValueError traceback.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit", "abc"], env)
+    assert r.returncode == 1
+    assert "Usage" in r.stderr
+    assert "Traceback" not in r.stderr
+
+    # Happy path: a valid --limit still works, so the guard did not break valid usage.
+    r = _run_cmd(["uv", "run", "ss-search", "health", "--limit", "2"], env)
+    assert r.returncode == 0
+
+
 def test_mocs_not_indexed(vault_and_db):
     _, _, env = vault_and_db
 
