@@ -5,7 +5,7 @@ rewrites an inner tree-search research agent, keeping rewrites only when they be
 on **private held-out scores** under a **fixed budget**, with layered reward-hacking defenses and
 RSI-ladder measurement.
 
-**Status: M1–M3 shipped; M4–M5 machinery built.** The standalone inner agent, the outer step
+**Status: M1–M4 shipped; M5 machinery built.** The standalone inner agent, the outer step
 (propose → evaluate → verify → select), the full three-family task battery, the unattended
 `/rsi:run` driver, robust aggregation + reward-hack outlier detection, the hand-tuned
 `gen-human` baseline, the `holdout-tasks/` generalization set, `/rsi:report`, and `/rsi:ignite`

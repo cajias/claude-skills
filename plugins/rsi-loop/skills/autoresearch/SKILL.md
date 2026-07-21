@@ -24,6 +24,7 @@ Design details: [`docs/PLAN.md`](../../docs/PLAN.md), §3 "`autoresearch` as a s
 
 Naming note: this is distinct from the third-party
 [uditgoenka/autoresearch](https://github.com/uditgoenka/autoresearch) skill (a single-level
-metric hill-climb loop, evaluated in PLAN.md §5.1 as a candidate outer-loop chassis). If that
-chassis is adopted (the §5.2 experiment, pending), this skill will be renamed to avoid trigger
-collision.
+metric hill-climb loop, evaluated in PLAN.md §5.1 as a candidate outer-loop chassis). The §5.2
+experiment resolved in favor of the native chassis (Arm B, `/rsi:step` / `/rsi:run`); the
+third-party chassis was not adopted, so no rename is needed and this skill keeps its name. See
+[`docs/experiments/chassis-ab/`](../../docs/experiments/chassis-ab/).
