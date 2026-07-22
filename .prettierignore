@@ -22,3 +22,8 @@ plugins/integrations/skills/
 # Session-local agent memory (self-ignoring via nested .gitignore; Prettier
 # only reads the root .gitignore, so it must be listed here explicitly).
 .remember/
+plugins/rsi-loop/docs/experiments/run-002/gen-006/
+plugins/rsi-loop/docs/experiments/run-002/gen-007/
+plugins/rsi-loop/docs/experiments/run-002/gen-008/
+plugins/rsi-loop/docs/experiments/run-002/gen-009/
+plugins/rsi-loop/docs/experiments/run-002/seeds3-evals/

@@ -1,0 +1,168 @@
+{
+ "task": "instruction-routing",
+ "split": "private",
+ "n_instances": 32,
+ "score": 0.1875,
+ "per_instance": [
+  {
+   "name": "add-0",
+   "score": 0.0,
+   "error": "expected '9', got ''"
+  },
+  {
+   "name": "subtract-1",
+   "score": 0.0,
+   "error": "expected '-15', got ''"
+  },
+  {
+   "name": "multiply-2",
+   "score": 0.0,
+   "error": "expected '-14', got ''"
+  },
+  {
+   "name": "reverse-3",
+   "score": 0.0,
+   "error": "expected 'egnaro', got ''"
+  },
+  {
+   "name": "uppercase-4",
+   "score": 0.0,
+   "error": "expected 'PYTHON', got ''"
+  },
+  {
+   "name": "letters-5",
+   "score": 0.0,
+   "error": "expected '6', got ''"
+  },
+  {
+   "name": "nth-6",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "max-7",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "add-8",
+   "score": 0.0,
+   "error": "expected '33', got ''"
+  },
+  {
+   "name": "subtract-9",
+   "score": 0.0,
+   "error": "expected '-15', got ''"
+  },
+  {
+   "name": "multiply-10",
+   "score": 0.0,
+   "error": "expected '0', got ''"
+  },
+  {
+   "name": "reverse-11",
+   "score": 0.0,
+   "error": "expected 'lenrek', got ''"
+  },
+  {
+   "name": "uppercase-12",
+   "score": 0.0,
+   "error": "expected 'PYTHON', got ''"
+  },
+  {
+   "name": "letters-13",
+   "score": 0.0,
+   "error": "expected '6', got ''"
+  },
+  {
+   "name": "nth-14",
+   "score": 0.0,
+   "error": "expected 'kiwi', got ''"
+  },
+  {
+   "name": "max-15",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "add-16",
+   "score": 0.0,
+   "error": "expected '9', got ''"
+  },
+  {
+   "name": "subtract-17",
+   "score": 0.0,
+   "error": "expected '33', got ''"
+  },
+  {
+   "name": "multiply-18",
+   "score": 0.0,
+   "error": "expected '20', got ''"
+  },
+  {
+   "name": "reverse-19",
+   "score": 0.0,
+   "error": "expected 'nohtyp', got ''"
+  },
+  {
+   "name": "uppercase-20",
+   "score": 0.0,
+   "error": "expected 'BANANA', got ''"
+  },
+  {
+   "name": "letters-21",
+   "score": 0.0,
+   "error": "expected '6', got ''"
+  },
+  {
+   "name": "nth-22",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "max-23",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "add-24",
+   "score": 0.0,
+   "error": "expected '11', got ''"
+  },
+  {
+   "name": "subtract-25",
+   "score": 0.0,
+   "error": "expected '-21', got ''"
+  },
+  {
+   "name": "multiply-26",
+   "score": 0.0,
+   "error": "expected '72', got ''"
+  },
+  {
+   "name": "reverse-27",
+   "score": 0.0,
+   "error": "expected 'lenrek', got ''"
+  },
+  {
+   "name": "uppercase-28",
+   "score": 0.0,
+   "error": "expected 'BANANA', got ''"
+  },
+  {
+   "name": "letters-29",
+   "score": 0.0,
+   "error": "expected '6', got ''"
+  },
+  {
+   "name": "nth-30",
+   "score": 1.0,
+   "error": null
+  },
+  {
+   "name": "max-31",
+   "score": 0.0,
+   "error": "expected '12', got ''"
+  }
+ ]
+}
