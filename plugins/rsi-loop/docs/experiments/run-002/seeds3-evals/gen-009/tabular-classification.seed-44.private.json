@@ -1,0 +1,38 @@
+{
+ "task": "tabular-classification",
+ "split": "private",
+ "n_instances": 5,
+ "score": 0.875,
+ "per_instance": [
+  {
+   "name": "private-group-0",
+   "score": 0.9375,
+   "n": 16,
+   "error": null
+  },
+  {
+   "name": "private-group-1",
+   "score": 0.75,
+   "n": 16,
+   "error": null
+  },
+  {
+   "name": "private-group-2",
+   "score": 0.9375,
+   "n": 16,
+   "error": null
+  },
+  {
+   "name": "private-group-3",
+   "score": 0.875,
+   "n": 16,
+   "error": null
+  },
+  {
+   "name": "private-group-4",
+   "score": 0.875,
+   "n": 16,
+   "error": null
+  }
+ ]
+}

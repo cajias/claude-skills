@@ -1,0 +1,57 @@
+{
+ "task": "bin-packing",
+ "split": "private",
+ "n_instances": 7,
+ "score": 0.937937,
+ "per_instance": [
+  {
+   "name": "prv-uniform-80",
+   "score": 0.916667,
+   "bins_used": 48,
+   "lower_bound": 44,
+   "error": null
+  },
+  {
+   "name": "prv-uniform-120",
+   "score": 0.984127,
+   "bins_used": 63,
+   "lower_bound": 62,
+   "error": null
+  },
+  {
+   "name": "prv-triplet-60",
+   "score": 0.952381,
+   "bins_used": 21,
+   "lower_bound": 20,
+   "error": null
+  },
+  {
+   "name": "prv-triplet-90",
+   "score": 0.966667,
+   "bins_used": 30,
+   "lower_bound": 29,
+   "error": null
+  },
+  {
+   "name": "prv-bimodal-70",
+   "score": 0.885714,
+   "bins_used": 35,
+   "lower_bound": 31,
+   "error": null
+  },
+  {
+   "name": "prv-bimodal-100",
+   "score": 0.86,
+   "bins_used": 50,
+   "lower_bound": 43,
+   "error": null
+  },
+  {
+   "name": "prv-uniform-15",
+   "score": 1.0,
+   "bins_used": 7,
+   "lower_bound": 7,
+   "error": null
+  }
+ ]
+}

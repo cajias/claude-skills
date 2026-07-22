@@ -1,0 +1,24 @@
+{
+  "algorithm": "adversarial-probe-tree-search",
+  "num_drafts": 5,
+  "max_nodes": 9,
+  "model": "haiku",
+  "effort": "low",
+  "context_mode": "full-history",
+  "selection": "public-search-then-shared-adversarial-probe-tiebreak; probe pool guarantees the improve/explore-lineage leaves and scales with the tie count (bounded), with strongest drafts as brittle contrast; gen-007 gates trust on the top-band DECISION MARGIN (gap between #1 and #2 robustness), not global spread: escalate the battery until the leaders separate by >= robust_margin, then argmax; if they stay within the margin after escalation, pick conservatively/deterministically among the near-tied top band (prefer improve/explore-lineage leaf, then robustness -> public -> lowest id) instead of trusting single-variant noise",
+  "probe_modality": "auto-detected by the battery builder from task.md + public input shape: numeric-tabular => data-perturbation battery (train bootstrap/subsample, within-scale feature jitter, noise-feature-column permute, single-feature holdout) scored by test-row prediction stability vs the candidate's unperturbed-train baseline; language => existing paraphrase/synonym/re-template battery scored by answer equivalence",
+  "probe_topk": 4,
+  "probe_topk_max": 8,
+  "public_tie_band": 0.05,
+  "min_spread": 0.1,
+  "robust_margin": 0.05,
+  "max_escalations": 2,
+  "probe_reserve_tokens": 350000,
+  "draft_directions": [
+    "simplest correct baseline — prioritize validity over quality",
+    "sorting/preprocessing-based heuristic (e.g. handle the hardest elements first)",
+    "incremental best-choice heuristic: at each step take the locally optimal placement/decision",
+    "deterministic local search: start from a greedy solution, then iteratively improve it",
+    "robustness-first: parse/interpret the input tolerantly (accept rephrasings, synonyms, reordered clauses, formatting and encoding variation) and normalize before solving, so the same intent always maps to the same answer"
+  ]
+}

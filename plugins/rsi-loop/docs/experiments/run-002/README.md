@@ -6,15 +6,48 @@ budget per evaluation (9 nodes, haiku, seed 42). Selection is on the robust
 private aggregate; the inner agent never sees the private split. Full step
 records in `ledger.jsonl`.
 
-| Step | Generation | Mutation                            | bin-pack | tabular | instr-route | Private agg | Outcome               |
-| ---- | ---------- | ----------------------------------- | -------- | ------- | ----------- | ----------- | --------------------- |
-| 0    | gen-000    | baseline AIDE0                      | 0.938    | 0.788   | 0.000       | 0.575       | incumbent             |
-| 1    | gen-003    | robustness-aware selection          | 0.938    | 0.788   | 0.000       | 0.575       | **rejected** (tie)    |
-| 2    | gen-004    | shared adversarial robustness probe | 0.938    | 0.788   | **0.219**   | **0.648**   | **ACCEPTED** (+0.073) |
-| 3    | gen-005    | lineage-aware probe pool            | 0.938    | 0.788   | **0.844**   | **0.856**   | **ACCEPTED** (+0.208) |
+| Step | Generation | Mutation                            | bin-pack | tabular | instr-route | Private agg | Outcome                    |
+| ---- | ---------- | ----------------------------------- | -------- | ------- | ----------- | ----------- | -------------------------- |
+| 0    | gen-000    | baseline AIDE0                      | 0.938    | 0.788   | 0.000       | 0.575       | incumbent                  |
+| 1    | gen-003    | robustness-aware selection          | 0.938    | 0.788   | 0.000       | 0.575       | **rejected** (tie)         |
+| 2    | gen-004    | shared adversarial robustness probe | 0.938    | 0.788   | **0.219**   | **0.648**   | **ACCEPTED** (+0.073)      |
+| 3    | gen-005    | lineage-aware probe pool            | 0.938    | 0.788   | **0.844**   | **0.856**   | **ACCEPTED** (+0.208)      |
+| 4    | gen-006    | modality-aware data-perturbation    | 0.938    | 0.838   | 0.250       | 0.675       | **rejected** (single-seed) |
+| 5    | gen-007    | margin-gated escalation             | 0.938    | 0.825   | 0.000       | 0.588       | **rejected** (single-seed) |
+| 6    | gen-005    | robust re-baseline @ seeds 3        | 0.938    | 0.775   | 0.219       | 0.644       | **ACCEPTED** (re-baseline) |
+| 7    | gen-006    | data-perturb probe, re-eval seeds 3 | 0.938    | 0.800   | **0.438**   | **0.725**   | **ACCEPTED** (+0.081)      |
+| 8    | gen-008    | multi-draw de-noising @ seeds 3     | 0.938    | 0.838   | 0.313       | 0.696       | **rejected**               |
+| 9    | gen-009    | correctness-coverage @ seeds 3      | 0.938    | 0.513   | 0.188       | 0.546       | **rejected** (plateau)     |
+
+For steps 6-9 the per-task cells are the **median across seeds 42/43/44**, not a single-seed draw; the aggregate is the
+mean of those per-task medians.
 
 **M3 exit criterion** is a multi-step unattended run with a sane ledger; this
 directory is that ledger as it accumulates.
+
+## The --seeds 3 pivot (steps 4-9)
+
+Steps 4-5 were scored the old way — a single-seed private aggregate — against gen-005's banked **0.856**. Neither
+cleared it: gen-006 (modality-aware data-perturbation) landed 0.675 and gen-007 (margin-gated escalation) 0.588, so
+both were rejected. But 0.856 was itself a single-seed number, and run-001's tie-breaker-saturation lesson had already
+flagged single-seed private scores on tiny splits as fragile — PLAN.md's own "prefer multi-seed" caveat.
+
+The run then switched selection to a **3-seed median**: each generation is re-scored at seeds 42/43/44 and selected on
+the mean of per-task medians (the bin/tab/instr cells for steps 6-9 above are those medians).
+
+Re-baselining gen-005 under this rule (step 6) collapsed its aggregate from the inflated 0.856 to a robust **0.644**.
+The 0.856 had been a simultaneous lucky draw across three tiny private splits — tabular seeds `[0.0, 0.775, 0.788]`
+→ median 0.775, instruction-routing `[0.438, 0.156, 0.219]` → median 0.219. That 0.644 is the honest incumbent bar,
+and every later step is judged against it.
+
+Re-evaluated at seeds 3, gen-006's data-perturbation probe (step 7) reaches **0.725 > 0.644** (+0.081) with the
+verifier clean, so it is **ACCEPTED** as the new incumbent — tabular median 0.775 → 0.800, instruction-routing
+0.219 → 0.438.
+
+Steps 8-9 then both reject against 0.725: gen-008 (multi-draw de-noising) fell to 0.696 and gen-009
+(correctness-coverage probe) to 0.546, each failing on the instruction-routing target (instr median 0.438 → 0.313,
+then → 0.188). Two consecutive rejections triggered the **plateau stop** at 10 ledger steps (~37.9M inner tokens). The
+scientific write-up of these three results is in `M3-FINDINGS.md`.
 
 ## Step 3 — the pool fix lands the improve leaves (ACCEPTED)
 
