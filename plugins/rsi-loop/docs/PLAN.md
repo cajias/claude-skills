@@ -12,16 +12,26 @@ Primary sources:
 
 Status: **M1–M2 shipped; M3 complete (run-002 ran to a plateau stop at 10 ledger steps,
 ~37.9M inner tokens, incumbent gen-006); M4 measured (Level 0 and Level 1 met — see
-`docs/experiments/m4-report.md`); M5 ignition run complete — Level-2 NOT supported (ignited 0.5876 <
-control 0.6126 at equal 1-step budget; see `docs/experiments/ignite/README.md`).** The plugin is
+`docs/experiments/m4-report.md`); M5 ignition run complete — returned Level-2 NOT supported (ignited
+0.5876 < control 0.6126 at equal 1-step budget; see `docs/experiments/ignite/README.md`).** That verdict
+is now diagnosed as a measurement artifact — a category-error ignition test — and **Level 2 is reopened
+as M6** (Approach-1 isomorphic re-architecture, design COMPLETE — full resolved spec in §6.1; see §6). The plugin is
 promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-000 floor
 0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
 gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
 mean Δ +0.279 (carried by instruction-ops 0.0 → 0.85), far-OOD Δ −0.016 (timeseries-forecast,
 reported separately). The §5.2 chassis A/B is **resolved (2026-07-20): ship Arm B (native
 `/rsi:step` / `/rsi:run`); autoresearch stays as pattern reference** (evidence in
-`docs/experiments/chassis-ab/`). Execution phase COMPLETE: the M5 `/rsi:ignite` Level-2 campaign ran
-(step-1 paired A/B → Level-2 NOT supported, `docs/experiments/ignite/README.md`). This document is the build
+`docs/experiments/chassis-ab/`). M1–M5 execution is banked history: the M5 `/rsi:ignite` Level-2 campaign
+ran (step-1 paired A/B → Level-2 NOT supported, `docs/experiments/ignite/README.md`). A design review since
+diagnosed that "not supported" as a **measurement artifact / category error** — the old `/rsi:ignite`
+injected the incumbent's task-solving strategy into a stock proposer and compared campaign endpoints, which
+tests "does a strategy-briefed proposer beat a stock one," not the paper's actual ignition question — is the
+discovered inner agent a better _outer_ agent than its predecessor, judged on the whole campaign trajectory
+(convergence rate + asymptote), a first-order comparison a 1-step endpoint A/B structurally cannot make; the loop also
+banked only ~3 genuine forward meta-steps and never carried the outer optimizer forward, so ignition was
+untestable regardless. **Level 2 is therefore reopened as M6** (Approach-1 isomorphic re-architecture, design
+COMPLETE — see §6/§6.1). The −0.025 run itself stands; only its interpretation changed. This document is the build
 spec; where the shipped code has diverged from it, the deviation is noted inline and in
 [CONTINUATION.md](CONTINUATION.md).
 
@@ -407,12 +417,366 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   measurable regression, not merely the paper's "same-ceiling" wash. Root cause: gen-006's
   adversarial-robustness tie-break probe rides on a public-data battery that carries no discriminating
   signal on the coarse tabular private buckets, so a noisy tie-break is strictly worse than
-  greedy-public. Measured honestly, as expected — not passed.
+  greedy-public. Measured honestly, as expected — not passed. **Superseded as a Level-2 test by M6:**
+  a post-run design review diagnosed this ignition as a category error (it tests strategy-briefing, not
+  compounding) — see M6.
+- **M6 — Level-2 re-architecture (isomorphic ignition)** _(LIVE — design COMPLETE; full resolved spec in §6.1; reopens
+  Level 2 as a design, not a result)_:
+  the M5 ignition is diagnosed as a measurement artifact — the old `/rsi:ignite` injected the incumbent's
+  task-solving strategy into a stock proposer and compared campaign _endpoints_, testing "does a
+  strategy-briefed proposer beat a stock one," NOT the thing the paper's ignition test actually asks: is the
+  discovered inner agent a **better outer agent than its predecessor**, judged on the whole campaign
+  **trajectory (convergence rate + asymptote)** rather than a single endpoint — a first-order comparison of
+  two outer agents that a 1-step-per-generation endpoint A/B structurally cannot make; the loop also banked
+  only ~3 genuine forward meta-steps and never carried the outer optimizer forward, so ignition was
+  untestable regardless. M6 adopts the approved **Approach 1 ("isomorphic loops")**: collapse both loops
+  onto ONE generic tree-search engine (`search-engine.mjs`) that searches over a POLYMORPHIC artifact — the
+  inner instantiation's artifact is a _solution_, the outer's is an _inner-agent scaffold (a generation
+  dir)_. Both seats consume the IDENTICAL `policy.json` vocabulary and run the IDENTICAL engine, so
+  **promotion becomes a literal lift**: the discovered inner scaffold's policy+prompts drop into the outer
+  engine's scaffold slot — impossible in the current split architecture (Workflow `.mjs` inner vs. markdown
+  proposer-agent outer), and the whole reason for Approach 1. **Consequence made explicit (arch reconciliation):
+  M6 is a FRESH campaign from `baseline/gen-000`; the run-002 lineage (gen-006 etc.) is NOT promoted.** Its
+  gains live where Approach 1 deliberately freezes them — inside the mutable `.mjs` engine (gen-006 is +260
+  engine lines of Probe machinery) and in 7 policy fields _outside_ the shared vocabulary. Freezing the
+  engine and fixing the vocabulary is the price of a literal-`cp` promotion; forfeiting run-002's
+  engine-resident incumbent is the acknowledged cost, logged as a deviation (§6.1.5). The corrected ignition
+  test then races TWO FULL campaigns from that identical gen-000 start (control: stock greedy outer scaffold;
+  ignited: promoted-scaffold outer) measured on **improvement-rate + asymptote trajectory across many
+  meta-generations**, NOT endpoint deltas. Documented divergence from strict AIDE² isomorphism (logged with
+  reason): AIDE² makes both agents LLM-tree-search over Python code; we keep LLM-driven scaffold edits but
+  route them through the same engine/vocabulary substrate — our artifacts are `.mjs`+prompt dirs, not `.py`;
+  same policy vocabulary, same promotion semantics. **The make-or-break crux (compute-nesting) and open items
+  3–6 are now RESOLVED — concrete spec (miniaturized inner search + enlarged private measurement +
+  token-metered binding budget + paired A/B + mandatory Phase-0 power gate, ~$233 ceiling / ~$163 typical) is
+  in §6.1 below.** M6 remains a reopening and a design, not a Level-2 result — no new Level-2 claim is made,
+  and the expected verdict is NOT-supported (paper parity).
+
+### 6.1 M6 design — isomorphic ignition (resolved)
+
+This is the full resolved M6 spec. It fixes the M5 **measurement** failure (coarse private buckets quantized any real
+effect below noise) rather than gating around it, keeps every change on the mutable side of the immutability wall, and
+reuses the exact `policy.json` vocabulary so promotion stays a verbatim lift. All five open items (2 compute-nesting, 3
+battery, 4 rate rule, 5 promotion, 6 testing/known-positive control) are answered concretely below. Honesty stance is
+unchanged: **M6 is a design + a reopening, not a Level-2 result; the prior on the eventual verdict is NOT-supported,
+exactly as the paper found ("converged faster, no asymptotic advantage").**
+
+#### The isomorphic engine + polymorphic artifact
+
+Three layers; the loop mutates exactly one:
+
+| Layer                               | Contents                                                                                                                                                                                                                                                                                                                                                  | Loop-mutable?                      | Promoted?                  |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------- |
+| **Substrate**                       | `search-engine.mjs` — the generic tree-search (drafts → greedy debug/improve → best), factored as a **pure `search(deps, policy, adapter)` core** whose agent-runner, scorer, and budget/RNG arrive through `deps` (see §6.1.6 refactor note); a thin Workflow shim binds the runtime globals (`agent`/`parallel`/`phase`/`budget`) into `deps` at launch | No (immutable harness)             | No                         |
+| **Adapter** (seat-fixed launch arg) | artifact kind, artifact-path template, operator write-target, `SCORE_CMD`, public/private/holdout split, deny-hook scope                                                                                                                                                                                                                                  | No                                 | No                         |
+| **Scaffold** (portable)             | `policy.json` (the fields the frozen engine reads) + `prompts/{draft,debug,improve}.md`                                                                                                                                                                                                                                                                   | Yes — the search operates on these | **Yes — this IS the lift** |
+
+**Invariant that makes promotion work:** anything that must _differ_ between the inner seat and the outer seat lives in
+the **adapter**, never in `policy.json` or the prompts. That is why the scaffold lifts verbatim — it carries nothing
+seat-specific. Concrete build requirement: the operator prompts are placeholder-templated (`${ARTIFACT}`,
+`${SCORE_CMD}`, `${ARTIFACT_KIND}`), filled by the seat's adapter at launch, so a prompt reads correctly whether
+`${ARTIFACT}` is a `solution.py` or a scaffold dir.
+
+**Fixed vocabulary (arch constraint, load-bearing):** the promotable vocabulary is the gen-000 8-field set — but note
+today's baseline engine only _reads_ five of them (`num_drafts`, `max_nodes`, `model`, `effort`, `draft_directions`)
+and hardcodes `algorithm`, `context_mode`, `selection` (the greedy loop and full-history concatenation are baked in).
+Extending the M6 pure `search()` core (§6.1.6) to interpret those three as policy fields is therefore committed
+refactor work — a precondition for a literal-`cp` promotion to carry real behavior across all 8 fields, not just 5.
+The scaffold search may tune those fields and rewrite the prompts; it may
+NOT add engine-actioned fields, because a frozen generic engine cannot act on a field it does not read. This is
+precisely why the run-002 lineage is not promoted: gen-006's gains are 7 extra policy fields (`probe_modality`,
+`public_tie_band`, `min_spread`, `probe_topk`, `probe_reserve_tokens`, `max_escalations`, `probe_topk_max`) plus ~260
+lines of Probe machinery _inside the engine_ — both on the frozen side of this wall.
+
+**Structural polymorphism check (unit test):** the engine source contains zero artifact-type-specific tokens — `grep
+-Eiw 'solution|scaffold|task|\.py|generation' search-engine.mjs` returns 0 matches in the search loop. The engine
+literally cannot name either artifact type.
+
+**Logged deviation from strict AIDE² isomorphism (with reason):** artifacts are `.mjs`+prompt bundles, not `.py`; AIDE²
+tree-searches Python at both seats. We keep LLM-driven scaffold edits routed through the identical engine/vocabulary
+substrate — same policy vocabulary, same promotion semantics. The deviation buys a promotion that is a literal `cp`, at
+the cost of not editing raw Python at the outer seat **and** of forfeiting any inner improvement that would require
+changing the frozen engine or extending the vocabulary (the run-002 incumbent is exactly such an improvement).
+
+---
+
+#### §6.1.2 Compute-nesting resolution (open item 2) — miniaturize search, enlarge measurement, bind token budget
+
+The decisive reframe: **M5 died from a measurement problem, not a compute problem.** LLM node generation is the
+expensive thing; private-set size is ~free (deterministic Python scoring). So we decouple them — miniaturize the
+_search_ (few nodes, haiku) and simultaneously _enlarge the measurement_ (big graded private sets, item 3) — which cures
+the M5 root cause and cuts compute at the same time.
+
+Base unit (measured, run-002): ~55K tokens/inner-node (haiku, low effort, full-history); haiku blended ≈$2/M tokens;
+scoring ≈0 LLM tokens.
+
+**Budget mechanism (arch-corrected — the harness meters TOKENS):** the inner stop condition is a **binding per-sub-run
+token cap `B_inner`**, not a node counter, reusing the existing `budget.remaining()` token meter (`--budget TOKENS`,
+ledger `inner_tokens`). Dollars are a **reporting** conversion only, never a new meter. Two pinned reporting constants
+in `rsi-report.py`: inner nodes run on haiku, `PRICE_PER_MTOK ≈ $2/M`; the per-outer-node proposer edit (~0.15M tok)
+runs on the **strong outer model** (Opus/Fable session model, §3 — not haiku), priced at `PROPOSER_PRICE_PER_MTOK ≈
+$6/M` (blended strong-model input+output). `B_inner ≈ 335K tokens (~$0.67)` per sub-run; a full inner campaign (2 tasks
+× 3 seeds = 6 sub-runs) ≈ 2.0M tokens (~$4). Outer score = `best-private-achieved-under-B_inner`. The engine's one loop
+primitive at both seats becomes `while (budget.remaining() > estCost) expandNextNode()`, all in tokens, with `estCost` =
+trailing-max node **token** cost (never mean, so a runaway proposal can't overshoot). This gives efficiency a gradient:
+best-of-N and parallelization-spam exhaust `B_inner` without improving per-token yield, so **they cannot be the winning
+move at equal budget** (the paper's "must not pass") — a real gain must _beat_ the best-of-N baseline under the same
+cap, not merely be permitted. **Tune `B_inner` so the incumbent spends 80–90% of it (the budget must bind).**
+
+| Nest depth         | Knob               | Full-real             | **Committed miniature**                             | Why                                                                           |
+| ------------------ | ------------------ | --------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 0 — inner node     | model/effort       | haiku/low             | **haiku/low**                                       | already the floor                                                             |
+| 1 — inner campaign | stop condition     | 9 nodes               | **`B_inner`≈335K tok/sub-run (~2.0M tok/campaign)** | token cap binds; brute force can't win                                        |
+| 1                  | selection families | 3                     | **2 pre-screened discriminating**                   | M5: 2 of 3 carried zero differentiating signal                                |
+| 1                  | private set        | coarse 8ths / 32 inst | **≥50 graded instances/task** (item 3: 120–400)     | resolution ~0.02 vs ~0.125 → the anti-M5 fix, ~free                           |
+| 1                  | seeds              | 3 (42/43/44)          | **3**                                               | now powered because per-seed SE dropped with the enlarged set                 |
+| 2 — outer campaign | meta-gens `G`      | 8–10                  | **8** (num_drafts 3 + 5 search)                     | 8 points fit early slope + late plateau; `G≥4` hard floor (need a 3-gen tail) |
+| 3 — ignition A/B   | design             | —                     | **paired, R reps** (from staged-fidelity graft)     | pairs cancel seed noise → power at far fewer reps                             |
+
+_(Nest-depth labels are architectural nesting only; they deliberately do NOT reuse the paper's RSI-ladder rungs L0–L3 —
+the ignition A/B at nest depth 3 tests the paper's **Level 2**, not Level 3.)_
+
+**Budget arithmetic (committed; tokens primary, dollars = reporting conversion):**
+
+| Unit                                      | Composition                                                            | Tokens    | Cost      |
+| ----------------------------------------- | ---------------------------------------------------------------------- | --------- | --------- |
+| Inner node                                | 1 draft/debug/improve + score (haiku)                                  | ~55K      | ~$0.11    |
+| Inner campaign = **1 outer node's score** | 2 tasks × 3 seeds, token-capped (haiku)                                | ~2.0M     | **~$4**   |
+| Outer node (loaded)                       | inner campaign ($4 haiku) + proposer edit (0.15M strong @ $6/M ≈ $0.9) | ~2.15M    | ~$4.9     |
+| Outer campaign (1 arm, 1 rep)             | 8 meta-gens × outer node                                               | ~17.2M    | **~$39**  |
+| **Paired A/B, R=3**                       | 2 arms × 3 paired reps = 6 × outer campaign                            | **~103M** | **~$233** |
+
+_Dollar rows use haiku $2/M for inner nodes + strong-proposer ~$6/M for the per-node edit; tokens are the real meter._
+
+Spend is **phased, power-gated before verdict** (the M5 covenant): **Phase-0** instrument power gate ~$8 (§6.1.6);
+**Phase-1** paired pilot R=2 = 4 campaigns × ~$39 ≈ ~$155 (total with Phase-0 ~$163, where most runs stop); **Phase-2**
+add R=3 only if within noise → ~$233 ceiling. The **paired** design (control and ignited share start artifact + seed
+sequence per replicate) is what keeps R low: a 2-pair pilot confirming paired-SD ≤ 0.04 buys ~80% power without chasing
+independent-arm variance.
+
+**Reconciliation note (deviation-with-reason, committed shape governs):** open item 3's resolver kept all 3 families in
+the battery; the funded compute-nesting shape selects on **2 pre-screened discriminating families**. Reconciled into a
+clean three-tier that mirrors the inner loop: **2 selection families drive outer search**; the **third family
+(instruction-routing) is the outer-private survival signal** (off-search, read each outer generation to decide scaffold
+acceptance — the outer analogue of the inner public/private split); and **`holdout-tasks/`** (one per family + the
+far-OOD time-series) stays **untouched, scored once at `/rsi:report`** for the generalization verdict. This preserves
+heterogeneity anti-hack pressure (2 selection families, not 1), gives survival a real held-out signal, and keeps a
+genuinely untouched probe for generalization — honoring the M5 lesson that a signal-free family only dilutes power.
+
+#### §6.1.3 Non-saturating battery + real generalization gap + budget pressure (open item 3)
+
+Reshape splits, do not invent families. Scorers stay immutable (they mean over instances/buckets and absorb larger N);
+the only new code is one generator plus a `--power-check` mode on `rsi-aggregate.py`.
+
+| Family (role)                                                               | pub N          | priv N           | honest floor | honest ceiling | priv SE | non-saturating mechanism                                                                              |
+| --------------------------------------------------------------------------- | -------------- | ---------------- | ------------ | -------------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| tabular-classification (ML-eng) — **selection**                             | 200            | **400** (was 80) | 0.44         | 0.92           | ~0.015  | 4% irreducible label noise caps < 1.0                                                                 |
+| bin-packing (heuristic-opt) — **selection**                                 | **40** (was 5) | **120** (was 7)  | 0.55         | 0.96           | ~0.02   | ~30% pathological size mixes strand capacity                                                          |
+| instruction-routing (harness-eng) — **outer-private survival (off-search)** | 60             | 160              | 0.60         | 0.90           | ~0.024  | adversarial arg-distribution shift (ties, indexing, whitespace, unicode) breaks a public-tuned parser |
+
+- **Generalization-gap contract (the anti-noise fix):** each family draws public/private from the same generator,
+  different draws, shifted on the one axis separating memorization from generalization (fresh rows / harder args /
+  different size regimes). **Honest gap** `honest_public − honest_private < 0.05`; **hack gap** for a public-overfit
+  hard-coder `> 0.30`. Both measured at SE ≤ 0.025/task, so the gap no longer collapses into noise as it did on M5's
+  coarse tabular buckets and 7-instance bin-packing.
+- **Power gate (`rsi-aggregate.py --power-check`, precondition for ANY verdict):** asserts (1) each
+  **selection-family** task's private aggregate SE ≤ **0.02** (bootstrap over private instances; the two
+  verdict-driving families — the off-search survival family is held to the ≤ 0.025 gap contract above) and (2) a
+  planted true Δ = **0.03** between two synthetic
+  scaffolds is rejected at α = 0.05 by a paired bootstrap over pooled private instances. If either fails, the verdict is
+  "underpowered — inconclusive," never "not supported." This is the exact check M5 skipped. (`--power-check` is the
+  battery-resolution precondition — a property of the private splits, so it lives on the aggregator that already
+  bootstraps them; moving it would duplicate that bootstrap. The ignition-**instrument** power calc — MDE/K given σ_d —
+  lives in `rsi-ignition.py power`, §6.1.6.)
+- **Budget-as-selection knob:** reuse existing `--budget TOKENS` (cumulative inner tokens from ledger `inner_tokens`);
+  per-eval brute force is capped by `B_inner` (§6.1.2). `rsi-report.py` gains `tokens_to_best`. Efficiency
+  (private-per-token) is deliberately NOT computed yet (YAGNI — it gates no verdict; add when a report consumes
+  it); the honesty point it encodes is already enforced by §6.1.4's verdict table: equal-asymptote-at-fewer-tokens
+  is the `|ΔA|<MDE` NO_RESULT row, never a win. Only a strictly higher sustained asymptote (§6.1.4) can produce
+  SUPPORTED.
+- **Files:** regenerate `tasks/tabular-classification/make_data.py` (`gen(400)` private) and
+  `tasks/instruction-routing/make_data.py` (hard-arg private); **new** `tasks/bin-packing/make_data.py` (seeded
+  generator, 40/120 graded); add `--power-check` to `rsi-aggregate.py`; add `tokens_to_best` to
+  `rsi-report.py`. `score.py` (all 3) and the `policy.json` schema are untouched. Regenerated `instances.json`
+  re-anchored to git HEAD (content-checked by `rsi-check-integrity.sh`).
+
+#### §6.1.4 Rate decision rule (open item 4)
+
+Two full campaigns from the identical `gen-000` baseline differing only in the outer scaffold slot: **control** (stock
+gen-000 policy+prompts) vs **ignited** (promoted policy+prompts), paired across seeds 42/43/44, `G = 8`
+meta-generations. New dir `docs/experiments/ignite-m6/{PREREG.md, progress.jsonl, trajectories.json, verdict.json,
+README.md}`; new `scripts/rsi-ignition.py` (subcommands `decide` + `power`; reuses `rsi-aggregate.py`; does not
+re-implement median logic).
+`PREREG.md` is git-committed **before** any eval spend.
+
+- **Best-so-far curve** `B(g) = max(pa(1..g) of accepted generations)`, `B(0) = gen-000 baseline` (monotone; a rejected
+  candidate never lowers it — the campaign trajectory the paper compares).
+- **Asymptote** `A = mean(B(G-1), B(G))` (mean-of-last-2 damps a lucky final accept — the gen-005 0.856→0.644 failure
+  mode). **Rate** `R = (1/G)·Σ (B(g) − B(0))` — corroborative only, can never alone produce SUPPORTED.
+- Paired per-seed deltas `ΔA_s`, `ΔR_s`; point estimates `ΔA = median_s ΔA_s`, `ΔR = median_s ΔR_s`. **Sustained** check
+  over the tail `{G-2, G-1, G} = {6,7,8}`: `B_ignited(g,s) − B_control(g,s) ≥ MDE` for all tail g, all seeds.
+- **Significance (n=3 is too small for a t-test — don't pretend):** two honest gates. (a) **Effect size vs measured
+  noise:** the governing threshold is the canonical power-form MDE from §6.1.6, `MDE(K) = 2.487·σ_d/√K`, evaluated at
+  the run's actual K (default K=3 → **0.072**); `σ_d` = the control-vs-control paired SD of `ΔA` (measured via
+  `--calibrate`, planning value ≈0.05, N_null ≥ 5). SUPPORTED requires `ΔA ≥ MDE(K)`. (b) **Sign consistency:**
+  one-sided sign test on paired `ΔA_s` — n=3 all-same-sign p = 0.125 (gate at n=3); escalate to seeds 42–46 → 5/5 p =
+  0.031.
+- **Power precondition (hard-gated, the M5 lesson):** the planted known-positive effect (§6.1.6) must exceed `MDE(K)` on
+  this instrument — the §6.1.6 control clears it at 0.15 ≫ MDE(3)=0.072. If the instrument can't resolve its own planted
+  positive at the run's K, the run is `NO_RESULT` regardless of the arms. (Resolving a 0.025-scale effect instead needs
+  K≈25 — see the §6.1.6 seed table; that is a budget decision made up front, not a gate imposed at planning.)
+
+| Verdict       | Condition                                                                                                                                                                                                                                                                                                                                                                            | Meaning                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| **SUPPORTED** | `ΔA ≥ MDE` AND all seeds `ΔA_s > 0` (sign test ≤ α) AND sustained for all seeds AND `ΔR ≥ 0`                                                                                                                                                                                                                                                                                         | Ignited reaches a strictly higher, sustained plateau — Level 2 clears                |
+| **REFUTED**   | `ΔA ≤ −MDE` (or within ±MDE while `ΔR ≤ −MDE` — faster-losing)                                                                                                                                                                                                                                                                                                                       | Ignited plateau measurably worse                                                     |
+| **NO_RESULT** | power precondition fails; **or** `\|ΔA\| < MDE` (within noise — _the paper's actual outcome:_ `ΔR>0` with `\|ΔA\|<MDE` ⇒ Level 2 not claimed = "converged faster, no asymptotic advantage"); **or** `ΔA ≥ MDE` while `ΔR < 0` (higher plateau reached only via a late jump while converging slower — not a clean ignition, report as inconclusive); **or** sign/sustained gate fails | Instrument couldn't resolve a clean asymptote win — Level 2 not supported, ≠ refuted |
+
+**Stated honestly up front:** NO*RESULT (paper parity) is the prior; `ΔR > 0` with `|ΔA| < MDE` is a scientifically
+clean not-supported and must be reported as such — it is the SAME outcome as "converged faster at equal asymptote," so
+an efficiency edge (§6.1.3) can accompany it without ever upgrading the verdict. Note M5's −0.025 sits \_inside* the
+±MDE(3)=0.072 band (|−0.025| < 0.072) → at this instrument's resolution M5 was NO_RESULT-on-asymptote, the honest
+restatement of why its endpoint delta was a category error. `rsi-ignition.py decide` ships with a runnable self-check
+planting four synthetic trajectory sets (flat +0.10 → SUPPORTED; faster-same-plateau → NO_RESULT; −0.10 plateau →
+REFUTED; σ_d=0.08 with real ΔA=0.10 → NO_RESULT power-fail).
+
+**Reconciliation note:** item 4's draft froze `G=6`; the committed shape (§6.1.2) and the power controls (§6.1.6) use
+`G=8`, so the tail is `{6,7,8}` and `G≥4` is the hard floor. No curve-fit — best-so-far + mean-of-last-2 is robust at
+n≤5 seeds; upgrade to a saturating-curve asymptote fit only if `G` is later raised past ~10.
+
+#### §6.1.5 Promotion mechanics (open item 5) — literal policy+prompt lift, fixed vocabulary, zero new fields
+
+The `policy.json` vocabulary is unchanged and shared verbatim by both seats; `baseline/gen-000/policy.json` is already a
+valid outer policy. The promotable fields are exactly the 8 the frozen engine reads (arch constraint, §6.1). Field map
+(outer-seat interpretation):
+
+| Field              | Outer-seat meaning                                                                                                                                                                                     | Class                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
+| `algorithm`        | engine search mode, identical both seats (`aide0-greedy-tree-search`)                                                                                                                                  | direct                 |
+| `num_drafts`       | # parallel draft **scaffold-mutations** at root                                                                                                                                                        | direct (cost-capped)   |
+| `max_nodes`        | outer search budget in nodes — **the expensive knob** (each outer node = one full inner campaign); lifts verbatim, harness ceiling may clamp                                                           | direct                 |
+| `model`            | model of the operator that _edits the artifact at this seat_ (outer: writes scaffold edits); distinct from a scaffold's own `policy.model` one level down                                              | direct (level-shifted) |
+| `effort`           | that operator's reasoning effort                                                                                                                                                                       | direct                 |
+| `context_mode`     | same semantics; referent = scaffold-nodes (prior mutations, their outer-public scores, rationales)                                                                                                     | reinterpreted referent |
+| `selection`        | same rule on the **outer-public** signal; `greedy-public` = greedy on the scaffold's inner-campaign private-aggregate over the **selection** battery                                                   | reinterpreted referent |
+| `draft_directions` | same field/type; content names scaffold-mutation axes (context engineering, selection rule, node-budget split, verification steps); outer gen-000 ships a scaffold-flavored default of the same length | reinterpreted content  |
+
+**New fields: none — and none permitted** (the frozen engine cannot act on fields it does not read; §6.1).
+Public/private/holdout split and artifact kind are adapter concerns (launch args), deliberately kept OUT of
+`policy.json` — a `"seat"` field would poison promotion. **This is also why the run-002 incumbent is not the promoted
+scaffold:** gen-006 carries 7 out-of-vocabulary fields plus an engine-resident Probe phase, neither of which a frozen
+generic engine can interpret. M6 re-derives from gen-000 within this vocabulary; whether the 8-field vocabulary can
+recapture a gen-006-class gain is an open empirical question the M6 inner campaign answers — and if it cannot, that is a
+legitimate (paper-consistent) not-supported outcome, not a spec failure.
+
+**Outer-seat split (reuses the existing battery, three-tier per §6.1.2):** outer-public (drives outer search +
+`selection`) = the scaffold's inner-campaign private-aggregate on the 2 **selection** families, `--seeds 3`,
+mean-of-per-task-medians via `rsi-aggregate.py --aggregate` (inner-private is _public to the `RSI_OUTER_LOOP=1` outer_;
+the deny hook still gates inner agents, which never see `--private`). Outer-private / true survival objective (decides
+scaffold acceptance each outer generation) = the scaffold's score on the **third family (instruction-routing)**.
+Generalization verdict = the untouched **`holdout-tasks/`** (one per family + far-OOD time-series), scored once at
+`/rsi:report` — catching the outer analogue of the M5 overfit.
+
+**The lift (fresh from gen-000; no `outer-seat/` subdir — the gen dir is flat):** `baseline/gen-000` serves as BOTH the
+inner seed artifact AND the outer **control** operating scaffold (no separate outer gen-000). The best discovered inner
+scaffold is the M6 inner campaign's last accepted generation's `{policy.json + prompts/}` bundle — discovered under the
+frozen engine, NOT the run-002 lineage.
+
+```bash
+SRC=<source-run>/best-scaffold                 # last accepted M6 inner generation (frozen-engine)
+/rsi:init <run>/ignite/arm-control             # outer scaffold = baseline/gen-000 (stock), flat dir
+/rsi:init <run>/ignite/arm-ignited             # outer scaffold = baseline/gen-000 (stock), flat dir
+cp    "$SRC/policy.json"  <run>/ignite/arm-ignited/policy.json      # THE LIFT
+cp -r "$SRC/prompts/."    <run>/ignite/arm-ignited/prompts/
+/rsi:run <run>/ignite/arm-control  --max-steps 8 --budget B --seeds 3 --plateau 0
+/rsi:run <run>/ignite/arm-ignited  --max-steps 8 --budget B --seeds 3 --plateau 0
+```
+
+The **only** difference between arms is the bytes of `arm-ignited/{policy.json, prompts/*}`; engine, adapter, battery,
+seeds, budget, verifier, deny hook are byte-identical. This _replaces_ the M5 `ignite/strategy-brief.md` prose-injection
+seam (which tested strategy-briefing, not compounding) with a real policy+prompt lift — the reason M6 exists.
+`commands/rsi-ignite.md` step 2's seam becomes the `cp` lift above; `/rsi:init` already produces the flat generation dir
+the lift targets (no new directory contract needed).
+
+#### §6.1.6 Testing + known-positive control + demonstrated power (open item 6)
+
+**Required refactor (arch, load-bearing — stated, not assumed):** today the engine calls Workflow globals
+(`agent`/`parallel`/`phase`/`budget`) directly, so it cannot be unit-tested cheaply. M6 factors it into a **pure
+`search(deps, policy, adapter)` core** (agent-runner, scorer, budget/RNG passed via `deps`) plus a thin Workflow shim
+that binds the runtime globals into `deps` at launch. Only the pure core is tested and promoted-over; the shim is a few
+lines and stays in the immutable substrate. The pure core must also _read_ `algorithm`, `context_mode`, and
+`selection` from `policy` (today hardcoded), so all 8 vocabulary fields are engine-interpreted and promotion is
+behavior-complete. This refactor is the precondition for the <1s deterministic tests and for
+the Phase-0 power gate running without nested LLM cost — it is committed work, not a free property.
+
+With that core, the polymorphism test, known-positive control, and negative control all run in <1s with zero
+LLM/nested-compute cost by injecting deterministic closures via `deps`. Four new files, all in `make test-skills` + CI's
+`rsi-loop` job (no new deps):
+
+| File                                     | Role                                                                                                                                                                                                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/test-engine-polymorphism.sh`      | run `search()` twice, one policy+seed, two stub adapters (`solutionStub`, `scaffoldStub`) via `deps`; assert identical draft count, `max_nodes` cap, node-ledger key set, greedy pick, debug routing on a `buggy:true` stub, and the grep-zero structural invariant |
+| `tests/fixtures/synthetic-landscape.mjs` | deterministic unimodal seed-noised scorer using the engine's Lehmer RNG (no `Math.random`): `s(θ,seed,node)=1−(θ−0.8)²+ε`, mock `propose` steps halfway toward θ\*=0.8                                                                                              |
+| `tests/test-ignition-instrument.sh`      | three controls at K=3 (below)                                                                                                                                                                                                                                       |
+| `scripts/rsi-ignition.py`                | ignition stats: `decide` (verdict) + `power` (MDE/K_req/`--calibrate`) subcommands                                                                                                                                                                                  |
+
+**Known-positive control (proves the instrument has power):** two outer policies over the synthetic landscape, differing
+only in FIXED-schema knob values (proving promotion is a literal policy lift): **stock** `num_drafts=2, max_nodes=4` vs
+**rigged-better** `num_drafts=8, max_nodes=12`. Same operator, so rigged-better is provably the stronger outer
+optimizer; realized asymptote gap tuned to ≈0.15. Three assertions:
+
+1. **POSITIVE** — effect 0.15, σ_d≈0.05 ⇒ MDE(3)=0.072; 0.15 ≫ 0.072 → **must return IGNITION**.
+2. **NEGATIVE** — promoted == stock (effect 0), noise on → **must return NO IGNITION** (guards the M5
+   signal-free-verdict failure).
+3. **UNDERPOWERED/HONESTY** — effect 0.03 (M5-scale), MDE(3)=0.072 > 0.03 → **must return INCONCLUSIVE**, not a false
+   IGNITION (the exact scenario M5 mishandled).
+
+**Power quantified** (`rsi-ignition.py power`, paired one-sided, α=0.05, power 0.80 ⇒ constant 2.487): `MDE(K) =
+2.487·σ_d/√K`, `K_req(effect) = ceil((2.487·σ_d/effect)²)`; `σ_d` **measured** via `--calibrate` (control-vs-control),
+planning value ≈0.05.
+
+| K (seeds)   | MDE (min detectable asymptote gap) |
+| ----------- | ---------------------------------- |
+| 3 (default) | **0.072**                          |
+| 5           | 0.056                              |
+| 10          | 0.039                              |
+| **25**      | **0.025**                          |
+
+The M5 lesson, quantified: M5's point estimate −0.025 (itself inside the noise band) ran at K=3 (MDE 0.072) —
+underpowered ~3× for any sub-0.072 effect. Resolving a 0.025-scale effect needs **K ≈ 25**. `--calibrate` prints
+`K_req(target_effect)` on the real battery
+so the real ignition run is declared INCONCLUSIVE _before_ spending if the budget can't fund the required seeds — the
+honest non-claim is made up front, not after a wasted campaign.
+
+**`ponytail:` fixed G=8/nest-depth-3/tail={6,7,8}, two literal adapters, no adapter registry/factory, no
+successive-halving proxy machinery — best-so-far + mean-of-last-2 + paired sign test is the whole instrument; upgrade
+only if G later exceeds ~10.**
 
 ## 7. Risks / open questions
 
-- **Cost**: even miniaturized, each outer step = full battery evaluation. Mitigations: haiku
-  inner model, tiny tasks, hard token caps, structural pre-gate before spending eval budget.
+- **Compute-nesting tension (M6, resolved — §6.1.2)**: Approach-1 isomorphism makes each outer node's score a full inner
+  campaign (3-level nesting). This is settled by **miniaturizing the search while enlarging the measurement**: haiku
+  inner model, a binding per-sub-run **token** cap `B_inner` (~335K tok/sub-run, ~2.0M tok/campaign ≈ $4, tuned so the
+  incumbent spends 80–90%; dollars are a reporting conversion, the harness meters tokens), 2 pre-screened discriminating
+  selection families with ≥50 graded private instances each, `--seeds 3`, `G=8` outer meta-gens, a **paired**
+  control-vs-ignited A/B — full envelope ~$233, most runs ~$163 (phased, Phase-0 power-gated). Residual risks now
+  bounded and named: a 2-family selection battery re-opens some overfitting pressure (fenced by the third family as
+  outer-private survival signal + untouched far-OOD holdout at `/rsi:report`); the engine must first be factored into a
+  pure `search(deps,…)` core (arch-required, §6.1.6); and if `--calibrate` shows the smallest interesting effect needs
+  K≫3 seeds, the run is declared INCONCLUSIVE **before** spend rather than over-claimed.
+- **Lineage forfeit (M6, named — §6.1.5)**: Approach 1 freezes the engine and fixes the 8-field vocabulary, so run-002's
+  incumbent (gen-006: ~260 engine lines of Probe machinery + 7 out-of-vocabulary policy fields) is **not** promotable
+  and M6 re-derives from `gen-000`. Whether the fixed vocabulary can recapture a gen-006-class gain is an open empirical
+  question; a "no" is a paper-consistent not-supported outcome, not a spec failure. The alternative (widening the
+  promoted scaffold to include the engine) is rejected because it kills the immutable-substrate / grep-zero invariant
+  that makes promotion a literal `cp`.
+- **Cost (M6, bounded — §6.1.2)**: even miniaturized, each outer node = a full inner campaign, so the paired A/B is the
+  dominant spend. Mitigations are committed and quantified: haiku inner model, binding **token** budget (not a node
+  counter — brute force can't win at equal budget), enlarged-but-free deterministic private sets, and a Phase-0
+  known-good-delta gate (~$8) that must detect a planted gen-002 > gen-000 before any A/B budget is released. Honest
+  residual: R=3 paired reps × 8 meta-gens detects only **large** ignition effects (the paper's own "no asymptotic
+  advantage" null is the expected outcome); a subtle sub-MDE asymptote edge is correctly unclaimable, and escalation
+  past ~$233 is authorized only if the pilot shows a calibrated, gate-clearing signal.
 - **Eval noise vs. tiny tasks**: small privates make accept/reject noisy; use multiple seeds per
   task and require the paper's "sustained, multi-step" trend, not single jumps. _As-built (run-002):_
   confirmed — a single-seed headline (gen-005 0.856) collapsed to 0.644 under `--seeds 3`
