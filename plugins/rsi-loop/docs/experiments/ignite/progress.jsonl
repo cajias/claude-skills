@@ -1,0 +1,16 @@
+{"arm":"arm-control","gen":"gen-001","task":"bin-packing","seed":42,"public":0.964762,"private":0.937937,"sandbox":"arm-control/eval/gen-001/bin-packing/sandbox","note":"calibration eval; matches historical baseline 0.938"}
+{"arm":"arm-control","gen":"gen-001","task":"bin-packing","seed":44,"public":0.964762,"private":0.937937}
+{"arm":"arm-control","gen":"gen-001","task":"bin-packing","seed":43,"public":0.964762,"private":0.937937}
+{"arm":"arm-ignited","gen":"gen-001","task":"bin-packing","seed":42,"public":0.964762,"private":0.937937,"selected_node":5,"top_public_node":0,"top_public_private":0.937937,"probe_broke_tie":true,"spread":0.545}
+{"arm":"arm-control","gen":"gen-001","task":"tabular-classification","seed":44,"public":0.9,"private":0.9,"selected_node":8}
+{"arm":"arm-control","gen":"gen-001","task":"tabular-classification","seed":43,"public":0.955,"private":0.975,"selected_node":5}
+{"arm":"arm-ignited","gen":"gen-001","task":"tabular-classification","seed":42,"public":0.885,"private":0.825,"selected_node":6,"top_public_node":7,"top_public_private":0.9125,"probe_broke_tie":true,"spread":0.416}
+{"arm":"arm-ignited","gen":"gen-001","task":"tabular-classification","seed":44,"public":0.92,"private":0.925,"selected_node":5,"top_public_node":8,"top_public_private":0.9,"probe_broke_tie":true,"spread":0.5}
+{"arm":"arm-ignited","gen":"gen-001","task":"tabular-classification","seed":43,"public":0.805,"private":0.775,"selected_node":6,"top_public_node":8,"top_public_private":0.9375,"probe_broke_tie":true,"spread":0.429}
+{"arm":"arm-control","gen":"gen-001","task":"instruction-routing","seed":42,"public":1.0,"private":0.0,"selected_node":0}
+{"arm":"arm-control","gen":"gen-001","task":"instruction-routing","seed":43,"public":1.0,"private":0.0,"selected_node":0}
+{"arm":"arm-control","gen":"gen-001","task":"instruction-routing","seed":44,"public":1.0,"private":0.0,"selected_node":0}
+{"arm":"arm-ignited","gen":"gen-001","task":"instruction-routing","seed":43,"public":1.0,"private":0.0,"selected_node":0,"probe_outcome":"saturated-fallback","spread":0.063}
+{"arm":"arm-ignited","gen":"gen-001","task":"instruction-routing","seed":44,"public":1.0,"private":0.0,"selected_node":1,"top_public_node":0,"top_public_private":0.0,"probe_broke_tie":true,"spread":0.3,"node8_generalizer":0.0}
+{"arm":"arm-ignited","gen":"gen-001","task":"instruction-routing","seed":42,"public":1.0,"private":0.0625,"selected_node":1,"top_public_node":0,"probe_broke_tie":true,"spread":0.302,"node5_generalizer":0.0625}
+{"arm":"arm-control","gen":"gen-001","task":"tabular-classification","seed":42,"public":0.885,"private":0.8625,"selected_node":7}

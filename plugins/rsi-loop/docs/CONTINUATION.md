@@ -20,8 +20,13 @@ this repo; the scratchpad run directory is ephemeral and fully reconstructable f
 - **M4 — MEASURED** (`docs/experiments/m4-report.md`): Level 0 and Level 1 both met; gen-005
   beats the hand-tuned `gen-human` baseline 0.588 by +0.269; holdout near-transfer mean Δ +0.279,
   far-OOD Δ −0.016 (reported separately). Real `/rsi:report` output committed.
-- **M5 — MACHINERY BUILT** (`commands/rsi-ignite.md`): `/rsi:ignite` Level-2 swap test. The
-  real ignition campaign is **not yet run** (see "How to continue").
+- **M5 — RUN; Level-2 NOT supported** (`docs/experiments/ignite/README.md`): `/rsi:ignite` step-1
+  paired A/B (both arms from gen-000, `--seeds 3`) → mean-of-per-task-medians **control 0.6126 vs
+  ignited 0.5876** (ignited −0.025, a measurable regression, stronger than the paper's same-ceiling
+  wash). The deficit is entirely tabular: gen-006's adversarial-robustness tie-break probe rides on a
+  public-data battery with no discriminating signal on the coarse private buckets, so its noisy
+  tie-break is strictly worse than greedy-public. Operator stopped after the decisive step 1 (7 of 8
+  steps not run — verdict won't flip). This was the last open milestone; the rsi-loop plan is COMPLETE.
 - **§5.2 chassis A/B — RESOLVED (2026-07-20)** (`docs/experiments/chassis-ab/`): ship **Arm B**
   (native `/rsi:step` / `/rsi:run`); keep autoresearch as pattern reference. Decided on the
   pre-registered structural metrics via a paired run + the Arm A chassis demo (not the full
@@ -30,16 +35,17 @@ this repo; the scratchpad run directory is ephemeral and fully reconstructable f
 
 ## How to continue (from the banked state)
 
-The scientific core is proven and committed (M1–M4), M3 ran to a plateau stop, and §5.2 is decided.
-Only **one** real-compute run remains — the M5 ignition campaign, explicitly deferred by the operator.
-It is driven from the committed run-002 evidence — the scratchpad run dir is ephemeral and
-reconstructable from `docs/experiments/run-002/` (ledger + `gen-000/003/004/005/006/007/008/009`
-generation dirs + `seeds3-evals/` winning-node snapshots). Rebuild it, then:
+The scientific core is proven and committed (M1–M4), M3 ran to a plateau stop, §5.2 is decided, and
+**M5 has now run — the plan is COMPLETE with no real-compute items left.**
 
-1. **M5 — `/rsi:ignite <run-dir>`.** Paired A/B of two full 8-step campaigns (control vs a
-   proposer briefed with gen-006's discovered strategy), ~48 evals. The paper found a Level-2
-   _rejection_ (faster convergence, same ceiling) and the command is instrumented to measure that
-   honestly, not to pass — expect to document a known-negative.
+1. **M5 — `/rsi:ignite` — DONE (Level-2 NOT supported).** Ran a step-1 paired A/B from gen-002 evidence
+   (both arms from gen-000, `--seeds 3`): mean-of-per-task-medians **control 0.6126 vs ignited 0.5876**
+   — ignited −0.025, a measurable regression, stronger than the paper's "same-ceiling" wash. Deficit is
+   entirely tabular (gen-006's adversarial-robustness tie-break probe rides on a public-data battery with
+   no discriminating signal on coarse private buckets → noisy tie-break strictly worse than greedy-public).
+   Operator stopped after the decisive step 1; the other 7 of 8 steps were not run (verdict won't flip).
+   Full evidence + mechanism: `docs/experiments/ignite/README.md`. The paper's expected known-negative,
+   measured honestly — not passed. (The historical rebuild recipe below is retained for reference.)
 
 **M3 steps 4–10 — DONE** (was item 1). run-002 ran to a plateau stop at 10 ledger steps
 (~37.9M inner tokens); incumbent advanced gen-005 → **gen-006** (robust 0.644 → 0.725 under
@@ -105,19 +111,19 @@ accepts were gated by the mechanical battery (reproduce vs pristine scorer, git 
 escape-residue, hard-coding audit, too-good outlier) — all clean. The extension steps 4–10 then ran
 under `--seeds 3`; budget for the remaining big-compute item (M5 `/rsi:ignite`) is the live constraint.
 
-Resume plan: see the "How to continue" section above. In short — M3 is done (incumbent **gen-006**,
-robust 0.725); only M5 `/rsi:ignite` remains, explicitly deferred by the operator. §5.2 chassis A/B
-is DONE (ship Arm B — `docs/experiments/chassis-ab/`); M4 `/rsi:report` is already done
-(`docs/experiments/m4-report.md`).
+Resume plan: **nothing left to run — the rsi-loop plan is COMPLETE.** M1–M2 shipped; M3 done
+(incumbent **gen-006**, robust 0.725); §5.2 chassis A/B done (ship Arm B — `docs/experiments/chassis-ab/`);
+M4 `/rsi:report` done (`docs/experiments/m4-report.md`); M5 `/rsi:ignite` RUN — Level-2 NOT supported
+(`docs/experiments/ignite/README.md`). Only optional future work remains (the §7 phantom-node fix and
+deny-hook/immutable-harness security tests — both belong in a future generation, never a mid-run harness edit).
 
-## Pending execution phase (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
+## Execution phase — COMPLETE (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
 
-§5.2 chassis A/B is **DONE** (ship Arm B — `docs/experiments/chassis-ab/`), M4 `/rsi:report`
-is **DONE** (`docs/experiments/m4-report.md`), and **M3 steps 4–10 is DONE** (run-002 plateau stop,
-incumbent gen-006). Marketplace promotion and the as-built PLAN.md reconciliation are also complete.
-The only outstanding item is **M5 `/rsi:ignite`**, explicitly deferred by the operator. Pace that
-multi-hour run via `send_later`/ScheduleWakeup re-invoking `/rsi:run` on the same run dir
-(resume-aware from the ledger plus best.txt).
+§5.2 chassis A/B **DONE** (ship Arm B — `docs/experiments/chassis-ab/`), M4 `/rsi:report` **DONE**
+(`docs/experiments/m4-report.md`), **M3 steps 4–10 DONE** (run-002 plateau stop, incumbent gen-006),
+and **M5 `/rsi:ignite` DONE** — Level-2 NOT supported (step-1 paired A/B: ignited 0.5876 < control 0.6126;
+`docs/experiments/ignite/README.md`). Marketplace promotion and the as-built PLAN.md reconciliation are
+also complete. No pending real-compute items remain.
 
 ## How to resume a live run
 

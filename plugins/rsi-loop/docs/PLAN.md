@@ -12,15 +12,16 @@ Primary sources:
 
 Status: **M1–M2 shipped; M3 complete (run-002 ran to a plateau stop at 10 ledger steps,
 ~37.9M inner tokens, incumbent gen-006); M4 measured (Level 0 and Level 1 met — see
-`docs/experiments/m4-report.md`); M5 machinery built, ignition run pending.** The plugin is
+`docs/experiments/m4-report.md`); M5 ignition run complete — Level-2 NOT supported (ignited 0.5876 <
+control 0.6126 at equal 1-step budget; see `docs/experiments/ignite/README.md`).** The plugin is
 promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-000 floor
 0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
 gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
 mean Δ +0.279 (carried by instruction-ops 0.0 → 0.85), far-OOD Δ −0.016 (timeseries-forecast,
 reported separately). The §5.2 chassis A/B is **resolved (2026-07-20): ship Arm B (native
 `/rsi:step` / `/rsi:run`); autoresearch stays as pattern reference** (evidence in
-`docs/experiments/chassis-ab/`). Remaining execution phase: only the M5 `/rsi:ignite` Level-2
-campaign (a large real-compute run; explicitly deferred by the operator). This document is the build
+`docs/experiments/chassis-ab/`). Execution phase COMPLETE: the M5 `/rsi:ignite` Level-2 campaign ran
+(step-1 paired A/B → Level-2 NOT supported, `docs/experiments/ignite/README.md`). This document is the build
 spec; where the shipped code has diverged from it, the deviation is noted inline and in
 [CONTINUATION.md](CONTINUATION.md).
 
@@ -399,9 +400,14 @@ disambiguates by plugin prefix, but if adoption lands in M2 we should rename our
   `baseline/gen-human` hand-tuned baseline, `holdout-tasks/` (one per family + a far-OOD
   time-series task), `/rsi:report` (`scripts/rsi-report.py`) with ladder-level evidence
   (improvement slope vs. baseline, generalization deltas, hack-rate trend).
-- **M5 — ignition test** _(machinery built; ignition run pending)_: `/rsi:ignite` swaps the best generation's strategy
-  into the proposer role and compares campaigns at equal budget (the paper's Level-2 test —
-  expect, like Weco, to measure it honestly rather than to pass it).
+- **M5 — ignition test** _(RUN — Level-2 NOT supported; see `docs/experiments/ignite/README.md`)_:
+  `/rsi:ignite` swaps the best generation's strategy into the proposer role and compares campaigns at
+  equal budget (the paper's Level-2 test). Step-1 paired A/B (both arms from gen-000, `--seeds 3`):
+  mean-of-per-task-medians **control 0.6126 vs ignited 0.5876** — ignited is −0.025 _worse_, a
+  measurable regression, not merely the paper's "same-ceiling" wash. Root cause: gen-006's
+  adversarial-robustness tie-break probe rides on a public-data battery that carries no discriminating
+  signal on the coarse tabular private buckets, so a noisy tie-break is strictly worse than
+  greedy-public. Measured honestly, as expected — not passed.
 
 ## 7. Risks / open questions
 
