@@ -26,7 +26,11 @@ this repo; the scratchpad run directory is ephemeral and fully reconstructable f
   wash). The deficit is entirely tabular: gen-006's adversarial-robustness tie-break probe rides on a
   public-data battery with no discriminating signal on the coarse private buckets, so its noisy
   tie-break is strictly worse than greedy-public. Operator stopped after the decisive step 1 (7 of 8
-  steps not run — verdict won't flip). This was the last open milestone; the rsi-loop plan is COMPLETE.
+  steps not run — verdict won't flip). This run is banked history, but a post-run design review diagnosed
+  its "not supported" verdict as a **measurement artifact / category error** (a 1-step endpoint A/B tests
+  strategy-briefing, not whether the evolved agent is a better outer agent — the paper's first-order trajectory
+  comparison), so **Level 2 is reopened as M6** (Approach-1 isomorphic
+  re-architecture, design COMPLETE — full resolved spec in §6.1 of [PLAN.md](PLAN.md)).
 - **§5.2 chassis A/B — RESOLVED (2026-07-20)** (`docs/experiments/chassis-ab/`): ship **Arm B**
   (native `/rsi:step` / `/rsi:run`); keep autoresearch as pattern reference. Decided on the
   pre-registered structural metrics via a paired run + the Arm A chassis demo (not the full
@@ -36,7 +40,22 @@ this repo; the scratchpad run directory is ephemeral and fully reconstructable f
 ## How to continue (from the banked state)
 
 The scientific core is proven and committed (M1–M4), M3 ran to a plateau stop, §5.2 is decided, and
-**M5 has now run — the plan is COMPLETE with no real-compute items left.**
+**M5 has run (Level-2 NOT supported) — but that verdict is now diagnosed as a measurement artifact, so
+Level 2 is reopened as M6 (design COMPLETE — full resolved spec in §6.1 of [PLAN.md](PLAN.md)).** run-002/M5 stay
+banked history; the live work is now the M6 IMPLEMENTATION.
+
+**How to continue → M6 (design COMPLETE; the live work is IMPLEMENTATION).** The Approach-1 isomorphic re-architecture
+is now fully specified in **§6.1 of [PLAN.md](PLAN.md)** — all five open items (compute-nesting, battery, rate rule,
+promotion mechanics, testing/known-positive control) are resolved with committed numbers, not "TBD," and the three arch
+constraints are folded in: the promotion is a fresh campaign **from `gen-000`** (run-002's engine-resident incumbent is
+deliberately not carried), the budget is metered in **tokens** (dollars are a reporting conversion), and the engine must
+first be factored into a pure `search(deps, policy, adapter)` core plus a thin Workflow shim. The next work is building
+that resolved spec: extract `search-engine.mjs` as the pure core with injected agent-runner/scorer/budget (with the
+grep-zero polymorphism test), placeholder-template the `baseline/gen-000` prompts, regenerate the enlarged/de-saturated
+task splits + `--power-check`, add `scripts/rsi-ignition.py` (subcommands `decide` + `power`) with its self-check,
+and rewrite `commands/rsi-ignite.md` so the seam is the `cp` policy+prompt lift into the flat arm dir. M6
+remains a reopening/design, not a Level-2 result — the expected verdict stays NOT-supported (paper parity), and the
+Phase-0 power gate must pass before any A/B budget is spent.
 
 1. **M5 — `/rsi:ignite` — DONE (Level-2 NOT supported).** Ran a step-1 paired A/B from gen-002 evidence
    (both arms from gen-000, `--seeds 3`): mean-of-per-task-medians **control 0.6126 vs ignited 0.5876**
@@ -111,19 +130,25 @@ accepts were gated by the mechanical battery (reproduce vs pristine scorer, git 
 escape-residue, hard-coding audit, too-good outlier) — all clean. The extension steps 4–10 then ran
 under `--seeds 3`; budget for the remaining big-compute item (M5 `/rsi:ignite`) is the live constraint.
 
-Resume plan: **nothing left to run — the rsi-loop plan is COMPLETE.** M1–M2 shipped; M3 done
-(incumbent **gen-006**, robust 0.725); §5.2 chassis A/B done (ship Arm B — `docs/experiments/chassis-ab/`);
-M4 `/rsi:report` done (`docs/experiments/m4-report.md`); M5 `/rsi:ignite` RUN — Level-2 NOT supported
-(`docs/experiments/ignite/README.md`). Only optional future work remains (the §7 phantom-node fix and
-deny-hook/immutable-harness security tests — both belong in a future generation, never a mid-run harness edit).
+Resume plan: **M1–M5 execution is banked; the M6 design is COMPLETE (§6.1 of [PLAN.md](PLAN.md)) and the live work is
+the M6 IMPLEMENTATION (Level 2 reopened).** M1–M2
+shipped; M3 done (incumbent **gen-006**, robust 0.725); §5.2 chassis A/B done (ship Arm B —
+`docs/experiments/chassis-ab/`); M4 `/rsi:report` done (`docs/experiments/m4-report.md`); M5 `/rsi:ignite`
+RUN — Level-2 NOT supported (`docs/experiments/ignite/README.md`), now diagnosed as a measurement artifact
+→ **Level 2 reopened as M6** (Approach-1 isomorphic re-architecture, design COMPLETE — see §6.1 in
+[PLAN.md](PLAN.md)). Also-optional future work: the §7 phantom-node fix and
+deny-hook/immutable-harness security tests — both belong in a future generation, never a mid-run harness edit.
 
-## Execution phase — COMPLETE (real Workflow compute, ~0.5M tokens / ~30 min per inner eval)
+## Execution phase (M1–M5) — banked; Level 2 reopened as M6 (design COMPLETE, implementation live)
 
 §5.2 chassis A/B **DONE** (ship Arm B — `docs/experiments/chassis-ab/`), M4 `/rsi:report` **DONE**
 (`docs/experiments/m4-report.md`), **M3 steps 4–10 DONE** (run-002 plateau stop, incumbent gen-006),
-and **M5 `/rsi:ignite` DONE** — Level-2 NOT supported (step-1 paired A/B: ignited 0.5876 < control 0.6126;
+and **M5 `/rsi:ignite` RUN** — Level-2 NOT supported (step-1 paired A/B: ignited 0.5876 < control 0.6126;
 `docs/experiments/ignite/README.md`). Marketplace promotion and the as-built PLAN.md reconciliation are
-also complete. No pending real-compute items remain.
+also complete. The M5 verdict is now diagnosed as a measurement artifact (category-error ignition test),
+so **Level 2 is reopened as M6** (Approach-1 isomorphic re-architecture, design COMPLETE — full resolved spec in §6.1 of
+[PLAN.md](PLAN.md)); the live work is now the M6 IMPLEMENTATION (extract the pure engine core, reshape the battery, add
+the rate-decision + power scripts, rewrite the `cp`-lift ignite seam), with the Phase-0 power gate before any A/B spend.
 
 ## How to resume a live run
 
