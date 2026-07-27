@@ -52,6 +52,33 @@ check "Level 1 unknown without baseline" None "$(echo "$OUT" | field "v['rsi_lad
 check "trajectory tops out at 0.70, not 0.90" 0.7 \
   "$(echo "$OUT" | field "v['trajectory'][-1]['incumbent_private_aggregate']")"
 
+# tokens_to_best: best (0.70) first reached at step 4; all 5 steps spent 100
+# inner_tokens each (accepted AND rejected both count) → 500.
+check "tokens_to_best = cumulative spend through the best step (500)" 500 \
+  "$(echo "$OUT" | field "v['tokens_to_best']")"
+
+# step-0-only ledger → tokens_to_best equals step-0 inner_tokens.
+S0="$WORK/step0.jsonl"
+cat > "$S0" <<'JSONL'
+{"step":0,"generation":"gen-000","parent":null,"mutation":"baseline","private_aggregate":0.50,"inner_tokens":123,"verifier":null,"accepted":true,"reason":"baseline"}
+JSONL
+OUT0="$(python3 "$REP" --ledger "$S0")"
+check "tokens_to_best on step-0-only = step-0 inner_tokens (123)" 123 \
+  "$(echo "$OUT0" | field "v['tokens_to_best']")"
+
+# Best reached EARLY (step 1 = 0.70) then later steps rejected → tokens_to_best
+# stops at step 1's cumulative (100+100=200), NOT the 400 total.
+EB="$WORK/early-best.jsonl"
+cat > "$EB" <<'JSONL'
+{"step":0,"generation":"gen-000","parent":null,"mutation":"baseline","private_aggregate":0.50,"inner_tokens":100,"verifier":null,"accepted":true,"reason":"baseline"}
+{"step":1,"generation":"gen-001","parent":"gen-000","mutation":"m1","private_aggregate":0.70,"inner_tokens":100,"verifier":{"verdict":"clean"},"accepted":true,"reason":"beats"}
+{"step":2,"generation":"gen-002","parent":"gen-001","mutation":"m2","private_aggregate":0.65,"inner_tokens":100,"verifier":{"verdict":"clean"},"accepted":false,"reason":"regressed"}
+{"step":3,"generation":"gen-003","parent":"gen-001","mutation":"m3","private_aggregate":0.60,"inner_tokens":100,"verifier":{"verdict":"clean"},"accepted":false,"reason":"regressed"}
+JSONL
+OUTE="$(python3 "$REP" --ledger "$EB")"
+check "tokens_to_best stops at early best step (200), not 400 total" 200 \
+  "$(echo "$OUTE" | field "v['tokens_to_best']")"
+
 # With a human baseline the run's best (0.70) clears: Level 1 met.
 OUT="$(python3 "$REP" --ledger "$LED" --baseline-human 0.65)"
 check "Level 1 met when best beats human baseline" True \

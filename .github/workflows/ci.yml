@@ -147,6 +147,9 @@ jobs:
       - name: Ladder-evidence report
         run: bash plugins/rsi-loop/tests/test-report.sh
 
+      - name: Ignition instrument controls
+        run: bash plugins/rsi-loop/tests/test-ignition-instrument.sh
+
   test-scripts:
     name: Test scripts
     runs-on: ubuntu-latest
