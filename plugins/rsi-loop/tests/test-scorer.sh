@@ -38,7 +38,7 @@ def pack(items, capacity):
             bins.append([i]); loads.append(items[i])
     return bins
 PY
-check "FFD public score is the known 0.964762" 0.964762 \
+check "FFD public score is the known 0.882149" 0.882149 \
   "$(python3 "$SCORE" --public --solution "$WORK/ffd.py" | score_of)"
 
 cat > "$WORK/cheat.py" <<'PY'

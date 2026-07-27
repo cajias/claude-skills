@@ -2,113 +2,113 @@
   "cases": [
     {
       "name": "add-0",
-      "instruction": "what is 7 plus 2",
+      "instruction": "what\u00a0is\u00a07\u00a0plus\u00a02",
       "expected": "9"
     },
     {
       "name": "subtract-1",
-      "instruction": "-3 - 12",
-      "expected": "-15"
+      "instruction": "what\u00a0is\u00a0-2\u00a0minus\u00a0-3",
+      "expected": "1"
     },
     {
       "name": "multiply-2",
-      "instruction": "what is -2 times 7",
-      "expected": "-14"
+      "instruction": "what\u00a0is\u00a0-4\u00a0times\u00a0-3",
+      "expected": "12"
     },
     {
       "name": "reverse-3",
-      "instruction": "spell orange backwards",
-      "expected": "egnaro"
+      "instruction": "what is quick reversed",
+      "expected": "kciuq"
     },
     {
       "name": "uppercase-4",
-      "instruction": "convert python to uppercase",
-      "expected": "PYTHON"
-    },
-    {
-      "name": "letters-5",
-      "instruction": "length of the word kernel",
-      "expected": "6"
-    },
-    {
-      "name": "nth-6",
-      "instruction": "what is element 1 in [pear, apple, mango, lime, date]",
-      "expected": "pear"
-    },
-    {
-      "name": "max-7",
-      "instruction": "biggest number in [2, 39, 14, 37]",
-      "expected": "39"
-    },
-    {
-      "name": "add-8",
-      "instruction": "what is 13 plus 20",
-      "expected": "33"
-    },
-    {
-      "name": "subtract-9",
-      "instruction": "-9 - 6",
-      "expected": "-15"
-    },
-    {
-      "name": "multiply-10",
-      "instruction": "what is 0 times 1",
-      "expected": "0"
-    },
-    {
-      "name": "reverse-11",
-      "instruction": "spell kernel backwards",
-      "expected": "lenrek"
-    },
-    {
-      "name": "uppercase-12",
-      "instruction": "convert python to uppercase",
-      "expected": "PYTHON"
-    },
-    {
-      "name": "letters-13",
-      "instruction": "length of the word python",
-      "expected": "6"
-    },
-    {
-      "name": "nth-14",
-      "instruction": "item number 2 of [fig, kiwi, pear, apple]",
-      "expected": "kiwi"
-    },
-    {
-      "name": "max-15",
-      "instruction": "biggest number in [19, 8, 37]",
-      "expected": "37"
-    },
-    {
-      "name": "add-16",
-      "instruction": "sum of 15 and -6",
-      "expected": "9"
-    },
-    {
-      "name": "subtract-17",
-      "instruction": "27 - -6",
-      "expected": "33"
-    },
-    {
-      "name": "multiply-18",
-      "instruction": "what is 4 times 5",
-      "expected": "20"
-    },
-    {
-      "name": "reverse-19",
-      "instruction": "spell python backwards",
-      "expected": "nohtyp"
-    },
-    {
-      "name": "uppercase-20",
       "instruction": "convert banana to uppercase",
       "expected": "BANANA"
     },
     {
+      "name": "letters-5",
+      "instruction": "count the letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-6",
+      "instruction": "what is element 1 in [fig, kiwi, pear]",
+      "expected": "fig"
+    },
+    {
+      "name": "max-7",
+      "instruction": "biggest number in [\uff13, \uff11\uff16, \uff11\uff11]",
+      "expected": "16"
+    },
+    {
+      "name": "add-8",
+      "instruction": "what is \uff12\uff10 plus \uff13",
+      "expected": "23"
+    },
+    {
+      "name": "subtract-9",
+      "instruction": "-\uff17 - \uff12\uff10",
+      "expected": "-27"
+    },
+    {
+      "name": "multiply-10",
+      "instruction": "product of \uff13 and \uff18",
+      "expected": "24"
+    },
+    {
+      "name": "reverse-11",
+      "instruction": "spell harness backwards",
+      "expected": "ssenrah"
+    },
+    {
+      "name": "uppercase-12",
+      "instruction": "shout the word signal",
+      "expected": "SIGNAL"
+    },
+    {
+      "name": "letters-13",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0harness",
+      "expected": "7"
+    },
+    {
+      "name": "nth-14",
+      "instruction": "item number 1 of [apple]",
+      "expected": "apple"
+    },
+    {
+      "name": "max-15",
+      "instruction": "the\u00a0maximum\u00a0of\u00a0[18,\u00a025,\u00a040]",
+      "expected": "40"
+    },
+    {
+      "name": "add-16",
+      "instruction": "1\u00a0+\u00a02",
+      "expected": "3"
+    },
+    {
+      "name": "subtract-17",
+      "instruction": "what\u00a0is\u00a0-6\u00a0minus\u00a0-9",
+      "expected": "3"
+    },
+    {
+      "name": "multiply-18",
+      "instruction": "what\u00a0is\u00a08\u00a0times\u00a09",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-19",
+      "instruction": "what is signal reversed",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-20",
+      "instruction": "convert kernel to uppercase",
+      "expected": "KERNEL"
+    },
+    {
       "name": "letters-21",
-      "instruction": "length of the word kernel",
-      "expected": "6"
+      "instruction": "count the letters in delta",
+      "expected": "5"
     },
     {
       "name": "nth-22",
@@ -117,48 +117,688 @@
     },
     {
       "name": "max-23",
-      "instruction": "biggest number in [16, 35, 18, 5]",
-      "expected": "35"
+      "instruction": "biggest number in [\uff13\uff17, \uff11\uff18, \uff17]",
+      "expected": "37"
     },
     {
       "name": "add-24",
-      "instruction": "sum of -3 and 14",
-      "expected": "11"
+      "instruction": "sum of \uff12 and \uff11",
+      "expected": "3"
     },
     {
       "name": "subtract-25",
-      "instruction": "-9 - 12",
-      "expected": "-21"
+      "instruction": "-\uff13 - \uff12",
+      "expected": "-5"
     },
     {
       "name": "multiply-26",
-      "instruction": "what is 8 times 9",
-      "expected": "72"
+      "instruction": "product of -\uff11 and \uff14",
+      "expected": "-4"
     },
     {
       "name": "reverse-27",
-      "instruction": "spell kernel backwards",
-      "expected": "lenrek"
+      "instruction": "spell banana backwards",
+      "expected": "ananab"
     },
     {
       "name": "uppercase-28",
-      "instruction": "convert banana to uppercase",
-      "expected": "BANANA"
+      "instruction": "shout the word cat",
+      "expected": "CAT"
     },
     {
       "name": "letters-29",
-      "instruction": "length of the word kernel",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0banana",
       "expected": "6"
     },
     {
       "name": "nth-30",
-      "instruction": "what is element 2 in [fig, kiwi, pear, apple, mango]",
-      "expected": "kiwi"
+      "instruction": "what is element 1 in [plum, fig, kiwi, pear]",
+      "expected": "plum"
     },
     {
       "name": "max-31",
-      "instruction": "the maximum of [6, -3, 12]",
-      "expected": "12"
+      "instruction": "biggest number in [5, 26, 1, 8, 17]",
+      "expected": "26"
+    },
+    {
+      "name": "add-32",
+      "instruction": "what is 0 plus 7",
+      "expected": "7"
+    },
+    {
+      "name": "subtract-33",
+      "instruction": "23 - 0",
+      "expected": "23"
+    },
+    {
+      "name": "multiply-34",
+      "instruction": "product of 1 and -2",
+      "expected": "-2"
+    },
+    {
+      "name": "reverse-35",
+      "instruction": "spell\u00a0kernel\u00a0backwards",
+      "expected": "lenrek"
+    },
+    {
+      "name": "uppercase-36",
+      "instruction": "shout the word signal",
+      "expected": "SIGNAL"
+    },
+    {
+      "name": "letters-37",
+      "instruction": "length of the word orange",
+      "expected": "6"
+    },
+    {
+      "name": "nth-38",
+      "instruction": "item\u00a0number\u00a01\u00a0of\u00a0[lime]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-39",
+      "instruction": "the maximum of [14, 21, 30]",
+      "expected": "30"
+    },
+    {
+      "name": "add-40",
+      "instruction": "sum of 11 and 14",
+      "expected": "25"
+    },
+    {
+      "name": "subtract-41",
+      "instruction": "what is 8 minus 11",
+      "expected": "-3"
+    },
+    {
+      "name": "multiply-42",
+      "instruction": "what is -2 times 7",
+      "expected": "-14"
+    },
+    {
+      "name": "reverse-43",
+      "instruction": "what is signal reversed",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-44",
+      "instruction": "convert\u00a0python\u00a0to\u00a0uppercase",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-45",
+      "instruction": "count the letters in signal",
+      "expected": "6"
+    },
+    {
+      "name": "nth-46",
+      "instruction": "what is element \uff11 in [date, plum, fig]",
+      "expected": "date"
+    },
+    {
+      "name": "max-47",
+      "instruction": "biggest number in [-1, 4, 21]",
+      "expected": "21"
+    },
+    {
+      "name": "add-48",
+      "instruction": "sum of -8 and 7",
+      "expected": "-1"
+    },
+    {
+      "name": "subtract-49",
+      "instruction": "19 - 2",
+      "expected": "17"
+    },
+    {
+      "name": "multiply-50",
+      "instruction": "product of -3 and -6",
+      "expected": "18"
+    },
+    {
+      "name": "reverse-51",
+      "instruction": "spell\u00a0harness\u00a0backwards",
+      "expected": "ssenrah"
+    },
+    {
+      "name": "uppercase-52",
+      "instruction": "shout the word cat",
+      "expected": "CAT"
+    },
+    {
+      "name": "letters-53",
+      "instruction": "length of the word banana",
+      "expected": "6"
+    },
+    {
+      "name": "nth-54",
+      "instruction": "item\u00a0number\u00a01\u00a0of\u00a0[kiwi]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-55",
+      "instruction": "biggest number in [\uff12\uff10, \uff19, -\uff12, \uff11]",
+      "expected": "20"
+    },
+    {
+      "name": "add-56",
+      "instruction": "sum of \uff12 and \uff11\uff11",
+      "expected": "13"
+    },
+    {
+      "name": "subtract-57",
+      "instruction": "\uff19 - \uff11\uff14",
+      "expected": "-5"
+    },
+    {
+      "name": "multiply-58",
+      "instruction": "product of \uff13 and \uff18",
+      "expected": "24"
+    },
+    {
+      "name": "reverse-59",
+      "instruction": "spell harness backwards",
+      "expected": "ssenrah"
+    },
+    {
+      "name": "uppercase-60",
+      "instruction": "shout the word cat",
+      "expected": "CAT"
+    },
+    {
+      "name": "letters-61",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0orange",
+      "expected": "6"
+    },
+    {
+      "name": "nth-62",
+      "instruction": "item number 1 of [apple]",
+      "expected": "apple"
+    },
+    {
+      "name": "max-63",
+      "instruction": "the\u00a0maximum\u00a0of\u00a0[28,\u00a017,\u00a06]",
+      "expected": "28"
+    },
+    {
+      "name": "add-64",
+      "instruction": "19\u00a0+\u00a08",
+      "expected": "27"
+    },
+    {
+      "name": "subtract-65",
+      "instruction": "what\u00a0is\u00a02\u00a0minus\u00a07",
+      "expected": "-5"
+    },
+    {
+      "name": "multiply-66",
+      "instruction": "what\u00a0is\u00a08\u00a0times\u00a09",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-67",
+      "instruction": "what is signal reversed",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-68",
+      "instruction": "convert harness to uppercase",
+      "expected": "HARNESS"
+    },
+    {
+      "name": "letters-69",
+      "instruction": "count the letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-70",
+      "instruction": "what is element 2 in [mango, lime, date]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-71",
+      "instruction": "biggest number in [\uff11\uff19, \uff12\uff10, \uff15]",
+      "expected": "20"
+    },
+    {
+      "name": "add-72",
+      "instruction": "sum of \uff16 and -\uff17",
+      "expected": "-1"
+    },
+    {
+      "name": "subtract-73",
+      "instruction": "\uff12\uff11 - \uff11\uff10",
+      "expected": "11"
+    },
+    {
+      "name": "multiply-74",
+      "instruction": "product of -\uff11 and \uff14",
+      "expected": "-4"
+    },
+    {
+      "name": "reverse-75",
+      "instruction": "spell python backwards",
+      "expected": "nohtyp"
+    },
+    {
+      "name": "uppercase-76",
+      "instruction": "shout the word cat",
+      "expected": "CAT"
+    },
+    {
+      "name": "letters-77",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0harness",
+      "expected": "7"
+    },
+    {
+      "name": "nth-78",
+      "instruction": "item number 1 of [plum]",
+      "expected": "plum"
+    },
+    {
+      "name": "max-79",
+      "instruction": "the\u00a0maximum\u00a0of\u00a0[0,\u00a039,\u00a036]",
+      "expected": "39"
+    },
+    {
+      "name": "add-80",
+      "instruction": "-5\u00a0+\u00a0-2",
+      "expected": "-7"
+    },
+    {
+      "name": "subtract-81",
+      "instruction": "what\u00a0is\u00a06\u00a0minus\u00a09",
+      "expected": "-3"
+    },
+    {
+      "name": "multiply-82",
+      "instruction": "what\u00a0is\u00a04\u00a0times\u00a05",
+      "expected": "20"
+    },
+    {
+      "name": "reverse-83",
+      "instruction": "what is signal reversed",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-84",
+      "instruction": "convert python to uppercase",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-85",
+      "instruction": "count the letters in quick",
+      "expected": "5"
+    },
+    {
+      "name": "nth-86",
+      "instruction": "what is element 2 in [fig, kiwi, pear]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-87",
+      "instruction": "biggest number in [\uff13\uff11, \uff16, \uff12\uff11]",
+      "expected": "31"
+    },
+    {
+      "name": "add-88",
+      "instruction": "-\uff12 + \uff19",
+      "expected": "7"
+    },
+    {
+      "name": "subtract-89",
+      "instruction": "\uff19 - \uff12",
+      "expected": "7"
+    },
+    {
+      "name": "multiply-90",
+      "instruction": "product of -\uff15 and \uff10",
+      "expected": "0"
+    },
+    {
+      "name": "reverse-91",
+      "instruction": "spell kernel backwards",
+      "expected": "lenrek"
+    },
+    {
+      "name": "uppercase-92",
+      "instruction": "shout the word quick",
+      "expected": "QUICK"
+    },
+    {
+      "name": "letters-93",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-94",
+      "instruction": "item number 1 of [apple]",
+      "expected": "apple"
+    },
+    {
+      "name": "max-95",
+      "instruction": "biggest number in [38, 27, 6, 21]",
+      "expected": "38"
+    },
+    {
+      "name": "add-96",
+      "instruction": "what is 2 plus 19",
+      "expected": "21"
+    },
+    {
+      "name": "subtract-97",
+      "instruction": "-1 - 6",
+      "expected": "-7"
+    },
+    {
+      "name": "multiply-98",
+      "instruction": "product of 1 and -2",
+      "expected": "-2"
+    },
+    {
+      "name": "reverse-99",
+      "instruction": "spell\u00a0orange\u00a0backwards",
+      "expected": "egnaro"
+    },
+    {
+      "name": "uppercase-100",
+      "instruction": "shout the word delta",
+      "expected": "DELTA"
+    },
+    {
+      "name": "letters-101",
+      "instruction": "length of the word python",
+      "expected": "6"
+    },
+    {
+      "name": "nth-102",
+      "instruction": "item\u00a0number\u00a03\u00a0of\u00a0[lime,\u00a0date,\u00a0plum,\u00a0fig,\u00a0kiwi]",
+      "expected": "plum"
+    },
+    {
+      "name": "max-103",
+      "instruction": "the\u00a0maximum\u00a0of\u00a0[-2,\u00a023,\u00a014,\u00a039,\u00a014]",
+      "expected": "39"
+    },
+    {
+      "name": "add-104",
+      "instruction": "sum\u00a0of\u00a017\u00a0and\u00a00",
+      "expected": "17"
+    },
+    {
+      "name": "subtract-105",
+      "instruction": "what\u00a0is\u00a010\u00a0minus\u00a03",
+      "expected": "7"
+    },
+    {
+      "name": "multiply-106",
+      "instruction": "what\u00a0is\u00a08\u00a0times\u00a09",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-107",
+      "instruction": "what is ledger reversed",
+      "expected": "regdel"
+    },
+    {
+      "name": "uppercase-108",
+      "instruction": "convert python to uppercase",
+      "expected": "PYTHON"
+    },
+    {
+      "name": "letters-109",
+      "instruction": "count the letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-110",
+      "instruction": "item number 2 of [mango, lime, date, plum]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-111",
+      "instruction": "biggest number in [30, 35, 20, -5]",
+      "expected": "35"
+    },
+    {
+      "name": "add-112",
+      "instruction": "12 + 15",
+      "expected": "27"
+    },
+    {
+      "name": "subtract-113",
+      "instruction": "19 - 10",
+      "expected": "9"
+    },
+    {
+      "name": "multiply-114",
+      "instruction": "product of 5 and 2",
+      "expected": "10"
+    },
+    {
+      "name": "reverse-115",
+      "instruction": "spell\u00a0python\u00a0backwards",
+      "expected": "nohtyp"
+    },
+    {
+      "name": "uppercase-116",
+      "instruction": "shout the word cat",
+      "expected": "CAT"
+    },
+    {
+      "name": "letters-117",
+      "instruction": "length of the word orange",
+      "expected": "6"
+    },
+    {
+      "name": "nth-118",
+      "instruction": "item\u00a0number\u00a01\u00a0of\u00a0[kiwi]",
+      "expected": "kiwi"
+    },
+    {
+      "name": "max-119",
+      "instruction": "the\u00a0maximum\u00a0of\u00a0[8,\u00a017,\u00a00,\u00a017,\u00a010]",
+      "expected": "17"
+    },
+    {
+      "name": "add-120",
+      "instruction": "what\u00a0is\u00a01\u00a0plus\u00a04",
+      "expected": "5"
+    },
+    {
+      "name": "subtract-121",
+      "instruction": "what\u00a0is\u00a0-6\u00a0minus\u00a0-1",
+      "expected": "-5"
+    },
+    {
+      "name": "multiply-122",
+      "instruction": "what\u00a0is\u00a00\u00a0times\u00a01",
+      "expected": "0"
+    },
+    {
+      "name": "reverse-123",
+      "instruction": "what is cat reversed",
+      "expected": "tac"
+    },
+    {
+      "name": "uppercase-124",
+      "instruction": "convert harness to uppercase",
+      "expected": "HARNESS"
+    },
+    {
+      "name": "letters-125",
+      "instruction": "count the letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-126",
+      "instruction": "what is element \uff11 in [mango, lime, date, plum, fig]",
+      "expected": "mango"
+    },
+    {
+      "name": "max-127",
+      "instruction": "biggest number in [13, 40, 5]",
+      "expected": "40"
+    },
+    {
+      "name": "add-128",
+      "instruction": "sum of 4 and -7",
+      "expected": "-3"
+    },
+    {
+      "name": "subtract-129",
+      "instruction": "-5 - -6",
+      "expected": "1"
+    },
+    {
+      "name": "multiply-130",
+      "instruction": "product of -3 and -6",
+      "expected": "18"
+    },
+    {
+      "name": "reverse-131",
+      "instruction": "spell\u00a0orange\u00a0backwards",
+      "expected": "egnaro"
+    },
+    {
+      "name": "uppercase-132",
+      "instruction": "shout the word quick",
+      "expected": "QUICK"
+    },
+    {
+      "name": "letters-133",
+      "instruction": "length of the word banana",
+      "expected": "6"
+    },
+    {
+      "name": "nth-134",
+      "instruction": "what is element \uff13 in [kiwi, pear, apple, mango]",
+      "expected": "apple"
+    },
+    {
+      "name": "max-135",
+      "instruction": "biggest number in [\uff12\uff19, \uff13\uff18, \uff13\uff15, \uff13\uff16, \uff13\uff19]",
+      "expected": "39"
+    },
+    {
+      "name": "add-136",
+      "instruction": "sum of -\uff12 and \uff19",
+      "expected": "7"
+    },
+    {
+      "name": "subtract-137",
+      "instruction": "\uff15 - \uff11\uff10",
+      "expected": "-5"
+    },
+    {
+      "name": "multiply-138",
+      "instruction": "product of -\uff11 and \uff14",
+      "expected": "-4"
+    },
+    {
+      "name": "reverse-139",
+      "instruction": "spell banana backwards",
+      "expected": "ananab"
+    },
+    {
+      "name": "uppercase-140",
+      "instruction": "shout the word signal",
+      "expected": "SIGNAL"
+    },
+    {
+      "name": "letters-141",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0banana",
+      "expected": "6"
+    },
+    {
+      "name": "nth-142",
+      "instruction": "what is element 1 in [plum, fig, kiwi, pear]",
+      "expected": "plum"
+    },
+    {
+      "name": "max-143",
+      "instruction": "biggest number in [-\uff11, \uff11\uff14, \uff12\uff17]",
+      "expected": "27"
+    },
+    {
+      "name": "add-144",
+      "instruction": "\uff10 + -\uff11",
+      "expected": "-1"
+    },
+    {
+      "name": "subtract-145",
+      "instruction": "\uff19 - \uff12",
+      "expected": "7"
+    },
+    {
+      "name": "multiply-146",
+      "instruction": "product of -\uff15 and \uff10",
+      "expected": "0"
+    },
+    {
+      "name": "reverse-147",
+      "instruction": "spell orange backwards",
+      "expected": "egnaro"
+    },
+    {
+      "name": "uppercase-148",
+      "instruction": "shout the word delta",
+      "expected": "DELTA"
+    },
+    {
+      "name": "letters-149",
+      "instruction": "length\u00a0of\u00a0the\u00a0word\u00a0kernel",
+      "expected": "6"
+    },
+    {
+      "name": "nth-150",
+      "instruction": "item number 1 of [apple]",
+      "expected": "apple"
+    },
+    {
+      "name": "max-151",
+      "instruction": "biggest number in [14, 15, 8, 15]",
+      "expected": "15"
+    },
+    {
+      "name": "add-152",
+      "instruction": "sum of 4 and 11",
+      "expected": "15"
+    },
+    {
+      "name": "subtract-153",
+      "instruction": "-1 - 6",
+      "expected": "-7"
+    },
+    {
+      "name": "multiply-154",
+      "instruction": "product of 1 and -2",
+      "expected": "-2"
+    },
+    {
+      "name": "reverse-155",
+      "instruction": "spell\u00a0python\u00a0backwards",
+      "expected": "nohtyp"
+    },
+    {
+      "name": "uppercase-156",
+      "instruction": "shout the word signal",
+      "expected": "SIGNAL"
+    },
+    {
+      "name": "letters-157",
+      "instruction": "length of the word orange",
+      "expected": "6"
+    },
+    {
+      "name": "nth-158",
+      "instruction": "item\u00a0number\u00a01\u00a0of\u00a0[lime,\u00a0date,\u00a0plum,\u00a0fig,\u00a0kiwi]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-159",
+      "instruction": "the maximum of [0, 21, 32]",
+      "expected": "32"
     }
   ]
 }
