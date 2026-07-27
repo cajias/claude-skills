@@ -36,6 +36,16 @@ frozen engine reads — so no new fields are introduced or permitted (§6.1.5).
 
 ## Procedure
 
+0. **Pre-flight power gate (before releasing any A/B budget).** Run
+   `bash plugins/rsi-loop/tests/test-phase0-gate.sh` — the deterministic Phase-0
+   gate. It drives the real engine over a synthetic landscape (zero LLM, <2s) and
+   MUST pass: it proves the assembled instrument resolves a planted +0.15
+   policy-lift positive at K=3 while returning `NO_RESULT` on a 0-effect and a
+   0.03 effect. If it fails, the instrument cannot resolve its planted positive —
+   do not spend. The real ~$8 Phase-0 calibration (`rsi-ignition.py power
+--calibrate` on the real battery, step 4) then measures σ_d up front; if the
+   budget can't fund `K_req` seeds the run is declared INCONCLUSIVE before spend.
+
 1. Resolve the promoted scaffold from the source run: `SRC=<source-run>/best-scaffold`
    — the source run's last accepted M6 inner generation dir (its `policy.json` +
    `prompts/`), discovered under the frozen engine. `baseline/gen-000` serves as
