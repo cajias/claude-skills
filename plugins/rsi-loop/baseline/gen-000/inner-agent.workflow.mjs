@@ -17,7 +17,7 @@ export const meta = {
 // ── Inputs (provided by the /rsi:autoresearch or outer-step harness) ──
 // args = {
 //   sandbox:  absolute path of the inner sandbox (task.md, score.py, public/, nodes/)
-//   genDir:   absolute path of the generation directory (prompts/, policy.json)
+//   genDir:   absolute path of the generation directory (prompts/, policy.json, search-engine.mjs)
 //   policy:   parsed contents of genDir/policy.json (scripts cannot read files)
 //   seed:     integer RNG seed for reproducibility (default 42)
 //   taskName: display name for logs
@@ -31,22 +31,14 @@ const taskName = A.taskName || "task";
 if (!sandbox || !genDir)
   throw new Error("args.sandbox and args.genDir are required");
 
-const NUM_DRAFTS = policy.num_drafts ?? 5;
-const MAX_NODES = policy.max_nodes ?? 9;
-const MODEL = policy.model ?? "haiku";
-const EFFORT = policy.effort ?? "low";
-// The real per-generation directions live in policy.json (`draft_directions`),
-// which the harness always passes. This inline list is only a last-resort
-// default for a hand-run with no policy — keep it generic, not a shadow copy of
-// any specific generation's tuned directions.
-const DIRECTIONS =
-  policy.draft_directions ??
-  Array.from(
-    { length: NUM_DRAFTS },
-    (_, i) => `distinct solution direction #${i + 1}`,
-  );
+// The pure search core travels with the generation dir (proposer copies the
+// whole dir). The Workflow tool runs this body inside an async function, so a
+// static `import` is illegal and a relative dynamic import cannot resolve —
+// import the engine by its absolute path under genDir.
+const { search } = await import(`${genDir}/search-engine.mjs`);
 
 // Deterministic Lehmer RNG — Workflow scripts have no Math.random by design.
+// Moved out of the engine (kept impure, injected via deps).
 let rngState = ((A.seed ?? 42) >>> 0) % 2147483647 || 1;
 function rand() {
   rngState = (rngState * 48271) % 2147483647;
@@ -87,20 +79,16 @@ function nodePath(id) {
   return `${sandbox}/nodes/node-${id}/solution.py`;
 }
 
-// Naive full-history context — deliberately weak (AIDE0), headroom for the
-// outer loop to discover context engineering.
-function historyText(nodes) {
-  return nodes
-    .map(
-      (n) =>
-        `### node-${n.id} [op=${n.op}${n.parent === null ? "" : ` parent=node-${n.parent}`} score=${n.public_score} buggy=${n.buggy}]\n` +
-        `summary: ${n.summary}\n\`\`\`python\n${n.code}\n\`\`\``,
-    )
-    .join("\n\n");
-}
-
-function draftPrompt(id, direction) {
-  return `You are the DRAFT operator of a tree-search research agent working on "${taskName}" (creating node-${id}).
+// ── gen-000 "solution" adapter ───────────────────────────────────────
+// All artifact-kind-specific text lives here (solution.py, task.md, score.py,
+// the sandbox wall). The engine sees only these closures.
+const adapter = {
+  artifactKind: "solution",
+  nodeSchema: NODE_SCHEMA,
+  rules: RULES,
+  artifactPath: nodePath,
+  draftPrompt({ id, direction, rules }) {
+    return `You are the DRAFT operator of a tree-search research agent working on "${taskName}" (creating node-${id}).
 
 1. Read ${sandbox}/task.md — it defines the solution contract and scoring.
 2. Read ${genDir}/prompts/draft.md and follow its method.
@@ -110,116 +98,63 @@ function draftPrompt(id, direction) {
 6. Return the structured output (exact solution code, real score, buggy flag, one-line summary).
 
 Rules:
-- ${RULES}`;
-}
-
-function fixPrompt(op, id, target, nodes, promptFile) {
-  const goal =
-    op === "debug"
-      ? `node-${target.id} is buggy (score ${target.public_score}). Diagnose the failure and produce a FIXED solution.`
-      : `node-${target.id} is the current best (score ${target.public_score}). Produce an IMPROVED solution with a strictly better public score.`;
-  return `You are the ${op.toUpperCase()} operator of a tree-search research agent working on "${taskName}" (creating node-${id}, child of node-${target.id}).
+- ${rules}`;
+  },
+  fixPrompt({ op, id, target, history, rules }) {
+    const goal =
+      op === "debug"
+        ? `node-${target.id} is buggy (score ${target.public_score}). Diagnose the failure and produce a FIXED solution.`
+        : `node-${target.id} is the current best (score ${target.public_score}). Produce an IMPROVED solution with a strictly better public score.`;
+    return `You are the ${op.toUpperCase()} operator of a tree-search research agent working on "${taskName}" (creating node-${id}, child of node-${target.id}).
 
 1. Read ${sandbox}/task.md.
-2. Read ${genDir}/prompts/${promptFile} and follow its method.
+2. Read ${genDir}/prompts/${op}.md and follow its method.
 3. ${goal}
 4. Full search history so far (all nodes):
 
-${historyText(nodes)}
+${history}
 
 5. Write your new complete solution to ${nodePath(id)}.
 6. Score it: cd ${sandbox} && python3 score.py --public --solution nodes/node-${id}/solution.py --json
 7. Return the structured output (exact solution code, real score, buggy flag, one-line summary).
 
 Rules:
-- ${RULES}`;
-}
+- ${rules}`;
+  },
+};
 
-function record(nodes, id, op, parent, result) {
-  nodes.push({
-    id,
-    op,
-    parent,
-    code: result ? result.code : "",
-    public_score:
-      result && typeof result.public_score === "number"
-        ? result.public_score
-        : 0,
-    buggy: result ? Boolean(result.buggy) || result.public_score <= 0 : true,
-    summary: result ? result.summary : "agent failed or was skipped",
-    path: nodePath(id),
-  });
-}
+// Bind the Workflow runtime globals into the engine's deps boundary.
+const deps = {
+  runAgent: (o) =>
+    agent(o.prompt, {
+      label: o.label,
+      phase: o.phase,
+      schema: o.schema,
+      model: o.model,
+      effort: o.effort,
+    }),
+  parallel,
+  phase,
+  log,
+  budget,
+  rand,
+};
 
-// ── Phase 1: parallel drafts ─────────────────────────────────────────
-phase("Draft");
-const nodes = [];
-const draftResults = await parallel(
-  Array.from(
-    { length: NUM_DRAFTS },
-    (_, i) => () =>
-      agent(draftPrompt(i, DIRECTIONS[i % DIRECTIONS.length]), {
-        label: `draft:node-${i}`,
-        phase: "Draft",
-        schema: NODE_SCHEMA,
-        model: MODEL,
-        effort: EFFORT,
-      }),
-  ),
-);
-draftResults.forEach((r, i) => record(nodes, i, "draft", null, r));
-log(`drafts done: scores [${nodes.map((n) => n.public_score).join(", ")}]`);
+const r = await search(deps, policy, adapter);
 
-// ── Phase 2: greedy debug/improve loop ───────────────────────────────
-phase("Search");
-while (nodes.length < MAX_NODES) {
-  if (budget.total && budget.remaining() < 20000) {
-    log(
-      `stopping early: token budget nearly exhausted (${budget.remaining()} left)`,
-    );
-    break;
-  }
-  const id = nodes.length;
-  const children = new Set(
-    nodes.filter((n) => n.parent !== null).map((n) => n.parent),
-  );
-  const buggyLeaves = nodes.filter((n) => n.buggy && !children.has(n.id));
-  let op, target;
-  if (buggyLeaves.length > 0) {
-    op = "debug";
-    target = buggyLeaves[Math.floor(rand() * buggyLeaves.length)];
-  } else {
-    op = "improve";
-    target = nodes.reduce((a, b) => (b.public_score > a.public_score ? b : a));
-  }
-  const result = await agent(fixPrompt(op, id, target, nodes, `${op}.md`), {
-    label: `${op}:node-${id}<-node-${target.id}`,
-    phase: "Search",
-    schema: NODE_SCHEMA,
-    model: MODEL,
-    effort: EFFORT,
-  });
-  record(nodes, id, op, target.id, result);
-  log(
-    `node-${id} (${op} of node-${target.id}): score ${nodes[id].public_score}`,
-  );
-}
-
-// ── Result ───────────────────────────────────────────────────────────
-const valid = nodes.filter((n) => !n.buggy);
-const best = (valid.length ? valid : nodes).reduce((a, b) =>
-  b.public_score > a.public_score ? b : a,
-);
+// Re-map the engine's generic output to the EXACT historical return shape.
 return {
   task: taskName,
   generation: genDir,
   best: {
-    node: best.id,
-    public_score: best.public_score,
-    solution_path: best.path,
-    summary: best.summary,
+    node: r.best.node,
+    public_score: r.best.public_score,
+    solution_path: r.best.artifact_path,
+    summary: r.best.summary,
   },
-  n_nodes: nodes.length,
-  n_buggy: nodes.filter((n) => n.buggy).length,
-  nodes: nodes.map(({ code, ...meta }) => meta),
+  n_nodes: r.n_nodes,
+  n_buggy: r.n_buggy,
+  // Re-attach the artifact-specific per-node `path` the historical shape carried
+  // (engine node records are generic and omit it); key order stays identical.
+  nodes: r.nodes.map((n) => ({ ...n, path: nodePath(n.id) })),
 };
