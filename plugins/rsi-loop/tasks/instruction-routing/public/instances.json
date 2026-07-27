@@ -159,6 +159,146 @@
       "name": "max-31",
       "instruction": "the largest number in [4, 17, 2, 15, 16]",
       "expected": "17"
+    },
+    {
+      "name": "add-32",
+      "instruction": "add 6 and 3",
+      "expected": "9"
+    },
+    {
+      "name": "subtract-33",
+      "instruction": "subtract 17 from 8",
+      "expected": "-9"
+    },
+    {
+      "name": "multiply-34",
+      "instruction": "multiply 9 by 6",
+      "expected": "54"
+    },
+    {
+      "name": "reverse-35",
+      "instruction": "reverse the word signal",
+      "expected": "langis"
+    },
+    {
+      "name": "uppercase-36",
+      "instruction": "uppercase the word delta",
+      "expected": "DELTA"
+    },
+    {
+      "name": "letters-37",
+      "instruction": "how many letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-38",
+      "instruction": "the 1st item in [fig, kiwi, pear, apple, mango]",
+      "expected": "fig"
+    },
+    {
+      "name": "max-39",
+      "instruction": "the largest number in [14, 19, 4]",
+      "expected": "19"
+    },
+    {
+      "name": "add-40",
+      "instruction": "add 6 and 7",
+      "expected": "13"
+    },
+    {
+      "name": "subtract-41",
+      "instruction": "subtract 1 from 14",
+      "expected": "13"
+    },
+    {
+      "name": "multiply-42",
+      "instruction": "multiply 5 by 2",
+      "expected": "10"
+    },
+    {
+      "name": "reverse-43",
+      "instruction": "reverse the word delta",
+      "expected": "atled"
+    },
+    {
+      "name": "uppercase-44",
+      "instruction": "uppercase the word cat",
+      "expected": "CAT"
+    },
+    {
+      "name": "letters-45",
+      "instruction": "how many letters in delta",
+      "expected": "5"
+    },
+    {
+      "name": "nth-46",
+      "instruction": "the 2nd item in [mango, lime, date, plum]",
+      "expected": "lime"
+    },
+    {
+      "name": "max-47",
+      "instruction": "the largest number in [1, 2, 39]",
+      "expected": "39"
+    },
+    {
+      "name": "add-48",
+      "instruction": "add 1 and 18",
+      "expected": "19"
+    },
+    {
+      "name": "subtract-49",
+      "instruction": "subtract 16 from 23",
+      "expected": "7"
+    },
+    {
+      "name": "multiply-50",
+      "instruction": "multiply 8 by 9",
+      "expected": "72"
+    },
+    {
+      "name": "reverse-51",
+      "instruction": "reverse the word harness",
+      "expected": "ssenrah"
+    },
+    {
+      "name": "uppercase-52",
+      "instruction": "uppercase the word harness",
+      "expected": "HARNESS"
+    },
+    {
+      "name": "letters-53",
+      "instruction": "how many letters in orange",
+      "expected": "6"
+    },
+    {
+      "name": "nth-54",
+      "instruction": "the 1st item in [plum, fig, kiwi, pear, apple]",
+      "expected": "plum"
+    },
+    {
+      "name": "max-55",
+      "instruction": "the largest number in [21, 30, 27, 36]",
+      "expected": "36"
+    },
+    {
+      "name": "add-56",
+      "instruction": "add 2 and 11",
+      "expected": "13"
+    },
+    {
+      "name": "subtract-57",
+      "instruction": "subtract 17 from 18",
+      "expected": "1"
+    },
+    {
+      "name": "multiply-58",
+      "instruction": "multiply 5 by 2",
+      "expected": "10"
+    },
+    {
+      "name": "reverse-59",
+      "instruction": "reverse the word ledger",
+      "expected": "regdel"
     }
   ]
 }
