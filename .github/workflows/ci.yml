@@ -147,6 +147,9 @@ jobs:
       - name: Ladder-evidence report
         run: bash plugins/rsi-loop/tests/test-report.sh
 
+      - name: Engine polymorphism + grep-zero invariant
+        run: bash plugins/rsi-loop/tests/test-engine-polymorphism.sh
+
   test-scripts:
     name: Test scripts
     runs-on: ubuntu-latest
