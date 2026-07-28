@@ -53,6 +53,60 @@ def linfit_slope(xs, ys):
     return sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / denom
 
 
+def compute_tokens_to_best(by_step, floor):
+    """Cumulative inner tokens spent up to and INCLUDING the step that first
+    reached the best incumbent private_aggregate (§6.1.3; /rsi:ignite step 4
+    "cumulative inner tokens").
+
+    Exact semantics:
+      - best-so-far is the monotone max of accepted numeric private_aggregate,
+        seeded by the gen-000 floor — i.e. the incumbent trajectory;
+      - the "best step" is the FIRST ledger step (in step order) at which the
+        best-so-far first reaches its final maximum value;
+      - tokens_to_best sums inner_tokens over EVERY step (accepted AND rejected)
+        up to and including that best step — all spend counts, matching the
+        cumulative-inner-tokens semantics (a rejected candidate still burned
+        inner tokens before the best was found);
+      - null private_aggregate steps never move the max, but their inner_tokens
+        still count toward the cumulative spend if they precede the best step;
+      - a ledger with only step 0 → tokens_to_best == step-0 inner_tokens;
+      - missing inner_tokens are treated as 0 (second return value flags it);
+      - no numeric accepted step anywhere → (None, False).
+
+    Efficiency (private-per-token) is deliberately NOT computed (§6.1.3 YAGNI —
+    it gates no verdict; the |ΔA|<MDE NO_RESULT row already encodes the honesty
+    point that equal-asymptote-at-fewer-tokens is never a win).
+    """
+    # Final best-so-far value (monotone max over accepted numeric steps).
+    best_raw = floor if isinstance(floor, (int, float)) else None
+    for s in by_step:
+        if s.get("accepted") and isinstance(s.get("private_aggregate"), (int, float)):
+            best_raw = s["private_aggregate"] if best_raw is None else max(best_raw, s["private_aggregate"])
+    if best_raw is None:
+        return None, False
+
+    # First step position at which the incumbent reaches that final max. The
+    # series is monotone, so the first time cur >= best_raw it equals best_raw.
+    cur = floor if isinstance(floor, (int, float)) else None
+    best_pos = None
+    for i, s in enumerate(by_step):
+        if s.get("accepted") and isinstance(s.get("private_aggregate"), (int, float)):
+            cur = s["private_aggregate"] if cur is None else max(cur, s["private_aggregate"])
+        if cur is not None and cur >= best_raw:
+            best_pos = i
+            break
+
+    total = 0
+    missing = False
+    for s in by_step[: best_pos + 1]:
+        tok = s.get("inner_tokens")
+        if isinstance(tok, (int, float)):
+            total += tok
+        else:
+            missing = True  # treat as 0 but flag the gap
+    return total, missing
+
+
 def build_report(steps, baseline_human, holdout):
     # Trajectory: best-so-far private aggregate after each step (incumbent value).
     by_step = sorted(steps, key=lambda s: s.get("step", 0))
@@ -84,6 +138,8 @@ def build_report(steps, baseline_human, holdout):
             if prev is None or s["private_aggregate"] > prev:
                 n_improvements += 1
                 prev = s["private_aggregate"]
+
+    tokens_to_best, tokens_missing = compute_tokens_to_best(by_step, floor)
 
     proposals = [s for s in by_step if s.get("step", 0) > 0]  # exclude step-0 baseline
     n_prop = len(proposals)
@@ -118,6 +174,12 @@ def build_report(steps, baseline_human, holdout):
         "improvement_over_gen000": round(best_value - floor, 6)
         if isinstance(floor, (int, float)) and isinstance(best_value, (int, float)) else None,
         "best_so_far_growth_rate_per_step": round(slope, 6),
+        "tokens_to_best": tokens_to_best,
+        "tokens_to_best_note": (
+            "cumulative inner_tokens (all steps, accepted+rejected) up to and "
+            "including the step that first reached the best incumbent aggregate"
+            + (" — some steps lacked inner_tokens (counted as 0)" if tokens_missing else "")
+        ),
         "n_accepted_improvements": n_improvements,
         "sustained": n_improvements >= 2,
         "trajectory": best_so_far,
