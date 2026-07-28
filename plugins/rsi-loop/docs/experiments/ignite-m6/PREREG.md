@@ -115,17 +115,39 @@ $0.9) = ~2.15M tok (~$4.9); outer campaign (1 arm, 1 rep) = 8 meta-gens × outer
 paired A/B R=3 = 2 arms × 3 reps = 6 campaigns = ~103M tok (~$233). B_inner ≈ 335K tok/sub-run (~$0.67),
 tuned so the incumbent spends 80–90%.
 
+> **⚠ MEASURED-COST ADDENDUM (2026-07-28, after a real cost probe — the planning numbers above are wrong).**
+> A single real inner sub-run (gen-000, tabular-classification, seed 42, under the actual Workflow tool)
+> cost **584,264 tokens** and **~39 min** wall-clock — **1.75× the 335K planning value.** Root cause: the
+> `B_inner` token cap the estimate assumed does **not bind** — the engine comment (`search-engine.mjs:16`)
+> states the token-cap primitive was "deliberately not built," and the Workflow `budget.total` is null, so
+> every sub-run runs the full `max_nodes=9` uncapped. Revised envelope at measured cost: inner campaign
+> (6 sub-runs) ≈ 3.5M tok; **outer campaign ≈ 31.6M tok (~$63, not $39)**; a discovery campaign + full
+> paired R=3 (7 campaigns, ~378 sub-runs) ≈ **~220M tok (~$442), ~1–2.5 days** wall-clock at 4–12×
+> parallelism. **Ceiling raised to $420 (authorized 2026-07-28).** Execution is **phased and re-measured at
+> every boundary** (below); discovery is run first as the cheap gate — if its best accepted scaffold equals
+> gen-000 (the paper's prior), the lift is gen-000→gen-000, the arms are identical, and the verdict is
+> `NO_RESULT` by construction with the A/B spend avoided.
+
 **`BUDGET_CEILING_USD` must be set before any paid phase. If it is unset, do all free work and stop.**
 Never exceed the ceiling; never start a phase whose worst-case cost exceeds remaining budget. Never
 fabricate an eval score.
 
+_(Dollar figures below are the original planning values; the measured-cost addendum above revises a
+campaign to ~$63. Phases execute in order, re-measuring cumulative spend at each boundary; never start a
+phase whose worst-case cost exceeds remaining budget under the $420 ceiling.)_
+
+- **Discovery (run first, ~$63) — the cheap gate.** A fresh gen-000 M6 inner campaign under the frozen
+  engine. **STOP RULE:** if the last accepted generation's scaffold equals gen-000 (no lift discovered —
+  the paper's prior), the ignited arm would be byte-identical to control → declare **NO_RESULT by
+  construction** and spend nothing on the A/B.
 - **Phase-0 — real-battery `--calibrate` (~$8).** Measures σ_d, prints K_req.
   **STOP RULE:** if budget can't fund K_req seeds for the smallest interesting effect → declare
   **INCONCLUSIVE up front**, spend nothing on a campaign.
-- **Phase-1 — paired pilot R=2 (4 campaigns × ~$39 ≈ ~$155; cumulative with Phase-0 ~$163).**
+- **Phase-1 — paired pilot R=2 (~$126 at measured cost; cumulative with discovery+Phase-0 ~$197).**
   **STOP RULE:** feed each arm's best-so-far trajectory to `rsi-ignition.py decide`; if |ΔA| < MDE(K) →
   `NO_RESULT`, **most runs STOP HERE**.
-- **Phase-2 — add R=3 ONLY if Phase-1 is within noise AND budget allows (→ ~$233 ceiling).**
+- **Phase-2 — add R=3 ONLY if Phase-1 is within noise AND budget allows (~$442 total → requires the $420
+  ceiling; if the boundary check shows Phase-2 would exceed remaining budget, STOP at the R=2 verdict).**
 
 ## 7. Deviations logged
 
