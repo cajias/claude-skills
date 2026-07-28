@@ -156,6 +156,9 @@ jobs:
       - name: Phase-0 power gate (known-positive/negative/underpowered controls)
         run: bash plugins/rsi-loop/tests/test-phase0-gate.sh
 
+      - name: Shim self-containment (no dynamic import; engine inlined, no drift)
+        run: bash plugins/rsi-loop/tests/test-shim-self-contained.sh
+
   test-scripts:
     name: Test scripts
     runs-on: ubuntu-latest
