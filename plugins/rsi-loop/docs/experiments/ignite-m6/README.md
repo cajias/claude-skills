@@ -91,3 +91,52 @@ echo '{"tasks":{"tabular-classification":{"per_instance":[0.90,0.88,0.92,0.85,0.
 Free work complete (PREREG + runbook committed, instrument verified). Paid phases 0/1/2 GATED on explicit
 `BUDGET_CEILING_USD` authorization. No eval scores exist yet — `trajectories.json` / `verdict.json` are
 written only after real Workflow compute.
+
+## Verdict (measured — 2026-07-28)
+
+**Outcome: `NO_RESULT`**, declared up front on a power / battery-resolution basis. Total spend ~$13 of the
+$420 ceiling (13 inner sub-runs: 1 cost-probe + 6 gen-000 baseline + 6 gen-001). See `verdict.json` /
+`trajectories.json` for the machine-readable record.
+
+**Runtime fix first (PR #60).** The M6 inner shim used `await import()`, which the Workflow runtime
+forbids; a cost-probe caught it at **$0** before any campaign spend. Fixed by inlining the engine into a
+self-contained shim. The campaign ran on the fixed shim.
+
+**Cost ran 1.75× the plan.** One inner sub-run measured **584,264 tokens / ~39 min** (9 uncapped haiku
+nodes — the planned `B_inner` token cap was never built; the engine comment says so and Workflow
+`budget.total` is `null`) vs. the 335K planning value. A full paired R=3 A/B is therefore ~**$442**,
+~1–2.5 days.
+
+**Discovery found a real, verified lift.** Under the frozen 8-field engine, gen-001 — a _prompt-only_
+k-fold-CV selection-signal mutation (policy.json unchanged, shim byte-identical) — moved the aggregate
+**0.8265 → 0.844** (+0.0175). Verifier verdict CLEAN: public reproduced exactly (s43 0.865), git-clean, no
+hard-coding, public-vs-private gap ≤0.0475 (honest generalization, not the >0.30 of an overfit hacker). So
+the scaffold **can** self-improve within the frozen vocabulary — the discovery gate did **not** fire, and
+the A/B was warranted on that axis.
+
+**Why we stop before the A/B — the battery cannot resolve the effect.** The gain lands _entirely_ on
+tabular-classification (0.7825 → 0.8175 median); bin-packing is 100% saturated (every node, every seed,
+every generation ties at exactly 0.8705 — FFD at the greedy ceiling, zero differentiating signal). The
+tabular ceiling ≈ 0.86 private against a gen-000 ≈ 0.78 gives ~0.08 headroom → at most ~0.040 in the
+two-task mean. That maximum is below MDE(3):
+
+| Quantity                                          | Value       |
+| ------------------------------------------------- | ----------- |
+| Measured σ_d (paired per-seed ΔA SD)              | 0.0492      |
+| MDE at K=3                                        | 0.0706      |
+| Battery ceiling (aggregate)                       | 0.8665      |
+| **Max achievable ΔA (battery-capped)**            | **0.040**   |
+| K_req for the 0.040 max effect                    | 10 seeds    |
+| K_req for a realistic 0.02 effect                 | 38 seeds    |
+| `decide` on a plausible small-gap pair (ΔA=0.005) | `NO_RESULT` |
+
+A paired A/B at K=10 is ~$418 for R=1 alone. So the A/B verdict is a **predetermined `NO_RESULT`-by-
+underpower**; spending ~$400 to confirm it would be the exact M5 mistake — the honest non-claim belongs up
+front, not after a wasted campaign.
+
+**Paper parity.** Control and ignited would reach the same **battery-imposed** ceiling — AIDE²'s "converged
+faster, no asymptotic advantage." `NO_RESULT` is the pre-registered expected success, not a failure.
+
+**What would change the verdict (future work, out of scope here):** de-saturate the bin-packing battery
+(harder instances) so it contributes differentiating signal, and/or fund K ≈ 10 seeds. Either raises the
+instrument's resolving power above the effect the scaffold can actually produce.

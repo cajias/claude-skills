@@ -1,0 +1,63 @@
+{
+  "experiment": "M6 isomorphic-ignition (Level-2 A/B)",
+  "date": "2026-07-28",
+  "verdict": "NO_RESULT",
+  "basis": "power / battery-resolution — declared up front (M5 covenant)",
+  "expected_prior": "NO_RESULT (paper parity)",
+  "runtime_fix": {
+    "blocker": "inner shim used await import(), forbidden by Workflow runtime",
+    "fix_pr": 60,
+    "caught_at_cost_usd": 0
+  },
+  "cost": {
+    "per_inner_subrun_tokens": 584264,
+    "per_inner_subrun_minutes": 39,
+    "planning_value_tokens": 335000,
+    "cost_ratio": 1.75,
+    "total_spent_usd_approx": 13,
+    "ceiling_usd": 420,
+    "full_R3_ab_estimate_usd": 442
+  },
+  "discovery": {
+    "gen000_aggregate": 0.8265,
+    "gen001_aggregate": 0.844,
+    "delta": 0.0175,
+    "gen001_mutation": "internal-kfold-cv-selection-signal (prompt-only)",
+    "gen001_accepted": true,
+    "verifier_verdict": "clean",
+    "gain_source": "tabular-classification only (0.7825->0.8175 median); bin-packing saturated/unchanged",
+    "per_task": {
+      "tabular-classification": {
+        "gen000_seeds": [0.8775, 0.7825, 0.7775],
+        "gen001_seeds": [0.7725, 0.8175, 0.8625]
+      },
+      "bin-packing": {
+        "gen000_seeds": [0.8705, 0.8705, 0.8705],
+        "gen001_seeds": [0.8705, 0.8705, 0.8705]
+      }
+    }
+  },
+  "power": {
+    "sigma_d_measured": 0.0492,
+    "mde_at_K3": 0.0706,
+    "battery_ceiling_aggregate": 0.8665,
+    "max_possible_delta_A": 0.04,
+    "max_delta_below_mde": true,
+    "bin_packing_saturated": true,
+    "k_req_for_max_effect_0.040": 10,
+    "k_req_for_realistic_effect_0.02": 38,
+    "decide_confirmation": {
+      "sigma_d": 0.0492,
+      "sample_delta_A": 0.005,
+      "mde": 0.0706,
+      "verdict": "NO_RESULT"
+    }
+  },
+  "stop_rule_fired": "Phase-0/battery power precondition: max achievable ΔA (0.040) < MDE(3) (0.0706); declare INCONCLUSIVE/NO_RESULT up front rather than spend ~$400 on a predetermined-NO_RESULT A/B",
+  "honesty_note": "Real lift discovered (gen-001, verifier-clean) so this is NOT a scaffold-can't-improve result — it is that the BATTERY cannot resolve a scaffold-vs-scaffold asymptote difference at feasible K, because bin-packing is saturated and tabular headroom is small. Paper-parity: control and ignited reach the same battery-imposed ceiling.",
+  "artifacts": {
+    "discovery_ledger": "discovery-ledger.jsonl",
+    "prereg": "PREREG.md",
+    "runbook": "README.md"
+  }
+}

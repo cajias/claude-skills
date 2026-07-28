@@ -14,8 +14,19 @@ Status: **M1–M2 shipped; M3 complete (run-002 ran to a plateau stop at 10 ledg
 ~37.9M inner tokens, incumbent gen-006); M4 measured (Level 0 and Level 1 met — see
 `docs/experiments/m4-report.md`); M5 ignition run complete — returned Level-2 NOT supported (ignited
 0.5876 < control 0.6126 at equal 1-step budget; see `docs/experiments/ignite/README.md`).** That verdict
-is now diagnosed as a measurement artifact — a category-error ignition test — and **Level 2 is reopened
-as M6** (Approach-1 isomorphic re-architecture, design COMPLETE — full resolved spec in §6.1; see §6). The plugin is
+is now diagnosed as a measurement artifact — a category-error ignition test — and **Level 2 was reopened
+as M6** (Approach-1 isomorphic re-architecture, design COMPLETE — full resolved spec in §6.1; see §6).
+**M6 is now RESOLVED (2026-07-28): verdict NO_RESULT (paper parity), declared up front on a
+power/battery-resolution basis** — see `docs/experiments/ignite-m6/verdict.json`. A real cost probe first
+exposed that the inner shim's `await import()` is forbidden by the Workflow runtime (fixed by inlining the
+engine, PR #60; caught at \$0). The fresh gen-000 discovery campaign then found a **real, verifier-clean
+lift** (gen-001, a prompt-only k-fold-CV mutation: 0.8265 → 0.844, gain entirely on tabular), so the scaffold
+_can_ self-improve within the frozen 8-field vocabulary. But the battery cannot resolve a scaffold-vs-scaffold
+asymptote difference: bin-packing is 100% saturated (0.8705, zero signal) and tabular headroom is small, so the
+**maximum achievable ΔA ≈ 0.040 < MDE(3) = 0.071** at measured σ*d = 0.049 (K_req(0.040) = 10 seeds). Spending
+the ~\$400 paired A/B would confirm a predetermined NO_RESULT — the exact M5 mistake — so it was declared up
+front. Total spend ~\$13 of a \$420 ceiling. Paper-parity: control and ignited reach the same battery-imposed
+ceiling ("converged faster, no asymptotic advantage"). The plugin is
 promoted in `.claude-plugin/marketplace.json`. Real-compute results so far: gen-000 floor
 0.575 → gen-005 0.856 private aggregate (+0.281, two accepted improvements across steps 2–3);
 gen-005 beats the hand-tuned `gen-human` baseline 0.588 (Level 1, +0.269); holdout near-transfer
@@ -27,7 +38,7 @@ ran (step-1 paired A/B → Level-2 NOT supported, `docs/experiments/ignite/READM
 diagnosed that "not supported" as a **measurement artifact / category error** — the old `/rsi:ignite`
 injected the incumbent's task-solving strategy into a stock proposer and compared campaign endpoints, which
 tests "does a strategy-briefed proposer beat a stock one," not the paper's actual ignition question — is the
-discovered inner agent a better _outer_ agent than its predecessor, judged on the whole campaign trajectory
+discovered inner agent a better \_outer* agent than its predecessor, judged on the whole campaign trajectory
 (convergence rate + asymptote), a first-order comparison a 1-step endpoint A/B structurally cannot make; the loop also
 banked only ~3 genuine forward meta-steps and never carried the outer optimizer forward, so ignition was
 untestable regardless. **Level 2 is therefore reopened as M6** (Approach-1 isomorphic re-architecture, design
