@@ -1,0 +1,24 @@
+{
+  "note": "Discovery campaign best-so-far trajectory only. The paired A/B (arm-control vs arm-ignited) was NOT run — the up-front power analysis (see verdict.json) showed the battery's max achievable ΔA (0.040) is below MDE(3)=0.0706, so no arm trajectories exist. These are the discovery-loop aggregates that established (a) a real verified lift exists and (b) the battery ceiling that caps A/B resolving power.",
+  "discovery_best_so_far": {
+    "gen000": 0.8265,
+    "gen001": 0.844
+  },
+  "per_seed_aggregates": {
+    "gen000": {
+      "42": 0.874,
+      "43": 0.827,
+      "44": 0.824
+    },
+    "gen001": {
+      "42": 0.822,
+      "43": 0.844,
+      "44": 0.867
+    }
+  },
+  "arms": {
+    "arm_control": null,
+    "arm_ignited": null,
+    "reason_not_run": "battery underpowered for the A/B at feasible K (see verdict.json power block)"
+  }
+}

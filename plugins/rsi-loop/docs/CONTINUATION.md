@@ -4,6 +4,27 @@ Snapshot for resuming the KICKOFF.md build in a fresh session. Everything needed
 this repo; the scratchpad run directory is ephemeral and fully reconstructable from
 `docs/experiments/run-002/` (the current run; `run-001/` mirrors the earlier M2 campaign).
 
+## M6 — RESOLVED (2026-07-28): NO_RESULT (paper parity), on power/battery-resolution
+
+The M6 isomorphic-ignition A/B is **complete**; full evidence in `docs/experiments/ignite-m6/`
+(`PREREG.md`, `README.md` verdict section, `verdict.json`, `trajectories.json`, `discovery-ledger.jsonl`).
+
+- **Runtime fix first (PR #60):** a \$0 cost probe caught that the inner shim's `await import(search-engine.mjs)`
+  is forbidden by the Workflow runtime (`import() is not available in workflow scripts`). Every prior M6 test
+  had validated the engine Node-direct, masking it. Fixed by inlining the engine into the shim (self-contained);
+  new `tests/test-shim-self-contained.sh` is the static guard. See [[rsi-m6-shim-import-blocker]].
+- **Measured cost 1.75× plan:** one inner sub-run = 584K tok / ~39 min (the `B_inner` token cap was never built;
+  `budget.total` is null so it runs the full `max_nodes=9`). Full paired R=3 A/B ≈ \$442; ceiling raised to \$420.
+- **Discovery found a REAL lift (gate did NOT fire):** fresh gen-000 campaign, 2 selection tasks × seeds 42/43/44.
+  gen-001 (prompt-only `internal-kfold-cv-selection-signal`) private\*aggregate **0.8265 → 0.844** (+0.0175), gain
+  entirely on tabular (median 0.7825 → 0.8175); bin-packing unchanged. **Verifier CLEAN** (public reproduced exactly,
+  integrity git-clean, honest pub-priv gap ≤0.0475). So the scaffold _can_ self-improve within the frozen 8-field vocab.
+- **NO_RESULT on power, declared up front (the M5 lesson):** measured σ_d = 0.049 → MDE(3) = 0.071. bin-packing is
+  100% saturated (0.8705 across every node/seed/gen — zero A/B signal); tabular headroom small → **max achievable
+  ΔA ≈ 0.040 < MDE(3)**. K_req(0.040) = 10 seeds (~\$418 for R=1). The A/B verdict is predetermined NO_RESULT-by-underpower,
+  so it was NOT run — spending ~\$400 to confirm it would repeat the M5 mistake. Total spent ~\$13 / \$420.
+- **What would change it:** de-saturate the bin-packing battery (harder instances) and/or fund K≈10 seeds — both future work.
+
 ## Where the build stands (2026-07-22 — banked)
 
 - **M1 — done** (`docs/experiments/m1-smoke-bin-packing.md`): gen-000 verified end-to-end;
