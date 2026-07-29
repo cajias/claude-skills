@@ -23,7 +23,7 @@ engine, PR #60; caught at \$0). The fresh gen-000 discovery campaign then found 
 lift** (gen-001, a prompt-only k-fold-CV mutation: 0.8265 → 0.844, gain entirely on tabular), so the scaffold
 _can_ self-improve within the frozen 8-field vocabulary. But the battery cannot resolve a scaffold-vs-scaffold
 asymptote difference: bin-packing is 100% saturated (0.8705, zero signal) and tabular headroom is small, so the
-**maximum achievable ΔA ≈ 0.040 < MDE(3) = 0.071** at measured σ*d = 0.049 (K_req(0.040) = 10 seeds). Spending
+**maximum achievable ΔA ≈ 0.040 < MDE(3) = 0.071** at measured `σ_d` = 0.049 (`K_req(0.040)` = 10 seeds). Spending
 the ~\$400 paired A/B would confirm a predetermined NO_RESULT — the exact M5 mistake — so it was declared up
 front. Total spend ~\$13 of a \$420 ceiling. Paper-parity: control and ignited reach the same battery-imposed
 ceiling ("converged faster, no asymptotic advantage"). The plugin is
@@ -38,7 +38,7 @@ ran (step-1 paired A/B → Level-2 NOT supported, `docs/experiments/ignite/READM
 diagnosed that "not supported" as a **measurement artifact / category error** — the old `/rsi:ignite`
 injected the incumbent's task-solving strategy into a stock proposer and compared campaign endpoints, which
 tests "does a strategy-briefed proposer beat a stock one," not the paper's actual ignition question — is the
-discovered inner agent a better \_outer* agent than its predecessor, judged on the whole campaign trajectory
+discovered inner agent a better `outer` agent than its predecessor, judged on the whole campaign trajectory
 (convergence rate + asymptote), a first-order comparison a 1-step endpoint A/B structurally cannot make; the loop also
 banked only ~3 genuine forward meta-steps and never carried the outer optimizer forward, so ignition was
 untestable regardless. **Level 2 is therefore reopened as M6** (Approach-1 isomorphic re-architecture, design
