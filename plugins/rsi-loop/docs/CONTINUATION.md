@@ -16,9 +16,9 @@ The M6 isomorphic-ignition A/B is **complete**; full evidence in `docs/experimen
 - **Measured cost 1.75× plan:** one inner sub-run = 584K tok / ~39 min (the `B_inner` token cap was never built;
   `budget.total` is null so it runs the full `max_nodes=9`). Full paired R=3 A/B ≈ \$442; ceiling raised to \$420.
 - **Discovery found a REAL lift (gate did NOT fire):** fresh gen-000 campaign, 2 selection tasks × seeds 42/43/44.
-  gen-001 (prompt-only `internal-kfold-cv-selection-signal`) private*aggregate **0.8265 → 0.844** (+0.0175), gain
+  gen-001 (prompt-only `internal-kfold-cv-selection-signal`) private\*aggregate **0.8265 → 0.844** (+0.0175), gain
   entirely on tabular (median 0.7825 → 0.8175); bin-packing unchanged. **Verifier CLEAN** (public reproduced exactly,
-  integrity git-clean, honest pub-priv gap ≤0.0475). So the scaffold \_can* self-improve within the frozen 8-field vocab.
+  integrity git-clean, honest pub-priv gap ≤0.0475). So the scaffold _can_ self-improve within the frozen 8-field vocab.
 - **NO_RESULT on power, declared up front (the M5 lesson):** measured σ_d = 0.049 → MDE(3) = 0.071. bin-packing is
   100% saturated (0.8705 across every node/seed/gen — zero A/B signal); tabular headroom small → **max achievable
   ΔA ≈ 0.040 < MDE(3)**. K_req(0.040) = 10 seeds (~\$418 for R=1). The A/B verdict is predetermined NO_RESULT-by-underpower,
