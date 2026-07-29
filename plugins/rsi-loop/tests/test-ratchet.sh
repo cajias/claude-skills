@@ -77,6 +77,21 @@ has() { # $1 file, $2 substring -> True/False
   if [[ -f "$1" ]] && grep -qF -- "$2" "$1"; then echo True; else echo False; fi
 }
 
+exists() { if [[ -e "$1" ]]; then echo yes; else echo no; fi; }   # $1 path -> yes/no
+
+witness() { # $1 bank, $2 id — append the ledger line vouching for the bytes on disk,
+  # so a hand-written case file passes the integrity check and reaches the repro
+  # stage. Without this the bank is merely unwitnessed (exit 4) and nothing about
+  # reading the case is exercised.
+  python3 -c "
+import hashlib, json, sys
+bank, cid = sys.argv[1], sys.argv[2]
+sha = hashlib.sha256(open(f'{bank}/cases/{cid}.json', 'rb').read()).hexdigest()
+with open(f'{bank}/ledger.jsonl', 'a') as fh:
+    fh.write(json.dumps({'event': 'add', 'id': cid, 'case_sha256': sha}, sort_keys=True) + '\n')
+" "$1" "$2"
+}
+
 newbank() { mkdir -p "$1/cases"; echo "$1"; }
 fixed() { printf 'def f(x):\n    return x  # %s\n' "$2" > "$1"; }   # $1 path, $2 fix token
 regress() { printf 'def f(x):\n    return x  # fix reverted\n' > "$1"; }
@@ -223,6 +238,104 @@ run add --bank "$B_TRUNC" --id trunc-case --source ci-break --summary "ledger wi
 RC="$(run check --bank "$B_TRUNC")"
 case "$RC" in 1 | 4) V=ratchet-refusal ;; *) V="exit $RC" ;; esac
 check "wiped ledger cannot launder a tamper into a pass" ratchet-refusal "$V"
+
+# ── Scenario 4 ────────────────────────────────────────────────────────
+# GIVEN an --id that is not a bare name, THEN `add` refuses it (exit 2) and
+# writes nothing. The id becomes a file name, so an id like '../escaped' or an
+# absolute path is an arbitrary-file-write primitive — in the one tool whose job
+# is integrity. Every escape target here stays under $WORK: a regression must not
+# be able to litter the real filesystem.
+B_DEEP="$(newbank "$WORK/deep/bank")"
+check "traversal --id refused (exit 2)" 2 "$(run add --bank "$B_DEEP" --id "../escaped" \
+  --source revert --summary "escape attempt" --repro "true" --golden-text x)"
+# The id is joined onto cases/, so '../x' escapes to the bank root and '../../x'
+# escapes the bank entirely. Assert at the level each one actually reaches.
+check "traversal --id wrote nothing outside cases/" no "$(exists "$B_DEEP/escaped.json")"
+check "traversal rejection names the offending id" True "$(has "$WORK/err" "../escaped")"
+
+check "deep traversal --id refused (exit 2)" 2 "$(run add --bank "$B_DEEP" \
+  --id "../../escaped-deep" --source revert --summary "escape attempt" \
+  --repro "true" --golden-text x)"
+check "deep traversal wrote nothing outside the bank" no "$(exists "$WORK/deep/escaped-deep.json")"
+
+# An absolute id discards the bank prefix entirely (Path('a') / '/tmp/x' == '/tmp/x').
+check "absolute --id refused (exit 2)" 2 "$(run add --bank "$B_DEEP" \
+  --id "$WORK/abs-escape" --source revert --summary "escape attempt" \
+  --repro "true" --golden-text x)"
+check "absolute --id wrote nothing at that path" no "$(exists "$WORK/abs-escape.json")"
+
+check "subdirectory --id refused (exit 2)" 2 "$(run add --bank "$B_DEEP" --id "sub/dir" \
+  --source revert --summary "escape attempt" --repro "true" --golden-text x)"
+check "subdirectory --id created no subdirectory" no "$(exists "$B_DEEP/cases/sub")"
+
+check "dot --id refused (exit 2)" 2 "$(run add --bank "$B_DEEP" --id ".." \
+  --source revert --summary "escape attempt" --repro "true" --golden-text x)"
+check "no refused id landed in the bank" 0 \
+  "$(ls "$B_DEEP/cases" 2>/dev/null | wc -l | tr -d ' ')"
+
+# ── Scenario 5 ────────────────────────────────────────────────────────
+# GIVEN a malformed case file the ledger vouches for, THEN `check` reports a data
+# error (exit 2), NOT the ratchet (exit 1). A crash would exit 1 too, which makes
+# a broken bank indistinguishable from a real regression to any caller gating on
+# the exit code — the ratchet's whole signal. A traceback is never an answer.
+B_NOREPRO="$(newbank "$WORK/bank-norepro")"
+printf '{"id": "no-repro", "source": "revert", "summary": "no repro key"}\n' \
+  > "$B_NOREPRO/cases/no-repro.json"
+witness "$B_NOREPRO" no-repro
+RC="$(run check --bank "$B_NOREPRO")"
+check "case missing 'repro' is a data error, not the ratchet (exit 2)" 2 "$RC"
+check "malformed case did not traceback" "False False" \
+  "$(has "$WORK/out" Traceback) $(has "$WORK/err" Traceback)"
+check "malformed case is named in the message" True \
+  "$([[ "$(has "$WORK/out" no-repro)$(has "$WORK/err" no-repro)" == *True* ]] && echo True || echo False)"
+
+B_BADJSON="$(newbank "$WORK/bank-badjson")"
+printf '{"id": "bad-json", "repro": "true"\n' > "$B_BADJSON/cases/bad-json.json"
+witness "$B_BADJSON" bad-json
+RC="$(run check --bank "$B_BADJSON")"
+check "unparseable case is a data error, not the ratchet (exit 2)" 2 "$RC"
+check "unparseable case did not traceback" "False False" \
+  "$(has "$WORK/out" Traceback) $(has "$WORK/err" Traceback)"
+
+# `list` reads the same case files and must not traceback on them either.
+RC="$(run list --bank "$B_BADJSON")"
+check "list did not traceback on an unparseable case" "False False" \
+  "$(has "$WORK/out" Traceback) $(has "$WORK/err" Traceback)"
+check "list on an unparseable case is a data error (exit 2)" 2 "$RC"
+
+# A forged ledger line is the other direction of the same escape: `check` derives
+# a path from the ledger's id, so an appended '../../x' walks it out of the bank.
+# Pointed at an existing out-of-bank file with a matching sha, an unguarded check
+# satisfies its own integrity test against something that is not a case at all
+# and prints "ratchet holds" — a laundered pass, which is the failure mode the
+# ledger exists to prevent. An id `add` could never have written is a tamper (4).
+B_FORGE="$(newbank "$WORK/deep/bank-forged")"
+# cases/../../ is $WORK/deep — one level above the bank, outside it either way.
+printf 'not a case at all\n' > "$WORK/deep/outsider.json"
+printf '{"case_sha256": "%s", "event": "add", "id": "../../outsider"}\n' \
+  "$(sha "$WORK/deep/outsider.json")" > "$B_FORGE/ledger.jsonl"
+RC="$(run check --bank "$B_FORGE")"
+check "forged ledger id cannot launder a pass (exit 4)" 4 "$RC"
+check "forged ledger id did not traceback" "False False" \
+  "$(has "$WORK/out" Traceback) $(has "$WORK/err" Traceback)"
+
+# TAMPERED still outranks malformed: an unwitnessed bad case is a tamper (4).
+B_UNWIT="$(newbank "$WORK/bank-unwitnessed-bad")"
+printf 'not json at all\n' > "$B_UNWIT/cases/unwitnessed-bad.json"
+check "tamper still outranks malformed (exit 4)" 4 "$(run check --bank "$B_UNWIT")"
+
+# ── Scenario 6 ────────────────────────────────────────────────────────
+# GIVEN a repro that cannot express failure, THEN `add` refuses it (exit 2). An
+# empty shell command exits 0 forever, so the case can never bite: it inflates
+# the count of banked cases while witnessing nothing.
+B_REPRO="$(newbank "$WORK/bank-repro")"
+check "empty --repro refused (exit 2)" 2 "$(run add --bank "$B_REPRO" --id empty-repro \
+  --source revert --summary "unfailable repro" --repro "" --golden-text x)"
+check "whitespace --repro refused (exit 2)" 2 "$(run add --bank "$B_REPRO" \
+  --id blank-repro --source revert --summary "unfailable repro" --repro "   " \
+  --golden-text x)"
+check "no unfailable case landed in the bank" 0 \
+  "$(ls "$B_REPRO/cases" 2>/dev/null | wc -l | tr -d ' ')"
 
 echo
 echo "rsi-ratchet: $PASS passed, $FAIL failed"
