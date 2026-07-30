@@ -337,6 +337,76 @@ check "whitespace --repro refused (exit 2)" 2 "$(run add --bank "$B_REPRO" \
 check "no unfailable case landed in the bank" 0 \
   "$(ls "$B_REPRO/cases" 2>/dev/null | wc -l | tr -d ' ')"
 
+# ── Scenario 7 ────────────────────────────────────────────────────────
+# GIVEN a symlink planted in the bank's layout, THEN the tool refuses to operate
+# (exit 2). This is the --id escape of scenario 4 by a different vector, and the
+# guards there cannot see it: resolving a path FOLLOWS the link, so with cases/
+# pointed elsewhere the resolved parent still *is* <bank>/cases — it just lives
+# outside the bank now. Every write the tool makes is redirected: case files under
+# `add`, witness lines appended to the ledger. Nothing in a legitimate bank is
+# ever a link, so the rule is the lazy one — cases/ a real directory, the ledger
+# and every case a regular file.
+B_SYMDIR="$WORK/bank-symdir"
+mkdir -p "$B_SYMDIR" "$WORK/sym-target"
+ln -s "$WORK/sym-target" "$B_SYMDIR/cases"
+check "symlinked cases/ refused by add (exit 2)" 2 "$(run add --bank "$B_SYMDIR" \
+  --id sym-escape --source revert --summary "symlink escape" --repro "true" \
+  --golden-text x)"
+check "symlinked cases/ wrote nothing at the link target" no \
+  "$(exists "$WORK/sym-target/sym-escape.json")"
+check "symlinked cases/ refused by check (exit 2)" 2 "$(run check --bank "$B_SYMDIR")"
+check "symlink rejection names what was rejected" "True True" \
+  "$(has "$WORK/err" cases) $(has "$WORK/err" symlink)"
+check "symlinked cases/ refused by list (exit 2)" 2 "$(run list --bank "$B_SYMDIR")"
+
+# A case file may not be a link either: moved out and linked back, its sha still
+# matches the ledger, so integrity "passes" while the banked bytes now live where
+# the append-only regime cannot see them.
+B_SYMCASE="$(newbank "$WORK/bank-symcase")"
+fixed "$FIX/symcase.py" SYMCASE_FIX
+run add --bank "$B_SYMCASE" --id linked-case --source ci-break --summary "case relinked" \
+  --repro "grep -q SYMCASE_FIX $FIX/symcase.py" --golden-text "SYMCASE_FIX" >/dev/null
+mv "$B_SYMCASE/cases/linked-case.json" "$WORK/outside-case.json"
+ln -s "$WORK/outside-case.json" "$B_SYMCASE/cases/linked-case.json"
+RC="$(run check --bank "$B_SYMCASE")"
+case "$RC" in 2 | 4) V=refused ;; *) V="exit $RC" ;; esac
+check "symlinked case file refused, never a pass" refused "$V"
+check "symlinked case file did not traceback" "False False" \
+  "$(has "$WORK/out" Traceback) $(has "$WORK/err" Traceback)"
+
+# A symlinked ledger redirects the append that IS the witness: the obligation
+# lands in a file outside the bank, which a later `check` can simply not find.
+B_SYMLED="$(newbank "$WORK/bank-symledger")"
+: > "$WORK/outside-ledger.jsonl"
+ln -s "$WORK/outside-ledger.jsonl" "$B_SYMLED/ledger.jsonl"
+check "symlinked ledger refused by add (exit 2)" 2 "$(run add --bank "$B_SYMLED" \
+  --id led-escape --source revert --summary "ledger redirect" --repro "true" \
+  --golden-text x)"
+check "symlinked ledger received no witness line" 0 \
+  "$(wc -l < "$WORK/outside-ledger.jsonl" | tr -d ' ')"
+check "symlinked ledger refused by check (exit 2)" 2 "$(run check --bank "$B_SYMLED")"
+
+# ── Scenario 8 ────────────────────────────────────────────────────────
+# GIVEN a repro written relative to the repository root — which every real banked
+# case is — THEN `check` reaches the same verdict from any cwd. A repro is a shell
+# command, so leaving its execution directory undefined makes the ratchet bite on
+# a PHANTOM regression whenever the caller's cwd differs: corrosive in an
+# integrity tool, because it trains operators to ignore the ratchet and reds CI
+# for the wrong reason. The directory is therefore fixed at the repo root.
+REPO_ROOT="$(cd "$PLUGIN_ROOT/../.." && pwd)"
+B_CWD="$(newbank "$WORK/bank-cwd")"
+run add --bank "$B_CWD" --id repo-relative --source review-finding \
+  --summary "repro path is relative to the repo root" \
+  --repro "grep -q lint-file Makefile" --golden-text "lint-file" >/dev/null
+check "repo-relative repro passes from the repo root (exit 0)" 0 \
+  "$(cd "$REPO_ROOT" && run check --bank "$B_CWD")"
+check "repo-relative repro passes from an unrelated cwd (exit 0)" 0 \
+  "$(cd "$WORK" && run check --bank "$B_CWD")"
+# The default is a default, not a hardcoding: pointed somewhere the repro cannot
+# succeed, --cwd makes the ratchet bite — which proves the flag is load-bearing.
+check "--cwd override is honored (exit 1)" 1 \
+  "$(run check --bank "$B_CWD" --cwd "$WORK")"
+
 echo
 echo "rsi-ratchet: $PASS passed, $FAIL failed"
 [[ "$FAIL" -eq 0 ]]
