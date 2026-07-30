@@ -1,0 +1,11 @@
+{
+  "banked_at": "2026-07-30T11:57:30.902183+00:00",
+  "golden": {
+    "path": "plugins/rsi-loop/baseline/gen-000/inner-agent.workflow.mjs",
+    "sha256": "8f9e90313068e5e51d44aa09081895c2047b5dfb2856670f211483660385dda3"
+  },
+  "id": "shim-workflow-no-dynamic-import",
+  "repro": "bash plugins/rsi-loop/tests/test-shim-self-contained.sh > /dev/null",
+  "source": "ci-break",
+  "summary": "The Claude Code Workflow runtime forbids await import(), but the inner-agent shim used it; every prior test ran the engine Node-direct, which permits import(), masking the bug until a real Workflow run (daaf43f)."
+}
