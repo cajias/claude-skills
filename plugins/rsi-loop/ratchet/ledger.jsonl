@@ -1,0 +1,4 @@
+{"case_sha256": "bba0e7caef3d0eac0980b5b9ec4e15e6450a33e73daf7f9f648ac9e1cbf53b5a", "event": "add", "id": "shim-workflow-no-dynamic-import"}
+{"case_sha256": "9c3327469127e3d5f2e16de80320cd61cd14d16d6e7bcc11431174957f00b42b", "event": "add", "id": "validate-frontmatter-awk-helper"}
+{"case_sha256": "26b0235c1887be06dd3304aec5fb25c8183b1f4fbd735e291acbfe1ad653c68e", "event": "add", "id": "ls-lint-ignores-pycache"}
+{"case_sha256": "c00275db17a76d041f14db6bfdc01fd46a61d7cea0e8d36c095c5e065aba720d", "event": "add", "id": "lint-file-covers-uv-plugins"}
