@@ -264,6 +264,7 @@ def cmd_check(args):
                 shell=True,
                 capture_output=True,
                 timeout=REPRO_TIMEOUT_S,
+                check=False,  # we read returncode; a raise would crash, not report
             )
             reason = None if proc.returncode == 0 else f"repro exited {proc.returncode}"
         except subprocess.TimeoutExpired:
