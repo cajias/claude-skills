@@ -30,6 +30,12 @@ along with the obligation.
 Integrity is checked before any repro runs, and outranks it: a bank that does
 not match its witness makes every repro verdict meaningless.
 
+A repro is a shell command, so WHERE it runs is part of the case. That directory
+is fixed at the repository root — the ancestor of this script — never the
+caller's cwd, which would make the ratchet bite on a phantom regression whenever
+CI or an operator invoked it from elsewhere. Write repro paths relative to the
+repo root (`grep -q x Makefile`); `check --cwd` overrides for anything else.
+
 Exit codes (a shell caller can gate on these):
   0  success / the ratchet holds
   1  THE RATCHET BIT — a banked case's repro failed (regression)
@@ -58,6 +64,9 @@ SOURCES = ("review-finding", "ci-break", "revert", "escaped-bug")
 # A wedged repro must not be able to hold CI hostage; a timeout is a regression.
 REPRO_TIMEOUT_S = 120
 DEFAULT_BANK = Path(__file__).resolve().parent.parent / "ratchet"
+# <repo>/plugins/rsi-loop/scripts/rsi-ratchet.py — derived from __file__, not from
+# the bank, so it holds for a bank kept anywhere.
+REPO_ROOT = Path(__file__).resolve().parents[3]
 # An id becomes a file name, so it is a path component and nothing else.
 ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
@@ -66,12 +75,39 @@ class BadId(Exception):
     """An id that cannot safely become a file name."""
 
 
+class BadBank(Exception):
+    """A bank whose layout is not what it claims to be."""
+
+
 class Malformed(Exception):
     """A banked case that cannot be read as a case."""
 
 
 def sha256_file(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def cases_dir(bank):
+    """The single point where <bank>/cases is named — so the single guard.
+
+    A symlinked cases/ is the --id escape by another vector, and the guards in
+    case_path cannot see it: resolving a path FOLLOWS the link, so with cases/
+    pointed elsewhere the resolved parent still *is* <bank>/cases — outside the
+    bank. Every write is redirected, and `check` then vouches for files the
+    append-only regime never saw. Nothing in a real bank is ever a link.
+    """
+    cases = bank / "cases"
+    if cases.is_symlink():
+        raise BadBank(f"{cases} is a symlink; cases/ must be a real directory")
+    return cases
+
+
+def ledger_path(bank):
+    """Same rule for the witness: a symlinked ledger redirects the append."""
+    ledger = bank / "ledger.jsonl"
+    if ledger.is_symlink():
+        raise BadBank(f"{ledger} is a symlink; the ledger must be a regular file")
+    return ledger
 
 
 def case_path(bank, case_id):
@@ -85,10 +121,14 @@ def case_path(bank, case_id):
     """
     if not ID_RE.match(case_id):
         raise BadId(case_id)
-    cases = bank / "cases"
+    cases = cases_dir(bank)
     path = cases / f"{case_id}.json"
     if path.resolve().parent != cases.resolve():
         raise BadId(case_id)
+    # A case moved out and linked back keeps its sha, so integrity would "pass"
+    # while the banked bytes live where append-only cannot reach them.
+    if path.is_symlink():
+        raise BadBank(f"{path} is a symlink; a banked case must be a regular file")
     return path
 
 
@@ -135,7 +175,7 @@ def witnessed(bank):
     `check` already reports as tampering.
     """
     out = {}
-    path = bank / "ledger.jsonl"
+    path = ledger_path(bank)
     if not path.is_file():
         return out
     for line in path.read_text().splitlines():
@@ -151,8 +191,14 @@ def witnessed(bank):
 
 
 def banked_cases(bank):
-    cases_dir = bank / "cases"
-    return sorted(cases_dir.glob("*.json")) if cases_dir.is_dir() else []
+    cases = cases_dir(bank)
+    if not cases.is_dir():
+        return []
+    found = sorted(cases.glob("*.json"))
+    for path in found:
+        if path.is_symlink():
+            raise BadBank(f"{path} is a symlink; a banked case must be a regular file")
+    return found
 
 
 def cmd_add(args):
@@ -202,7 +248,7 @@ def cmd_add(args):
 
     # Hash what landed on disk, not what we meant to write: the ledger witnesses
     # bytes, so `check` (and a plain sha256sum) compare the same thing.
-    with (bank / "ledger.jsonl").open("a") as fh:
+    with ledger_path(bank).open("a") as fh:
         entry = {"event": "add", "id": args.id, "case_sha256": sha256_file(path)}
         fh.write(json.dumps(entry, sort_keys=True) + "\n")
         fh.flush()
@@ -254,6 +300,15 @@ def cmd_check(args):
     if bad:
         return report_malformed(bad)
 
+    # Every repro runs in a DEFINED directory, never the caller's. Left to the
+    # caller's cwd, repo-relative repro paths make the ratchet bite on a phantom
+    # regression from any other directory — an integrity tool that cries wolf
+    # trains operators to ignore it, and reds CI for the wrong reason.
+    cwd = Path(args.cwd) if args.cwd else REPO_ROOT
+    if not cwd.is_dir():
+        print(f"rsi-ratchet: --cwd is not a directory: {cwd}", file=sys.stderr)
+        return 2
+
     # Report only failures: a passing case in the output would let an empty run
     # look like a clean one, and buries the regression an operator must act on.
     failed = []
@@ -262,6 +317,7 @@ def cmd_check(args):
             proc = subprocess.run(
                 case["repro"],
                 shell=True,
+                cwd=cwd,
                 capture_output=True,
                 timeout=REPRO_TIMEOUT_S,
                 check=False,  # we read returncode; a raise would crash, not report
@@ -341,10 +397,15 @@ def main() -> int:
     )
     golden.add_argument("--golden-text", help="the fix's golden ref inline")
 
-    sub.add_parser(
+    p_check = sub.add_parser(
         "check",
         parents=[common],
         help="verify integrity, then re-run every banked repro",
+    )
+    p_check.add_argument(
+        "--cwd",
+        help=f"directory every repro runs in (default: the repo root, {REPO_ROOT}) — "
+        "so a case's paths are repo-relative and the verdict is cwd-independent",
     )
     sub.add_parser("list", parents=[common], help="one line per banked case")
 
@@ -357,6 +418,9 @@ def main() -> int:
             "letters, digits, '.', '_', '-', starting alphanumeric",
             file=sys.stderr,
         )
+        return 2
+    except BadBank as exc:
+        print(f"rsi-ratchet: REFUSED — {exc}", file=sys.stderr)
         return 2
     except Exception:  # noqa: BLE001 — blind is the point; see below
         # Exit 1 is reserved for a real regression, so an internal error must not
