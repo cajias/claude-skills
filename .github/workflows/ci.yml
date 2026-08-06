@@ -159,6 +159,9 @@ jobs:
       - name: Shim self-containment (no dynamic import; engine inlined, no drift)
         run: bash plugins/rsi-loop/tests/test-shim-self-contained.sh
 
+      - name: Free labels — additive facts + the §13.3 policy gate
+        run: bash plugins/rsi-loop/tests/test-labels.sh
+
   test-scripts:
     name: Test scripts
     runs-on: ubuntu-latest
