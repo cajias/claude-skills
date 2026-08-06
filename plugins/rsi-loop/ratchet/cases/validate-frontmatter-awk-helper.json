@@ -1,0 +1,11 @@
+{
+  "banked_at": "2026-07-30T11:57:30.951674+00:00",
+  "golden": {
+    "path": "scripts/validate.sh",
+    "sha256": "1adc18f87631a65b4717986fa0f83a9dd8383cb9b4886b9b9ada097ee766f1e2"
+  },
+  "id": "validate-frontmatter-awk-helper",
+  "repro": "grep -A2 -F \"extract_frontmatter() {\" scripts/validate.sh | grep -q awk && ! grep -qF \",/^---\" scripts/validate.sh",
+  "source": "review-finding",
+  "summary": "validate.sh read frontmatter with a sed '/^---$/,/^---$/p' range that over-captured whenever a body line was '---', and piping it into grep -q raised SIGPIPE under set -o pipefail; ~6% of runs emitted false warnings/errors. Fixed by the extract_frontmatter() awk helper plus here-strings (d897d44)."
+}
