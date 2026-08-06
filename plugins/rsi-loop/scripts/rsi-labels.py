@@ -38,9 +38,13 @@ Exit codes: 0 accepted · 2 usage/validation error · 3 REFUSED (§13.3 hard lin
 
 import argparse
 import json
+import os
 import sys
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
+
+DESCRIPTION = "§13.2 Track 2: free labels, and the §13.3 hard line."
 
 # §13.2's four free-label sources. Anything else (a benchmark score, a hunch) is
 # not ground truth and must not be recordable as one.
@@ -54,15 +58,15 @@ MDE_CITE = (
 )
 
 # Policy classification, keyed on normalized path components — one source of
-# truth for `gate` and `fact --scope`.
-POLICY_DIRS = {  # any directory component with this name
+# truth for `gate` and `fact --scope`. All keys are casefolded: see normalize().
+POLICY_DIRS = {  # any component with this name, at any depth
     "prompts": "lives under a prompts/ directory (prompt text is policy)",
     "hooks": "lives under a hooks/ directory (hook logic is policy)",
 }
 POLICY_NAMES = {  # exact file name, at any depth
     "policy.json": "is the policy file",
-    "CLAUDE.md": "is a CLAUDE.md behavioral-rule file",
-    "SKILL.md": "is a skill definition",
+    "claude.md": "is a CLAUDE.md behavioral-rule file",
+    "skill.md": "is a skill definition",
     "search-engine.mjs": "is the search engine",
 }
 POLICY_MD_DIRS = {  # markdown under a directory with this name
@@ -72,14 +76,58 @@ POLICY_MD_DIRS = {  # markdown under a directory with this name
 }
 
 
-def policy_reason(path: str) -> str | None:
-    """Why `path` is a policy/strategy edit, or None if it is additive-safe."""
-    parts = PurePosixPath(Path(path).as_posix()).parts
-    name = parts[-1] if parts else ""
-    dirs = set(parts[:-1])
+def normalize(path: str) -> tuple[str, ...]:
+    """Casefolded path components, with every cheap spelling dodge collapsed.
 
+    A gate that classifies raw strings is a gate with a bypass per spelling, so
+    normalize once here and let both callers inherit it:
+
+    * NFKC — fullwidth lookalikes (`ｐrompts`, `／`) fold to ASCII.
+    * `\\` is a separator too; on Windows `prompts\\x.md` is that policy file.
+    * Windows drops trailing dots and spaces from a name, so `CLAUDE.md.` and
+      `CLAUDE.md ` open `CLAUDE.md`. Strip both, and leading space with them.
+    * `.`/`..`/duplicate separators resolve away: `a/../prompts/x.md` is policy.
+    * Casefolded, because on a case-insensitive filesystem (APFS, NTFS)
+      `claude.md` and `PROMPTS/` ARE `CLAUDE.md` and `prompts/` — the same bytes
+      on disk. A case-sensitive classifier hands out a real bypass.
+
+    ponytail: no confusable-script mapping — Cyrillic `рrompts/` is a genuinely
+    different directory, and a homoglyph table would refuse innocent paths.
+    """
+    text = unicodedata.normalize("NFKC", path).replace("\\", "/")
+    out: list[str] = []
+    for raw in PurePosixPath(text).parts:
+        if raw in ("", "."):
+            continue
+        if raw == "..":
+            out.append(raw)
+            continue
+        # Trailing dots/spaces are not part of the name a filesystem opens.
+        part = raw.strip().rstrip(". ").strip() or raw
+        out.append(part.casefold())
+    return tuple(out)
+
+
+def policy_reason(path: str) -> str | None:
+    """Why `path` is a policy/strategy edit, or None if it is additive-safe.
+
+    Classifies the spelling given AND the symlink-resolved target: a link named
+    `docs/notes.md` that points into `prompts/` still edits the prompt, and an
+    innocent name is not a defence.
+    """
+    # realpath() also anchors a relative path to the cwd, which is correct: run
+    # from inside prompts/, `x.md` IS prompts/x.md. Deliberately fail-safe.
+    for parts in (normalize(path), normalize(os.path.realpath(path))):
+        if why := classify(parts):
+            return why
+    return None
+
+
+def classify(parts: tuple[str, ...]) -> str | None:
+    """Policy reason for already-normalized components, or None."""
+    name = parts[-1] if parts else ""
     for d, why in POLICY_DIRS.items():
-        if d in dirs:
+        if d in parts:  # includes the directory itself, not just its contents
             return why
     if name in POLICY_NAMES:
         return POLICY_NAMES[name]
@@ -87,9 +135,17 @@ def policy_reason(path: str) -> str | None:
         return "is an agent workflow"
     if name.endswith(".md"):
         for d, why in POLICY_MD_DIRS.items():
-            if d in dirs:
+            if d in parts[:-1]:
                 return why
     return None
+
+
+def blank(value: str, flag: str) -> bool:
+    """True (and complains) if a path argument carries no path at all."""
+    if value.strip():
+        return False
+    print(f"rsi-labels: {flag} must not be empty", file=sys.stderr)
+    return True
 
 
 def refuse(offenders: list[tuple[str, str]]) -> int:
@@ -102,7 +158,11 @@ def refuse(offenders: list[tuple[str, str]]) -> int:
 
 
 def append(store: str, log: str, record: dict) -> None:
-    """Append one compact JSON line. Append-only: mode 'a', never a rewrite."""
+    """Append one compact JSON line. Append-only: mode 'a', never a rewrite.
+
+    Raises OSError on an unusable --store; cmd_* turns that into exit 2, because
+    an uncaught traceback exits 1 and 1 is not one of this tool's verdicts.
+    """
     d = Path(store)
     d.mkdir(parents=True, exist_ok=True)
     with open(d / log, "a") as fh:
@@ -119,18 +179,17 @@ def cmd_fact(args: argparse.Namespace) -> int:
         print("rsi-labels: --text must not be empty", file=sys.stderr)
         return 2
     # Classify BEFORE any write: a refused call leaves the store byte-identical.
-    if args.scope:
-        why = policy_reason(args.scope)
-        if why:
+    if args.scope is not None:
+        if blank(args.scope, "--scope"):
+            return 2
+        if why := policy_reason(args.scope):
             return refuse([(args.scope, why)])
     record = {"ts": now(), "signal": args.signal, "text": text}
     if args.scope:
         record["scope"] = args.scope
     if args.source:
         record["source"] = args.source
-    append(args.store, "facts.jsonl", record)
-    print(f"rsi-labels: recorded fact ({args.signal})")
-    return 0
+    return write(args.store, "facts.jsonl", record, f"recorded fact ({args.signal})")
 
 
 def cmd_failure(args: argparse.Namespace) -> int:
@@ -141,12 +200,23 @@ def cmd_failure(args: argparse.Namespace) -> int:
     record = {"ts": now(), "signal": args.signal, "summary": summary}
     if args.repro:
         record["repro"] = args.repro
-    append(args.store, "failures.jsonl", record)
-    print(f"rsi-labels: logged failure ({args.signal})")
+    return write(args.store, "failures.jsonl", record, f"logged failure ({args.signal})")
+
+
+def write(store: str, log: str, record: dict, said: str) -> int:
+    """append() plus the confirmation line, with --store errors as exit 2."""
+    try:
+        append(store, log, record)
+    except OSError as exc:
+        print(f"rsi-labels: cannot write --store {store}: {exc}", file=sys.stderr)
+        return 2
+    print(f"rsi-labels: {said}")
     return 0
 
 
 def cmd_gate(args: argparse.Namespace) -> int:
+    if any(blank(p, "--path") for p in args.path):
+        return 2
     offenders = [(p, why) for p in args.path if (why := policy_reason(p))]
     if offenders:
         return refuse(offenders)
@@ -155,7 +225,9 @@ def cmd_gate(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    # Literal, not __doc__: python3 -OO strips docstrings, and reading one at
+    # startup dies with an AttributeError — exit 1, a code that is not a verdict.
+    ap = argparse.ArgumentParser(description=DESCRIPTION)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     def with_common(p: argparse.ArgumentParser) -> argparse.ArgumentParser:

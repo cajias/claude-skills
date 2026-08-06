@@ -277,6 +277,105 @@ for p in "prompts/system.md" "CLAUDE.md" "hooks/pre-commit.sh" "search-engine.mj
   check "refused fact wrote nothing: $p" "no-file" "$(records_in "$SS/facts.jsonl")"
 done
 
+# ── Bypass resistance: normalize first, then classify ────────────────────
+echo "[gate — classifier normalization]"
+
+# Case folding is not a nicety here. On a case-insensitive filesystem (APFS,
+# NTFS) `claude.md` IS `CLAUDE.md` and `PROMPTS/` IS `prompts/` — the same
+# bytes on disk. A case-sensitive gate therefore hands out a real bypass, so
+# the classifier compares casefolded.
+CASE_BYPASSES=(
+  "PROMPTS/x.md" "Prompts/x.md" "HOOKS/x.sh" "AGENTS/r.md" "agents/r.MD"
+  "claude.md" "Claude.md" "CLAUDE.MD" "skill.md" "policy.JSON"
+  "inner.WORKFLOW.MJS" "search-engine.MJS"
+)
+for p in "${CASE_BYPASSES[@]}"; do
+  run gate --store "$WORK/s-gate" --path "$TREE/$p"
+  check "case variant refused (exit 3): $p" 3 "$RC"
+done
+
+# Separator and filename-shape spellings of the same policy file. Backslash is
+# a separator on Windows; Windows also strips trailing dots and spaces from a
+# name, so `CLAUDE.md.` resolves to `CLAUDE.md` there.
+SHAPE_BYPASSES=(
+  'prompts\x.md' 'plugins\x\CLAUDE.md'
+  "CLAUDE.md." "CLAUDE.md " " CLAUDE.md"
+  "prompts" "prompts/" "x/prompts"       # the policy directory itself
+  "hooks" "plugins/x/hooks/"
+)
+for p in "${SHAPE_BYPASSES[@]}"; do
+  run gate --store "$WORK/s-gate" --path "$TREE/$p"
+  check "shape variant refused (exit 3): $p" 3 "$RC"
+done
+
+# Unicode lookalikes. NFKC folds fullwidth forms to ASCII, so `ｐｒｏｍｐｔｓ/`
+# cannot be a second spelling of the policy directory. (Casefolding alone does
+# NOT do this: 'ｐｒｏｍｐｔｓ'.casefold() is still fullwidth.)
+for p in 'ｐｒｏｍｐｔｓ/x.md' 'ＣＬＡＵＤＥ.md' 'ｈｏｏｋｓ/x.sh'; do
+  run gate --store "$WORK/s-gate" --path "$p"
+  check "fullwidth lookalike refused (exit 3): $p" 3 "$RC"
+done
+
+# `..` resolves both ways or not at all. It must collapse INTO a policy dir
+# (asserted above) and equally collapse back OUT of one: prompts/../docs/x.md
+# is docs/x.md, and refusing it would block a licensed additive write.
+run gate --store "$WORK/s-gate" --path "$TREE/prompts/../docs/NOTES.md"
+check "'..' out of a policy dir resolves to the safe path (exit 0)" 0 "$RC"
+
+# A symlink with an innocent name is still an edit to the policy file it points
+# at, so the resolved target is classified too — spelling is not a defence.
+ln -s "$TREE/prompts/system.md" "$TREE/docs/looks-safe.md"
+run gate --store "$WORK/s-gate" --path "$TREE/docs/looks-safe.md"
+check "symlink to a policy file refused (exit 3)" 3 "$RC"
+ln -s "$TREE/prompts" "$TREE/safe-dir"
+run gate --store "$WORK/s-gate" --path "$TREE/safe-dir/system.md"
+check "path through a symlinked policy dir refused (exit 3)" 3 "$RC"
+# ...and resolution must not start refusing ordinary files.
+ln -s "$TREE/docs/NOTES.md" "$TREE/docs/alias.md"
+run gate --store "$WORK/s-gate" --path "$TREE/docs/alias.md"
+check "symlink to a safe file still passes" 0 "$RC"
+
+# An empty path is not a cleared path: "0 real paths, exit 0" is the vacuous
+# pass again, one argument lower.
+run gate --store "$WORK/s-gate" --path ''
+check "empty --path is a usage error (exit 2)" 2 "$RC"
+run gate --store "$WORK/s-gate" --path '   '
+check "whitespace-only --path is a usage error (exit 2)" 2 "$RC"
+run fact --store "$WORK/s-blankscope" --signal ci-failure --text 'x' --scope '  '
+check "blank --scope is a usage error (exit 2)" 2 "$RC"
+
+# One classifier, so `fact --scope` inherits every normalization above for free.
+# If these pass while the `gate` cases above pass, the check is not duplicated
+# at the call site.
+i=0
+for p in "PROMPTS/x.md" "claude.md" 'prompts\x.md' "x/prompts" "CLAUDE.md."; do
+  i=$((i + 1))
+  SS="$WORK/s-smug2-$i"
+  run fact --store "$SS" --signal user-correction \
+    --text 'a fact about the reviewer prompt' --scope "$TREE/$p"
+  check "fact --scope normalizes too (exit 3): $p" 3 "$RC"
+  check "normalized refusal wrote nothing: $p" "no-file" "$(records_in "$SS/facts.jsonl")"
+done
+
+# ── Robustness: no crash may impersonate a verdict ───────────────────────
+echo "[robustness]"
+
+# `python3 -OO` strips docstrings, so anything that reads __doc__ at startup
+# dies with an AttributeError before argparse runs — exit 1, no verdict.
+set +e
+python3 -OO "$LABELS" gate --store "$WORK/s-oo" --path "$TREE/README.md" \
+  > "$OUT_FILE" 2> "$ERR_FILE"
+OO_RC=$?
+set -e
+check "runs under python3 -OO (docstrings stripped)" 0 "$OO_RC"
+check "-OO run prints no traceback" "no" "$(out_has 'Traceback')"
+
+# A hostile --store is an error the tool reports, not one the interpreter does.
+: > "$WORK/store-is-a-file"
+run fact --store "$WORK/store-is-a-file" --signal ci-failure --text 'x'
+check "--store that is a file exits 2" 2 "$RC"
+check "hostile --store prints no traceback" "no" "$(out_has 'Traceback')"
+
 # ── Usage ────────────────────────────────────────────────────────────────
 echo "[usage]"
 
