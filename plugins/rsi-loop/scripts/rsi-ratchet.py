@@ -27,6 +27,13 @@ second direction is what stops a wiped ledger from laundering a deletion into a
 pass — with only one direction, `: > ledger.jsonl` would erase the evidence
 along with the obligation.
 
+Residual: the ledger catches a tamper that does not also forge the witness. A
+same-uid writer who neuters a case AND rewrites its ledger line to match passes
+`check`; only an out-of-band witness closes that, and here it is git — the bank
+and its ledger are committed, ledger lines are only ever APPENDED, and
+`git log -p ratchet/ledger.jsonl` is a history no later write can retroactively
+alter. A diff MODIFYING an existing line is the signal a reviewer must reject.
+
 Integrity is checked before any repro runs, and outranks it: a bank that does
 not match its witness makes every repro verdict meaningless.
 
