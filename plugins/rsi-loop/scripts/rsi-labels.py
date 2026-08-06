@@ -100,7 +100,8 @@ def normalize(path: str) -> tuple[str, ...]:
         if raw in ("", "."):
             continue
         if raw == "..":
-            out.append(raw)
+            if out:  # a leading/unmatched ".." has nothing to pop
+                out.pop()
             continue
         # Trailing dots/spaces are not part of the name a filesystem opens.
         part = raw.strip().rstrip(". ").strip() or raw
@@ -200,7 +201,9 @@ def cmd_failure(args: argparse.Namespace) -> int:
     record = {"ts": now(), "signal": args.signal, "summary": summary}
     if args.repro:
         record["repro"] = args.repro
-    return write(args.store, "failures.jsonl", record, f"logged failure ({args.signal})")
+    return write(
+        args.store, "failures.jsonl", record, f"logged failure ({args.signal})"
+    )
 
 
 def write(store: str, log: str, record: dict, said: str) -> int:
