@@ -55,7 +55,10 @@ vanished or changed is a tamper, and so is a case file the ledger never vouched 
 stops a wiped ledger from laundering a deletion into a pass). Because the witness is over bytes,
 `ratchet/` is in `.prettierignore` — a reformat would forge a tamper alarm. There is deliberately
 no `retire`/`delete`: retiring a saturated case is a human act appended to the ledger, never
-something the loop can call.
+something the loop can call. Detection has a bound: a writer who tampers with a case _and_ rewrites
+its ledger line to match passes `check`, so the real rail is that both are committed to git — ledger
+lines are only ever appended, and a diff that modifies an existing line is the tamper signal a
+reviewer must reject.
 
 To bank a new failure, fix it first, then hand the tool a repro that passes now and would fail if
 the fix were reverted (verify both directions before banking — the tool rejects an empty repro but
