@@ -137,6 +137,32 @@ mechanical, top-tier for architecture/security/adversarial-verify"). If it must 
 4000-char budget, keep the "specialized-first, general-purpose last, tier-by-complexity" principle
 even if the full table is dropped.
 
+## Workflow engine (optional, for large milestones)
+
+The Procedure above is the inline path — follow it directly for a handful of issues. For a large
+milestone, or when the user asks for `ultracode` / a fan-out, hand the whole thing to the bundled
+Workflow engine instead:
+
+```
+Workflow({
+  scriptPath: "${CLAUDE_PLUGIN_ROOT}/skills/milestone-goal-prompt/workflows/goal-prompt.js",
+  args: { repo: "<owner/name or group/project>", milestone: "<number or title>" }
+})
+```
+
+Optional args: `platform` (`"github"` | `"gitlab"`; auto-detected from the git remote when omitted)
+and `config` (`{maxRounds, maxIssues, charBudget}`).
+
+It runs the same method in four phases — **Survey** (issues + honest verify command, in parallel),
+**Analyze** (one agent per issue, pipelined), **Assemble** (synthesize the directive), **Verify**
+(three distinct adversarial lenses — completeness, correctness, constraints — looping until two
+consecutive rounds surface nothing new, hard cap four rounds).
+
+It returns `{directive, charCount, verifyCommand, issues, blocked, rounds, findingsApplied,
+converged, overBudget}`. You still own the Output contract below: print the two labeled blocks
+yourself. If `converged` is false, say so — the directive is not adversarially clean. Reserve the
+inline path for small milestones, since the workflow spends several agents per issue.
+
 ## Required tools
 
 `gh` (issues, milestones, repo metadata), `Bash`/`Grep` for repo inspection (finding the real

@@ -1,7 +1,7 @@
 {
   "name": "dev-process",
   "description": "Design-and-build process skills: layered design docs, C4 architecture artifacts, Diataxis documentation, README authoring, a milestone execution harness, milestone goal-prompt generation, positive-framing spec guidance, and a schema drift playbook.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Raul Cajias"
   },
