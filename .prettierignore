@@ -19,6 +19,14 @@ plugins/dev-process/skills/
 plugins/ci-build/skills/
 plugins/integrations/skills/
 
+# Ratchet bank (§13.2 Track 1). The bank's integrity model hashes each case
+# file's BYTES and witnesses that sha256 in ledger.jsonl. Prettier is not a
+# fixed point on `json.dumps(indent=2)` output (it collapses short arrays onto
+# one line), so a single reformat would break every sha and make `rsi-ratchet.py
+# check` report a phantom TAMPER — a forged tamper alarm, not a formatting nit.
+# Only rsi-ratchet.py may write here.
+plugins/rsi-loop/ratchet/
+
 # Session-local agent memory (self-ignoring via nested .gitignore; Prettier
 # only reads the root .gitignore, so it must be listed here explicitly).
 .remember/

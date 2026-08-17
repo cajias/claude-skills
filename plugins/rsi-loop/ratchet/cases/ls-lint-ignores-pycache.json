@@ -1,0 +1,11 @@
+{
+  "banked_at": "2026-07-30T11:57:31.001554+00:00",
+  "golden": {
+    "path": ".ls-lint.yml",
+    "sha256": "1fcd4658cab4e9249f98be66f7b772a4ebb3005ead9b734645ee3862dcc289d2"
+  },
+  "id": "ls-lint-ignores-pycache",
+  "repro": "grep -qF \"**/__pycache__\" .ls-lint.yml && grep -qF \"**/.pytest_cache\" .ls-lint.yml",
+  "source": "ci-break",
+  "summary": "A stray plugins/rsi-loop/scripts/__pycache__ directory failed ls-lint, which does not read .gitignore; .ls-lint.yml must ignore **/__pycache__ and **/.pytest_cache explicitly."
+}

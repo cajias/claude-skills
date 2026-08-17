@@ -36,6 +36,46 @@ Three AIDE² families under `tasks/`, each with a public/private split and an im
 solution is a tiny agent scaffold). Second-order generalization is measured on `holdout-tasks/`
 — one unseen task per family plus a far-OOD time-series forecast — which no run ever trains on.
 
+## Ratchet (§13.2 Track 1)
+
+§13.1 proves a single real task cannot license a harness edit (MDE at K=1 is 0.124; real gains are
+0.02–0.05), so online _optimization_ is off the table. What is available online is _hardening_,
+which needs no counterfactual and no statistics because it is monotone: every real failure — a
+review finding, a CI break, a revert, an escaped bug — becomes a permanent regression case with the
+fix as its golden ref, and no future harness may regress it. `scripts/rsi-ratchet.py` is that bank:
+`add` banks a failure, `check` re-verifies every banked repro, `list` prints one line per case.
+Exit codes are `0` holds, `1` **the ratchet bit** (a repro regressed), `2` usage/unreadable bank,
+`3` refused (id already banked), `4` tampered. Exit 1 is reserved for a real regression, so no
+internal error can impersonate one.
+
+The bank is append-only by DETECTION, not prevention — inner agents share this uid, so a read-only
+bit is theatre. Every `add` witnesses the case file's sha256 in `ratchet/ledger.jsonl`, and `check`
+reconciles bank against ledger in both directions before running any repro: a witnessed case that
+vanished or changed is a tamper, and so is a case file the ledger never vouched for (which is what
+stops a wiped ledger from laundering a deletion into a pass). Because the witness is over bytes,
+`ratchet/` is in `.prettierignore` — a reformat would forge a tamper alarm. There is deliberately
+no `retire`/`delete`: retiring a saturated case is a human act appended to the ledger, never
+something the loop can call. Detection has a bound: a writer who tampers with a case _and_ rewrites
+its ledger line to match passes `check`, so the real rail is that both are committed to git — ledger
+lines are only ever appended, and a diff that modifies an existing line is the tamper signal a
+reviewer must reject.
+
+To bank a new failure, fix it first, then hand the tool a repro that passes now and would fail if
+the fix were reverted (verify both directions before banking — the tool rejects an empty repro but
+cannot detect a vacuous one):
+
+```bash
+python3 plugins/rsi-loop/scripts/rsi-ratchet.py add \
+  --bank plugins/rsi-loop/ratchet \
+  --id ls-lint-ignores-pycache --source ci-break \
+  --summary "a stray __pycache__ failed ls-lint, which does not read .gitignore" \
+  --repro 'grep -qF "**/__pycache__" .ls-lint.yml' \
+  --golden .ls-lint.yml
+```
+
+Repros run through the shell in the caller's cwd, so write them relative to the repo root — that is
+where CI runs `check`, as the `Ratchet — banked cases still fixed` step of `test-rsi-loop`.
+
 ## Safety
 
 Inner agents run in sandboxes built from public materials only; the plugin's PreToolUse hook

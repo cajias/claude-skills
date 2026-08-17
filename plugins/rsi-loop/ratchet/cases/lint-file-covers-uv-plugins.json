@@ -1,0 +1,11 @@
+{
+  "banked_at": "2026-07-30T11:57:31.051527+00:00",
+  "golden": {
+    "path": "Makefile",
+    "sha256": "423bc620f80d2e176d8ce827672589c285f16b781c71ebcdb7265668b27824c0"
+  },
+  "id": "lint-file-covers-uv-plugins",
+  "repro": "grep -qF \"plugins/*.py)\" Makefile && grep -qF \"uv run --directory\" Makefile",
+  "source": "review-finding",
+  "summary": "make lint-file silently skipped Python under plugins/, so the PostToolUse format hook was a no-op for the uv plugins; the lint-file target needs a plugins/*.py case that runs each plugin's own ruff via uv run --directory (16a3bbd, #46)."
+}
