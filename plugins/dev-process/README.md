@@ -9,15 +9,16 @@ producers.
 
 ## Skills
 
-| Skill                    | Purpose                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------- |
-| `create-readme`          | Write a README.md for the project.                                                                |
-| `design-phase-artifacts` | Produce a C4 architecture overview plus five Notion design artifacts grounded in real code.       |
-| `design-plan-docs`       | Generate the layered design doc set under `docs/design/`, with traceability and Mermaid diagrams. |
-| `documentation-writer`   | Diataxis-guided technical writing for software documentation.                                     |
-| `iterative-build-loop`   | Drive a milestone plan to test-verified done, then consolidate learnings into skills and hooks.   |
-| `schema-drift-playbook`  | Fix validator-versus-data drift in three coordinated parts: relaxation, migration, producer fix.  |
-| `state-the-target`       | State the target positively in specs, PRDs, design docs, and agent prompts.                       |
+| Skill                    | Purpose                                                                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `create-readme`          | Write a README.md for the project.                                                                                                           |
+| `design-phase-artifacts` | Produce a C4 architecture overview plus five Notion design artifacts grounded in real code.                                                  |
+| `design-plan-docs`       | Generate the layered design doc set under `docs/design/`, with traceability and Mermaid diagrams.                                            |
+| `documentation-writer`   | Diataxis-guided technical writing for software documentation.                                                                                |
+| `iterative-build-loop`   | Drive a milestone plan to test-verified done, then consolidate learnings into skills and hooks.                                              |
+| `milestone-goal-prompt`  | Print a copy-paste autonomous-loop prompt that drives a GitHub/GitLab milestone to completion. Ships a Workflow engine for large milestones. |
+| `schema-drift-playbook`  | Fix validator-versus-data drift in three coordinated parts: relaxation, migration, producer fix.                                             |
+| `state-the-target`       | State the target positively in specs, PRDs, design docs, and agent prompts.                                                                  |
 
 ## Typical order
 
