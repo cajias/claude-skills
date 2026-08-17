@@ -165,6 +165,9 @@ jobs:
       - name: Ratchet — banked cases still fixed
         run: python3 plugins/rsi-loop/scripts/rsi-ratchet.py check --bank plugins/rsi-loop/ratchet
 
+      - name: Free labels — additive facts + the §13.3 policy gate
+        run: bash plugins/rsi-loop/tests/test-labels.sh
+
   test-scripts:
     name: Test scripts
     runs-on: ubuntu-latest
