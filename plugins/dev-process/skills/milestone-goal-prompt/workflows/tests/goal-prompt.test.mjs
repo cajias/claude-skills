@@ -301,27 +301,36 @@ test("the workflow never reaches for forbidden sandbox APIs", async () => {
 });
 
 // The close-out only survives compression because BOTH the must-retain list and
-// the completeness lens name it. Drop either and the assembler is free to trim
-// it with every other test still green — so assert both sites, not the file.
-test("the automation-recommender close-out is named in both prompt sites", async () => {
-  const raw = await readFile(SCRIPT, "utf8");
-  const site = (from, to) =>
-    raw.slice(raw.indexOf(from), raw.indexOf(to)).replace(/"\s*\+\s*"/g, "");
-  const critic = site("lens: \"completeness\"", "lens: \"correctness\"");
-  const retain = site("The directive MUST retain", "Hard limit:");
-  for (const [name, text] of [
-    ["completeness critic", critic],
-    ["must-retain list", retain],
-  ]) {
-    assert.ok(text.length > 0, `${name} block not found`);
-    assert.ok(
-      text.includes("claude-automation-recommender"),
-      `${name} must name the automation recommender`,
-    );
+// the completeness lens carry it. Assert the prompts the workflow actually sent
+// (the harness records every one) rather than scraping the source — a source
+// scan has to re-simulate string concatenation and fails open when a sentinel
+// moves. Both sites read from one CLOSE_OUT constant, so this also pins that.
+test("both prompt sites carry the automation-recommender close-out", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  const promptFor = (label) => {
+    const call = agentCalls.find((c) => c.opts && c.opts.label === label);
+    assert.ok(call, `no agent call labelled ${label}`);
+    return call.prompt;
+  };
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = promptFor(label);
+    for (const required of [
+      "claude-automation-recommender",
+      "candidate guards",
+      "Never auto-install",
+      "read-only repo profiler",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must carry "${required}"`,
+      );
+    }
   }
-  // Candidate-guard framing, not auto-install: the loop runs unattended.
-  assert.ok(
-    retain.includes("candidate") && retain.includes("never auto-install"),
-    "must-retain list must keep the candidate-guard / no-auto-install framing",
-  );
 });

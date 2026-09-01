@@ -54,5 +54,9 @@ two `uv` plugins at commit.
 
 ## CI
 
-6 jobs: `ci.yml` (lint, semantic-search, claudeception, ai-writing, rsi-loop) + `commit-lint.yml`.
-Conventional commits enforced (see `.commitlintrc.json`).
+8 jobs: `ci.yml` (lint, semantic-search, claudeception, ai-writing, dev-process, rsi-loop, scripts)
+plus `commit-lint.yml`. Conventional commits enforced (see `.commitlintrc.json`).
+
+The two Node jobs (`ai-writing`, `dev-process`) each pin a `working-directory` and run
+`node --test tests/*.test.mjs`. A workflow test suite outside those two directories runs in no
+automation at all — add a job when you add a suite.

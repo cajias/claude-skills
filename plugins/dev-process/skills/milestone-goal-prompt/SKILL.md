@@ -1,6 +1,6 @@
 ---
 name: milestone-goal-prompt
-description: Research (as an internal step) a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — behavior-driven (BDD) scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build + all tests + zero lint + /code-review + /security-audit + /ponytail:ponytail findings all cleared), specialized-agent selection with model tier scaled to task complexity, and a root-cause→harness-hardening loop closed out each iteration by `/claude-code-setup:claude-automation-recommender`. Use this whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or otherwise wants a ready-to-paste block that autonomously completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for actually executing the work (this only GENERATES and PRINTS the prompt — the loop does the work), NOT for merely summarizing or listing a milestone's issues, and NOT for a single one-off issue fix.
+description: Research a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — BDD scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build, tests, zero lint, /code-review, /security-audit, /ponytail:ponytail all cleared), specialized-agent selection, model tier scaled to complexity, and a root-cause→hardening loop closed out each iteration by /claude-code-setup:claude-automation-recommender. Use whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or wants a ready-to-paste block that completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for executing the work (it only GENERATES and PRINTS the prompt — the loop does it), NOT for summarizing or listing issues, and NOT for a one-off issue fix.
 ---
 
 # Milestone Goal Prompt
@@ -72,17 +72,17 @@ Work through these in order. Steps 1–5 are research; step 6 is synthesis; step
      durable guard that makes the class less likely next time (a hook, a learner rule, a lint, a
      toolchain check), and record what was added;
    - the **iteration close-out** — after the gate is green, end the iteration by running
-     `/claude-code-setup:claude-automation-recommender`. It is a read-only repo profiler, not a
-     root-cause analyzer: it reads the language, framework, and dependencies and proposes harness
+     `/claude-code-setup:claude-automation-recommender`. It is a read-only repo profiler, **not** a
+     root-cause analyzer: it reads language, framework, and dependencies and proposes harness
      automations (hooks, subagents, skills, MCP servers). Treat its output as **candidate guards for
      the root-cause loop above** — adopt one only when it actually guards a root cause seen this
-     iteration, and record the rest as declined. Because its profile input barely changes between
-     iterations, expect mostly repeats after the first pass; that is fine, the point is the
-     cross-check. **Never auto-install** a recommendation that could stall an unattended loop
-     (a confirmation-prompting `PreToolUse` hook, an MCP server needing a restart) — propose those
-     to the operator instead. This skill lives in the `claude-code-setup` plugin, which this
-     marketplace does not ship: if it is not installed, the directive must **say so loudly and
-     continue**, never silently skip the close-out;
+     iteration, and record the rest as declined. Its profile input barely changes between iterations,
+     so expect mostly repeats after the first pass; the cross-check is the point. **Never
+     auto-install** anything that could stall an unattended loop (a confirmation-prompting
+     `PreToolUse` hook, an MCP server needing a restart) — propose those to the operator. Availability
+     is a property of the operator's harness, so gate on the **session's available-skills listing**,
+     not on any marketplace: if the skill is absent, say so loudly and continue — never silently skip
+     the close-out;
    - the **agent & model policy** (see section below) — dispatch the right specialized agent per
      task, `general-purpose` last resort, model tier scaled to complexity;
    - operating constraints — local-only (Finch/Docker, no cloud), `rtk`-prefixed shell,
@@ -189,7 +189,8 @@ labeled blocks** the user pastes in sequence.
 
 If the directive would exceed 4000 characters, compress the prose — the loop can re-fetch issue
 detail with `gh` in-context — but **never drop** the Definition-of-Done gate, the adversarial
-gap-check, the trust-boundary invariants, or the root-cause loop. Those are the point.
+gap-check, the trust-boundary invariants, or the root-cause loop and its close-out. Those are the
+point.
 
 Use this exact shape:
 

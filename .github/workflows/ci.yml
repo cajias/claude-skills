@@ -120,6 +120,24 @@ jobs:
       - name: Test workflows
         run: node --test tests/*.test.mjs
 
+  test-dev-process:
+    name: Test dev-process plugin
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: plugins/dev-process/skills/milestone-goal-prompt/workflows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Test workflows
+        run: node --test tests/*.test.mjs
+
   test-rsi-loop:
     name: Test rsi-loop plugin
     runs-on: ubuntu-latest
