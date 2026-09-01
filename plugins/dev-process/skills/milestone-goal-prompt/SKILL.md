@@ -1,6 +1,6 @@
 ---
 name: milestone-goal-prompt
-description: Research (as an internal step) a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — behavior-driven (BDD) scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build + all tests + zero lint + /code-review + /security-audit + /ponytail:ponytail findings all cleared), specialized-agent selection with model tier scaled to task complexity, and a root-cause→harness-hardening loop. Use this whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or otherwise wants a ready-to-paste block that autonomously completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for actually executing the work (this only GENERATES and PRINTS the prompt — the loop does the work), NOT for merely summarizing or listing a milestone's issues, and NOT for a single one-off issue fix.
+description: Research (as an internal step) a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — behavior-driven (BDD) scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build + all tests + zero lint + /code-review + /security-audit + /ponytail:ponytail findings all cleared), specialized-agent selection with model tier scaled to task complexity, and a root-cause→harness-hardening loop closed out each iteration by `/claude-code-setup:claude-automation-recommender`. Use this whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or otherwise wants a ready-to-paste block that autonomously completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for actually executing the work (this only GENERATES and PRINTS the prompt — the loop does the work), NOT for merely summarizing or listing a milestone's issues, and NOT for a single one-off issue fix.
 ---
 
 # Milestone Goal Prompt
@@ -71,6 +71,18 @@ Work through these in order. Steps 1–5 are research; step 6 is synthesis; step
    - the **root-cause loop** — for every bug or gap, find the root cause and add the cheapest
      durable guard that makes the class less likely next time (a hook, a learner rule, a lint, a
      toolchain check), and record what was added;
+   - the **iteration close-out** — after the gate is green, end the iteration by running
+     `/claude-code-setup:claude-automation-recommender`. It is a read-only repo profiler, not a
+     root-cause analyzer: it reads the language, framework, and dependencies and proposes harness
+     automations (hooks, subagents, skills, MCP servers). Treat its output as **candidate guards for
+     the root-cause loop above** — adopt one only when it actually guards a root cause seen this
+     iteration, and record the rest as declined. Because its profile input barely changes between
+     iterations, expect mostly repeats after the first pass; that is fine, the point is the
+     cross-check. **Never auto-install** a recommendation that could stall an unattended loop
+     (a confirmation-prompting `PreToolUse` hook, an MCP server needing a restart) — propose those
+     to the operator instead. This skill lives in the `claude-code-setup` plugin, which this
+     marketplace does not ship: if it is not installed, the directive must **say so loudly and
+     continue**, never silently skip the close-out;
    - the **agent & model policy** (see section below) — dispatch the right specialized agent per
      task, `general-purpose` last resort, model tier scaled to complexity;
    - operating constraints — local-only (Finch/Docker, no cloud), `rtk`-prefixed shell,
@@ -85,9 +97,6 @@ Work through these in order. Steps 1–5 are research; step 6 is synthesis; step
    - **All `/code-review` findings addressed.**
    - **All `/security-audit` findings addressed.**
    - **All `/ponytail:ponytail` findings addressed** (delete over-engineering; stdlib/native over new deps).
-   - **`/claude-code-setup:claude-automation-recommender` run as the iteration's closing act** — it
-     picks the cheapest durable guard for the root causes found this iteration (hook, subagent, skill,
-     MCP server). Each recommendation is either applied or deferred with a stated reason; record which.
 
    The same gate re-runs across the whole milestone at the end, and for the complete goal at
    large, before anything is declared done. These are DEFAULT criteria on top of each issue's

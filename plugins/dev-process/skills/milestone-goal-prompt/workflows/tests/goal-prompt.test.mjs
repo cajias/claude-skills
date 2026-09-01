@@ -299,3 +299,29 @@ test("the workflow never reaches for forbidden sandbox APIs", async () => {
     assert.ok(!raw.includes(bad), `workflow must not use ${bad}`);
   }
 });
+
+// The close-out only survives compression because BOTH the must-retain list and
+// the completeness lens name it. Drop either and the assembler is free to trim
+// it with every other test still green — so assert both sites, not the file.
+test("the automation-recommender close-out is named in both prompt sites", async () => {
+  const raw = await readFile(SCRIPT, "utf8");
+  const site = (from, to) =>
+    raw.slice(raw.indexOf(from), raw.indexOf(to)).replace(/"\s*\+\s*"/g, "");
+  const critic = site("lens: \"completeness\"", "lens: \"correctness\"");
+  const retain = site("The directive MUST retain", "Hard limit:");
+  for (const [name, text] of [
+    ["completeness critic", critic],
+    ["must-retain list", retain],
+  ]) {
+    assert.ok(text.length > 0, `${name} block not found`);
+    assert.ok(
+      text.includes("claude-automation-recommender"),
+      `${name} must name the automation recommender`,
+    );
+  }
+  // Candidate-guard framing, not auto-install: the loop runs unattended.
+  assert.ok(
+    retain.includes("candidate") && retain.includes("never auto-install"),
+    "must-retain list must keep the candidate-guard / no-auto-install framing",
+  );
+});
