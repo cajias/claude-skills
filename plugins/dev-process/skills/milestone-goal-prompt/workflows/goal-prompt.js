@@ -167,8 +167,9 @@ const CRITICS = [
       "Is the full Definition-of-Done gate present and unweakened (build, all " +
       "tests, zero lint, /code-review, /security-audit, /ponytail findings all " +
       "cleared)? Is EVERY open issue represented? Is the root-cause → " +
-      `harness-hardening loop preserved, including ${CLOSE_OUT}? Is the ` +
-      "agent/model policy clause intact?",
+      "harness-hardening loop preserved, together with its iteration close-out? " +
+      "Is the agent/model policy clause intact?\n\nThe close-out requirement, " +
+      `verbatim — the directive must carry all of it:\n${CLOSE_OUT}`,
   },
   {
     lens: "correctness",
