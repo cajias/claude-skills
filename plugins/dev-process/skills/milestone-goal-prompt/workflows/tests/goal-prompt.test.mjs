@@ -321,11 +321,18 @@ test("both prompt sites carry the automation-recommender close-out", async () =>
 
   for (const label of ["assemble:directive", "critic:completeness"]) {
     const prompt = promptFor(label);
+    // Each string pins a clause that can be weakened independently: the fully
+    // namespaced command (a bare skill name still passes under the wrong
+    // plugin), the unconditional trigger, the adopt-only restriction, the
+    // no-auto-install rule, the profiler framing, and the missing-skill path.
     for (const required of [
-      "claude-automation-recommender",
+      "/claude-code-setup:claude-automation-recommender",
+      "after the gate is green",
       "candidate guards",
+      "adopt only what guards",
       "Never auto-install",
       "read-only repo profiler",
+      "available-skills listing",
     ]) {
       assert.ok(
         prompt.includes(required),
