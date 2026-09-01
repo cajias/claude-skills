@@ -85,6 +85,9 @@ Work through these in order. Steps 1–5 are research; step 6 is synthesis; step
    - **All `/code-review` findings addressed.**
    - **All `/security-audit` findings addressed.**
    - **All `/ponytail:ponytail` findings addressed** (delete over-engineering; stdlib/native over new deps).
+   - **`/claude-code-setup:claude-automation-recommender` run as the iteration's closing act** — it
+     picks the cheapest durable guard for the root causes found this iteration (hook, subagent, skill,
+     MCP server). Each recommendation is either applied or deferred with a stated reason; record which.
 
    The same gate re-runs across the whole milestone at the end, and for the complete goal at
    large, before anything is declared done. These are DEFAULT criteria on top of each issue's

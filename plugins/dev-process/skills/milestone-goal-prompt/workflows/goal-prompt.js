@@ -153,7 +153,8 @@ const CRITICS = [
     ask:
       "Is the full Definition-of-Done gate present and unweakened (build, all " +
       "tests, zero lint, /code-review, /security-audit, /ponytail findings all " +
-      "cleared)? Is EVERY open issue represented? Is the root-cause → " +
+      "cleared, /claude-code-setup:claude-automation-recommender run to close the " +
+      "iteration)? Is EVERY open issue represented? Is the root-cause → " +
       "harness-hardening loop preserved? Is the agent/model policy clause intact?",
   },
   {
@@ -316,7 +317,9 @@ const assemblePrompt = (extra) =>
   "- a BDD given/when/then per issue, RED-first (test proven to fail for the right reason)\n" +
   "- the adversarial gap-check\n" +
   "- the per-iteration Definition-of-Done gate: builds, all tests pass, zero " +
-  "lint, /code-review + /security-audit + /ponytail:ponytail findings all cleared\n" +
+  "lint, /code-review + /security-audit + /ponytail:ponytail findings all cleared, " +
+  "and /claude-code-setup:claude-automation-recommender run as the closing act " +
+  "with each recommendation applied or deferred with a reason\n" +
   "- skip-if-blocked handling for blocked issues\n" +
   "- the root-cause → cheapest-durable-guard loop\n" +
   "- specialized-agent selection with model tier scaled to complexity, " +
