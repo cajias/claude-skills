@@ -26,6 +26,22 @@ extract_frontmatter() {
   awk 'NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} {print}' "$1"
 }
 
+# Length of the `description:` value in a frontmatter block read on stdin,
+# with continuation lines joined and whitespace collapsed. Prints 0 when there
+# is no description.
+# The stop pattern must accept a BARE key (`metadata:`, nothing after the
+# colon) as well as `key: value` — requiring a space after the colon let the
+# nested lines of a `metadata:` block be swallowed into the description, the
+# same over-capture class this file's extraction fix already addressed.
+description_length() {
+  awk '
+    /^description:/ { sub(/^description:[[:space:]]*/, ""); d = $0; ind = 1; next }
+    ind && /^[a-zA-Z0-9_-]+:([[:space:]]|$)/ { ind = 0 }
+    ind { d = d " " $0 }
+    END { gsub(/[[:space:]]+/, " ", d); gsub(/^ | $/, "", d); print length(d) }
+  '
+}
+
 # ─── 1. Plugin Structure ───────────────────────────────────────────
 
 section "Plugin Structure"
@@ -224,6 +240,66 @@ done
 pass "$valid_skills/$total_skills skills have SKILL.md"
 [[ $empty_dirs -gt 0 ]] && error "$empty_dirs empty skill directories"
 [[ $missing_frontmatter -gt 0 ]] && warn "$missing_frontmatter skills without YAML frontmatter"
+
+# ─── Skill Description Length ─────────────────────────────────────
+# Claude Code truncates each description in the skill listing at
+# skillListingMaxDescChars (default 1536). Past that, the trigger phrases the
+# tail carries stop reaching the model, so the skill silently stops firing.
+# Covers plugins/*/skills/ too — the section above only walks skills/.
+# (1024 is the stricter Agent Skills spec limit, relevant only if these are
+# ever consumed outside Claude Code; not enforced here.)
+
+section "Skill Description Length"
+
+DESC_CAP=1536
+over_cap=0
+worst_len=0
+worst_file=""
+
+while IFS= read -r skill_file; do
+  len=$(extract_frontmatter "$skill_file" | description_length)
+  [[ -z "$len" || "$len" -eq 0 ]] && continue
+  if [[ "$len" -gt "$DESC_CAP" ]]; then
+    over_cap=$((over_cap + 1))
+    if [[ "$len" -gt "$worst_len" ]]; then
+      worst_len="$len"
+      worst_file="${skill_file#"$REPO_ROOT"/}"
+    fi
+  fi
+done < <(find "$REPO_ROOT/plugins" "$REPO_ROOT/skills" -name SKILL.md \
+  -not -path '*/node_modules/*' -not -path '*/.venv/*' 2>/dev/null)
+
+if [[ $over_cap -gt 0 ]]; then
+  warn "$over_cap skill description(s) over the $DESC_CAP-char listing cap — worst: $worst_file ($worst_len). Their trigger phrases are truncated away."
+else
+  pass "all skill descriptions within the $DESC_CAP-char listing cap"
+fi
+
+# ─── Test Suite CI Coverage ───────────────────────────────────────
+# A node --test suite runs in CI only if some job pins its directory as a
+# working-directory. Suites outside those directories run in no automation at
+# all, so they can rot — or be deleted — without anything going red.
+
+section "Test Suite CI Coverage"
+
+CI_FILE="$REPO_ROOT/.github/workflows/ci.yml"
+uncovered=0
+
+if [[ ! -f "$CI_FILE" ]]; then
+  warn "no .github/workflows/ci.yml — cannot check test suite coverage"
+else
+  while IFS= read -r suite_dir; do
+    rel="${suite_dir#"$REPO_ROOT"/}"
+    if ! grep -q "working-directory: $rel\$" "$CI_FILE"; then
+      warn "$rel/tests runs in NO ci.yml job — add one or it is unguarded"
+      uncovered=$((uncovered + 1))
+    fi
+  done < <(find "$REPO_ROOT/plugins" -path '*/tests/*.test.mjs' \
+    -not -path '*/node_modules/*' -printf '%h\n' 2>/dev/null |
+    sed 's|/tests$||' | sort -u)
+
+  [[ $uncovered -eq 0 ]] && pass "every plugin .test.mjs suite has a ci.yml job"
+fi
 
 # ─── Summary ──────────────────────────────────────────────────────
 

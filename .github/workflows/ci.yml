@@ -186,6 +186,9 @@ jobs:
       - name: validate.sh frontmatter extraction
         run: bash scripts/test-validate.sh
 
+      - name: repo-invariant PreToolUse guard
+        run: bash scripts/test-guard-repo-invariants.sh
+
       - name: session-analysis scripts
         run: python3 -m pytest skills/claude-session-analysis/scripts/test_session_analysis.py -v
 
