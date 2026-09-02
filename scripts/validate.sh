@@ -269,8 +269,12 @@ while IFS= read -r skill_file; do
 done < <(find "$REPO_ROOT/plugins" "$REPO_ROOT/skills" -name SKILL.md \
   -not -path '*/node_modules/*' -not -path '*/.venv/*' 2>/dev/null)
 
+# An error, not a warning: the population is at zero, so any hit is a NEW
+# regression rather than inherited debt. Truncation silently drops the tail of
+# the description, which is where trigger phrases live, so the skill stops
+# firing with nothing else going red. Put explanation in the body, not here.
 if [[ $over_cap -gt 0 ]]; then
-  warn "$over_cap skill description(s) over the $DESC_CAP-char listing cap — worst: $worst_file ($worst_len). Their trigger phrases are truncated away."
+  error "$over_cap skill description(s) over the $DESC_CAP-char listing cap — worst: $worst_file ($worst_len). Truncation drops the trailing trigger phrases; move detail into the skill body."
 else
   pass "all skill descriptions within the $DESC_CAP-char listing cap"
 fi

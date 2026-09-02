@@ -2,33 +2,22 @@
 name: skill-creator-trigger-eval-gotchas
 version: 1.1.0
 description: |
-  Three chained gotchas when running the skill-creator plugin's trigger-eval
+  Six chained gotchas when running the skill-creator plugin's trigger-eval
   machinery (scripts/run_loop.py, scripts/run_eval.py) against a skill. Use
-  when: (1) the trigger eval reports 0% recall / "skill never triggers" even
-  on verbatim trigger phrases like the skill's own example phrasings —
-  if the skill under test is ALREADY INSTALLED in the project, the harness's
-  synthetic probe (registered as <name>-skill-<uuid> in .claude/commands/) is
-  shadowed by the real skill: Claude invokes the real name, the harness only
-  counts the uuid probe, recall reads 0%. Verify with one ground-truth
-  `claude -p "<trigger phrase>"` grepping the stream for the real skill name;
-  (2) `python -m scripts.run_loop` fails with ModuleNotFoundError: anthropic —
-  run via `uv run --with anthropic python -m scripts.run_loop`; (3) the loop
-  crashes at the improvement step with "Could not resolve authentication
-  method" — improve_description.py uses the Anthropic SDK directly and needs
-  ANTHROPIC_API_KEY, which subscription-authenticated Claude Code sessions
-  don't export; measurement-only (run_eval.py) still works without it;
-  (4) scores look wrong and you launched from the plugin's directory —
-  run_eval resolves the project root by walking UP FROM CWD to the first
-  .claude/ dir, so launching from ~/.claude/plugins/... roots the test at
-  $HOME, not your project. Launch with cwd = the project, PYTHONPATH = the
-  skill-creator directory; (5) 0% recall even though the skill was correctly
-  moved out of .claude/skills/ — SIBLING-probe shadowing: run_eval's default
-  --num-workers 10 makes each parallel worker write its own <name>-skill-<uuid>.md
-  probe into the same .claude/commands/, sessions invoke a sibling's uuid and
-  every worker's own-name check fails. Always pass --num-workers 1;
-  (6) harness recall looks low (e.g. ~50-60%) while ground-truth `claude -p`
-  checks trigger the real skill fine — uuid-probe semantic gap; treat harness
-  recall as a lower bound.
+  when: the trigger eval reports 0% recall or "skill never triggers" even on
+  verbatim trigger phrases; `python -m scripts.run_loop` fails with
+  `ModuleNotFoundError: anthropic`; the loop crashes at the improvement step
+  with "Could not resolve authentication method", or improve_description.py
+  wants an ANTHROPIC_API_KEY that a subscription-authenticated Claude Code
+  session never exports; scores
+  look wrong because you launched from the plugin's directory instead of the
+  project; 0% recall persists even after moving the skill out of
+  .claude/skills/; or harness recall reads low (~50-60%) while ground-truth
+  `claude -p` runs trigger the real skill fine. Causes and fixes covered:
+  probe shadowing by an already-installed skill, SIBLING-probe shadowing from
+  parallel --num-workers writing rival <name>-skill-<uuid> probes into
+  .claude/commands/, cwd-sensitive project-root resolution, and the uuid-probe
+  semantic gap that makes harness recall a lower bound.
 ---
 
 # skill-creator-trigger-eval-gotchas
