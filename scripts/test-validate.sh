@@ -123,6 +123,34 @@ for _ in $(seq 1 200); do
 done
 check "flakiness: 0 missing-name over 200 iterations" 0 "$flaky_fail"
 
+# ─── description_length(): same over-capture class, different helper ──
+# The listing-cap check is only meaningful if the measured length is the
+# description ALONE. A bare `metadata:` key (nothing after the colon) must end
+# the description, or its nested lines inflate the count and a compliant skill
+# gets warned about.
+eval "$(sed -n '/^description_length()/,/^}/p' "$VALIDATE")"
+check "description_length is loaded as a function" function "$(type -t description_length || true)"
+
+DESC_SIMPLE="$WORK/desc-simple.md"
+printf -- '---\nname: x\ndescription: abcde\n---\nbody\n' > "$DESC_SIMPLE"
+check "single-line description" 5 \
+  "$(extract_frontmatter "$DESC_SIMPLE" | description_length)"
+
+DESC_WRAPPED="$WORK/desc-wrapped.md"
+printf -- '---\nname: x\ndescription: one\n  two\n  three\nname2: y\n---\n' > "$DESC_WRAPPED"
+check "wrapped description joins continuation lines" 13 \
+  "$(extract_frontmatter "$DESC_WRAPPED" | description_length)"
+
+DESC_META="$WORK/desc-meta.md"
+printf -- '---\nname: x\ndescription: abcde\nmetadata:\n  author: A Very Long Author Name Here\n  version: 1.0.0\n---\n' > "$DESC_META"
+check "bare 'metadata:' key ends the description" 5 \
+  "$(extract_frontmatter "$DESC_META" | description_length)"
+
+DESC_NONE="$WORK/desc-none.md"
+printf -- '---\nname: x\n---\nbody\n' > "$DESC_NONE"
+check "no description yields 0" 0 \
+  "$(extract_frontmatter "$DESC_NONE" | description_length)"
+
 # ─── Summary ─────────────────────────────────────────────────────────
 echo
 echo "test-validate: $PASS passed, $FAIL failed"
