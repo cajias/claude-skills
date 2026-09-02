@@ -299,3 +299,83 @@ test("the workflow never reaches for forbidden sandbox APIs", async () => {
     assert.ok(!raw.includes(bad), `workflow must not use ${bad}`);
   }
 });
+
+// The close-out only survives compression because BOTH the must-retain list and
+// the completeness lens carry it. Assert the prompts the workflow actually sent
+// (the harness records every one) rather than scraping the source — a source
+// scan has to re-simulate string concatenation and fails open when a sentinel
+// moves. Both sites read from one CLOSE_OUT constant, so this also pins that.
+test("both prompt sites carry the automation-recommender close-out", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  const promptFor = (label) => {
+    const call = agentCalls.find((c) => c.opts && c.opts.label === label);
+    assert.ok(call, `no agent call labelled ${label}`);
+    return call.prompt;
+  };
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = promptFor(label);
+    // Each string pins a clause that can be weakened independently: the fully
+    // namespaced command (a bare skill name still passes under the wrong
+    // plugin), the unconditional trigger, the adopt-only restriction, the
+    // no-auto-install rule, the profiler framing, and the missing-skill path.
+    for (const required of [
+      "/claude-code-setup:claude-automation-recommender",
+      "after the gate is green",
+      "candidate guards",
+      "adopt only what guards",
+      "Never auto-install",
+      "read-only repo profiler",
+      "available-skills listing",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must carry "${required}"`,
+      );
+    }
+  }
+});
+
+// The gate enumerates commands the loop must run, so both sites have to name
+// the SAME resolvable ones. They drifted before: the lens asked about a bare
+// `/ponytail` while the gate required `/ponytail:ponytail`, so a directive
+// using either passed, and `/security-audit` named a command that resolves
+// nowhere — a gate row that can never go green.
+test("both prompt sites name the same resolvable gate commands", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = agentCalls.find((c) => c.opts && c.opts.label === label)
+      .prompt;
+    for (const required of [
+      "/code-review",
+      "/security-review",
+      "/ponytail:ponytail",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must name ${required}`,
+      );
+    }
+    // The retired name and the un-namespaced form must not come back.
+    assert.ok(
+      !prompt.includes("/security-audit"),
+      `${label} names /security-audit, which resolves to no skill`,
+    );
+    assert.ok(
+      !/\/ponytail(?!:)/.test(prompt),
+      `${label} uses a bare /ponytail; the gate requires /ponytail:ponytail`,
+    );
+  }
+});
