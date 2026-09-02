@@ -1,6 +1,6 @@
 ---
 name: milestone-goal-prompt
-description: Research a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — BDD scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build, tests, zero lint, /code-review, /security-audit, /ponytail:ponytail all cleared), specialized-agent selection, model tier scaled to complexity, and a root-cause→hardening loop closed out each iteration by /claude-code-setup:claude-automation-recommender. Use whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or wants a ready-to-paste block that completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for executing the work (it only GENERATES and PRINTS the prompt — the loop does it), NOT for summarizing or listing issues, and NOT for a one-off issue fix.
+description: Research a GitHub/GitLab milestone's open issues in order to PRINT a copy-paste autonomous-loop prompt that drives the milestone to completion — BDD scenarios, adversarial gap-checking, a per-iteration Definition-of-Done gate (build, tests, zero lint, /code-review, /security-review, /ponytail:ponytail all cleared), specialized-agent selection, model tier scaled to complexity, and a root-cause→hardening loop closed out each iteration by /claude-code-setup:claude-automation-recommender. Use whenever the user says "generate a goal prompt", "goal-driven prompt", "milestone loop prompt", "prompt to finish/complete the milestone", "clear-and-paste prompt for milestone N", "make me a prompt to drive /autoresearch", or wants a ready-to-paste block that completes a milestone's remaining issues. The deliverable is the prompt itself, not a summary. NOT for executing the work (it only GENERATES and PRINTS the prompt — the loop does it), NOT for summarizing or listing issues, and NOT for a one-off issue fix.
 ---
 
 # Milestone Goal Prompt
@@ -95,7 +95,7 @@ Work through these in order. Steps 1–5 are research; step 6 is synthesis; step
      `cargo xtask e2e`, and `npm test` where relevant.
    - **Zero lint:** `rtk cargo lint` (fmt-check + clippy `-D warnings`) clean; for TS, `tsc --noEmit` + `npm run lint` clean.
    - **All `/code-review` findings addressed.**
-   - **All `/security-audit` findings addressed.**
+   - **All `/security-review` findings addressed.**
    - **All `/ponytail:ponytail` findings addressed** (delete over-engineering; stdlib/native over new deps).
 
    The same gate re-runs across the whole milestone at the end, and for the complete goal at

@@ -341,3 +341,41 @@ test("both prompt sites carry the automation-recommender close-out", async () =>
     }
   }
 });
+
+// The gate enumerates commands the loop must run, so both sites have to name
+// the SAME resolvable ones. They drifted before: the lens asked about a bare
+// `/ponytail` while the gate required `/ponytail:ponytail`, so a directive
+// using either passed, and `/security-audit` named a command that resolves
+// nowhere — a gate row that can never go green.
+test("both prompt sites name the same resolvable gate commands", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = agentCalls.find((c) => c.opts && c.opts.label === label)
+      .prompt;
+    for (const required of [
+      "/code-review",
+      "/security-review",
+      "/ponytail:ponytail",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must name ${required}`,
+      );
+    }
+    // The retired name and the un-namespaced form must not come back.
+    assert.ok(
+      !prompt.includes("/security-audit"),
+      `${label} names /security-audit, which resolves to no skill`,
+    );
+    assert.ok(
+      !/\/ponytail(?!:)/.test(prompt),
+      `${label} uses a bare /ponytail; the gate requires /ponytail:ponytail`,
+    );
+  }
+});
