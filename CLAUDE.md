@@ -6,8 +6,9 @@ Claude Code plugin/skill marketplace. Editing here triggers automation — read 
 
 - `make validate` — structural checks: plugin structure, marketplace sync (plugin.json `version` must match
   marketplace.json), hook schema, agent frontmatter (`name`/`description`/`model`), skill completeness
-  (`SKILL.md` + `README.md`), skill-description length (warns over the 1536-char listing cap, past which
-  Claude Code truncates the description and its trigger phrases stop reaching the model), and that every
+  (`SKILL.md` + `README.md`), skill-description length (FAILS over the 1536-char listing cap, past which
+  Claude Code truncates the description and its trailing trigger phrases stop reaching the model — put
+  detail in the skill body, not the description), and that every
   `plugins/**/tests/*.test.mjs` suite is pinned by a `working-directory` in `ci.yml`. Runs at husky
   pre-commit; NOT in CI.
 - `make test-skills` — per-plugin structural eval via `scripts/test-skills.sh`; runs in neither CI nor

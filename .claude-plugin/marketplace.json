@@ -18,7 +18,7 @@
     {
       "name": "cc-authoring",
       "description": "Hard-won gotchas from authoring and distributing Claude Code plugins, skills, hooks, and Workflow scripts. Bundles APM packaging traps, plugin cache and marketplace path failures, hook main-vs-subagent detection, Workflow meta parsing breaks, and orchestration verification playbooks.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "tags": [
         "claude-code",
         "plugin-authoring",
