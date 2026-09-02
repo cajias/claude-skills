@@ -5,8 +5,11 @@ Claude Code plugin/skill marketplace. Editing here triggers automation — read 
 ## Commands
 
 - `make validate` — structural checks: plugin structure, marketplace sync (plugin.json `version` must match
-  marketplace.json), hook schema, agent frontmatter (`name`/`description`/`model`), and skill completeness
-  (`SKILL.md` + `README.md`). Runs at husky pre-commit; NOT in CI.
+  marketplace.json), hook schema, agent frontmatter (`name`/`description`/`model`), skill completeness
+  (`SKILL.md` + `README.md`), skill-description length (warns over the 1536-char listing cap, past which
+  Claude Code truncates the description and its trigger phrases stop reaching the model), and that every
+  `plugins/**/tests/*.test.mjs` suite is pinned by a `working-directory` in `ci.yml`. Runs at husky
+  pre-commit; NOT in CI.
 - `make test-skills` — per-plugin structural eval via `scripts/test-skills.sh`; runs in neither CI nor
   pre-commit. One plugin: `bash scripts/test-skills.sh <name>`.
 - `make install` — symlink every `plugins/*/` into `~/.claude/plugins/` (live symlinks; edits apply without reinstall).
@@ -36,6 +39,23 @@ A PostToolUse hook in `.claude/settings.json` runs `make lint-file FILE=<rel>` o
 whenever that plugin ships a `pyproject.toml` — currently `semantic-search` and `claudeception` (#46).
 A `.py` under a plugin with no `pyproject.toml` falls through untouched; lint-staged still formats the
 two `uv` plugins at commit.
+
+## Blocked actions (PreToolUse guard)
+
+A PreToolUse hook runs `scripts/guard-repo-invariants.sh` on every `Edit|Write|MultiEdit|Bash`
+and exits 2 on four things this file already forbade but nothing enforced. If one fires, fix the
+cause — do not work around the guard.
+
+| Blocked                                          | Why                                                                          |
+| ------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Edits under `plugins/rsi-loop/docs/experiments/` | frozen run evidence                                                          |
+| `git commit --no-verify` / `-n`                  | husky (`make validate` + lint-staged) is the only structural gate outside CI |
+| `pip install`, `black`                           | uv + ruff only                                                               |
+| Force-push to `main`/`master`                    | includes the bare `git push --force` case, resolved via `HEAD`               |
+
+Feature-branch force-pushes stay allowed — that is the normal rebase workflow.
+Behaviour is pinned by `scripts/test-guard-repo-invariants.sh`, which asserts the allow cases as
+carefully as the blocks — a guard with false positives is one people route around.
 
 ## Python
 
