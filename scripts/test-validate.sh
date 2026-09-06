@@ -151,6 +151,34 @@ printf -- '---\nname: x\n---\nbody\n' > "$DESC_NONE"
 check "no description yields 0" 0 \
   "$(extract_frontmatter "$DESC_NONE" | description_length)"
 
+# ─── Test Suite CI Coverage: runs against a fixture repo ─────────────
+# This check was unfailable: it used GNU find's `-printf`, which BSD/macOS find
+# rejects, and `2>/dev/null` hid the error — so the loop never ran and the check
+# always reported OK. Both directions are asserted here; a check that cannot go
+# red is as useless as one that cannot go green. REPO_ROOT is overridable in
+# validate.sh precisely so these two cases can point it at a fixture.
+FIX="$WORK/repo"
+mkdir -p "$FIX/plugins/demo/.claude-plugin" "$FIX/plugins/demo/tests" \
+  "$FIX/.claude-plugin" "$FIX/.github/workflows" "$FIX/skills"
+echo '{"name":"demo","description":"d","version":"1.0.0"}' > "$FIX/plugins/demo/.claude-plugin/plugin.json"
+echo '{"plugins":[]}' > "$FIX/.claude-plugin/marketplace.json"
+echo 'export default 1;' > "$FIX/plugins/demo/tests/foo.test.mjs"
+
+# (a) suite present, ci.yml does NOT pin its directory → must fail
+printf 'jobs:\n  demo:\n    steps:\n      - run: echo hi\n' > "$FIX/.github/workflows/ci.yml"
+out="$(REPO_ROOT="$FIX" bash "$VALIDATE" 2>&1)"; rc=$?
+check "unpinned suite: validate.sh exits 1" 1 "$rc"
+# Assert the ERROR: prefix, not just the path — a bare path match would also be
+# satisfied by the old `warn`, which did not fail the run.
+check "unpinned suite: reported as an ERROR" yes "$(has 'ERROR: plugins/demo/tests' "$out")"
+
+# (b) same fixture, directory pinned in ci.yml → must pass
+printf 'jobs:\n  demo:\n    steps:\n      - run: echo hi\n        working-directory: plugins/demo\n' \
+  > "$FIX/.github/workflows/ci.yml"
+out="$(REPO_ROOT="$FIX" bash "$VALIDATE" 2>&1)"; rc=$?
+check "pinned suite: validate.sh exits 0" 0 "$rc"
+check "pinned suite: coverage check passes" yes "$(has 'every plugin .test.mjs suite' "$out")"
+
 # ─── Summary ─────────────────────────────────────────────────────────
 echo
 echo "test-validate: $PASS passed, $FAIL failed"
