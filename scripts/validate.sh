@@ -5,7 +5,8 @@ set -euo pipefail
 # Checks structural correctness of plugins, agents, skills, and marketplace sync.
 # Run: npm run validate
 
-REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Overridable so tests can drive this validator against a fixture repo.
+REPO_ROOT="${REPO_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 ERRORS=0
 WARNINGS=0
 
@@ -292,15 +293,18 @@ uncovered=0
 if [[ ! -f "$CI_FILE" ]]; then
   warn "no .github/workflows/ci.yml — cannot check test suite coverage"
 else
+  # The find below carries no 2>/dev/null: `-printf` was a GNU-only extension
+  # that BSD/macOS find rejects outright, and the redirect swallowed the error
+  # so this check silently passed on every mac. Let an incompatibility be loud.
   while IFS= read -r suite_dir; do
     rel="${suite_dir#"$REPO_ROOT"/}"
     if ! grep -q "working-directory: $rel\$" "$CI_FILE"; then
-      warn "$rel/tests runs in NO ci.yml job — add one or it is unguarded"
+      error "$rel/tests runs in NO ci.yml job — add one or it is unguarded"
       uncovered=$((uncovered + 1))
     fi
   done < <(find "$REPO_ROOT/plugins" -path '*/tests/*.test.mjs' \
-    -not -path '*/node_modules/*' -printf '%h\n' 2>/dev/null |
-    sed 's|/tests$||' | sort -u)
+    -not -path '*/node_modules/*' |
+    sed 's|/tests/[^/]*$||' | sort -u)
 
   [[ $uncovered -eq 0 ]] && pass "every plugin .test.mjs suite has a ci.yml job"
 fi
