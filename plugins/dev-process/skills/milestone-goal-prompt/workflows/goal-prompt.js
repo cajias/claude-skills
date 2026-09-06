@@ -54,6 +54,9 @@ const GATE_COMMANDS =
 // The iteration close-out, stated ONCE. Both the must-retain list and the
 // completeness lens interpolate this, so the two sites cannot drift apart —
 // hand-copying it into each prompt is how they silently diverged before.
+// The memory clause is the destination the declined list never had: the
+// recommender's profile input barely changes, so without somewhere durable to
+// put "already declined, and why", every pass re-evaluates the same repeats.
 const CLOSE_OUT =
   "the iteration close-out: after the gate is green, run " +
   "/claude-code-setup:claude-automation-recommender — a read-only repo profiler, " +
@@ -63,7 +66,40 @@ const CLOSE_OUT =
   "unattended loop (a confirmation-prompting PreToolUse hook, an MCP server " +
   "needing a restart); propose those to the operator. If the skill is not in the " +
   "session's available-skills listing, say so loudly and continue — never " +
-  "silently skip the close-out";
+  "silently skip the close-out; then write the iteration's durable learnings to " +
+  "memory — the facts and project notes worth keeping, plus the recommendations " +
+  "you declined and why, so the next pass recognizes repeats instead of " +
+  "re-evaluating them; skip one-offs";
+// The milestone-level exit criterion, stated ONCE for the same reason as
+// GATE_COMMANDS and CLOSE_OUT: both the must-retain list and the completeness
+// lens interpolate it, so the two sites cannot drift. Per-issue tests going
+// green is a different claim from the milestone's own behavior being exercised,
+// and only the second one makes a milestone done (see the iterative-build-loop
+// skill, "Every milestone exits on a real test").
+const MILESTONE_EXIT_TEST =
+  "the milestone exit test: the ONE end-to-end behavior test this milestone " +
+  "unlocks, named concretely (file + case + the command that runs just it), " +
+  "which must EXIST, RUN and be GREEN before the milestone is called done — " +
+  "inherited green tests prove nothing about what this milestone unlocked, so " +
+  "every issue's test passing does not make the milestone done. If no such " +
+  "test exists, writing it RED-first is the loop's first act";
+// The /goal stop-gate, stated ONCE for the same reason as the three constants
+// above: both the must-retain list and the completeness lens interpolate it, so
+// neither site can be weakened alone. Without a /goal the milestone-exit-test
+// row is a criterion with no enforcement — an autonomous loop that CAN stop
+// early will, and the row never gets to block anything.
+const GOAL_STOP_GATE =
+  "the /goal stop-gate: the run is gated by a /goal whose condition is that " +
+  "this milestone's named exit behavior test runs green AND every issue has " +
+  "cleared the Definition-of-Done gate, and the directive states that same " +
+  "condition so the two cannot drift. Without it the exit-test row is merely " +
+  "advisory, and an autonomous loop that CAN stop early will. /goal is a " +
+  "harness built-in, and built-ins do not appear in the session's " +
+  "available-skills listing (the only one it can read), so its presence could not be " +
+  "confirmed in advance: always emit the /goal block, and tell the user it is " +
+  "a built-in whose presence could not be confirmed, so if their session " +
+  "rejects it they paste only the /clear and /autoresearch blocks — never " +
+  "silently drop it";
 // Hard cap on adversarial rounds. Two consecutive dry rounds stop earlier.
 const MAX_ROUNDS = config.maxRounds || 4;
 const DRY_STREAK_TO_STOP = 2;
@@ -104,7 +140,14 @@ const VERIFY_SCHEMA = {
   type: "object",
   required: ["command", "justification", "canFail"],
   properties: {
+    // `command` is the end-to-end runner — the loop's keep/discard signal.
+    // build/test/lint fill the gate's other capability rows; each is optional
+    // because a repo may genuinely have no command for one, and an absent
+    // capability must be reported as absent rather than invented.
     command: { type: "string" },
+    build: { type: "string" },
+    test: { type: "string" },
+    lint: { type: "string" },
     justification: { type: "string" },
     canFail: { type: "boolean" },
     rejected: { type: "array", items: { type: "string" } },
@@ -173,9 +216,15 @@ const CRITICS = [
     ask:
       "Is the full Definition-of-Done gate present and unweakened (build, all " +
       `tests, zero lint, ${GATE_COMMANDS})? Is EVERY open issue represented? ` +
-      "Is the root-cause → " +
+      "Are the build/test/lint rows THIS repo's real commands, derived from its " +
+      "own build files — flag any row naming a toolchain this repo does not " +
+      "use, or a capability faked instead of reported absent. Is the root-cause → " +
       "harness-hardening loop preserved, together with its iteration close-out? " +
-      "Is the agent/model policy clause intact?\n\nThe close-out requirement, " +
+      "Is the agent/model policy clause intact?\n\nThe milestone exit criterion, " +
+      `verbatim — the directive must carry it:\n${MILESTONE_EXIT_TEST}\n\n` +
+      "The stop-gate requirement, " +
+      `verbatim — the directive must carry it:\n${GOAL_STOP_GATE}\n\n` +
+      "The close-out requirement, " +
       `verbatim — the directive must carry all of it:\n${CLOSE_OUT}`,
   },
   {
@@ -218,15 +267,23 @@ const [survey, verify] = await parallel([
     ),
   () =>
     agent(
-      `In repo ${repo}, derive the HONEST verify command for this project — ` +
-        "the one an autonomous loop should use as its keep/discard signal.\n" +
-        "Inspect the repo: read CLAUDE.md, the Makefile, package.json scripts, " +
-        "CI config, and any xtask/test harness. Prefer the real end-to-end " +
-        "runner over a decorative wrapper.\n" +
+      `In repo ${repo}, derive this project's REAL commands for four ` +
+        "capabilities: end-to-end (`command` — the one an autonomous loop uses " +
+        "as its keep/discard signal), plus `build`, `test` and `lint`, which " +
+        "fill the Definition-of-Done gate's other rows.\n" +
+        "Detection order, first hit wins: Makefile/justfile targets, then " +
+        "package.json scripts, then the language manifest (Cargo.toml, " +
+        "pyproject.toml, go.mod, pom.xml, …), then the CI workflow — CI breaks " +
+        "ties, since it is what actually has to pass. Read CLAUDE.md for the " +
+        "wrapper this repo expects (a command prefix, a task runner, a " +
+        "container). Report ONLY commands this repo really has: return the " +
+        "empty string for a capability it lacks, never a plausible-looking " +
+        "command from another project's toolchain.\n" +
         "CRITICAL: reject any script that cannot fail (one that swallows " +
-        "errors, or exits 0 regardless of results). List what you rejected " +
-        "and why in `rejected`. Set canFail=true only if you confirmed the " +
-        "command propagates a nonzero exit on real failure.",
+        "errors, exits 0 regardless of results, or invokes the test binary " +
+        "without the flag or env that enables the behavior under test). List " +
+        "what you rejected and why in `rejected`. Set canFail=true only if you " +
+        "confirmed the command propagates a nonzero exit on real failure.",
       { label: "survey:verify-cmd", phase: "Survey", schema: VERIFY_SCHEMA },
     ),
 ]);
@@ -328,17 +385,44 @@ const issueBrief = analyses
   )
   .join("\n");
 
+// An absent capability is reported as absent. Filling the hole with a
+// plausible command is exactly how another project's toolchain leaks into a
+// gate row that can never go green here.
+// "the survey never answered" is a different state from "this repo has none",
+// so a dead survey agent must not report four absent capabilities.
+const capabilityRow = (label, cmd) =>
+  `  ${label}: ${
+    verify
+      ? cmd || "(none in this repo — say so in the directive; do not invent one)"
+      : "(unresolved — say so)"
+  }\n`;
+
 const assemblePrompt = (extra) =>
   `Synthesize the autonomous-loop directive for milestone ` +
   `"${survey.milestoneTitle}" in ${repo}.\n\n` +
   `ISSUES:\n${issueBrief}\n\n` +
   `VERIFY COMMAND: ${verify ? verify.command : "(unresolved — say so)"}\n` +
   (verify ? `  justification: ${verify.justification}\n` : "") +
+  "\nTHIS REPO'S COMMANDS — the gate's capability rows take these verbatim:\n" +
+  capabilityRow("build", verify && verify.build) +
+  capabilityRow("test", verify && verify.test) +
+  capabilityRow("lint", verify && verify.lint) +
+  capabilityRow("end-to-end", verify && verify.command) +
   `\nThe directive MUST retain, even under compression:\n` +
+  "- the dry-run first act: before implementing anything, run each derived " +
+  "build/test/lint/end-to-end command once to confirm it RESOLVES in this " +
+  "repo. Exit 0 is NOT the bar — the exit test is written RED-first, so a " +
+  "green dry run would mean it tests nothing. A command that errors, or that " +
+  "reports success without executing anything, is not a gate. Order the first " +
+  "acts: dry-run, then build any runner reported absent above, then write the " +
+  "exit test RED-first\n" +
+  `- ${GOAL_STOP_GATE}\n` +
   "- a BDD given/when/then per issue, RED-first (test proven to fail for the right reason)\n" +
   "- the adversarial gap-check\n" +
-  "- the per-iteration Definition-of-Done gate: builds, all tests pass, zero " +
+  "- the per-iteration Definition-of-Done gate, its build/test/lint/end-to-end " +
+  "rows filled from THIS REPO'S COMMANDS above: builds, all tests pass, zero " +
   `lint, ${GATE_COMMANDS}\n` +
+  `- ${MILESTONE_EXIT_TEST}\n` +
   "- skip-if-blocked handling for blocked issues\n" +
   "- the root-cause → cheapest-durable-guard loop\n" +
   `- ${CLOSE_OUT}\n` +

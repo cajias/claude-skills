@@ -379,3 +379,191 @@ test("both prompt sites name the same resolvable gate commands", async () => {
     );
   }
 });
+
+// The gate's build/test/lint rows must come from the target repo. This skill
+// was extracted from a Rust workspace, and those literals leaked into the
+// normative text once already — a `cargo` row in a Python repo is a gate row
+// that can never go green. Only the completeness lens can catch it, so pin the
+// prompt that asks, then prove the finding reaches the reviser.
+test("a gate row naming a foreign toolchain is flagged and revised", async () => {
+  const finding = {
+    summary: "DoD gate names cargo commands in a repo with no Cargo.toml",
+    severity: "blocking",
+    fix: "fill the build/test/lint rows from this repo's own build files",
+  };
+  const { result, error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router({
+      critics: (round, lens) =>
+        round === 1 && lens === "completeness"
+          ? { findings: [finding] }
+          : { findings: [] },
+    }),
+  });
+  assert.equal(error, null);
+  assert.equal(result.findingsApplied, 1);
+  assert.equal(result.directive, "D-revised");
+
+  const lens = agentCalls.find(
+    (c) => c.opts && c.opts.label === "critic:completeness",
+  ).prompt;
+  assert.match(
+    lens,
+    /THIS repo's real commands/,
+    "the completeness lens must ask whether the gate rows are this repo's",
+  );
+  const revise = agentCalls.find(
+    (c) => c.opts && c.opts.label === "revise:round-1",
+  ).prompt;
+  assert.ok(revise.includes(finding.summary) && revise.includes(finding.fix));
+});
+
+test("a directive missing the milestone exit-test row is flagged and revised", async () => {
+  const finding = {
+    summary: "no milestone exit behavior test named",
+    severity: "blocking",
+    fix: "name the end-to-end test this milestone unlocks and require it green",
+  };
+  const { result, error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router({
+      critics: (round, lens) =>
+        round === 1 && lens === "completeness"
+          ? { findings: [finding] }
+          : { findings: [] },
+    }),
+  });
+  assert.equal(error, null);
+  assert.equal(result.findingsApplied, 1);
+  assert.equal(result.directive, "D-revised");
+
+  const revise = agentCalls.find(
+    (c) => c.opts && c.opts.label === "revise:round-1",
+  ).prompt;
+  assert.ok(revise.includes(finding.summary) && revise.includes(finding.fix));
+});
+
+// The exit-test row is a criterion with no enforcement until a /goal blocks
+// stopping on it, so a printed sequence that omits the /goal block has to reach
+// the reviser like any other blocking gap.
+test("a printed output missing the /goal block is flagged and revised", async () => {
+  const finding = {
+    summary: "printed sequence has no /goal block, only /clear + /autoresearch",
+    severity: "blocking",
+    fix: "emit /goal between them, conditioned on the named exit test running green",
+  };
+  const { result, error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router({
+      critics: (round, lens) =>
+        round === 1 && lens === "completeness"
+          ? { findings: [finding] }
+          : { findings: [] },
+    }),
+  });
+  assert.equal(error, null);
+  assert.equal(result.findingsApplied, 1);
+  assert.equal(result.directive, "D-revised");
+
+  const revise = agentCalls.find(
+    (c) => c.opts && c.opts.label === "revise:round-1",
+  ).prompt;
+  assert.ok(revise.includes(finding.summary) && revise.includes(finding.fix));
+});
+
+// Same single-source guarantee as the close-out: the stop-gate lives in one
+// constant interpolated into both prompt sites, so neither can be weakened
+// alone. Its clauses are separately droppable, so pin each one.
+test("both prompt sites carry the /goal stop-gate", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = agentCalls.find((c) => c.opts && c.opts.label === label)
+      .prompt;
+    for (const required of [
+      "/goal stop-gate",
+      "exit behavior test runs green",
+      "advisory",
+      // /goal is a built-in, so no listing can confirm it — the doctrine is
+      // "emit it always, tell the user it was unconfirmable", not "pre-check".
+      "always emit the /goal block",
+      "could not be confirmed",
+      "never silently drop it",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must carry "${required}"`,
+      );
+    }
+  }
+});
+
+// Same single-source guarantee as the close-out above: the milestone exit
+// criterion lives in one constant and is interpolated into both prompt sites,
+// so neither can be weakened alone.
+test("both prompt sites carry the milestone exit-test requirement", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = agentCalls.find((c) => c.opts && c.opts.label === label)
+      .prompt;
+    // Each clause can be dropped independently: the exist/run/green triple,
+    // the reason inherited greens do not count, and the write-it-first path.
+    for (const required of [
+      "milestone exit test",
+      "EXIST, RUN and be GREEN",
+      "inherited green tests prove nothing",
+      "writing it RED-first is the loop's first act",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must carry "${required}"`,
+      );
+    }
+  }
+});
+
+// The declined list used to have no destination, so the recommender's
+// mostly-repeat output got re-evaluated from scratch every pass. Memory is that
+// destination, and it rides the same CLOSE_OUT constant — pin it separately so
+// the memory half cannot be dropped while the recommender half still passes.
+test("both prompt sites carry the memory-consolidation close-out", async () => {
+  const { error, agentCalls } = await runWorkflow({
+    scriptPath: SCRIPT,
+    args: baseArgs,
+    mockAgent: router(),
+  });
+  assert.equal(error, null);
+
+  for (const label of ["assemble:directive", "critic:completeness"]) {
+    const prompt = agentCalls.find((c) => c.opts && c.opts.label === label)
+      .prompt;
+    // Strings unique to the memory clause. "declined" alone would pass on the
+    // pre-existing "record the rest as declined", so pin the phrasing that
+    // only exists once memory is the destination.
+    for (const required of [
+      "durable learnings to memory",
+      "recommendations you declined and why",
+      "recognizes repeats",
+      "skip one-offs",
+    ]) {
+      assert.ok(
+        prompt.includes(required),
+        `${label} prompt must carry "${required}"`,
+      );
+    }
+  }
+});

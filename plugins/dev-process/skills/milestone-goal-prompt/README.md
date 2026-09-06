@@ -6,5 +6,6 @@ prompt", or a "prompt to finish the milestone". Encodes BDD scenarios, an advers
 per-iteration Definition-of-Done gate (build + tests + zero lint + `/code-review` +
 `/security-review` + `/ponytail:ponytail`),
 specialized-agent selection with model tier scaled to complexity, and a root-cause hardening loop
-closed out each iteration by a `/claude-code-setup:claude-automation-recommender` cross-check.
+closed out each iteration by a `/claude-code-setup:claude-automation-recommender` cross-check plus a
+write of the iteration's durable learnings — facts, project notes, and what was declined — to memory.
 The deliverable is the prompt itself — the skill never runs the loop.
