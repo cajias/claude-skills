@@ -36,6 +36,14 @@ invocation is also what authorizes the merge.
 Re-assessment is gated on the head SHA, so a cycle where nothing moved costs one
 API call per repo.
 
+## Bundled agents
+
+Five agents in [`agents/`](./agents/), one per loop step, each with its model
+tier pinned to the consequence of getting that step wrong: `pr-recon` (sonnet),
+`pr-thread-triage` (opus), `pr-ci-doctor` (sonnet), `pr-gate-auditor` (opus),
+`pr-gate-handoff` (haiku). SKILL.md's "Which agent runs which step" table is the
+dispatch map.
+
 ## Documentation
 
 [`skills/pr-shepherd/SKILL.md`](./skills/pr-shepherd/SKILL.md) — the full loop,

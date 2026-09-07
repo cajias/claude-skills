@@ -371,6 +371,26 @@ when a repaired branch reports "N commits ahead" after its PR was squash-merged.
 Force-push is `--force-with-lease`, **to PR branches only. Never to the default
 branch** (`main`, or whatever this repo uses). No exception.
 
+## Which agent runs which step
+
+This plugin ships purpose-built agents. **Dispatch these by name** — falling
+through to `general-purpose` runs a read-only status sweep and an adversarial
+security-gate judgment on the same tier, which is exactly the mistake the tiers
+exist to prevent.
+
+| Step                       | Agent                          | Tier   | Why that tier                                                  |
+| -------------------------- | ------------------------------ | ------ | -------------------------------------------------------------- |
+| 0–2, 5 (assess)            | `pr-shepherd:pr-recon`         | sonnet | Bounded retrieval; a wrong field is visible next cycle         |
+| 3 (judge findings)         | `pr-shepherd:pr-thread-triage` | opus   | Silently dismissing a real security finding is unrecoverable   |
+| 5 (red CI)                 | `pr-shepherd:pr-ci-doctor`     | sonnet | CI is itself the objective check on the fix                    |
+| 6 (gate verdict)           | `pr-shepherd:pr-gate-auditor`  | opus   | Often the only check before a merge; a missed trigger ships    |
+| 6 (execute a HELD verdict) | `pr-shepherd:pr-gate-handoff`  | haiku  | Three known commands and a read-back; no judgment left to make |
+
+Steps **4a/4b (post the reply, resolve the thread)**, **7 (merge)** and **8
+(sibling repair)** have no agent on purpose: they are the orchestrator's, one
+actor per PR, serialized. `pr-thread-triage` drafts the reply text; the
+orchestrator posts it and calls `resolveReviewThread`.
+
 ## Concurrency
 
 Breadth is the point. Check many PRs at once, and dispatch every PR's assessment
