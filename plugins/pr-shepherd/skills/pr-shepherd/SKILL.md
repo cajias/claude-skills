@@ -694,6 +694,21 @@ The rules, plainly:
 
 ## SHA-gating
 
+**An empty enumeration is suspicious, never authoritative.** `gh search prs` can
+fail with `read: connection reset by peer` and still **exit 0**, printing the
+error to stderr and nothing to stdout. Observed live: a cycle that trusted that
+exit code would have parsed no output as "no open PRs" and reported a drained,
+healthy queue while completely blind. "There is no work" and "the call asking
+failed" are indistinguishable by exit code here.
+
+So when enumeration returns zero PRs, do NOT record a clean sweep. Re-run it. If
+it is empty twice, fall back to per-repo `gh pr list` across the repos already
+known, and say plainly that coverage is partial — a per-repo fallback cannot see
+a new PR in a repo not on that list. Report the gap rather than a clean result
+you did not obtain. Same failure as judging a truncated diff, or reading an empty
+`open` array without its `totalCount`: an all-clear you did not verify is not an
+all-clear.
+
 Re-assess a PR in full only when something the cheap sweep can see changed. One
 read-only 14-PR sweep cost roughly 590K subagent tokens; at a 10-minute cadence,
 re-assessing unchanged PRs every cycle is unaffordable and almost entirely waste,
