@@ -389,6 +389,18 @@ One auditor verdict and one approver verdict **per head SHA**. Re-running either
 agent on the same SHA hoping for a different answer is the score-gaming this
 design exists to stop; a new verdict requires a new head SHA.
 
+**Every verdict states the SHA it read, and the head can move while you wait.**
+Adjudication takes minutes; a force-push takes seconds. If the two keys read
+different trees, you do not have two verdicts of one PR — you have one verdict
+each of two PRs, and concurrence between them means nothing. Both auditors are
+therefore told to re-read the live head rather than trust the SHA in their brief,
+and to name the SHA their verdict binds to. On return, compare: if the SHAs
+differ, or if either differs from the current head, discard both and re-run.
+This is not hypothetical — `obsidian-ee` PR 96 was force-pushed mid-adjudication,
+going from 21 files and CONFLICTING to 14 files and MERGEABLE. Both keys caught
+it and rebound; had only one caught it, a CLEAR could have been assembled from
+two readings of different code.
+
 **The orchestrator never overrides a HOLD on its own judgment.** Only the human
 removing the `needs-human-review` label releases a PR.
 
