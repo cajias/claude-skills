@@ -5,8 +5,13 @@ Drives open GitHub pull requests to merged, in any repo.
 One cycle per PR: request a Copilot review at the **current** head SHA (a review
 at an older SHA is stale), enumerate review threads through the GraphQL
 `reviewThreads` API, judge each finding, delegate valid fixes to `@copilot`,
-reply **and** `resolveReviewThread` on every thread, drive CI green, evaluate a
-human-review gate, merge, then repair the sibling PRs the merge just staled.
+reply **and** `resolveReviewThread` on every thread, drive CI green, run the
+two-key merge gate, merge, then repair the sibling PRs the merge just staled.
+
+**The two-key gate:** a HOLD is actionable from one auditor, but a CLEAR — the
+verdict that auto-merges — needs a second auditor that judged the same diff
+blind to the first verdict, and any disagreement resolves to HOLD. No agent that
+changed a PR may gate it.
 
 The load-bearing idea: a pushed fix does not close a review thread. A watcher
 that polls for new commits or new comment timestamps reports a PR as clean while
@@ -40,11 +45,12 @@ API call per repo.
 
 ## Bundled agents
 
-Five agents in [`agents/`](./agents/), one per loop step, each with its model
+Six agents in [`agents/`](./agents/), one per loop step, each with its model
 tier pinned to the consequence of getting that step wrong: `pr-recon` (sonnet),
 `pr-thread-triage` (opus), `pr-ci-doctor` (sonnet), `pr-gate-auditor` (opus),
-`pr-gate-handoff` (haiku). SKILL.md's "Which agent runs which step" table is the
-dispatch map.
+`pr-gate-approver` (opus, the blind second key), `pr-gate-handoff` (haiku).
+SKILL.md's "Which agent runs which step" table is the dispatch map, and it also
+marks which agents may never gate a PR they touched.
 
 ## Documentation
 

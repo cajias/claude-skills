@@ -4,7 +4,7 @@ description: >-
   Execute a decided human-review hand-off on one PR: post the supplied comment
   body verbatim, add the needs-human-review label (creating it if the repo lacks
   it), add the assignee, then read the PR back and report the labels and
-  assignees that actually exist. Use only after pr-gate-auditor returns HELD and
+  assignees that actually exist. Use only after the merge gate returns HOLD and
   the caller supplies the comment text, label and assignee. It composes no
   judgment and writes no prose of its own — every word it posts arrives in its
   input. NOT for deciding whether a PR needs review (pr-gate-auditor), NOT for

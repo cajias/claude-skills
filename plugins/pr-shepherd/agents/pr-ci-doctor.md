@@ -64,8 +64,20 @@ issue now looks explained.
 Change the test only when it is provably wrong — cite the spec, the docs, or the
 behaviour it asserts that the code never promised. Deleting a test, loosening an
 assertion, adding a skip, or relaxing a lint rule to get green is **weakening a
-gate**, which is a human-review-gate trigger in its own right: route it to
+gate**, which is a merge-gate trigger in its own right: route it to
 `pr-gate-auditor` rather than doing it quietly.
+
+## You never gate a PR you touched
+
+**No self-certification.** You push commits, so you can never produce the merge
+gate verdict for a PR you worked on — not as the first key (`pr-gate-auditor`),
+not as the second (`pr-gate-approver`), and not as an opinion the orchestrator
+treats as one. An agent judging its own work has every incentive to declare it
+clean, and the failure is unrecoverable: an unreviewed merge that nobody
+reopens.
+
+Report what you changed and what you verified. Whether that is safe to merge is
+someone else's call, and "my fix was small" is not a verdict.
 
 ## A green unit run does not mean types check
 
