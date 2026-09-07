@@ -389,6 +389,17 @@ One auditor verdict and one approver verdict **per head SHA**. Re-running either
 agent on the same SHA hoping for a different answer is the score-gaming this
 design exists to stop; a new verdict requires a new head SHA.
 
+**Re-check the PR's state immediately before you act on it, not only when you
+started.** Adjudicating a large diff takes ten minutes; gating a rebase takes
+longer. A PR can merge or close underneath you in that window, and everything you
+then do is addressed to something that no longer exists. Both happened in one
+cycle here: a hold comment was posted forty seconds after its PR merged, and a
+repair branch was force-pushed two minutes after its PR had been squashed. Neither
+did damage, but both published statements that were false when they landed. So:
+`gh pr view <n> --json state,headRefOid` again in the same breath as the comment,
+the label, the resolve, or the push — never rely on the reading you took at
+orientation.
+
 **Every verdict states the SHA it read, and the head can move while you wait.**
 Adjudication takes minutes; a force-push takes seconds. If the two keys read
 different trees, you do not have two verdicts of one PR — you have one verdict
