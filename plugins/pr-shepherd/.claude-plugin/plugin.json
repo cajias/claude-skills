@@ -1,0 +1,16 @@
+{
+  "name": "pr-shepherd",
+  "description": "Drive GitHub PRs to merged: request a Copilot review at the current head SHA, resolve every review thread with the reply+resolve double-step, delegate fixes to @copilot, gate risky diffs for a human, merge, and repair the siblings the merge just staled.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Raul Cajias"
+  },
+  "keywords": [
+    "github",
+    "pull-request",
+    "code-review",
+    "copilot",
+    "graphql",
+    "automation"
+  ]
+}
