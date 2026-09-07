@@ -89,10 +89,36 @@ operations and the loss shows up as a vanished commit, not as an error.
 Copilot review is **not** automatic unless a repository ruleset enables it, so
 this is real per-PR work every cycle, not a one-time setting.
 
-Read the head SHA. If no Copilot review exists at or after it, request one — MCP
-`request_copilot_review` is the confirmed path. The CLI form
-`gh pr edit <n> --add-reviewer copilot-pull-request-reviewer` is unverified;
-confirm the accepted login on first use before relying on it.
+Read the head SHA. If no Copilot review exists at or after it, you need one —
+but **be aware that every programmatic path to request one currently fails, two
+of them silently.** Measured, not assumed:
+
+| Attempt                                                                         | Result                                                 |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| MCP `request_copilot_review`                                                    | `404 Not Found`                                        |
+| `gh pr edit <n> --add-reviewer copilot-pull-request-reviewer`                   | `422 Reviews may only be requested from collaborators` |
+| `POST .../requested_reviewers` `reviewers[]=copilot-pull-request-reviewer[bot]` | **HTTP 200, no effect**                                |
+| `POST .../requested_reviewers` `reviewers[]=Copilot`                            | **HTTP 200, no effect**                                |
+
+In both 200 cases `requested_reviewers` came back `{"users":[],"teams":[]}` and
+`/reviews` stayed empty. **A 2xx here proves nothing** — always read the state
+back before recording a review as requested.
+
+The reviewer bot's real login is `Copilot` (id `175728472`, node
+`BOT_kgDOCnlnWA`). `copilot-pull-request-reviewer[bot]` is only how it renders as
+a review _author_; it is not an accepted reviewer login. Repos here do carry
+genuine Copilot reviews, so the capability exists on the account — those were
+almost certainly triggered from the web UI. Root cause of the API failure is
+unknown; do not guess at which permission or licence gates it.
+
+**The durable fix is a repository ruleset that enables automatic Copilot review**,
+which turns this step from per-PR work into a one-time setting. Creating one is a
+repo-wide change that can block merges if misconfigured, so propose it and let the
+operator decide — never create it mid-loop.
+
+Until a ruleset exists, this step degrades honestly: report that Copilot review is
+absent and cannot be requested programmatically, then carry on with the rest of
+the loop. Do not report a review as requested when it was not.
 
 **A review of an older SHA is a stale review — re-request it.** This is not
 defensive design. Copilot reviewed `notion-plugin-para-viz#48` at `0c0bbd0`
@@ -164,6 +190,11 @@ disposition rubric transfers as judgment; its `glab` plumbing does not.
 `@copilot` ask and wait for the 👀 reaction or a push. No response means the
 mention path does not work in this repo, and every finding routes to the fallback
 for the rest of the run. Discover that on thread one, not ten threads deep.
+
+**Use `gh api -f`, never `-F`, for the reply body.** `-F` treats a leading `@`
+as a file reference, so `-F body='@copilot ...'` makes gh try to open a file named
+`copilot ...` and die with `no such file or directory`. Every fix request starts
+with `@copilot`, so this fires on the very first one.
 
 Reply in-thread with `@copilot <specific ask>`, then monitor. This is not
 fire-and-forget: poll for the agent's push and re-verify the finding is actually
