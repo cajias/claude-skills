@@ -33,11 +33,14 @@ restart. Most repos carry only GitHub's nine default labels, so it usually does
 not exist yet; `gh pr edit --add-label` on a missing label errors:
 
 ```bash
-gh label create needs-human-review \
-  --description "Held by pr-shepherd for human review" --color B60205 \
-  2>/dev/null || true
+gh label create needs-human-review --force \
+  --description "Held by pr-shepherd for human review" --color B60205
 gh pr edit "$PR" --add-label needs-human-review; echo "exit=$?"
 ```
+
+`--force` creates or updates, so this is safe every cycle — and unlike the
+`2>/dev/null || true` it replaces, it still fails loudly when the token cannot
+write labels, instead of hiding that behind a label that never lands.
 
 **2. The assignee** — the PR author, so it lands in their assigned-to-me view:
 
@@ -59,11 +62,11 @@ gh pr comment "$PR" --body-file "$BODY_FILE"; echo "exit=$?"
 
 ## Read back — a 2xx proves nothing
 
-This is the whole reason you exist as a separate step. In the recon that
-motivated this loop, `POST .../requested_reviewers` returned **HTTP 200 with no
-effect**, twice.
-`requested_reviewers` came back `{"users":[],"teams":[]}` and `/reviews` stayed
-empty. An exit code of 0 is not evidence the edit landed.
+This is the whole reason you exist as a separate step. `--add-label` resolves the
+name against the repo's **existing** labels: without the `gh label create` above
+it fails with `'needs-human-review' not found`, and a hand-off reported done on a
+label that never landed is a PR the loop merges next cycle. An exit code of 0 on
+the other two commands is not evidence they landed either.
 
 ```bash
 gh pr view "$PR" --json labels,assignees,url \

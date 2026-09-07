@@ -14,12 +14,14 @@ it is still blocked.
 
 ## Requirements
 
-- `gh` authenticated (`gh auth status`) with `repo` scope — enough to merge and
-  to request reviews.
+- `gh` authenticated (`gh auth status`) with `repo` scope — enough to merge,
+  label, and request a Copilot review (`gh pr edit --add-reviewer Copilot`; the
+  request is asynchronous, so it is confirmed on a later cycle by reading
+  `/reviews`, never by reading `requested_reviewers` straight back).
 - GraphQL access through `gh api graphql`. `gh pr view --comments` does not
   expose thread resolution state; only GraphQL does.
-- Optional: the GitHub MCP server, for `request_copilot_review` and
-  `update_pull_request_branch`.
+- Optional: the GitHub MCP server, for `update_pull_request_branch`. Its
+  `request_copilot_review` returns `404 Not Found` — use the `gh` path above.
 
 ## Usage
 

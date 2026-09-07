@@ -130,7 +130,7 @@
     },
     {
       "name": "pr-shepherd",
-      "description": "Drive GitHub PRs to merged: request a Copilot review at the current head SHA, resolve every review thread with the reply+resolve double-step, delegate fixes to @copilot, gate risky diffs for a human, merge, and repair the siblings the merge just staled.",
+      "description": "Drive GitHub PRs to merged: request a Copilot review at the current head SHA and confirm it on a later cycle (the request is asynchronous), resolve every review thread with the reply+resolve double-step, delegate fixes to @copilot, gate risky diffs for a human, merge, and repair the siblings the merge just staled.",
       "version": "0.1.0",
       "tags": [
         "github",
