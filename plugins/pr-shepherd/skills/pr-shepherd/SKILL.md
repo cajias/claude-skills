@@ -412,6 +412,14 @@ going from 21 files and CONFLICTING to 14 files and MERGEABLE. Both keys caught
 it and rebound; had only one caught it, a CLEAR could have been assembled from
 two readings of different code.
 
+**A base change invalidates a verdict for the same reason a head move does.** A
+verdict is bound to a diff, and a diff is a function of both endpoints, not
+just the head. Retargeting a PR's base — or the base branch's own tip moving
+underneath an unchanged head — changes the diff a CLEAR was issued against as
+surely as a force-push does, while the SHA-compare above, watching only the
+head, stays silent. See the habit-ledger case under SHA-gating below: a base
+retarget grew a held PR's diff back open without its head SHA moving at all.
+
 **The orchestrator never overrides a HOLD on its own judgment.** Only the human
 removing the `needs-human-review` label releases a PR.
 
@@ -759,20 +767,42 @@ silently, so a repo's 31st PR reads exactly like a PR that does not exist. That
 is the same truncation class as the diffs in this skill's own origin story (see
 Non-negotiable) — an incomplete result wearing a complete result's shape.
 
-Two triggers for a full re-assessment, not one:
+Three triggers for a full re-assessment, not one:
 
-- the head SHA moved, or
+- the head SHA moved,
 - **`needs-human-review` disappeared from `labels`.** Removing that label is the
   documented release mechanism from §6, and it is not a SHA change. Without this
   trigger the owner releases a PR and the loop never picks it up again — the
   gate becomes one-way and every HELD PR is stranded.
+- **the base changed — `baseRefName` itself, or the base branch's own tip SHA.**
+  A diff is a function of both endpoints, not just the head: retargeting a PR's
+  base, or the base branch advancing underneath an unchanged head, changes the
+  effective diff while the head-SHA trigger stays silent. `gh pr list --json
+number,headRefOid,labels` does not return the base at all — the sweep must
+  also request `baseRefName` (already carried in the query above, for §7/§8)
+  and compare it, cycle over cycle, against the value the last verdict was
+  bound to.
+
+This happened for real, not hypothetically. In `cajias/habit-ledger`, PR 36
+squash-merged into PR 35's head branch (`m8/gates-fail-loud`), and GitHub
+auto-retargeted PR 37's base from `m8/watched-ceilings` onto it. PR 37's head
+SHA never moved — `c90591c` throughout — so neither of the first two triggers
+fired. But the squash had rewritten SHAs upstream, so PR 37's branch still
+carried PR 36's original commits as orphaned duplicates, and its effective
+diff silently grew from 3 files (+102/-40) to 10 files (+1178/-73) —
+re-including `.github/workflows/backup.yml` and `.github/workflows/migrate.yml`,
+the same files that had just been HELD on triggers 1 and 3 of §6b. PR 37 held
+a two-key CLEAR bound to the 3-file diff; carried forward unchanged, that
+CLEAR would have waved the held workflow changes through on the next cycle.
 
 Cache per PR, on disk so it survives a restart:
 
 - last-seen head SHA,
 - whether `needs-human-review` was present last cycle, so its removal is
   detectable at all,
-- `baseRefName`, which §7 and §8 need before a merge,
+- `baseRefName` and the base branch's last-seen tip SHA — §7 and §8 already
+  need `baseRefName` before a merge, and the re-assessment trigger above now
+  needs both compared every cycle, not read once and forgotten,
 - the timestamp of any outstanding `@copilot` ask or Copilot review request, so
   "asked two cycles ago, still nothing" is a fact rather than a guess — and
   §6c's unreviewed-at-head precondition has something to fire on,
@@ -781,12 +811,19 @@ Cache per PR, on disk so it survives a restart:
   approver dissented on can be re-run next cycle until it agrees, which is the
   gaming §6a forbids.
 
+**Cheap backstop: compare file count and diffstat, not only the three triggers
+above.** The habit-ledger case was caught by watching the base; a future case
+may move some fourth thing nobody has named yet. Before acting on any cached
+verdict, re-read the PR's file list and diffstat and compare them to what the
+verdict was bound to — a changed file count or diffstat is itself a
+re-assessment trigger, independent of which endpoint moved or why.
+
 One deliberate exception, because new review threads and CI results do arrive
-without either trigger firing: those two gate the _full_ re-assessment, and you
-still run the two cheap queries (threads, checks) on a PR with an
-outstanding **Copilot review request** or an outstanding **`@copilot` fix ask**.
-Those are the two states where the awaited event is not a push. Every other
-unchanged PR costs nothing beyond the per-repo `gh pr list`.
+without any of the three triggers firing: those three gate the _full_
+re-assessment, and you still run the two cheap queries (threads, checks) on a
+PR with an outstanding **Copilot review request** or an outstanding
+**`@copilot` fix ask**. Those are the two states where the awaited event is not
+a push. Every other unchanged PR costs nothing beyond the per-repo `gh pr list`.
 
 ## Non-negotiable
 
