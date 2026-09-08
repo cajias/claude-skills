@@ -106,12 +106,29 @@ Read the head SHA. If no Copilot review exists at or after it, request one — a
 then **do not try to verify that request in the same cycle.** Measured, not
 assumed:
 
-| Attempt                                                       | Result                                                 |
-| ------------------------------------------------------------- | ------------------------------------------------------ |
-| MCP `request_copilot_review`                                  | `404 Not Found`                                        |
-| `gh pr edit <n> --add-reviewer copilot-pull-request-reviewer` | `422 Reviews may only be requested from collaborators` |
-| `gh pr edit <n> --add-reviewer Copilot`                       | `ok edited` — **the working path**                     |
-| `POST .../requested_reviewers` `reviewers[]=Copilot`          | 2xx, then `requested_reviewers` reads empty            |
+| Attempt                                                       | Result                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| MCP `request_copilot_review`                                  | `404 Not Found`                                                                                                                |
+| `gh pr edit <n> --add-reviewer copilot-pull-request-reviewer` | `422 Reviews may only be requested from collaborators`, exit 0                                                                 |
+| `gh pr edit <n> --add-reviewer Copilot`                       | `ok edited`, exit 0 — registers no reviewer: `reviewRequests.totalCount: 0` via REST and GraphQL alike, no review ever arrives |
+| `POST .../requested_reviewers` `reviewers[]=Copilot`          | 2xx, then `requested_reviewers` reads empty                                                                                    |
+
+**`ok edited` is not confirmation.** Measured live on three PRs across two
+repos (`cajias/habit-ledger#33`, `#37`; `cajias/notion-plugin-para-viz#59`):
+`gh pr edit <n> --add-reviewer Copilot` returned `ok edited` and exited 0 every
+time, and registered nothing — REST `requested_reviewers` read zero users and
+zero teams, GraphQL `reviewRequests.totalCount` read `0`, and no review
+arrived on the following cycle. Root cause is not established; a plausible
+but unverified explanation is that Copilot code review needs enabling at the
+repo/org level and cannot be requested per-PR at all. Do not treat this row as
+a working path.
+
+**Read back `reviewRequests.totalCount` via GraphQL, never `requested_reviewers`
+alone.** REST cannot represent a `Bot` reviewer at all, so it has nothing to
+say about whether a bot request landed. If `totalCount` is `0`, no request
+exists — whatever `gh pr edit` printed or exited. (This is a different failure
+than the POST row below, whose own empty read-back does not mean failure —
+next paragraph.)
 
 **That empty read-back is not a failed request.** `notion-plugin-para-viz#50`
 acquired a `copilot-pull-request-reviewer` review minutes after those POSTs,
@@ -165,9 +182,11 @@ Two Copilot bots, three names between them. Never conflate them:
 Node `BOT_kgDOCnlnWA` resolves to `login: copilot-pull-request-reviewer,
 databaseId: 175728472`, and `Copilot` is a reviewer-side alias with no user
 record at all — both `gh api /users/Copilot` and `user(login:"Copilot")` return
-`404`. That is why `Copilot` looks like a typo right up until `--add-reviewer
-Copilot` returns `ok edited`; do not "correct" it to the author login, which is
-the one spelling that 422s.
+`404`. Do not "correct" `--add-reviewer Copilot` to the author login,
+`copilot-pull-request-reviewer` — that is the one spelling that 422s. But
+`ok edited` is not evidence the other spelling works either: measured live, it
+exits 0 and registers no reviewer at all (table above, verification rule
+above it). Both spellings fail; only their failure mode differs.
 
 `suggestedActors(capabilities:[CAN_BE_ASSIGNED])` returning `copilot-swe-agent`
 proves the coding agent can be _assigned_. It does not prove it answers an
@@ -486,6 +505,13 @@ anything outside the RELEASE list. Unreviewed code is what the gate is for, and
 holding it is what keeps §7's condition 1 reachable — without it a review that
 never arrives either blocks the PR forever or gets quietly waved through.
 
+**"Outstanding since an earlier cycle" requires a request that actually
+registered.** `ok edited` from `gh pr edit --add-reviewer Copilot` is not that
+(§1) — confirm with `reviewRequests.totalCount` via GraphQL before counting a
+cycle as "asked". If no request ever registered, there is no outstanding
+request, and this precondition does not hold: firing it anyway parks the PR on
+a human waiting for a bot that was never actually asked.
+
 ### 6d. CLEAR — approve and merge
 
 Two independent CLEARs at the same head SHA, with 1–4 freshly re-verified, are
@@ -744,6 +770,15 @@ a new PR in a repo not on that list. Report the gap rather than a clean result
 you did not obtain. Same failure as judging a truncated diff, or reading an empty
 `open` array without its `totalCount`: an all-clear you did not verify is not an
 all-clear.
+
+**The Copilot review-request commands lie about success too, in both
+directions.** `gh pr edit <n> --add-reviewer copilot-pull-request-reviewer`
+exits 0 while printing `422 Reviews may only be requested from
+collaborators` — a loud failure disguised as a clean exit. `gh pr edit <n>
+--add-reviewer Copilot` exits 0 too, but silently: no error, `ok edited`, and
+still no reviewer registered (§1). Same lesson as the sweep above — exit 0
+proves the process ended, not that it did what was asked. Verify with
+`reviewRequests.totalCount`, never the exit code.
 
 Re-assess a PR in full only when something the cheap sweep can see changed. One
 read-only 14-PR sweep cost roughly 590K subagent tokens; at a 10-minute cadence,
