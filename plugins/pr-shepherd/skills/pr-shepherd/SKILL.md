@@ -694,6 +694,19 @@ The rules, plainly:
 
 ## SHA-gating
 
+**Never chain the per-repo sweep with `;` — only the last exit code survives.**
+Running `gh pr list ... ; gh pr list ... ; gh pr list ...` reports the status of
+the third call alone. Observed live: the first repo's call died with
+`connection reset by peer`, the other two returned normally, and the whole thing
+exited **0**. A cycle reading that exit code would have reported "no change
+across all three repos" while holding no data whatever for the first — worse
+than an empty result, because part of the answer is real and lends the rest
+false credibility.
+
+Issue one call per repo and check each on its own, or collect the results and
+assert you got a row for every repo you asked about. A sweep that silently
+covers two of three repos is how a moved head goes unnoticed for a whole cycle.
+
 **An empty enumeration is suspicious, never authoritative.** `gh search prs` can
 fail with `read: connection reset by peer` and still **exit 0**, printing the
 error to stderr and nothing to stdout. Observed live: a cycle that trusted that
