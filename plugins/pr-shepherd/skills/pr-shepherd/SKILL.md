@@ -707,6 +707,21 @@ Issue one call per repo and check each on its own, or collect the results and
 assert you got a row for every repo you asked about. A sweep that silently
 covers two of three repos is how a moved head goes unnoticed for a whole cycle.
 
+**A SHRINKING enumeration is more dangerous than an empty one.** `gh search prs`
+reads a search index that lags and drops rows. Observed live: a cycle tracking
+eleven open PRs got back four — the other seven were still `OPEN`, confirmed
+immediately by per-repo `gh pr list`. Nothing errored, nothing was empty, and the
+four returned were real, current and internally consistent. The empty-result rule
+below does not fire on this, and a loop trusting it would have concluded seven
+PRs had closed and silently stopped tracking them — six of which were held with
+unresolved findings.
+
+So the PR set is never allowed to shrink on the strength of search alone. Keep
+the previous cycle's repo list; when a repo's PRs vanish from search output,
+confirm with `gh pr list --repo <owner/name> --state open` before recording any
+of them as gone. Per-repo listing is authoritative; search is a hint. A PR leaves
+the tracked set only when a direct read says `MERGED` or `CLOSED`.
+
 **An empty enumeration is suspicious, never authoritative.** `gh search prs` can
 fail with `read: connection reset by peer` and still **exit 0**, printing the
 error to stderr and nothing to stdout. Observed live: a cycle that trusted that
