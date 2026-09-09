@@ -19,10 +19,11 @@ it is still blocked.
 
 ## Requirements
 
-- `gh` authenticated (`gh auth status`) with `repo` scope — enough to merge,
-  label, and request a Copilot review (`gh pr edit --add-reviewer Copilot`; the
-  request is asynchronous, so it is confirmed on a later cycle by reading
-  `/reviews`, never by reading `requested_reviewers` straight back).
+- `gh` authenticated (`gh auth status`) with `repo` scope — enough to merge and
+  label. If Copilot review requests are enabled in the repo/org, request with
+  `gh pr edit --add-reviewer @copilot` (or `Copilot`) and confirm on a later
+  cycle by reading `/reviews` at the current head SHA, never by reading
+  `requested_reviewers` straight back.
 - GraphQL access through `gh api graphql`. `gh pr view --comments` does not
   expose thread resolution state; only GraphQL does.
 - Optional: the GitHub MCP server, for `update_pull_request_branch`. Its

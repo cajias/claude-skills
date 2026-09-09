@@ -265,11 +265,11 @@ addressed **in the diff**, not in the agent's summary of the diff.
 
 **Silence is not quota exhaustion.** Self-fixing is authorized only on an
 explicit exhaustion signal — Copilot itself saying so in-thread ("premium
-requests exhausted", a quota error), or an authoritative billing read
-(`GET /users/<login>/settings/billing/usage`, which needs the `user` token
-scope; without that scope there is no programmatic check and the in-thread
-message is the only signal). On silence the PR waits and is reported. A stall,
-however long, does not authorize taking over.
+requests exhausted", a quota error), or a confirmed quota/billing signal from a
+supported API/UI in your environment. If you do not have a confirmed
+programmatic signal, the in-thread message is the only signal. On silence the
+PR waits and is reported. A stall, however long, does not authorize taking
+over.
 
 ## 4b. Close every thread — reply, then resolve
 
