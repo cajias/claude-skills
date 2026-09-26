@@ -1,0 +1,75 @@
+name: Copilot Auto-Assign
+
+# Assigns the GitHub Copilot coding agent to any issue cajias opens, so it starts
+# working autonomously and opens a fix PR on its own.
+#
+# Prerequisites this workflow file cannot set up by itself:
+#   1. Copilot coding agent must be enabled for this repo: Settings > Copilot > Coding agent.
+#      cajias needs a Copilot seat (Pro+, Business, or Enterprise) with coding-agent access.
+#   2. Add a repo secret `COPILOT_ASSIGN_PAT`: a PAT belonging to cajias with `repo` scope
+#      (classic) or Issues: write + Pull requests: write (fine-grained). The default
+#      GITHUB_TOKEN can't be used here — Copilot assignment must be attributed to the
+#      licensed human account, not the github-actions bot, or the API call is rejected.
+#
+# Review + CI shepherding are intentionally not wired up here:
+#   - Turn on Settings > Code review > "Copilot code review" > automatically request a
+#     review on every pull request. That covers "have another Copilot review the PR"
+#     without guessing at the reviewer bot's exact login in a workflow.
+#   - The coding agent already watches its own open PRs and reacts to new CI failures
+#     and review comments on its own, so no extra "shepherd until green" step is needed.
+#     It stops and asks for input if it gets stuck; auto-merge is a separate opt-in
+#     (Settings > General > "Allow auto-merge", then enable it per PR) that isn't
+#     enabled here since merging without a human look is a bigger call than this
+#     workflow makes on its own.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  assign-copilot:
+    if: github.event.issue.user.login == 'cajias'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign Copilot coding agent to the issue
+        env:
+          GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::COPILOT_ASSIGN_PAT secret is not set. See the prerequisites in this workflow's header." >&2
+            exit 1
+          fi
+
+          actor_id=$(gh api graphql -f query='
+            query($owner: String!, $name: String!) {
+              repository(owner: $owner, name: $name) {
+                suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
+                  nodes {
+                    login
+                    ... on Bot { id }
+                    ... on User { id }
+                  }
+                }
+              }
+            }' -f owner="$REPO_OWNER" -f name="$REPO_NAME" \
+            --jq '.data.repository.suggestedActors.nodes[] | select(.login == "copilot-swe-agent") | .id')
+
+          if [ -z "$actor_id" ]; then
+            echo "::error::Copilot isn't assignable on this repo yet. Enable it under Settings > Copilot > Coding agent, and confirm the assigning account has a coding-agent-capable seat." >&2
+            exit 1
+          fi
+
+          issue_node_id=$(gh api "repos/$REPO_OWNER/$REPO_NAME/issues/$ISSUE_NUMBER" --jq '.node_id')
+
+          jq -n --arg assignable "$issue_node_id" --arg actor "$actor_id" '{
+            query: "mutation($assignableId: ID!, $actorIds: [ID!]!) { replaceActorsForAssignable(input: { assignableId: $assignableId, actorIds: $actorIds }) { assignable { ... on Issue { id } } } }",
+            variables: { assignableId: $assignable, actorIds: [$actor] }
+          }' | gh api graphql --input -
