@@ -1,13 +1,16 @@
 name: Copilot Auto-Assign
 
 # Assigns the GitHub Copilot coding agent to any issue cajias opens, so it starts
-# working autonomously and opens a fix PR on its own.
+# working autonomously and opens a fix PR on its own. This uses GitHub's plain
+# "add an assignee" REST endpoint rather than the older GraphQL
+# suggestedActors/replaceActorsForAssignable dance — GitHub now accepts the bot's
+# handle there directly, so there's no bespoke API-plumbing to maintain here.
 #
 # Prerequisites this workflow file cannot set up by itself:
 #   1. Copilot coding agent must be enabled for this repo: Settings > Copilot > Coding agent.
 #      cajias needs a Copilot seat (Pro+, Business, or Enterprise) with coding-agent access.
-#   2. Add a repo secret `COPILOT_ASSIGN_PAT`: a PAT belonging to cajias with `repo` scope
-#      (classic) or Issues: write + Pull requests: write (fine-grained). The default
+#   2. Add a repo secret `COPILOT_ASSIGN_PAT`: a fine-grained PAT belonging to cajias with
+#      read/write access to Actions, Contents, Issues, and Pull requests. The default
 #      GITHUB_TOKEN can't be used here — Copilot assignment must be attributed to the
 #      licensed human account, not the github-actions bot, or the API call is rejected.
 #
@@ -45,9 +48,6 @@ jobs:
       - name: Assign Copilot coding agent to the issue
         env:
           GH_TOKEN: ${{ secrets.COPILOT_ASSIGN_PAT }}
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.event.repository.name }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           set -euo pipefail
 
@@ -56,30 +56,6 @@ jobs:
             exit 1
           fi
 
-          actor_id=$(gh api graphql \
-            -H "GraphQL-Features: issues_copilot_assignment_api_support" \
-            -f query='
-            query($owner: String!, $name: String!) {
-              repository(owner: $owner, name: $name) {
-                suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
-                  nodes {
-                    login
-                    ... on Bot { id }
-                    ... on User { id }
-                  }
-                }
-              }
-            }' -f owner="$REPO_OWNER" -f name="$REPO_NAME" \
-            --jq '.data.repository.suggestedActors.nodes[] | select(.login == "copilot-swe-agent") | .id')
-
-          if [ -z "$actor_id" ]; then
-            echo "::error::Copilot isn't assignable on this repo yet. Enable it under Settings > Copilot > Coding agent, and confirm the assigning account has a coding-agent-capable seat." >&2
-            exit 1
-          fi
-
-          issue_node_id=$(gh api "repos/$REPO_OWNER/$REPO_NAME/issues/$ISSUE_NUMBER" --jq '.node_id')
-
-          jq -n --arg assignable "$issue_node_id" --arg actor "$actor_id" '{
-            query: "mutation($assignableId: ID!, $actorIds: [ID!]!) { replaceActorsForAssignable(input: { assignableId: $assignableId, actorIds: $actorIds }) { assignable { ... on Issue { id } } } }",
-            variables: { assignableId: $assignable, actorIds: [$actor] }
-          }' | gh api graphql -H "GraphQL-Features: issues_copilot_assignment_api_support" --input -
+          gh api --method POST \
+            "repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees" \
+            -f "assignees[]=copilot-swe-agent[bot]"
