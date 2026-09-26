@@ -14,13 +14,21 @@ name: Copilot Auto-Assign
 # Review + CI shepherding are intentionally not wired up here:
 #   - Turn on Settings > Code review > "Copilot code review" > automatically request a
 #     review on every pull request. That covers "have another Copilot review the PR"
-#     without guessing at the reviewer bot's exact login in a workflow.
+#     without guessing at the reviewer bot's exact login in a workflow. Note: this only
+#     triggers the *first* review on PR open — GitHub currently has no API to trigger a
+#     re-review after Copilot pushes new commits, so a human still clicks "re-request
+#     review" for follow-up passes.
 #   - The coding agent already watches its own open PRs and reacts to new CI failures
 #     and review comments on its own, so no extra "shepherd until green" step is needed.
 #     It stops and asks for input if it gets stuck; auto-merge is a separate opt-in
 #     (Settings > General > "Allow auto-merge", then enable it per PR) that isn't
 #     enabled here since merging without a human look is a bigger call than this
 #     workflow makes on its own.
+#   - By default GitHub Actions won't even run on Copilot's pushes: it's treated as a
+#     first-time outside contributor, so a human has to click "Approve and run
+#     workflows" on every new commit, which defeats "autonomous." Settings > Actions >
+#     General has a newer option ("skip approval for Copilot coding agent workflows")
+#     that removes this gate — turn it on if you want CI to actually run unattended.
 
 on:
   issues:
@@ -48,7 +56,9 @@ jobs:
             exit 1
           fi
 
-          actor_id=$(gh api graphql -f query='
+          actor_id=$(gh api graphql \
+            -H "GraphQL-Features: issues_copilot_assignment_api_support" \
+            -f query='
             query($owner: String!, $name: String!) {
               repository(owner: $owner, name: $name) {
                 suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
@@ -72,4 +82,4 @@ jobs:
           jq -n --arg assignable "$issue_node_id" --arg actor "$actor_id" '{
             query: "mutation($assignableId: ID!, $actorIds: [ID!]!) { replaceActorsForAssignable(input: { assignableId: $assignableId, actorIds: $actorIds }) { assignable { ... on Issue { id } } } }",
             variables: { assignableId: $assignable, actorIds: [$actor] }
-          }' | gh api graphql --input -
+          }' | gh api graphql -H "GraphQL-Features: issues_copilot_assignment_api_support" --input -
