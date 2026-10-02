@@ -117,6 +117,10 @@ The plugin catalog is declared in [`.claude-plugin/marketplace.json`](./.claude-
 
 The catalog is edited directly and validated by `scripts/validate.sh` (run via `make validate`), which checks plugin structure, that each entry's version matches the plugin's own `plugin.json`, and that every entry in `marketplace.json` resolves to a real `plugins/` directory. Plugin directories absent from `marketplace.json` are treated as intentionally unpublished.
 
+### Copilot auto-assign
+
+When `cajias` opens an issue in this repository, GitHub Actions can automatically assign it to the GitHub Copilot coding agent via `.github/workflows/copilot-auto-assign.yml`. This workflow requires the `COPILOT_ASSIGN_PAT` repository secret and the Copilot coding agent to be enabled for the repository.
+
 ## How it works
 
 ```text
